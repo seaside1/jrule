@@ -30,18 +30,18 @@ public class _ITEMNAME extends JRuleDimmerItem {
     }
     
     public static void sendCommand(JRuleOnOffValue command) {
-        JRuleSwitchItem.sendCommand(ITEM, command);
+        JRuleDimmerItem.sendCommand(ITEM, command);
     }
 
     public static void sendCommand(int value) {
-        JRuleSwitchItem.sendCommand(ITEM, value);
+        JRuleDimmerItem.sendCommand(ITEM, value);
     }
 
     public static void postUpdate(JRuleOnOffValue value) {
-        JRuleSwitchItem.postUpdate(ITEM, value);
+        JRuleDimmerItem.postUpdate(ITEM, value);
     }
     
-    protected static void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(ITEM, value);
+    public static void postUpdate(int value) {
+        JRuleDimmerItem.postUpdate(ITEM, value);
     }
 }

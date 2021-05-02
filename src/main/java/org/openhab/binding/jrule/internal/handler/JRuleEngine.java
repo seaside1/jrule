@@ -17,7 +17,9 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.openhab.binding.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.binding.jrule.items.JRuleItem;
 import org.openhab.binding.jrule.items.JRuleItemType;
 import org.openhab.binding.jrule.rules.JRule;
+import org.openhab.binding.jrule.rules.JRuleEvent;
 import org.openhab.binding.jrule.rules.JRuleName;
 import org.openhab.binding.jrule.rules.JRuleTrigger;
 import org.openhab.binding.jrule.rules.JRuleWhen;
@@ -96,6 +99,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 logger.warn("Rule ignored since JRuleName annotation is missing");
                 continue;
             }
+
             if (method.getAnnotationsByType(JRuleWhen.class).length == 0) {
                 // method.isAnnotationPresent(JRuleWhens.class)) {
                 logger.warn("Rule ignored since JWhens annotation is missing");
@@ -109,6 +113,9 @@ public class JRuleEngine implements PropertyChangeListener {
             // getAnnotationsByType(Foo.class).length != 0;
             final JRuleWhen[] jRuleWhens = method.getAnnotationsByType(JRuleWhen.class);
             logger.debug("Got jrule whens size: {}", jRuleWhens.length);
+            Parameter[] parameters = method.getParameters();
+            boolean jRuleEventPresent = Arrays.stream(parameters)
+                    .filter(param -> (param.getType().equals(JRuleEvent.class))).count() > 0;
             // Validate make sure name and when is there
             // Make sure when has item ref
             // Loop and find the other and ors
@@ -123,7 +130,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
 
                 addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
-                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method);
+                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent);
                 itemNames.add(jRuleWhen.item() + getTypeOfEventFromTrigger(jRuleWhen.trigger()));
                 // item -> (name, trigger, itemclass)
 
@@ -144,15 +151,15 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private void addExecutionContext(JRule jRule, String itemClass, String ruleName, String trigger, String from,
-            String to, String update, String itemName, Method method) {
+            String to, String update, String itemName, Method method, boolean eventParameterPresent) {
         List<JRuleExecutionContext> contextList = itemToExecutionContexts.get(itemName);
         if (contextList == null) {
             contextList = new ArrayList<>();
             itemToExecutionContexts.put(itemName, contextList);
         }
         logger.debug("++ContextList add: {} itemName: {}", ruleName, itemName);
-        contextList.add(
-                new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName, itemClass, itemName, method));
+        contextList.add(new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName, itemClass, itemName,
+                method, eventParameterPresent));
     }
 
     private String getTypeOfEventFromTrigger(String trigger) {
@@ -236,17 +243,19 @@ public class JRuleEngine implements PropertyChangeListener {
         }
         final String type = ((ItemEvent) event).getType();
         final Set<String> triggerValues = new HashSet<>(5);
+        String stringValue;
         if (event instanceof ItemStateEvent) {
-            final String stringValue = ((ItemStateEvent) event).getItemState().toFullString();
+            stringValue = ((ItemStateEvent) event).getItemState().toFullString();
             triggerValues.add("received update");
             triggerValues.add("received update " + stringValue);
         } else if (event instanceof ItemCommandEvent) {
-            final String stringValue = ((ItemCommandEvent) event).getItemCommand().toFullString();
+            stringValue = ((ItemCommandEvent) event).getItemCommand().toFullString();
             triggerValues.add("received command");
             triggerValues.add("received command " + stringValue);
         } else if (event instanceof ItemStateChangedEvent) {
             final String newValue = ((ItemStateChangedEvent) event).getItemState().toFullString();
             final String oldValue = ((ItemStateChangedEvent) event).getOldItemState().toFullString();
+            stringValue = newValue;
             logger.debug("StringValue: {} type: {}", newValue, type);
             logger.debug("++Invoked execution contexts: {}", exectionContexts.size());
             logger.debug("Execution topic Topic: {}", event.getTopic());
@@ -269,9 +278,8 @@ public class JRuleEngine implements PropertyChangeListener {
         if (triggerValues.size() > 0) {
             exectionContexts.stream().forEach(context -> logger.debug("+Context: {} contained: {}",
                     context.getTriggerFullString(), triggerValues.contains(context.getTriggerFullString())));
-
             exectionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
-                    .forEach(context -> invokeRule(context));
+                    .forEach(context -> invokeRule(context, new JRuleEvent(stringValue)));
         }
     }
 
@@ -283,13 +291,13 @@ public class JRuleEngine implements PropertyChangeListener {
         return null;
     }
 
-    private void invokeRule(JRuleExecutionContext context) {
+    private void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
         logger.debug("Invoking rule for context: {}", context);
         Class<?> itemClazz = context.getClass();
         JRule rule = context.getJrule();
         Method method = context.getMethod();
         try {
-            method.invoke(rule); // .getClass().getDeclaredConstructor().newInstance());
+            final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
         } catch (IllegalAccessException e) {
             logger.error("Error", e);
         } catch (IllegalArgumentException e) {

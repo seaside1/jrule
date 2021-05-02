@@ -29,7 +29,7 @@ public class JRuleNumberItem extends JRuleItem {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    protected static double getState(String name) {
+    protected static Double getState(String name) {
         return JRuleEventHandler.get().getStateFromItemAsDouble(name);
     }
 }

@@ -22,18 +22,19 @@ import org.openhab.binding.jrule.rules.JRule;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleExecutionContext {
-    private String trigger;
-    private String ruleName;
-    private String itemClass;
-    private String itemName;
-    private String from;
-    private String to;
-    private String update;
-    private JRule jRule;
-    private Method method;
+    private final String trigger;
+    private final String ruleName;
+    private final String itemClass;
+    private final String itemName;
+    private final String from;
+    private final String to;
+    private final String update;
+    private final JRule jRule;
+    private final Method method;
+    private final boolean eventParameterPresent;
 
     public JRuleExecutionContext(JRule jRule, String trigger, String from, String to, String update, String ruleName,
-            String itemClass, String itemName, Method method) {
+            String itemClass, String itemName, Method method, boolean eventParameterPresent) {
         this.jRule = jRule;
         this.trigger = trigger;
         this.from = from;
@@ -43,6 +44,7 @@ public class JRuleExecutionContext {
         this.itemClass = itemClass;
         this.itemName = itemName;
         this.method = method;
+        this.eventParameterPresent = eventParameterPresent;
     }
 
     @Override
@@ -76,60 +78,24 @@ public class JRuleExecutionContext {
         return itemClass;
     }
 
-    public void setItemClass(String itemClass) {
-        this.itemClass = itemClass;
-    }
-
     public String getItemName() {
         return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
     }
 
     public String getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
     public String getTo() {
         return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
     }
 
     public String getUpdate() {
         return update;
     }
 
-    public void setUpdate(String update) {
-        this.update = update;
-    }
-
     public JRule getjRule() {
         return jRule;
-    }
-
-    public void setjRule(JRule jRule) {
-        this.jRule = jRule;
-    }
-
-    public void setTrigger(String trigger) {
-        this.trigger = trigger;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
     }
 
     public String getRuleName() {
@@ -142,5 +108,9 @@ public class JRuleExecutionContext {
 
     public Method getMethod() {
         return method;
+    }
+
+    public boolean isEventParameterPresent() {
+        return eventParameterPresent;
     }
 }
