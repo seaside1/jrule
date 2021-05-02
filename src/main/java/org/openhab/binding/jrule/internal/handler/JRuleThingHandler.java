@@ -187,6 +187,7 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     @Override
     public void dispose() {
         super.dispose();
+        logger.debug("JRuleThingHandler dispose");
         JRuleEngine.get().reset();
         if (directoryWatcher != null) {
             directoryWatcher.removePropertyChangeListener(this);

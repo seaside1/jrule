@@ -173,26 +173,39 @@ public class JRuleEventHandler {
         this.itemRegistry = itemRegistry;
     }
 
-    public double getStateFromItemAsDouble(String name) {
+    public Double getStateFromItemAsDouble(String name) {
         State state = getStateFromItem(name); // item.getStateAs(DecimalType.class);
+        if (state == null) {
+            return null;
+        }
         DecimalType decimalType = state.as(DecimalType.class);// getStateFromItem(name);
         return decimalType.doubleValue();
     }
 
     public String getStringValue(String itemName) {
         State state = getStateFromItem(itemName);
+        if (state == null) {
+            return null;
+        }
         StringType stringType = state.as(StringType.class);
-        return stringType.toString();
+        logger.debug("Got state: {} {}", state, stringType);
+        return stringType == null ? null : stringType.toString();
     }
 
-    public int getStateFromItemAsInt(String itemName) {
+    public Integer getStateFromItemAsInt(String itemName) {
         State state = getStateFromItem(itemName);
+        if (state == null) {
+            return null;
+        }
         DecimalType decimalType = state.as(DecimalType.class);
         return decimalType.intValue();
     }
 
     public Date getStateFromItemAsDate(String itemName) {
         State state = getStateFromItem(itemName);
+        if (state == null) {
+            return null;
+        }
         DateTimeType dateTimeType = state.as(DateTimeType.class);
         return Date.from(ZonedDateTime.now().toInstant());
     }
