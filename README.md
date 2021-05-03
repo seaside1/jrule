@@ -32,7 +32,9 @@ Switch MyTestSwitch2  "Test Switch 2" (JRule)
 
 2. Create the following class
 
+```java
 package org.openhab.binding.jrule.rules.user;
+import static org.openhab.binding.jrule.rules.JRuleOnOffValue.ON;
 import org.openhab.binding.jrule.items.generated._MyTestSwitch;
 import org.openhab.binding.jrule.rules.JRule;
 import org.openhab.binding.jrule.rules.JRuleName;
@@ -50,29 +52,139 @@ public class MySwitchRule extends JRule {
         logger.debug("||||| --> Hello World!");
     }
 }
+```
 
 Make sure you add the Jar-files from /opt/jrule/jar as dependencies.
 
-Use Case Invoke another item Switch from rule
+Examples 
 
+Use Case: Invoke another item Switch from rule
+```java
     @JRuleName("MyRuleTurnSwich2On")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
         logger.debug("||||| --> Executing rule MyRule: changed to on");
-        _MySwitch2.sendCommand(JRuleOnOffValue.ON);
+        _MySwitch2.sendCommand(ON);
     }
+```
 
-Use case Invoke a Doorbell, but only allow the rule to be invoke once every 20 seconds:
+Use case: Invoke a Doorbell, but only allow the rule to be invoke once every 20 seconds:
+
+```java
     @JRuleName("MyLockTestRule1")
     @JRuleWhen(item = _MyTestSwitch2.ITEM, trigger = _MyTestSwitch2.TRIGGER_CHANGED_FROM_OFF_TO_ON)
     public void execLockTestRule() {
         if (getTimedLock("MyLockTestRule1", 20)) {
-            _MyDoorBellItem.sendCommand(JRuleOnOffValue.ON);
+            _MyDoorBellItem.sendCommand(ON);
             logger.debug("||||| --> Got Lock! Ding-dong !");
         } else {
             logger.debug("||||| --> Ignoring call to rule it is locked!");
         }
     }
-    
-    
-- Dynamic reloading of single rule http://tutorials.jenkov.com/java-reflection/dynamic-class-loading-reloading.html#dynamicreloading
+```
+Use case: Use the value that caused the trigger
+```java
+   @JRuleName("MyEventValueTest")
+   @JRuleWhen(item = __MyTestSwitch2.ITEM, trigger = __MyTestSwitch2.TRIGGER_RECEIVED_COMMAND)
+   public void myEventValueTest(JRuleEvent event) {
+	  logger.info("Got value from event: {}", event.getValue());
+   }
+```
+Use case: Or statement for rule trigger
+```java
+   @JRuleName("MyNumberRule1")
+   @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "14", to = "10")
+   @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "10", to = "12")
+   public void myOrRuleNumber(JRuleEvent event) {
+	logger.info("Got change number: {}", event.getValue());
+   }
+```
+
+Use case: Define your own functionality
+Create a Rules class that extends: JRuleUser.java
+JRuleUser.java should be placed in the same folder as your rules:
+
+```java
+package org.openhab.binding.jrule.rules.user;
+
+import org.openhab.binding.jrule.rules.JRule;
+
+public class JRuleUser extends JRule {
+
+	
+}
+```
+
+Your class rules can now extend the JRuleUser
+package org.openhab.binding.jrule.rules.user;
+```java
+import static org.openhab.binding.jrule.rules.JRuleOnOffValue.ON;
+import org.openhab.binding.jrule.items.generated._MyTestSwitch;
+import org.openhab.binding.jrule.rules.JRule;
+import org.openhab.binding.jrule.rules.JRuleName;
+import org.openhab.binding.jrule.rules.JRuleWhen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MySwitchRule extends JRule {
+
+    private final Logger logger = LoggerFactory.getLogger(MySwitchRule.class);
+}
+```
+
+Let's say we want to add a common function that should be available for all user rules.
+I want to add a function that checks if it is ok to send notifications debing on what time it is.
+I'll do this:
+
+```java
+package org.openhab.binding.jrule.rules.user;
+
+import org.openhab.binding.jrule.rules.JRule;
+
+public class JRuleUser extends JRule {
+
+	private static final int startDay = 8;
+	private static final int endDay = 21;
+	
+	
+	protected boolean timeIsOkforDisturbance() {
+		return nowHour() >= startDay && nowHour() <= endDay;
+	}
+	
+}
+```
+
+``
+I then extend the rule from my Java Rules file:
+
+```java
+package org.openhab.binding.jrule.rules.user;
+
+import org.openhab.binding.jrule.items.generated._MyTestSwitch;
+import org.openhab.binding.jrule.rules.JRuleEvent;
+import org.openhab.binding.jrule.rules.JRuleName;
+import org.openhab.binding.jrule.rules.JRuleWhen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MyTestUserRule extends JRuleUser {
+	private final Logger logger = LoggerFactory.getLogger(MyTestUserRule.class);
+
+	@JRuleName("TestUserDefinedRule")
+	@JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
+	public void mySendNotificationRUle(JRuleEvent event) {
+		if (timeIsOkforDisturbance()) {
+			logger.info("It's ok to send a distrubing notification");
+		}
+	}
+
+}
+```
+
+Use case: Create a timer
+
+Use case: create a lock
+
+Use case: Create or reschedule lock
+``
+`
