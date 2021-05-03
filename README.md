@@ -121,12 +121,13 @@ package org.openhab.binding.jrule.rules.user;
 import static org.openhab.binding.jrule.rules.JRuleOnOffValue.ON;
 import org.openhab.binding.jrule.items.generated._MyTestSwitch;
 import org.openhab.binding.jrule.rules.JRule;
+import org.openhab.binding.jrule.rules.user.JRuleUser;
 import org.openhab.binding.jrule.rules.JRuleName;
 import org.openhab.binding.jrule.rules.JRuleWhen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MySwitchRule extends JRule {
+public class MySwitchRule extends JRuleUser {
 
     private final Logger logger = LoggerFactory.getLogger(MySwitchRule.class);
 }
@@ -186,5 +187,6 @@ Use case: Create a timer
 Use case: create a lock
 
 Use case: Create or reschedule lock
+Use case: Using say command for tts
 ``
 `
