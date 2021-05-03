@@ -41,6 +41,7 @@ import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
+import org.openhab.core.voice.VoiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,9 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
     @NonNullByDefault({})
     private EventPublisher eventPublisher;
+
+    @NonNullByDefault({})
+    private VoiceManager voiceManager;
 
     private static final String PREFIX_DEBUG_LOG = "[{}] [{}] {}";
 
@@ -84,14 +88,17 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     private Thread rulesDirWatcherThread;
 
     public JRuleThingHandler(Thing thing, ItemRegistry itemRegistry, EventPublisher eventPublisher,
-            JRuleEventSubscriber eventSubscriber) {
+            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager) {
         super(thing);
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.eventPublisher = eventPublisher;
+        this.voiceManager = voiceManager;
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
+        JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
+        jRuleVoiceHandler.setVoiceManager(voiceManager);
         logger.debug("New instance JRuleThingHandler: {}", thing.getUID());
     }
 

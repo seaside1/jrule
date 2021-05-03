@@ -29,6 +29,7 @@ import javax.tools.ToolProvider;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.jrule.internal.JRuleConfig;
+import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +107,7 @@ public class JRuleCompiler {
     }
 
     public void compileIitemsInFolder(File itemsFolder) {
+        // TODO: Using config dir
         final String itemsClassPath = System.getProperty("java.class.path") + File.pathSeparator
                 + "/opt/jrule/jar/jrule.jar";
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
@@ -124,13 +126,18 @@ public class JRuleCompiler {
     }
 
     public void compileRulesInFolder(File rulesFolder) {
-        String rulesClassPath = System.getProperty("java.class.path") + File.pathSeparator
-                + "/opt/jrule/jar/jruleItems.jar" + File.pathSeparator + "/opt/jrule/jar/jrule.jar" + File.pathSeparator
-                + "/opt/jrule/jar/org.eclipse.jdt.annotation-2.2.100.jar" + File.pathSeparator
-                + "/opt/jrule/jar/slf4j-api-1.7.16.jar";
+        String rulesClassPath = //
+                System.getProperty("java.class.path") + File.pathSeparator //
+                        + "/opt/jrule/jar/jruleItems.jar" + File.pathSeparator //
+                        + "/opt/jrule/jar/jrule.jar" + File.pathSeparator //
+                        + "/opt/jrule/jar/org.eclipse.jdt.annotation-2.2.100.jar" + File.pathSeparator //
+                        + "/opt/jrule/jar/slf4j-api-1.7.16.jar" + File.pathSeparator;
         logger.debug("Compiling rules in folder: {}", rulesFolder.getAbsolutePath());
+        compileClass(new File(rulesFolder.getAbsolutePath() + File.separator + "JRuleUser.java"), rulesClassPath);
+        JRuleUtil.createJarFile("/opt/jrule/rules", "/opt/jrule/jar/user-rules.jar");
+        final String finalClassPath = rulesClassPath + File.separator + "/opt/jrule/jar/user-rules.jar";
         final File[] javaFiles = rulesFolder.listFiles(GeneratedFileNameFilter.JAVA_FILTER);
-        Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, rulesClassPath));
+        Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
     }
 
     private String removeExtension(@NonNull String name, String extention) {
@@ -143,6 +150,7 @@ public class JRuleCompiler {
     }
 
     public void compileRules() {
+        compileRulesInFolder(new File(jRuleConfig.getWorkingDirectory() + JRuleConfig.RULES_DIR));
         compileRulesInFolder(new File(jRuleConfig.getWorkingDirectory() + JRuleConfig.RULES_DIR));
     }
 

@@ -23,6 +23,7 @@ import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BaseThingHandlerFactory;
 import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerFactory;
+import org.openhab.core.voice.VoiceManager;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,13 +41,16 @@ public class JRuleThingHandlerFactory extends BaseThingHandlerFactory {
     private final ItemRegistry itemRegistry;
     private final JRuleEventSubscriber eventSubscriber;
     private final EventPublisher eventPublisher;
+    private final VoiceManager voiceManager;
 
     @Activate
     public JRuleThingHandlerFactory(final @Reference JRuleEventSubscriber eventSubscriber,
-            final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher) {
+            final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
+            final @Reference VoiceManager voiceManager) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.eventPublisher = eventPublisher;
+        this.voiceManager = voiceManager;
     }
 
     @Override
@@ -58,7 +62,7 @@ public class JRuleThingHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
         if (JRuleThingHandler.supportsThingType(thingTypeUID)) {
-            return new JRuleThingHandler(thing, itemRegistry, eventPublisher, eventSubscriber);
+            return new JRuleThingHandler(thing, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
         }
         return null;
     }
