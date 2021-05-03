@@ -255,7 +255,6 @@ public class JRuleUtil {
             JarOutputStream target = new JarOutputStream(new FileOutputStream(targetFile), manifest);
             File inputDir = new File(inputDirectory);
             for (File nestedFile : inputDir.listFiles()) {
-
                 add("", nestedFile, target);
             }
             target.close();

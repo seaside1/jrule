@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 
 import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.openhab.binding.jrule.internal.handler.JRuleEngine;
+import org.openhab.binding.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.core.common.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,17 +49,44 @@ public abstract class JRule {
         JRuleEngine.get().add(this);
     }
 
-    protected CompletableFuture<Void> createTimer(String ruleName, int timeInSeconds, Consumer<Void> fn) {
+    protected synchronized boolean isTimerRunning(String ruleName) {
+        final CompletableFuture<Void> completableFuture = ruleNameToCompletableFuture.get(ruleName);
+        return completableFuture == null ? false : completableFuture.isDone();
+    }
+
+    protected synchronized CompletableFuture<Void> createOrRescheduleTimer(String ruleName, int timeInSeconds,
+            Consumer<Void> fn) {
+        if (ruleNameToCompletableFuture.get(ruleName) != null) {
+            logger.debug("Future already running for ruleName: {}", ruleName);
+            CompletableFuture<Void> completableFuture = ruleNameToCompletableFuture.get(ruleName);
+            boolean cancelled = completableFuture.cancel(false);
+            ruleNameToCompletableFuture.remove(completableFuture);
+            logger.debug("Rescheduling existing timer by removing old timer: {}", cancelled);
+        }
+        return createTimer(ruleName, timeInSeconds, fn);
+    }
+
+    protected synchronized CompletableFuture<Void> createTimer(String ruleName, int timeInSeconds, Consumer<Void> fn) {
         if (ruleNameToCompletableFuture.get(ruleName) != null) {
             logger.debug("Future already running for ruleName: {}", ruleName);
             return ruleNameToCompletableFuture.get(ruleName);
         }
         Executor delayedExecutor = CompletableFuture.delayedExecutor(timeInSeconds, TimeUnit.SECONDS, scheduler);
         CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
+        ruleNameToCompletableFuture.put(ruleName, future);
+        logger.debug("Start timer for rule: {}, timeSeconds: {}", ruleName, timeInSeconds);
         return future.thenAccept(fn).thenAccept(s -> {
             logger.debug("Removing future for rule: {}", ruleName);
             ruleNameToCompletableFuture.remove(ruleName);
         });
+    }
+
+    protected void say(String text) {
+        JRuleVoiceHandler.get().say(text);
+    }
+
+    protected void say(String text, String voiceId, String sinkId) {
+        JRuleVoiceHandler.get().say(text, voiceId, sinkId);
     }
 
     protected boolean getTimedLock(String ruleName, int seconds) {
