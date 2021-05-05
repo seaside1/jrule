@@ -78,7 +78,7 @@ public class JRuleCompiler {
 
                     }
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                    logger.error("COuld not find class", e);
+                    logger.error("Could not find class", e);
                 }
             });
             // Class<?> loadedClass = classLoader.loadClass("org.openhab.binding.jrule.items.generated." + _MotionUl");
