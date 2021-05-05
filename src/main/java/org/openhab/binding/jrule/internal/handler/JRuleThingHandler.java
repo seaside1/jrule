@@ -38,6 +38,8 @@ import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
@@ -110,8 +112,7 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
                     new File(config.getWorkingDirectory() + JRuleConfig.RULES_DIR_START).toURI().toURL() };
 
             ClassLoader loader = new URLClassLoader(urls, JRuleUtil.class.getClassLoader());
-            compiler.loadClasses(loader, new File(config.getWorkingDirectory() + JRuleConfig.RULES_DIR),
-                    JRuleConfig.RULES_PACKAGE, true);
+            compiler.loadClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
 
         } catch (MalformedURLException e) {
             logger.debug("Failed to create instance", e);
@@ -121,11 +122,6 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     private void compileUserRules() {
         logger.debug("Compile User Rules");
         compiler.compileRules();
-    }
-
-    private void compileItemSources() {
-        logger.debug("Compile class");
-        compiler.compileItems();
     }
 
     private void loadRules() {
@@ -146,17 +142,51 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         // new MyRule();
     }
 
+    private boolean initializeFolder(String folder) {
+        File fileFolder = new File(folder);
+        if (!fileFolder.exists()) {
+            fileFolder.mkdirs();
+        }
+        if (!fileFolder.canRead() || !fileFolder.canWrite()) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.HANDLER_INITIALIZING_ERROR,
+                    "Folder can not read or write: " + folder);
+            logger.error("JarFolder can not read or write: {}", folder);
+            return false;
+        }
+        return true;
+    }
+
     @SuppressWarnings("null")
     @Override
     public final void initialize() {
+        updateStatus(ThingStatus.UNKNOWN);
         config = getConfigAs(JRuleConfig.class);
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
         logger.debug("SettingConfig name: {} config: {}", config.getClass(), config.toString());
+
+        if (!initializeFolder(config.getWorkingDirectory())) {
+            return;
+        }
+        if (!initializeFolder(config.getJarDirectory())) {
+            return;
+        }
+        if (!initializeFolder(config.getItemsDirectory())) {
+            return;
+        }
+        if (!initializeFolder(config.getRulesDirectory())) {
+            return;
+        }
+
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Writing jars");
         writeExternalJars();
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Generating items");
         generateItemSources();
-        compileItemSources();
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Compiling items");
+        compiler.compileItems();
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Creating items jar");
         createItemsJar();
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Compiling rules");
         compileUserRules();
         createRuleInstances();
         startDirectoryWatcher();
@@ -174,20 +204,24 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     }
 
     private void createItemsJar() {
-        JRuleUtil.createJarFile(config.getWorkingDirectory() + File.separator + "gen",
-                config.getWorkingDirectory() + File.separator + "jar" + File.separator + "jruleItems.jar");
+        JRuleUtil.createJarFile(config.getItemsRootDirectory(),
+                compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
     }
 
     private void writeExternalJars() {
-        writeJar("jrule.jar");
-        writeJar("slf4j-api-1.7.16.jar");
-        writeJar("org.eclipse.jdt.annotation-2.2.100.jar");
+        writeJar(JRuleCompiler.JAR_JRULE_NAME);
+        writeJar(JRuleCompiler.JAR_SLF4J_API_NAME);
+        writeJar(JRuleCompiler.JAR_ECLIPSE_ANNOTATIONS_NAME);
     }
 
     private void writeJar(String name) {
         URL jarUrl = JRuleUtil.getResourceUrl("lib/" + name);
         final byte[] jarBytes = JRuleUtil.getResourceAsBytes(jarUrl);
         JRuleUtil.writeFile(jarBytes, config.getWorkingDirectory() + File.separator + "jar/" + name);
+    }
+
+    private File getJarFolder(String name) {
+        return new File(config.getJarDirectory() + File.separator + name);
     }
 
     @SuppressWarnings("null")

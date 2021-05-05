@@ -24,10 +24,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public class JRuleConfig {
+    private static final String JAR_DIR = "jar";
     public static final String ITEMS_PACKAGE = "org.openhab.binding.jrule.items.generated.";
     public static final String RULES_PACKAGE = "org.openhab.binding.jrule.rules.user.";
 
-    public static final String ITEMS_DIR_START = "gen";
+    public static final String ITEMS_DIR_START = "items";
 
     public static final String ITEMS_DIR = ITEMS_DIR_START + File.separator + "org" + File.separator + "openhab"
             + File.separator + "binding" + File.separator + "jrule" + File.separator + "items" + File.separator
@@ -42,6 +43,26 @@ public class JRuleConfig {
 
     public String getWorkingDirectory() {
         return workingDirectory;
+    }
+
+    public String getItemsDirectory() {
+        return new StringBuilder().append(workingDirectory).append(File.separator).append(ITEMS_DIR).toString();
+    }
+
+    public String getJarDirectory() {
+        return new StringBuilder().append(workingDirectory).append(File.separator).append(JAR_DIR).toString();
+    }
+
+    public String getRulesDirectory() {
+        return new StringBuilder().append(workingDirectory).append(File.separator).append(RULES_DIR).toString();
+    }
+
+    public String getItemsRootDirectory() {
+        return new StringBuilder().append(workingDirectory).append(File.separator).append(ITEMS_DIR_START).toString();
+    }
+
+    public String getRulesRootDirectory() {
+        return new StringBuilder().append(workingDirectory).append(File.separator).append(RULES_DIR_START).toString();
     }
 
     public void setWorkingDirectory(String workingDirectory) {

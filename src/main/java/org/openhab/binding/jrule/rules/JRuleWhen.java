@@ -27,6 +27,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
 public @interface JRuleWhen {
+    int hours() default -1;
+
+    int minutes() default -1;
+
+    int seconds() default -1;
+
     String item() default "";
 
     String trigger() default "";

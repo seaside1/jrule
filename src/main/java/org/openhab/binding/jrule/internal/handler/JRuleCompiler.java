@@ -40,6 +40,13 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleCompiler {
 
+    private static final String JRULE_USER_JAVA = "JRuleUser.java";
+    private static final String JAR_USER_RULES = "user-rules.jar";
+    public static final String JAR_JRULE_NAME = "jrule.jar";
+    public static final String JAR_JRULE_ITEMS_NAME = "jruleItems.jar";
+    public static final String JAR_ECLIPSE_ANNOTATIONS_NAME = "org.eclipse.jdt.annotation-2.2.100.jar";
+    public static final String JAR_SLF4J_API_NAME = "slf4j-api-1.7.16.jar";
+
     private final Logger logger = LoggerFactory.getLogger(JRuleCompiler.class);
 
     private final JRuleConfig jRuleConfig;
@@ -51,7 +58,13 @@ public class JRuleCompiler {
     public void loadClasses(ClassLoader classLoader, File classFolder, String classPackage, boolean createInstance) {
         try {
             final File[] classItems = classFolder.listFiles(GeneratedFileNameFilter.CLASS_FILTER);
-            logger.debug("Number of classes to load: {} folder: {}", classItems.length, classFolder.getAbsolutePath());
+            if (classItems == null || classItems.length == 0) {
+                logger.info("Found no user defined java rules to load into memory in folder: {}",
+                        classFolder.getAbsolutePath());
+                return;
+            }
+            logger.info("Number of Java Rules classes to load in to memory: {} folder: {}", classItems.length,
+                    classFolder.getAbsolutePath());
             Arrays.stream(classItems).forEach(classItem -> logger.debug("Attempting to load class: {}", classItem));
 
             Arrays.stream(classItems).forEach(classItem -> {
@@ -109,7 +122,7 @@ public class JRuleCompiler {
     public void compileIitemsInFolder(File itemsFolder) {
         // TODO: Using config dir
         final String itemsClassPath = System.getProperty("java.class.path") + File.pathSeparator
-                + "/opt/jrule/jar/jrule.jar";
+                + getJarPath(JAR_JRULE_NAME);
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
         final File[] javaItems = itemsFolder.listFiles(GeneratedFileNameFilter.JAVA_FILTER);
         final File[] classItems = itemsFolder.listFiles(GeneratedFileNameFilter.CLASS_FILTER);
@@ -125,19 +138,9 @@ public class JRuleCompiler {
         classNames.clear();
     }
 
-    public void compileRulesInFolder(File rulesFolder) {
-        String rulesClassPath = //
-                System.getProperty("java.class.path") + File.pathSeparator //
-                        + "/opt/jrule/jar/jruleItems.jar" + File.pathSeparator //
-                        + "/opt/jrule/jar/jrule.jar" + File.pathSeparator //
-                        + "/opt/jrule/jar/org.eclipse.jdt.annotation-2.2.100.jar" + File.pathSeparator //
-                        + "/opt/jrule/jar/slf4j-api-1.7.16.jar" + File.pathSeparator;
-        logger.debug("Compiling rules in folder: {}", rulesFolder.getAbsolutePath());
-        compileClass(new File(rulesFolder.getAbsolutePath() + File.separator + "JRuleUser.java"), rulesClassPath);
-        JRuleUtil.createJarFile("/opt/jrule/rules", "/opt/jrule/jar/user-rules.jar");
-        final String finalClassPath = rulesClassPath + File.separator + "/opt/jrule/jar/user-rules.jar";
-        final File[] javaFiles = rulesFolder.listFiles(GeneratedFileNameFilter.JAVA_FILTER);
-        Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
+    public String getJarPath(String jarName) {
+        return new StringBuilder().append(jRuleConfig.getJarDirectory()).append(File.separator).append(jarName)
+                .toString();
     }
 
     private String removeExtension(@NonNull String name, String extention) {
@@ -145,13 +148,35 @@ public class JRuleCompiler {
     }
 
     public void compileItems() {
-        compileIitemsInFolder(new File(jRuleConfig.getWorkingDirectory() + JRuleConfig.ITEMS_DIR));
-        // TODO Auto-generated method stub
+        logger.info("Compiling items in folder: {}", jRuleConfig.getItemsDirectory());
+        compileIitemsInFolder(new File(jRuleConfig.getItemsDirectory()));
     }
 
     public void compileRules() {
-        compileRulesInFolder(new File(jRuleConfig.getWorkingDirectory() + JRuleConfig.RULES_DIR));
-        compileRulesInFolder(new File(jRuleConfig.getWorkingDirectory() + JRuleConfig.RULES_DIR));
+        String rulesClassPath = //
+                System.getProperty("java.class.path") + File.pathSeparator //
+                        + getJarPath(JAR_JRULE_ITEMS_NAME) + File.pathSeparator //
+                        + getJarPath(JAR_JRULE_NAME) + File.pathSeparator //
+                        + getJarPath(JAR_ECLIPSE_ANNOTATIONS_NAME) + File.pathSeparator //
+                        + getJarPath(JAR_SLF4J_API_NAME) + File.pathSeparator;
+        logger.debug("Compiling rules in folder: {}", jRuleConfig.getRulesDirectory());
+        File userFile = new File(jRuleConfig.getRulesDirectory() + File.separator + JRULE_USER_JAVA);
+        if (userFile.exists()) {
+            compileClass(userFile, rulesClassPath);
+            JRuleUtil.createJarFile(jRuleConfig.getRulesRootDirectory(), getJarPath(JAR_USER_RULES));
+        }
+        File jarUserFilerFile = new File(getJarPath(JAR_USER_RULES));
+        final String finalClassPath = jarUserFilerFile.exists()
+                ? rulesClassPath + File.separator + jarUserFilerFile.getAbsolutePath()
+                : rulesClassPath;
+        final File[] javaFiles = new File(jRuleConfig.getRulesDirectory())
+                .listFiles(GeneratedFileNameFilter.JAVA_FILTER);
+        if (javaFiles == null || javaFiles.length == 0) {
+            logger.info("Found no java rules to compile and use in folder: {}, no rules are loaded",
+                    jRuleConfig.getRulesDirectory());
+            return;
+        }
+        Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
     }
 
     public void compileRule(String ruleName) {
