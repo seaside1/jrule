@@ -96,7 +96,7 @@ public class JRuleEngine implements PropertyChangeListener {
         Class<?> clazz = jRule.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(JRuleName.class)) {
-                logger.warn("Rule ignored since JRuleName annotation is missing");
+                logger.warn("Rule ignored since JRuleName annotation is missing: {}", jRule.getClass().toString());
                 continue;
             }
 

@@ -107,9 +107,8 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     // Remove creating instances of items
     private void createRuleInstances() {
         try {
-            final URL[] urls = new URL[] {
-                    new File(config.getWorkingDirectory() + JRuleConfig.ITEMS_DIR_START).toURI().toURL(),
-                    new File(config.getWorkingDirectory() + JRuleConfig.RULES_DIR_START).toURI().toURL() };
+            final URL[] urls = new URL[] { new File(config.getItemsRootDirectory()).toURI().toURL(),
+                    new File(config.getRulesRootDirectory()).toURI().toURL() };
 
             ClassLoader loader = new URLClassLoader(urls, JRuleUtil.class.getClassLoader());
             compiler.loadClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
