@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleItemClassGenerator {
 
+    private static final String JAVA_FILE_ENDING = ".java";
     private static final String JRULE_GENERATION_PREFIX = "_";
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
@@ -74,9 +75,9 @@ public class JRuleItemClassGenerator {
     }
 
     public boolean generateItemSource(Item item) {
-        File f = new File(jRuleConfig.getWorkingDirectory() + JRuleConfig.ITEMS_DIR + JRULE_GENERATION_PREFIX
-                + item.getName() + ".java");
-        f.getParentFile().mkdirs();
+        File f = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory()).append(File.separator)
+                .append(JRULE_GENERATION_PREFIX).append(item.getName()).append(JAVA_FILE_ENDING).toString());
+
         if (f.exists()) {
             logger.debug("Item: {} already exists, ignoring", item.getName());
             return false;
