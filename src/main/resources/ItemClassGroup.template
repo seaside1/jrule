@@ -13,6 +13,7 @@
 package org.openhab.binding.jrule.items.generated;
 
 import org.openhab.binding.jrule.items.JRuleGroupItem;
+import org.openhab.binding.jrule.rules.JRuleOnOffValue;
 
 /**
  * Automatically Generated Class
@@ -24,15 +25,27 @@ public class _ITEMNAME extends JRuleGroupItem {
 
     public static final String ITEM = "ITEMNAME";
     
-     public static String getState() {
+    public static String getState() {
         return JRuleGroupItem.getState(ITEM);
     }
     
-     public static void sendCommand(String value) {
+    public static JRuleOnOffValue getStateAsOnOffValue() {
+        return JRuleGroupItem.getStateAsOnOffValue(ITEM); 
+    }
+    
+    public static void sendCommand(String value) {
         JRuleGroupItem.sendCommand(ITEM, value);
     }
 
     public static void postUpdate(String value) {
+        JRuleGroupItem.postUpdate(ITEM, value);
+    }
+
+    public static void sendCommand(JRuleOnOffValue value) {
+        JRuleGroupItem.sendCommand(ITEM, value);
+    }
+
+    public static void postUpdate(JRuleOnOffValue value) {
         JRuleGroupItem.postUpdate(ITEM, value);
     }
 }

@@ -28,4 +28,24 @@ public class JRuleEvent {
     public String getValue() {
         return value;
     }
+
+    public Double getValueAsDouble() {
+        Double d = null;
+        try {
+            d = Double.parseDouble(value);
+        } catch (NumberFormatException x) {
+            // ignore
+        }
+        return d;
+    }
+
+    public Integer getValueAsInteger() {
+        Integer i = null;
+        try {
+            i = Integer.parseInt(value);
+        } catch (NumberFormatException x) {
+            // ignore
+        }
+        return i;
+    }
 }

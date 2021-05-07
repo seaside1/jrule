@@ -108,7 +108,7 @@ public class JRuleCompiler {
                     logger.debug("Compilation of class successfull!");
                 } else {
                     for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                        logger.debug("Error on line {} in {}", diagnostic.getLineNumber(),
+                        logger.info("Error on line {} in {}", diagnostic.getLineNumber(),
                                 diagnostic.getSource().toUri());
                     }
                 }

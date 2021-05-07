@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.openhab.binding.jrule.items.JRulePercentType;
 import org.openhab.binding.jrule.rules.JRuleOnOffValue;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.Item;
@@ -28,6 +29,7 @@ import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -72,6 +74,14 @@ public class JRuleEventHandler {
         sendCommand(itemName, new StringType(command));
     }
 
+    public void sendCommand(String itemName, JRulePercentType value) {
+        sendCommand(itemName, new PercentType(value.getValue()));
+    }
+
+    public void sendCommand(String itemName, int value) {
+        sendCommand(itemName, new DecimalType(value));
+    }
+
     public void sendCommand(String itemName, double value) {
         sendCommand(itemName, new DecimalType(value));
     }
@@ -84,12 +94,17 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
+        logger.info("SendCommand itemName: {} command: {}", itemName, command);
         final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
         eventPublisher.post(commandEvent);
     }
 
     public void postUpdate(String itemName, Date date) {
         postUpdate(itemName, new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())));
+    }
+
+    public void postUpdate(String itemName, JRulePercentType value) {
+        postUpdate(itemName, new PercentType(value.getValue()));
     }
 
     public void postUpdate(String itemName, JRuleOnOffValue state) {

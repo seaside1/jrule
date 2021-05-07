@@ -13,7 +13,9 @@
 package org.openhab.binding.jrule.rules;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +27,9 @@ import java.util.function.Supplier;
 
 import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.openhab.binding.jrule.internal.handler.JRuleEngine;
+import org.openhab.binding.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.binding.jrule.internal.handler.JRuleVoiceHandler;
+import org.openhab.binding.jrule.items.JRulePercentType;
 import org.openhab.core.common.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +44,7 @@ public abstract class JRule {
     private final Logger logger = LoggerFactory.getLogger(JRule.class);
 
     // TODO: Static or not...
-    private final Map<String, CompletableFuture<Void>> ruleNameToCompletableFuture = new HashMap<>();
+    private final static Map<String, CompletableFuture<Void>> ruleNameToCompletableFuture = new HashMap<>();
 
     protected final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
@@ -60,8 +64,9 @@ public abstract class JRule {
             logger.debug("Future already running for ruleName: {}", ruleName);
             CompletableFuture<Void> completableFuture = ruleNameToCompletableFuture.get(ruleName);
             boolean cancelled = completableFuture.cancel(false);
-            ruleNameToCompletableFuture.remove(completableFuture);
-            logger.debug("Rescheduling existing timer by removing old timer: {}", cancelled);
+            ruleNameToCompletableFuture.remove(ruleName);
+            logger.info("Rescheduling existing timer by removing old timer for rule {} cancelled: {}", ruleName,
+                    cancelled);
         }
         return createTimer(ruleName, timeInSeconds, fn);
     }
@@ -74,9 +79,9 @@ public abstract class JRule {
         Executor delayedExecutor = CompletableFuture.delayedExecutor(timeInSeconds, TimeUnit.SECONDS, scheduler);
         CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
         ruleNameToCompletableFuture.put(ruleName, future);
-        logger.debug("Start timer for rule: {}, timeSeconds: {}", ruleName, timeInSeconds);
+        logger.info("Start timer for rule: {}, timeSeconds: {}", ruleName, timeInSeconds);
         return future.thenAccept(fn).thenAccept(s -> {
-            logger.debug("Removing future for rule: {}", ruleName);
+            logger.info("Timer has finsihed rule: {}", ruleName);
             ruleNameToCompletableFuture.remove(ruleName);
         });
     }
@@ -89,6 +94,46 @@ public abstract class JRule {
         JRuleVoiceHandler.get().say(text, voiceId, sinkId);
     }
 
+    protected void sendCommand(String itemName, JRuleOnOffValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    protected void sendCommand(String itemName, JRulePercentType percentTypeCommand) {
+        JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand);
+    }
+
+    protected void sendCommand(String itemName, String command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    protected void sendCommand(String itemName, double value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    protected void sendCommand(String itemName, int value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    protected void sendCommand(String itemName, Date date) {
+        JRuleEventHandler.get().sendCommand(itemName, date);
+    }
+
+    protected void postUpdate(String itemName, Date date) {
+        JRuleEventHandler.get().postUpdate(itemName, date);
+    }
+
+    protected void postUpdate(String itemName, JRuleOnOffValue state) {
+        JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    protected void postUpdate(String itemName, String value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
+    protected void postUpdate(String itemName, double value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
     protected boolean getTimedLock(String ruleName, int seconds) {
         CompletableFuture<Void> future = ruleNameToCompletableFuture.get(ruleName);
         if (future != null) {
@@ -98,14 +143,14 @@ public abstract class JRule {
         future = JRuleUtil.scheduleAsync(scheduler, asyncTask, seconds, TimeUnit.SECONDS);
         ruleNameToCompletableFuture.put(ruleName, future);
         future.thenAccept(itemName -> {
-            logger.debug("Timer completed! Releasing lock");
+            logger.info("{}: Timer completed! Releasing lock", ruleName);
             ruleNameToCompletableFuture.remove(ruleName);
         });
         return true;
     }
 
     protected int nowHour() {
-        return Instant.now().atZone(ZoneOffset.UTC).getHour();
+        return Instant.now().atZone(ZoneId.systemDefault()).getHour();
     }
 
     protected int nowMinute() {
