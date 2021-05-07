@@ -13,6 +13,7 @@
 package org.openhab.binding.jrule.items;
 
 import org.openhab.binding.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.binding.jrule.rules.JRuleOnOffValue;
 
 /**
  * The {@link JRuleGroupItem} Items
@@ -25,11 +26,23 @@ public class JRuleGroupItem extends JRuleItem {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
+    protected static JRuleOnOffValue getStateAsOnOffValue(String itemName) {
+        return JRuleEventHandler.get().getOnOffValue(itemName);
+    }
+
+    public static void sendCommand(String itemName, JRuleOnOffValue value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
     public static void sendCommand(String itemName, String value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
     public static void postUpdate(String itemName, String value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
+    public static void postUpdate(String itemName, JRuleOnOffValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 }

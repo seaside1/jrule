@@ -96,7 +96,7 @@ public class JRuleEngine implements PropertyChangeListener {
         Class<?> clazz = jRule.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(JRuleName.class)) {
-                logger.warn("Rule ignored since JRuleName annotation is missing: {}", jRule.getClass().toString());
+                logger.debug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
                 continue;
             }
 
@@ -120,7 +120,13 @@ public class JRuleEngine implements PropertyChangeListener {
             // Make sure when has item ref
             // Loop and find the other and ors
             for (JRuleWhen jRuleWhen : jRuleWhens) {
+                // if (jRuleWhen.item() == null || jRuleWhen.item().isEmpty()) {
+                // boolean isCrond = jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1;
+                // addTimedExecution(jRuleWhen, method);
+                // continue;
+                // }
                 final String itemClass = "org.openhab.binding.jrule.items.generated._" + jRuleWhen.item();
+
                 // getClassForItemFromAnnotation(
                 // "org.openhab.binding.jrule.items.generated._" + jRuleWhen.item());
 
@@ -149,6 +155,43 @@ public class JRuleEngine implements PropertyChangeListener {
             }
         }
     }
+
+    // private CompletableFuture<Void> createTimer(int hours, int minutes, int seconds) {
+    // Calendar cal = Calendar.getInstance();
+    //
+    // if (hours != -1) {
+    // cal.set(Calendar.HOUR_OF_DAY, hours);
+    // }
+    // if (minutes != -1) {
+    // cal.set(Calendar.MINUTE, minutes);
+    // }
+    // if (seconds != -1) {
+    // cal.set(Calendar.SECOND, seconds);
+    // }
+    // Date date = cal.getTime();
+    // long initialDelay = new Date(date.getTime() - System.currentTimeMillis()).getTime();
+    // Executor delayedExecutor = CompletableFuture.delayedExecutor(initialDelay, TimeUnit.MILLISECONDS, scheduler);
+    // CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
+    // return future;
+    // }
+
+    // private void addTimedExecution(JRuleWhen jRuleWhen, Method method) {
+    // // ruleNameToCompletableFuture.put(ruleName, future);
+    // CompletableFuture<Void> future = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+    // logger.info("Start timer for timed rule rule");
+    // Consumer<Void> consumer = new Consumer<Void>() {
+    // @Override
+    // public void accept(Void t) {
+    // invokeRule(null, null);
+    //
+    // }
+    // };
+    // future.thenAccept(consumer).thenAccept(s -> {
+    // logger.info("Timer has finsihed rule: {}", ruleName);
+    // CompletableFuture<Void> createTimer = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+    // timer.ruleNameToCompletableFuture.remove(ruleName);
+    // });
+    // }
 
     private void addExecutionContext(JRule jRule, String itemClass, String ruleName, String trigger, String from,
             String to, String update, String itemName, Method method, boolean eventParameterPresent) {

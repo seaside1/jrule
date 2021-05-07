@@ -42,7 +42,7 @@ public class JRuleDimmerItem extends JRuleItem {
     }
 
     protected static void sendCommand(String itemName, int value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
     }
 
     protected static void postUpdate(String itemName, JRuleOnOffValue state) {
@@ -50,6 +50,6 @@ public class JRuleDimmerItem extends JRuleItem {
     }
 
     protected static void postUpdate(String itemName, int value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 }
