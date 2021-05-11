@@ -113,7 +113,8 @@ Use Case: Invoke another item Switch from rule
     }
 ```
 
-Use case: Invoke a Doorbell, but only allow the rule to be invoke once every 20 seconds:
+Use case: Invoke a Doorbell, but only allow the rule to be invoke once every 20 seconds.
+This is done by aquiring a lock getTimedLock("MyLockTestRule1", 20).
 
 ```java
     @JRuleName("MyLockTestRule1")
@@ -128,6 +129,8 @@ Use case: Invoke a Doorbell, but only allow the rule to be invoke once every 20 
     }
 ```
 Use case: Use the value that caused the trigger
+When the rule is triggered, the triggered value is stored in the event.
+
 ```java
    @JRuleName("MyEventValueTest")
    @JRuleWhen(item = __MyTestSwitch2.ITEM, trigger = __MyTestSwitch2.TRIGGER_RECEIVED_COMMAND)
@@ -136,6 +139,8 @@ Use case: Use the value that caused the trigger
    }
 ```
 Use case: Or statement for rule trigger
+To add an OR statement we simply add multiple @JRuleWhen statements
+
 ```java
    @JRuleName("MyNumberRule1")
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "14", to = "10")
@@ -179,8 +184,8 @@ public class MySwitchRule extends JRuleUser {
 ```
 
 Let's say we want to add a common function that should be available for all user rules.
-I want to add a function that checks if it is ok to send notifications debing on what time it is.
-I'll do this:
+We want to add a function that checks if it is ok to send notifications debing on what time it is.
+We'll do this:
 
 ```java
 package org.openhab.binding.jrule.rules.user;
@@ -201,7 +206,7 @@ public class JRuleUser extends JRule {
 ```
 
 ``
-I then extend the rule from my Java Rules file:
+We then extend the rule from the Java Rules file:
 
 ```java
 package org.openhab.binding.jrule.rules.user;
@@ -227,12 +232,42 @@ public class MyTestUserRule extends JRuleUser {
 }
 ```
 
+Use case create a timer for automatically turning of a light when it is turned on. If it's running cancel it and schedule a new one. 
+```
+   @JRuleName("myTimerRule")
+    @JRuleWhen(item = _MyLightSwitch.ITEM, trigger = _MyLightSwitch.TRIGGER_CHANGED_TO_ON)
+    public synchronized void myTimerRule(JRuleEvent event) {
+        logger.info("myTimerRule Turning on light it will be turned off in 2 mins");
+        createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
+            logger.info("Time is up! Turning off lights");
+            _MyLightSwitch.sendCommand(OFF);
+        });
+    }
+```
+
+Use case: Let's say we have a 433 MHz wall socket with no ON/OFF feedback and a bit of bad radio reception. We can then create a repeating timer
+to send multiple ON statements to be sure it actually turns on.
+ createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 4, will create a repeating timer that will trigger after 0 seconds, 7s, 14s and 21s 
+ If the Timer is already running it will cancel it and create a new one.
+ 
+```
+    @JRuleName("repeatRuleExample")
+    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    public synchronized void repeatRuleExample(JRuleEvent event) {
+        createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 10, (Void) -> { // Lambda Expression
+            final String messageOn = "repeatRuleExample Repeating.....";
+            looger.info(messageOn);
+            _MyBad433Switch.sendCommand(ON);
+        });
+    }
+```
+
+
 Use case: Create a timer
-
-Use case: create a lock
-
 Use case: Create or reschedule lock
 Use case: Using say command for tts
+Use case: Crond timer
+Use case: Greater than, less than, eq
 
 # Current Binding Limitations (this will be fixed)
 - Items files will only be generated if the java-source and .class files under /etc/openhab/jrule/items/
