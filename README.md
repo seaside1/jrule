@@ -1,21 +1,21 @@
 # J Rule
-Write OpenHab Rules using Java
+Write OpenHAB Rules using Java
 
 This binding aims to enable Java development of OpenHAB Rules. The binding will allow the user to create custom OpenHAB rules
-in a java-source file. The Java Rules need triggers in order for the engine to know when to exectute them. The triggers
+in a java-source file. The Java Rules will need defined triggers in order for the engine to know how and when to exectute them. The triggers
 are very similar to Rules DSL but expressed using java annotations.
 In order to execture rules based on items defined in .items-files (the regular OpenHAB Items), the binding need to know about the items and
 this is realized by the Rule Engine when it generates .java and .class files for each items in the system. The class files are packaged in a .jar
 file which the user can use as dependency when doing Rules Development.
 In order for the binding to pick up rules, they need to be compiled first. The source .java -files are placed in a specific rules folder and
-will be automatically compiled when the binding is started.
+will be automatically compiled and loaded when the binding is started.
 
 # Why?
  - You will be able to use a standard Java IDE to develop your rules. 
- - Full auto completion (Shift space) for all items, less chance of error
- - Full take advantage of all java design patters
+ - Full auto completion (Shift space) for all items, less chance of errors and typos
+ - Take full advantage of all java design patters
  - Share and reuse code for you rules
- - Advanced timers and locks are built in and be used
+ - Advanced timers and locks are built in and can be used without cluttering the code
  - Possibility to write junit-tests to test your rules
  - Use any 3rd party dependencies and libraries in your rules
 
