@@ -233,7 +233,7 @@ public class MyTestUserRule extends JRuleUser {
 ```
 
 Use case create a timer for automatically turning of a light when it is turned on. If it's running cancel it and schedule a new one. 
-```
+```java
    @JRuleName("myTimerRule")
     @JRuleWhen(item = _MyLightSwitch.ITEM, trigger = _MyLightSwitch.TRIGGER_CHANGED_TO_ON)
     public synchronized void myTimerRule(JRuleEvent event) {
@@ -250,7 +250,7 @@ to send multiple ON statements to be sure it actually turns on.
  createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 4, will create a repeating timer that will trigger after 0 seconds, 7s, 14s and 21s 
  If the Timer is already running it will cancel it and create a new one.
  
-```
+```java
     @JRuleName("repeatRuleExample")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public synchronized void repeatRuleExample(JRuleEvent event) {
