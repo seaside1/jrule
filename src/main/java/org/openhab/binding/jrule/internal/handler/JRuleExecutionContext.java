@@ -28,13 +28,23 @@ public class JRuleExecutionContext {
     private final String itemName;
     private final String from;
     private final String to;
+    private final Double gt;
+    private final Double gte;
+    private final Double lt;
+    private final Double lte;
+
     private final String update;
     private final JRule jRule;
     private final Method method;
     private final boolean eventParameterPresent;
 
     public JRuleExecutionContext(JRule jRule, String trigger, String from, String to, String update, String ruleName,
-            String itemClass, String itemName, Method method, boolean eventParameterPresent) {
+            String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt, Double lte,
+            Double gt, Double gte) {
+        this.gt = gt;
+        this.gte = gte;
+        this.lt = lt;
+        this.lte = lte;
         this.jRule = jRule;
         this.trigger = trigger;
         this.from = from;
@@ -47,11 +57,16 @@ public class JRuleExecutionContext {
         this.eventParameterPresent = eventParameterPresent;
     }
 
+    public JRuleExecutionContext(JRule jRule, Method method, String ruleName, boolean jRuleEventPresent) {
+        this(jRule, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null, null);
+    }
+
     @Override
     public String toString() {
         return "JRuleExecutionContext [trigger=" + trigger + ", ruleName=" + ruleName + ", itemClass=" + itemClass
-                + ", itemName=" + itemName + ", from=" + from + ", to=" + to + ", jRule=" + jRule + ", method=" + method
-                + "]";
+                + ", itemName=" + itemName + ", from=" + from + ", to=" + to + ", gt=" + gt + ", gte=" + gte + ", lt="
+                + lt + ", lte=" + lte + ", update=" + update + ", jRule=" + jRule + ", method=" + method
+                + ", eventParameterPresent=" + eventParameterPresent + "]";
     }
 
     public String getTrigger() {
@@ -112,5 +127,25 @@ public class JRuleExecutionContext {
 
     public boolean isEventParameterPresent() {
         return eventParameterPresent;
+    }
+
+    public Double getGt() {
+        return gt;
+    }
+
+    public Double getGte() {
+        return gte;
+    }
+
+    public Double getLt() {
+        return lt;
+    }
+
+    public Double getLte() {
+        return lte;
+    }
+
+    public boolean isNumericOperation() {
+        return lte != null || lt != null || gt != null || gte != null;
     }
 }
