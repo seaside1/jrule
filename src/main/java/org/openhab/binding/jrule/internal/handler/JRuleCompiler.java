@@ -120,7 +120,6 @@ public class JRuleCompiler {
     }
 
     public void compileIitemsInFolder(File itemsFolder) {
-        // TODO: Using config dir
         final String itemsClassPath = System.getProperty("java.class.path") + File.pathSeparator
                 + getJarPath(JAR_JRULE_NAME);
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());

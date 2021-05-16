@@ -20,12 +20,20 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.jrule.internal.JRuleBindingConstants;
 import org.openhab.binding.jrule.internal.JRuleUtil;
@@ -37,6 +45,7 @@ import org.openhab.binding.jrule.rules.JRuleEvent;
 import org.openhab.binding.jrule.rules.JRuleName;
 import org.openhab.binding.jrule.rules.JRuleTrigger;
 import org.openhab.binding.jrule.rules.JRuleWhen;
+import org.openhab.core.common.ThreadPoolManager;
 import org.openhab.core.events.Event;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
@@ -65,6 +74,8 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private Set<String> itemNames = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
+    protected final ScheduledExecutorService scheduler = ThreadPoolManager
+            .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
     private JRuleEngine() {
     }
@@ -120,11 +131,12 @@ public class JRuleEngine implements PropertyChangeListener {
             // Make sure when has item ref
             // Loop and find the other and ors
             for (JRuleWhen jRuleWhen : jRuleWhens) {
-                // if (jRuleWhen.item() == null || jRuleWhen.item().isEmpty()) {
-                // boolean isCrond = jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1;
-                // addTimedExecution(jRuleWhen, method);
-                // continue;
-                // }
+                if (jRuleWhen.item() == null || jRuleWhen.item().isEmpty()) {
+                    if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1) {
+                        addTimedExecution(jRule, jRuleName.value(), jRuleWhen, method, jRuleEventPresent);
+                    }
+                    continue;
+                }
                 final String itemClass = "org.openhab.binding.jrule.items.generated._" + jRuleWhen.item();
 
                 // getClassForItemFromAnnotation(
@@ -136,7 +148,9 @@ public class JRuleEngine implements PropertyChangeListener {
                 logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
 
                 addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
-                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent);
+                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
+                        getDoubelFromAnnotation(jRuleWhen.lt()), getDoubelFromAnnotation(jRuleWhen.lte()),
+                        getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()));
                 itemNames.add(jRuleWhen.item() + getTypeOfEventFromTrigger(jRuleWhen.trigger()));
                 // item -> (name, trigger, itemclass)
 
@@ -156,45 +170,60 @@ public class JRuleEngine implements PropertyChangeListener {
         }
     }
 
-    // private CompletableFuture<Void> createTimer(int hours, int minutes, int seconds) {
-    // Calendar cal = Calendar.getInstance();
-    //
-    // if (hours != -1) {
-    // cal.set(Calendar.HOUR_OF_DAY, hours);
-    // }
-    // if (minutes != -1) {
-    // cal.set(Calendar.MINUTE, minutes);
-    // }
-    // if (seconds != -1) {
-    // cal.set(Calendar.SECOND, seconds);
-    // }
-    // Date date = cal.getTime();
-    // long initialDelay = new Date(date.getTime() - System.currentTimeMillis()).getTime();
-    // Executor delayedExecutor = CompletableFuture.delayedExecutor(initialDelay, TimeUnit.MILLISECONDS, scheduler);
-    // CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
-    // return future;
-    // }
+    private Double getDoubelFromAnnotation(double d) {
+        if (d == Double.MIN_VALUE) {
+            return null;
+        }
+        return Double.valueOf(d);
+    }
 
-    // private void addTimedExecution(JRuleWhen jRuleWhen, Method method) {
-    // // ruleNameToCompletableFuture.put(ruleName, future);
-    // CompletableFuture<Void> future = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
-    // logger.info("Start timer for timed rule rule");
-    // Consumer<Void> consumer = new Consumer<Void>() {
-    // @Override
-    // public void accept(Void t) {
-    // invokeRule(null, null);
-    //
-    // }
-    // };
-    // future.thenAccept(consumer).thenAccept(s -> {
-    // logger.info("Timer has finsihed rule: {}", ruleName);
-    // CompletableFuture<Void> createTimer = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
-    // timer.ruleNameToCompletableFuture.remove(ruleName);
-    // });
-    // }
+    private CompletableFuture<Void> createTimer(int hours, int minutes, int seconds) {
+        Calendar calFuture = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        calFuture.set(Calendar.HOUR_OF_DAY, hours == -1 ? 0 : hours);
+        calFuture.set(Calendar.MINUTE, minutes == -1 ? 0 : minutes);
+        calFuture.set(Calendar.SECOND, seconds == -1 ? 0 : seconds);
+        logger.debug("Hours: {} calHours: {}", hours, calFuture.get(Calendar.HOUR_OF_DAY));
+        calFuture.set(Calendar.HOUR_OF_DAY, hours);
+        if (calFuture.before(now)) {
+            if (hours != -1) {
+                calFuture.add(Calendar.DAY_OF_MONTH, 1);
+            } else if (minutes != -1) {
+                calFuture.add(Calendar.HOUR, 1);
+            } else if (seconds != -1) {
+                calFuture.add(Calendar.MINUTE, 1);
+            }
+        }
+        Date date = calFuture.getTime();
+        long initialDelay = new Date(date.getTime() - System.currentTimeMillis()).getTime();
+        logger.debug("Schedule crond: {} initialDelay: {}", date, initialDelay);
+        Executor delayedExecutor = CompletableFuture.delayedExecutor(initialDelay, TimeUnit.MILLISECONDS, scheduler);
+        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
+        return future;
+    }
+
+    private synchronized void addTimedExecution(JRule jRule, String jRuleName, JRuleWhen jRuleWhen, Method method,
+            boolean jRuleEventPresent) {
+        CompletableFuture<Void> future = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+        logger.info("Scheduling timer for rule: {} hours: {} minutes: {} seconds: {}", jRule, jRuleWhen.hours(),
+                jRuleWhen.minutes(), jRuleWhen.seconds());
+        JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, method, jRuleName, jRuleEventPresent);
+        Consumer<Void> consumer = new Consumer<Void>() {
+            @Override
+            public void accept(Void t) {
+                invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
+            }
+        };
+        future.thenAccept(consumer).thenAccept(s -> {
+            logger.info("Timer has finsihed rule: {}", jRuleName);
+            createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+            addTimedExecution(jRule, jRuleName, jRuleWhen, method, jRuleEventPresent);
+        });
+    }
 
     private void addExecutionContext(JRule jRule, String itemClass, String ruleName, String trigger, String from,
-            String to, String update, String itemName, Method method, boolean eventParameterPresent) {
+            String to, String update, String itemName, Method method, boolean eventParameterPresent, Double lt,
+            Double lte, Double gt, Double gte) {
         List<JRuleExecutionContext> contextList = itemToExecutionContexts.get(itemName);
         if (contextList == null) {
             contextList = new ArrayList<>();
@@ -202,7 +231,7 @@ public class JRuleEngine implements PropertyChangeListener {
         }
         logger.debug("++ContextList add: {} itemName: {}", ruleName, itemName);
         contextList.add(new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName, itemClass, itemName,
-                method, eventParameterPresent));
+                method, eventParameterPresent, lt, lte, gt, gte));
     }
 
     private String getTypeOfEventFromTrigger(String trigger) {
@@ -321,9 +350,50 @@ public class JRuleEngine implements PropertyChangeListener {
         if (triggerValues.size() > 0) {
             exectionContexts.stream().forEach(context -> logger.debug("+Context: {} contained: {}",
                     context.getTriggerFullString(), triggerValues.contains(context.getTriggerFullString())));
+
             exectionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
-                    .forEach(context -> invokeRule(context, new JRuleEvent(stringValue)));
+                    .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(stringValue)));
         }
+    }
+
+    private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
+        if (context.isNumericOperation()) {
+            Double value = getValuAsDouble(jRuleEvent.getValue());
+            if (context.getGt() != null) {
+                if (value > context.getGt()) {
+                    invokeRule(context, jRuleEvent);
+                }
+            } else if (context.getGte() != null) {
+                if (value >= context.getGte()) {
+                    invokeRule(context, jRuleEvent);
+                }
+            } else if (context.getLt() != null) {
+                if (value < context.getLt()) {
+                    invokeRule(context, jRuleEvent);
+                }
+
+            } else if (context.getLte() != null) {
+                if (value <= context.getLte()) {
+                    invokeRule(context, jRuleEvent);
+                }
+            }
+        } else {
+            invokeRule(context, jRuleEvent);
+        }
+    }
+
+    private Double getValuAsDouble(String value) {
+        double parseDouble = 0;
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        try {
+            parseDouble = Double.parseDouble(value);
+        } catch (Exception x) {
+            logger.error("Failed to parse value: {} as double", value, x);
+            return null;
+        }
+        return parseDouble;
     }
 
     @Nullable
@@ -336,9 +406,10 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
         logger.debug("Invoking rule for context: {}", context);
-        Class<?> itemClazz = context.getClass();
+        // Class<?> itemClazz = context.getClass();
         JRule rule = context.getJrule();
         Method method = context.getMethod();
+        logger.debug("Invoking context: {}", context);
         try {
             final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
         } catch (IllegalAccessException e) {

@@ -42,4 +42,16 @@ public @interface JRuleWhen {
     String from() default "";
 
     String to() default "";
+
+    double gt() default Double.MIN_VALUE;
+
+    double lt() default Double.MIN_VALUE;
+
+    double gte() default Double.MIN_VALUE;
+
+    double lte() default Double.MIN_VALUE;
+
+    double eq() default Double.MIN_VALUE;
 }
+// Changed to greater than greaterequals less than lessthan or equals
+// Cronbased trigger
