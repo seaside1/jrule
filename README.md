@@ -2,15 +2,10 @@
 Write OpenHAB Rules using Java
 
 This binding aims to enable Java development of OpenHAB Rules. The binding will allow the user to create custom OpenHAB rules
-in a java-source file. The Java Rules will need defined triggers in order for the engine to know how and when to exectute them. The triggers
-are very similar to the triggers in Rules DSL but expressed using java annotations.
-In order to execture rules based on items defined in .items-files (the regular OpenHAB Items), the binding need to know about the items and
-this is realized by the Rule Engine when it generates .java and .class files for each items in the system. The class files are packaged in a .jar
-file which the user can use as dependency when doing Rules Development.
-In order for the binding to pick up rules, they need to be compiled first. The source .java -files are placed in a specific rules folder and
-will be automatically compiled and loaded when the binding is started.
-The syntax for rules as well as the design and thinking behind the binding is to provide something that is similar to 
-Rules DSL but more powerful and customizable.
+in one or several .java-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers
+are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execture rules based on items defined in .items-files (the regular OpenHAB Items), the binding needs to know about the items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
+For the binding to be able to pick up rules, they need to be compiled first. The source .java rules-files are placed in a specific rules folder and
+will be automatically compiled and loaded into OpenHAB when the binding is started. The syntax for rules as well as the design and thinking behind the binding is to provide something that is similar to Rules DSL but more powerful and customizable.
 
 # Why?
  - You will be able to use a standard Java IDE to develop your rules. 
@@ -45,23 +40,23 @@ The following jar files can be found under the jrule/jar-folder:
 
 | Jar File                               | Description                                                                                   |
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
-| jruleItems.jar                         | Contains all generated items, which will be used when developing rules                        |
-| jRule.jar                              | JRule Binding classes neeed as dependency when doing development                              |
+| jrule-items.jar                        | Contains all generated items, which will be used when developing rules                        |
+| jrule.jar                              | JRule Binding classes neeed as dependency when doing development                              |
 | org.eclipse.jdt.annotation-2.2.100.jar | eclipse annotations jar file needed for development to be able to compile                     |
 | slf4j-api-1.7.16.jar                   | Used for logging also needed in local rule development                                        |
 | used-rules.jar                         | The user compiled rules, used internally by the binding in the classpath for rules execution  |
 
 
 # Get started with the binding
-- Install the binding by copying the jrule-xx-xx.jar to openhab-addons folder
-- In the GUI add a new JRule Engine specify a working directory (default /etc/openhab/jrule)
+- Install the binding by copying the org.openhab.binding.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
+- In the GUI add a new JRule Engine as a Thing, specify a working directory (default /etc/openhab/jrule)
 - When the binding is started it will:
 1. Create JAVA source files for all items 
-2. Compile java source files and create a resulting jRule.jar file under /etc/openhab/jrule/jar
+2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/jrule/jar
 3. Compile any java rules file under  /etc/openhab/jrule/rules/org/openhab/binding/jrule/rules/user/
-4. Create jar files with dependencies to be used when creating your java-rules
+4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar)
 
-Once the JAVA rule engine has started and compile items successfully you can either copy the jar files
+Once the JAVA rule engine has started and compiled items successfully you can either copy the jar files
 form /etc/openhab/jrule/jar/* to the place where you intend to develop the Java- Rules, or share that folder
 using samba / CIFS / NFS or similar.
 - Set up your favourite IDEA as a standard java IDEA. 
