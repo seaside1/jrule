@@ -43,6 +43,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.jrule.internal.handler.JRuleThingHandler;
 import org.osgi.framework.FrameworkUtil;
@@ -65,6 +66,10 @@ public class JRuleUtil {
             byte[] bytes = in.readAllBytes();
             return new String(bytes, encoding);
         }
+    }
+
+    public static String removeExtension(@NonNull String name, String extention) {
+        return name.substring(0, name.lastIndexOf(extention));
     }
 
     public static @Nullable String getResourceAsString(@Nullable URL resource) {
@@ -303,5 +308,21 @@ public class JRuleUtil {
                 in.close();
             }
         }
+    }
+
+    public static String getItemNameFromTopic(@NonNull String topic) {
+        logger.debug("Parse topic: {}", topic);
+        if (topic.isEmpty()) {
+            // TODO: VAR
+            return "";
+        }
+        final int start = topic.indexOf("items/") + "items/".length();
+        int end = topic.lastIndexOf("/");
+        if (start > end) {
+            end = topic.length();
+        }
+        return end > 0 && end > start ? topic.substring(start, end) : "";
+        // final String[] fragments = topic.split("//");
+        // return (fragments.length > 0) ? fragments[fragments.length - 1] : "";
     }
 }

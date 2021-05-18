@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import org.openhab.binding.jrule.internal.JRuleBindingConstants;
 import org.openhab.binding.jrule.internal.JRuleConfig;
 import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.openhab.core.items.GroupItem;
@@ -34,8 +35,6 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleItemClassGenerator {
 
-    private static final String JAVA_FILE_ENDING = ".java";
-    private static final String JRULE_GENERATION_PREFIX = "_";
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
     private final URL itemClassTemplateUrl;
@@ -74,44 +73,57 @@ public class JRuleItemClassGenerator {
         this.jRuleConfig = jRuleConfig;
     }
 
-    public boolean generateItemSource(Item item) {
-        File f = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory()).append(File.separator)
-                .append(JRULE_GENERATION_PREFIX).append(item.getName()).append(JAVA_FILE_ENDING).toString());
+    public File getJavaItemForFile(Item item) {
+        return new File(new StringBuilder().append(jRuleConfig.getItemsDirectory()).append(File.separator)
+                .append(JRuleBindingConstants.JRULE_GENERATION_PREFIX).append(item.getName())
+                .append(JRuleBindingConstants.JAVA_FILE_TYPE).toString());
+    }
 
-        if (f.exists()) {
-            logger.debug("Item: {} already exists, ignoring", item.getName());
-            return false;
-        }
+    public boolean generateItemSource(Item item) {
+        File f = getJavaItemForFile(item);
         String generatedClass = null;
-        if (item.getType().equals(CoreItemFactory.SWITCH)) {
+        String type = item.getType();
+        if (type.contains(":")) {
+            String[] split = item.getType().split(":");
+            type = split[0];
+        }
+        if (type.equals(CoreItemFactory.SWITCH)) {
             generatedClass = switchItemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.DIMMER)) {
+        } else if (type.equals(CoreItemFactory.DIMMER)) {
             generatedClass = dimmerItemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.NUMBER)) {
+        } else if (type.equals(CoreItemFactory.NUMBER)) {
             generatedClass = numberItemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.STRING)) {
+        } else if (type.equals(CoreItemFactory.STRING)) {
             generatedClass = stringItemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.IMAGE)) {
+        } else if (type.equals(CoreItemFactory.IMAGE)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.CALL)) {
+        } else if (type.equals(CoreItemFactory.CALL)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.ROLLERSHUTTER)) {
+        } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.LOCATION)) {
+        } else if (type.equals(CoreItemFactory.LOCATION)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.COLOR)) {
+        } else if (type.equals(CoreItemFactory.COLOR)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.CONTACT)) {
+        } else if (type.equals(CoreItemFactory.CONTACT)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.PLAYER)) {
+        } else if (type.equals(CoreItemFactory.PLAYER)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(CoreItemFactory.DATETIME)) {
+        } else if (type.equals(CoreItemFactory.DATETIME)) {
             generatedClass = dateTimeItemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (item.getType().equals(GroupItem.TYPE)) {
+        } else if (type.equals(GroupItem.TYPE)) {
             generatedClass = groupItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else {
             logger.debug("Unsupported item type for item: {} type: {}", item.getName(), item.getType());
             return false;
+        }
+        if (f.exists()) {
+            String existingClass = JRuleUtil.getFileAsString(f);
+            if (existingClass.equals(generatedClass)) {
+                logger.debug("Item: {} already exists, ignoring", item.getName());
+                return false;
+            }
+
         }
         FileOutputStream fout = null;
         try {
@@ -137,4 +149,17 @@ public class JRuleItemClassGenerator {
         }
         return false;
     }
+
+    // private void getMd5Hash(String generatedClass) {
+    // MessageDigest md;
+    // try {
+    // md = MessageDigest.getInstance("MD5");
+    // md.update(generatedClass.getBytes());
+    // byte[] digest = md.digest();
+    // logger.debug("Digest: " + new String(digest));// String myHash =
+    // // DatatypeConverter.printHexBinary(digest).toUpperCase();
+    // } catch (NoSuchAlgorithmException e) {
+    //
+    // }
+    // }
 }

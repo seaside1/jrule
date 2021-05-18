@@ -23,6 +23,10 @@ import org.openhab.core.thing.ThingTypeUID;
  */
 @NonNullByDefault
 public class JRuleBindingConstants {
+    public static final String JRULE_GENERATION_PREFIX = "_";
+
+    public static final String JAVA_FILE_TYPE = ".java";
+    public static final String CLASS_FILE_TYPE = ".class";
 
     public static final String BINDING_ID = "jrule";
     public static final ThingTypeUID THING_TYPE_JRULE = new ThingTypeUID(BINDING_ID, "jruleengine");
