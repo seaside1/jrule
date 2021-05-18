@@ -262,17 +262,52 @@ to send multiple ON statements to be sure it actually turns on.
     }
 ```
 
+Use case Create a simple timer. When MyTestSwitch turns on it will wait 10 seconds and then turn MyTestSwitch2 to on. Note that
+it will not reschedule the timer, if the timer is already running it won't reschedule it.
+```java
+    @JRuleName("timerRuleExample")
+    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    public synchronized void timerRuleExample(JRuleEvent event) {
+        createTimer("myTimer", 10, (Void) -> { // Lambda Expression
+            final String messageOn = "timer example.";
+            looger.info(messageOn);
+            _MyTestWitch2.sendCommand(ON);
+        });
+    }
+```
 
-Use case: Create a timer
-Use case: Create or reschedule lock
+Use case trigger a rule at 22:30 in the evening to set initial brightness for a ZwaveDimmer to 30%
+```java
+  @JRuleName("setDayBrightness")
+  @JRuleWhen(hours=22, minutes=30)
+  public synchronized void setDayBrightness(JRuleEvent event) {
+      logger.info("Setting night brightness to 30%");
+      int dimLevel = 30;
+      _ZwaveDimmerBrightness.sendCommand(dimLevel);
+  }
+```
+
+Use case: If temperature is below or equals to 20 degrees send command on to a heating fan 
+It is possible to use:
+lte = less than or equals
+lt = less than
+gt = greater than
+gte = greater than or equals
+eq = equals
+```java
+  @JRuleName("turnOnFanIfTemperatureIsLow")
+  @JRuleWhen(item = _MyTemperatureSensor.ITEM, trigger = _MyTemperatureSensor.TRIGGER_RECEIVED_UPDATE, lte = 20)
+  public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
+      logger.info("Starting fan since temeprature dropped below 20");
+      _MyHeatinFanSwitch.sendCommand(ON);
+  }
+```
+
+
 Use case: Using say command for tts
-Use case: Crond timer
-Use case: Greater than, less than, eq
+
 
 # Current Binding Limitations (this will be fixed)
-- Items files will only be generated if the java-source and .class files under /etc/openhab/jrule/items/
-is removed. Do a rm /etc/openhab/jrule/items/* before starting openhab and the items will be regenerated
-- Adding new .java rules files will the binding is started will often not work, you might have to restart openhab for the binding to pick them up
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Roadmap
