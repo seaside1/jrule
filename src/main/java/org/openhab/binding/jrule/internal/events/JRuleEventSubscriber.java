@@ -23,9 +23,12 @@ import org.openhab.binding.jrule.internal.handler.JRuleEngine;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
+import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemCommandEvent;
+import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateEvent;
+import org.openhab.core.items.events.ItemUpdatedEvent;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,8 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     public static final String PROPERTY_ITEM_EVENT = "PROPERTY_ITEM_EVENT";
 
+    public static final String PROPERTY_ITEM_REGISTRY_EVENT = "PROPERTY_ITEM_REGESTRY_EVENT";
+
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
 
     private final Set<String> subscribedEventTypes = new HashSet<String>();
@@ -55,6 +60,9 @@ public class JRuleEventSubscriber implements EventSubscriber {
         subscribedEventTypes.add(ItemStateEvent.TYPE);
         subscribedEventTypes.add(ItemCommandEvent.TYPE);
         subscribedEventTypes.add(ItemStateChangedEvent.TYPE);
+        subscribedEventTypes.add(ItemUpdatedEvent.TYPE);
+        subscribedEventTypes.add(ItemAddedEvent.TYPE);
+        subscribedEventTypes.add(ItemRemovedEvent.TYPE);
     }
 
     @Override
@@ -85,9 +93,13 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     @Override
     public void receive(Event event) {
-
-        // logger.debug("++Got item event topic: {}", event.getTopic());
-        String itemFromTopic = getItemFromTopic(event.getTopic());
+        final String itemFromTopic = getItemFromTopic(event.getTopic());
+        if (event.getType().equals(ItemAddedEvent.TYPE) //
+                || event.getType().equals(ItemRemovedEvent.TYPE) //
+                || event.getType().equals(ItemUpdatedEvent.TYPE)) {
+            propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_REGISTRY_EVENT, null, event);
+            return;
+        }
         if (!jRuleMonitoredItems.contains(itemFromTopic)) {
             return;
         }

@@ -22,6 +22,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -32,9 +36,14 @@ import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.openhab.binding.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.binding.jrule.internal.watch.JRuleRulesWatcher;
 import org.openhab.binding.jrule.items.JRuleItemClassGenerator;
+import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.Item;
+import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.events.ItemAddedEvent;
+import org.openhab.core.items.events.ItemRemovedEvent;
+import org.openhab.core.items.events.ItemUpdatedEvent;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
@@ -89,6 +98,8 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     @Nullable
     private Thread rulesDirWatcherThread;
 
+    private volatile boolean recompileJar = true;
+
     public JRuleThingHandler(Thing thing, ItemRegistry itemRegistry, EventPublisher eventPublisher,
             JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager) {
         super(thing);
@@ -99,6 +110,7 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
+        eventSubscriber.addPropertyChangeListener(this);
         JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
         logger.debug("New instance JRuleThingHandler: {}", thing.getUID());
@@ -157,7 +169,9 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
     @SuppressWarnings("null")
     @Override
-    public final void initialize() {
+    public synchronized final void initialize() {
+        logger.info("Start Initializing JRule Binding");
+
         updateStatus(ThingStatus.UNKNOWN);
         config = getConfigAs(JRuleConfig.class);
         itemGenerator = new JRuleItemClassGenerator(config);
@@ -179,12 +193,7 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
         updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Writing jars");
         writeExternalJars();
-        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Generating items");
-        generateItemSources();
-        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Compiling items");
-        compiler.compileItems();
-        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Creating items jar");
-        createItemsJar();
+        handleItemSources();
         updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Compiling rules");
         compileUserRules();
         createRuleInstances();
@@ -192,6 +201,18 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         eventSubscriber.startSubscriper();
         logger.info("Initializing, setting status ONLINE");
         updateStatus(ONLINE);
+    }
+
+    private void handleItemSources() {
+        updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Generating items");
+        generateItemSources();
+        if (recompileJar) {
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Compiling items");
+            compileItems();
+            updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.BRIDGE_UNINITIALIZED, "Creating items jar");
+            createItemsJar();
+            updateStatus(ONLINE);
+        }
     }
 
     private void startDirectoryWatcher() {
@@ -202,18 +223,19 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         rulesDirWatcherThread.start();
     }
 
-    private void createItemsJar() {
+    private synchronized void createItemsJar() {
         JRuleUtil.createJarFile(config.getItemsRootDirectory(),
                 compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
+        recompileJar = false;
     }
 
-    private void writeExternalJars() {
+    private synchronized void writeExternalJars() {
         writeJar(JRuleCompiler.JAR_JRULE_NAME);
         writeJar(JRuleCompiler.JAR_SLF4J_API_NAME);
         writeJar(JRuleCompiler.JAR_ECLIPSE_ANNOTATIONS_NAME);
     }
 
-    private void writeJar(String name) {
+    private synchronized void writeJar(String name) {
         URL jarUrl = JRuleUtil.getResourceUrl("lib/" + name);
         final byte[] jarBytes = JRuleUtil.getResourceAsBytes(jarUrl);
         JRuleUtil.writeFile(jarBytes, config.getWorkingDirectory() + File.separator + "jar/" + name);
@@ -225,7 +247,7 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
     @SuppressWarnings("null")
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         super.dispose();
         logger.debug("JRuleThingHandler dispose");
         JRuleEngine.get().reset();
@@ -240,18 +262,64 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
                 // Best effort
             }
         }
+        eventSubscriber.removePropertyChangeListener(this);
     }
 
-    public void generateItemSources() {
-        itemRegistry.getItems().stream().forEach(item -> generateItemSource(item));
+    public synchronized void generateItemSources() {
+        // HashSet check if all java name exists in hashSet
+        File[] javaSourceItemsFromFolder = compiler.getJavaSourceItemsFromFolder(new File(config.getItemsDirectory()));
+        Collection<Item> items = itemRegistry.getItems();
+        Set<String> itemNames = new HashSet<>();
+        items.forEach(item -> itemNames.add(item.getName()));
+
+        // Delete items that are not present anymore
+        Arrays.stream(javaSourceItemsFromFolder).filter(
+                f -> itemNames.contains(JRuleUtil.removeExtension(f.getName(), JRuleBindingConstants.JAVA_FILE_TYPE)))
+                .forEach(f -> deleteFile(f));
+
+        items.stream().forEach(item -> generateItemSource(item));
     }
 
-    private void generateItemSource(Item item) {
+    private synchronized boolean deleteFile(File f) {
+        if (f.exists()) {
+            logger.debug("Deleting file: {}", f.getAbsolutePath());
+            return f.delete();
+        }
+        return false;
+    }
+
+    private synchronized void generateItemSource(Item item) {
         if (itemGenerator != null) {
-            itemGenerator.generateItemSource(item);
+            final boolean itemUpdated = itemGenerator.generateItemSource(item);
+            recompileJar |= itemUpdated;
+            if (itemUpdated) {
+                deleteClassFileForItem(item);
+            }
         } else {
             logger.error("Failed to generate Item sources, not initialized");
         }
+    }
+
+    private synchronized void deleteClassFileForItem(Item item) {
+        deleteClassFileForItem(item.getName());
+    }
+
+    // private void deleteSourceFileForItem(Item item) {
+    // deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
+    // .append(JRuleBindingConstants.JRULE_GENERATION_PREFIX).append(item.getName())
+    // .append(JRuleBindingConstants.CLASS_FILE_TYPE).toString()));
+    // }
+
+    private synchronized void deleteClassFileForItem(String itemName) {
+        deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
+                .append(JRuleBindingConstants.JRULE_GENERATION_PREFIX).append(itemName)
+                .append(JRuleBindingConstants.CLASS_FILE_TYPE).toString()));
+    }
+
+    private synchronized void deleteSourceFileForItem(String itemName) {
+        deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
+                .append(JRuleBindingConstants.JRULE_GENERATION_PREFIX).append(itemName)
+                .append(JRuleBindingConstants.JAVA_FILE_TYPE).toString()));
     }
 
     @Override
@@ -288,25 +356,69 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         return JRuleBindingConstants.THING_TYPE_JRULE.equals(thingTypeUID);
     }
 
+    private synchronized void compileItems() {
+        compiler.compileItems();
+    }
+
     @Override
     public void propertyChange(@Nullable PropertyChangeEvent evt) {
-        if (evt != null) {
-            final String property = evt.getPropertyName();
-            if (property == JRuleRulesWatcher.PROPERTY_ENTRY_CREATE
-                    || property == JRuleRulesWatcher.PROPERTY_ENTRY_MODIFY
-                    || property == JRuleRulesWatcher.PROPERTY_ENTRY_DELETE) {
-                Path newValue = (Path) evt.getNewValue();
-                logger.debug("Directory watcher new value: {}", newValue);
-                reloadRules();
-                logger.debug("All Rules reloaded");
 
-            }
+        logger.debug("++Evt: {}", evt);
+        if (evt == null) {
+            return;
         }
+
+        final String property = evt.getPropertyName();
+        if (property.equals(JRuleEventSubscriber.PROPERTY_ITEM_REGISTRY_EVENT)) {
+            logger.debug("++ Registry Evt: {}", evt);
+            Event event = (Event) evt.getNewValue();
+            if (event == null) {
+                logger.debug("++ event null: {}", evt);
+
+                return;
+            }
+            String eventType = event.getType();
+            logger.debug("++ payload: {} topic: {}", event.getPayload(), event.getTopic());
+            String itemName = JRuleUtil.getItemNameFromTopic(event.getTopic());
+            logger.debug("++ item name: {}", itemName);
+
+            if (eventType.equals(ItemRemovedEvent.TYPE)) {
+                logger.debug("++RemovedType: {}", evt);
+                deleteClassFileForItem(itemName);
+                deleteSourceFileForItem(itemName);
+                recompileJar = true;
+            } else if (eventType.equals(ItemAddedEvent.TYPE) || event.getType().equals(ItemUpdatedEvent.TYPE)) {
+                try {
+                    Item item = itemRegistry.getItem(itemName);
+                    generateItemSource(item);
+                } catch (ItemNotFoundException e) {
+                    logger.debug("Could not find new item", e);
+                }
+            } else {
+                logger.debug("Fauled to do something with item event");
+            }
+            if (recompileJar) {
+                compileItems();
+                createItemsJar();
+            }
+        } else if (property == JRuleRulesWatcher.PROPERTY_ENTRY_CREATE
+                || property == JRuleRulesWatcher.PROPERTY_ENTRY_MODIFY
+                || property == JRuleRulesWatcher.PROPERTY_ENTRY_DELETE) {
+            Path newValue = (Path) evt.getNewValue();
+            logger.debug("Directory watcher new value: {}", newValue);
+            reloadRules();
+            logger.debug("All Rules reloaded");
+
+        }
+    }
+
+    private String getItemNameFromPayload(String payload) {
+        return payload.substring(payload.indexOf('\''), payload.lastIndexOf('\''));
     }
 
     private void reloadRules() {
         compileUserRules();
-        JRuleEngine.get().clear();
+        JRuleEngine.get().reset();
         // compiler.
         createRuleInstances();
     }

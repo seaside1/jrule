@@ -74,6 +74,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private Set<String> itemNames = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
+    private Set<CompletableFuture<Void>> timers = new HashSet<>();
     protected final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
@@ -95,6 +96,12 @@ public class JRuleEngine implements PropertyChangeListener {
         itemNames.clear();
         itemToExecutionContexts.clear();
         itemToRules.clear();
+        clearTimers();
+    }
+
+    private synchronized void clearTimers() {
+        timers.stream().forEach(d -> d.cancel(true));
+        timers.clear();
     }
 
     public void remove(JRule jRule) {
@@ -205,13 +212,18 @@ public class JRuleEngine implements PropertyChangeListener {
     private synchronized void addTimedExecution(JRule jRule, String jRuleName, JRuleWhen jRuleWhen, Method method,
             boolean jRuleEventPresent) {
         CompletableFuture<Void> future = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+        timers.add(future);
         logger.info("Scheduling timer for rule: {} hours: {} minutes: {} seconds: {}", jRule, jRuleWhen.hours(),
                 jRuleWhen.minutes(), jRuleWhen.seconds());
         JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, method, jRuleName, jRuleEventPresent);
         Consumer<Void> consumer = new Consumer<Void>() {
             @Override
             public void accept(Void t) {
-                invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
+                try {
+                    invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
+                } finally {
+                    timers.remove(future);
+                }
             }
         };
         future.thenAccept(consumer).thenAccept(s -> {
@@ -421,11 +433,5 @@ public class JRuleEngine implements PropertyChangeListener {
         } catch (SecurityException e) {
             logger.error("Error", e);
         }
-    }
-
-    public void clear() {
-        itemToRules.clear();
-        itemToExecutionContexts.clear();
-        itemNames.clear();
     }
 }

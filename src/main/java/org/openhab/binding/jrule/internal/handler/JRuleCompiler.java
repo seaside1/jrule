@@ -27,7 +27,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.openhab.binding.jrule.internal.JRuleBindingConstants;
 import org.openhab.binding.jrule.internal.JRuleConfig;
 import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class JRuleCompiler {
                 try {
                     // "org.openhab.binding.jrule.items.generated."
                     Class<?> loadedClass = classLoader.loadClass(classPackage
-                            + removeExtension(classItem.getName(), GeneratedFileNameFilter.CLASS_FILE_TYPE));
+                            + JRuleUtil.removeExtension(classItem.getName(), JRuleBindingConstants.CLASS_FILE_TYPE));
                     if (createInstance) {
                         Object obj = loadedClass.newInstance();
                         logger.debug("Loaded and instance: {}", classItem.getName());
@@ -119,20 +119,24 @@ public class JRuleCompiler {
         }
     }
 
+    public File[] getJavaSourceItemsFromFolder(File folder) {
+        return folder.listFiles(GeneratedFileNameFilter.JAVA_FILTER);
+    }
+
     public void compileIitemsInFolder(File itemsFolder) {
         final String itemsClassPath = System.getProperty("java.class.path") + File.pathSeparator
                 + getJarPath(JAR_JRULE_NAME);
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
-        final File[] javaItems = itemsFolder.listFiles(GeneratedFileNameFilter.JAVA_FILTER);
+        final File[] javaItems = getJavaSourceItemsFromFolder(itemsFolder);
         final File[] classItems = itemsFolder.listFiles(GeneratedFileNameFilter.CLASS_FILTER);
         final Set<String> classNames = new HashSet<>();
         Arrays.stream(classItems).forEach(classItem -> classNames
-                .add(removeExtension(classItem.getName(), GeneratedFileNameFilter.CLASS_FILE_TYPE)));
+                .add(JRuleUtil.removeExtension(classItem.getName(), JRuleBindingConstants.CLASS_FILE_TYPE)));
 
         logger.debug("++ ClassNameSetSize: {}", classNames.size());
         Arrays.stream(javaItems)
                 .filter(javaItem -> !classNames
-                        .contains(removeExtension(javaItem.getName(), GeneratedFileNameFilter.JAVA_FILE_TYPE)))
+                        .contains(JRuleUtil.removeExtension(javaItem.getName(), JRuleBindingConstants.JAVA_FILE_TYPE)))
                 .forEach(javaItem -> compileClass(javaItem, itemsClassPath));
         classNames.clear();
     }
@@ -142,12 +146,7 @@ public class JRuleCompiler {
                 .toString();
     }
 
-    private String removeExtension(@NonNull String name, String extention) {
-        return name.substring(0, name.lastIndexOf(extention));
-    }
-
     public void compileItems() {
-        logger.info("Compiling items in folder: {}", jRuleConfig.getItemsDirectory());
         compileIitemsInFolder(new File(jRuleConfig.getItemsDirectory()));
     }
 
@@ -183,12 +182,11 @@ public class JRuleCompiler {
 
     private static class GeneratedFileNameFilter implements FilenameFilter {
 
-        private static final String JAVA_FILE_TYPE = ".java";
-        private static final String CLASS_FILE_TYPE = ".class";
-
         private static final String PREFIX = "_";
-        private static final GeneratedFileNameFilter JAVA_FILTER = new GeneratedFileNameFilter(JAVA_FILE_TYPE);
-        private static final GeneratedFileNameFilter CLASS_FILTER = new GeneratedFileNameFilter(CLASS_FILE_TYPE);
+        private static final GeneratedFileNameFilter JAVA_FILTER = new GeneratedFileNameFilter(
+                JRuleBindingConstants.JAVA_FILE_TYPE);
+        private static final GeneratedFileNameFilter CLASS_FILTER = new GeneratedFileNameFilter(
+                JRuleBindingConstants.CLASS_FILE_TYPE);
 
         private final String fileType;
 
