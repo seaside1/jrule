@@ -159,7 +159,7 @@ public class JRuleEngine implements PropertyChangeListener {
                         jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
                         getDoubelFromAnnotation(jRuleWhen.lt()), getDoubelFromAnnotation(jRuleWhen.lte()),
                         getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()));
-                itemNames.add(jRuleWhen.item() + getTypeOfEventFromTrigger(jRuleWhen.trigger()));
+                itemNames.add(jRuleWhen.item());
 
                 // HERE: Put trigger to rule hashmap or item to rule hashmao
                 // Check what you get from item notification
@@ -340,6 +340,7 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
+        logger.debug("invoke when context matches");
         if (context.isNumericOperation()) {
             Double value = getValuAsDouble(jRuleEvent.getValue());
             if (context.getGt() != null) {

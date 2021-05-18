@@ -104,8 +104,8 @@ public class JRuleEventSubscriber implements EventSubscriber {
         if (!jRuleMonitoredItems.contains(itemFromTopic)) {
             return;
         }
-        propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
         logger.debug("Got Event event: topic {} payload: {}", event.getTopic(), event.getPayload());
+        propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
