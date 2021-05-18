@@ -42,7 +42,6 @@ public enum JRuleChannel {
         Optional<JRuleChannel> channel = JRuleChannel.stream()
                 .filter(channelList -> str.replaceAll(DASH, UNDERSCORE).equalsIgnoreCase(channelList.name()))
                 .findFirst();
-        // .get();
         return channel.isPresent() ? channel.get() : null;
     }
 }

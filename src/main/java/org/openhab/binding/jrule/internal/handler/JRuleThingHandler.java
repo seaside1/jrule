@@ -17,7 +17,6 @@ import static org.openhab.core.thing.ThingStatus.ONLINE;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -65,6 +64,10 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class JRuleThingHandler extends BaseThingHandler implements PropertyChangeListener {
 
+    private static final String JAR_FOLDER = "jar/";
+
+    private static final String JAR_LIB_PATH = "lib/";
+
     @NonNullByDefault({})
     private ItemRegistry itemRegistry;
 
@@ -72,14 +75,7 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     private JRuleEventSubscriber eventSubscriber;
 
     @NonNullByDefault({})
-    private EventPublisher eventPublisher;
-
-    @NonNullByDefault({})
     private VoiceManager voiceManager;
-
-    private static final String PREFIX_DEBUG_LOG = "[{}] [{}] {}";
-
-    private static final String PREFIX_INFO_LOG = "[{}] {}";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleThingHandler.class);
 
@@ -105,7 +101,6 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         super(thing);
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
-        this.eventPublisher = eventPublisher;
         this.voiceManager = voiceManager;
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
@@ -116,13 +111,12 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         logger.debug("New instance JRuleThingHandler: {}", thing.getUID());
     }
 
-    // Remove creating instances of items
     private void createRuleInstances() {
         try {
             final URL[] urls = new URL[] { new File(config.getItemsRootDirectory()).toURI().toURL(),
                     new File(config.getRulesRootDirectory()).toURI().toURL() };
 
-            ClassLoader loader = new URLClassLoader(urls, JRuleUtil.class.getClassLoader());
+            final ClassLoader loader = new URLClassLoader(urls, JRuleUtil.class.getClassLoader());
             compiler.loadClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
 
         } catch (MalformedURLException e) {
@@ -132,25 +126,12 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
     private void compileUserRules() {
         logger.debug("Compile User Rules");
-        compiler.compileRules();
-    }
-
-    private void loadRules() {
-        Class[] classes = null;
-        try {
-            classes = JRuleUtil.getClasses("org.openhab.binding.jrule.rules");
-        } catch (ClassNotFoundException e) {
-            logger.debug("Failed to get classes", e);
-        } catch (IOException e) {
-            logger.debug("Failed to get classes", e);
+        if (compiler != null) {
+            compiler.compileRules();
+        } else {
+            logger.debug("Compiler is null aborting");
+            return;
         }
-        if (classes != null) {
-            logger.debug("Iterating classes: {}", classes.length);
-            for (Class clazz : classes) {
-                logger.debug("++Found class: {}", clazz.getName());// jRuleCommandHandler.se//, eventSubscriber)
-            }
-        }
-        // new MyRule();
     }
 
     private boolean initializeFolder(String folder) {
@@ -223,10 +204,15 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         rulesDirWatcherThread.start();
     }
 
+    @SuppressWarnings("null")
     private synchronized void createItemsJar() {
-        JRuleUtil.createJarFile(config.getItemsRootDirectory(),
-                compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
-        recompileJar = false;
+        if (config != null && compiler != null) {
+            JRuleUtil.createJarFile(config.getItemsRootDirectory(),
+                    compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
+            recompileJar = false;
+        } else {
+            logger.error("Failed to create items due to config {}, compiler {}", config, compiler);
+        }
     }
 
     private synchronized void writeExternalJars() {
@@ -236,13 +222,9 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     }
 
     private synchronized void writeJar(String name) {
-        URL jarUrl = JRuleUtil.getResourceUrl("lib/" + name);
+        final URL jarUrl = JRuleUtil.getResourceUrl(JAR_LIB_PATH.concat(name));
         final byte[] jarBytes = JRuleUtil.getResourceAsBytes(jarUrl);
-        JRuleUtil.writeFile(jarBytes, config.getWorkingDirectory() + File.separator + "jar/" + name);
-    }
-
-    private File getJarFolder(String name) {
-        return new File(config.getJarDirectory() + File.separator + name);
+        JRuleUtil.writeFile(jarBytes, config.getWorkingDirectory() + File.separator + JAR_FOLDER + name);
     }
 
     @SuppressWarnings("null")
@@ -266,7 +248,6 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
     }
 
     public synchronized void generateItemSources() {
-        // HashSet check if all java name exists in hashSet
         File[] javaSourceItemsFromFolder = compiler.getJavaSourceItemsFromFolder(new File(config.getItemsDirectory()));
         Collection<Item> items = itemRegistry.getItems();
         Set<String> itemNames = new HashSet<>();
@@ -304,12 +285,6 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         deleteClassFileForItem(item.getName());
     }
 
-    // private void deleteSourceFileForItem(Item item) {
-    // deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
-    // .append(JRuleBindingConstants.JRULE_GENERATION_PREFIX).append(item.getName())
-    // .append(JRuleBindingConstants.CLASS_FILE_TYPE).toString()));
-    // }
-
     private synchronized void deleteClassFileForItem(String itemName) {
         deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
                 .append(JRuleBindingConstants.JRULE_GENERATION_PREFIX).append(itemName)
@@ -324,7 +299,6 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-
         logger.debug("Handling command = {} for channel = {}", command.getClass(), channelUID);
         String channelId = channelUID.getIdWithoutGroup();
         JRuleChannel channel = JRuleChannel.fromString(channelId);
@@ -362,33 +336,28 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
 
     @Override
     public void propertyChange(@Nullable PropertyChangeEvent evt) {
-
-        logger.debug("++Evt: {}", evt);
         if (evt == null) {
             return;
         }
 
         final String property = evt.getPropertyName();
         if (property.equals(JRuleEventSubscriber.PROPERTY_ITEM_REGISTRY_EVENT)) {
-            logger.debug("++ Registry Evt: {}", evt);
             Event event = (Event) evt.getNewValue();
             if (event == null) {
-                logger.debug("++ event null: {}", evt);
-
+                logger.debug("Event value null. ignoring: {}", evt);
                 return;
             }
             String eventType = event.getType();
-            logger.debug("++ payload: {} topic: {}", event.getPayload(), event.getTopic());
             String itemName = JRuleUtil.getItemNameFromTopic(event.getTopic());
-            logger.debug("++ item name: {}", itemName);
 
             if (eventType.equals(ItemRemovedEvent.TYPE)) {
-                logger.debug("++RemovedType: {}", evt);
+                logger.debug("RemovedType: {}", evt);
                 deleteClassFileForItem(itemName);
                 deleteSourceFileForItem(itemName);
                 recompileJar = true;
             } else if (eventType.equals(ItemAddedEvent.TYPE) || event.getType().equals(ItemUpdatedEvent.TYPE)) {
                 try {
+                    logger.debug("Added/updatedType: {}", evt);
                     Item item = itemRegistry.getItem(itemName);
                     generateItemSource(item);
                 } catch (ItemNotFoundException e) {
@@ -412,14 +381,9 @@ public class JRuleThingHandler extends BaseThingHandler implements PropertyChang
         }
     }
 
-    private String getItemNameFromPayload(String payload) {
-        return payload.substring(payload.indexOf('\''), payload.lastIndexOf('\''));
-    }
-
     private void reloadRules() {
         compileUserRules();
         JRuleEngine.get().reset();
-        // compiler.
         createRuleInstances();
     }
 }

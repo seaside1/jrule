@@ -53,5 +53,3 @@ public @interface JRuleWhen {
 
     double eq() default Double.MIN_VALUE;
 }
-// Changed to greater than greaterequals less than lessthan or equals
-// Cronbased trigger

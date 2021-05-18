@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.jrule.internal.JRuleUtil;
 import org.openhab.binding.jrule.internal.handler.JRuleEngine;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventFilter;
@@ -93,7 +94,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     @Override
     public void receive(Event event) {
-        final String itemFromTopic = getItemFromTopic(event.getTopic());
+        final String itemFromTopic = JRuleUtil.getItemNameFromTopic(event.getTopic());
         if (event.getType().equals(ItemAddedEvent.TYPE) //
                 || event.getType().equals(ItemRemovedEvent.TYPE) //
                 || event.getType().equals(ItemUpdatedEvent.TYPE)) {
@@ -105,19 +106,6 @@ public class JRuleEventSubscriber implements EventSubscriber {
         }
         propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
         logger.debug("Got Event event: topic {} payload: {}", event.getTopic(), event.getPayload());
-    }
-
-    private String getItemFromTopic(String topic) {
-
-        if (topic.isEmpty()) {
-            // TODO: VAR
-            return "";
-        }
-        final int start = topic.indexOf("items/") + "items/".length();
-        final int end = topic.length();// topic.lastIndexOf("/");
-        return end > 0 && end > start ? topic.substring(start, end) : "";
-        // final String[] fragments = topic.split("//");
-        // return (fragments.length > 0) ? fragments[fragments.length - 1] : "";
     }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {

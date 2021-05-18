@@ -189,12 +189,12 @@ public class JRuleEventHandler {
     }
 
     public Double getStateFromItemAsDouble(String name) {
-        State state = getStateFromItem(name); // item.getStateAs(DecimalType.class);
+        State state = getStateFromItem(name);
         if (state == null) {
             return null;
         }
-        DecimalType decimalType = state.as(DecimalType.class);// getStateFromItem(name);
-        return decimalType.doubleValue();
+        DecimalType decimalType = state.as(DecimalType.class);
+        return decimalType != null ? decimalType.doubleValue() : null;
     }
 
     public String getStringValue(String itemName) {
@@ -213,7 +213,7 @@ public class JRuleEventHandler {
             return null;
         }
         DecimalType decimalType = state.as(DecimalType.class);
-        return decimalType.intValue();
+        return decimalType != null ? decimalType.intValue() : null;
     }
 
     public Date getStateFromItemAsDate(String itemName) {
@@ -222,6 +222,6 @@ public class JRuleEventHandler {
             return null;
         }
         DateTimeType dateTimeType = state.as(DateTimeType.class);
-        return Date.from(ZonedDateTime.now().toInstant());
+        return dateTimeType != null ? Date.from(dateTimeType.getZonedDateTime().toInstant()) : null;
     }
 }

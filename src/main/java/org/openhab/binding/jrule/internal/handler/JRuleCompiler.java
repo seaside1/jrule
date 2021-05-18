@@ -14,6 +14,7 @@ package org.openhab.binding.jrule.internal.handler;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,10 +41,12 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleCompiler {
 
+    private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
+    private static final String CLASSPATH_OPTION = "-classpath";
     private static final String JRULE_USER_JAVA = "JRuleUser.java";
     private static final String JAR_USER_RULES = "user-rules.jar";
     public static final String JAR_JRULE_NAME = "jrule.jar";
-    public static final String JAR_JRULE_ITEMS_NAME = "jruleItems.jar";
+    public static final String JAR_JRULE_ITEMS_NAME = "jrule-items.jar";
     public static final String JAR_ECLIPSE_ANNOTATIONS_NAME = "org.eclipse.jdt.annotation-2.2.100.jar";
     public static final String JAR_SLF4J_API_NAME = "slf4j-api-1.7.16.jar";
 
@@ -69,22 +72,19 @@ public class JRuleCompiler {
 
             Arrays.stream(classItems).forEach(classItem -> {
                 try {
-                    // "org.openhab.binding.jrule.items.generated."
                     Class<?> loadedClass = classLoader.loadClass(classPackage
                             + JRuleUtil.removeExtension(classItem.getName(), JRuleBindingConstants.CLASS_FILE_TYPE));
                     if (createInstance) {
-                        Object obj = loadedClass.newInstance();
-                        logger.debug("Loaded and instance: {}", classItem.getName());
+                        Object obj = loadedClass.getDeclaredConstructor().newInstance();
+                        logger.debug("Loaded and instance: {} obj: {}", classItem.getName(), obj);
 
                     }
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                        | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+                        | SecurityException e) {
                     logger.error("Could not find class", e);
                 }
             });
-            // Class<?> loadedClass = classLoader.loadClass("org.openhab.binding.jrule.items.generated." + _MotionUl");
-
-            // Object obj = loadedClass.newInstance();
-            // logger.debug("obj: {}", obj.getClass().getSimpleName());
         } catch (Exception e) {
             logger.error("error instance", e);
         }
@@ -97,7 +97,7 @@ public class JRuleCompiler {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
             List<String> optionList = new ArrayList<String>();
-            optionList.add("-classpath");
+            optionList.add(CLASSPATH_OPTION);
             optionList.add(classPath);
             Iterable<? extends JavaFileObject> compilationUnit = fileManager
                     .getJavaFileObjectsFromFiles(Arrays.asList(javaSourceFile));
@@ -114,7 +114,7 @@ public class JRuleCompiler {
                 }
                 fileManager.close();
             } catch (Exception x) {
-                logger.error("eeror", x);
+                logger.error("error", x);
             }
         }
     }
@@ -124,7 +124,7 @@ public class JRuleCompiler {
     }
 
     public void compileIitemsInFolder(File itemsFolder) {
-        final String itemsClassPath = System.getProperty("java.class.path") + File.pathSeparator
+        final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
                 + getJarPath(JAR_JRULE_NAME);
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
         final File[] javaItems = getJavaSourceItemsFromFolder(itemsFolder);
@@ -133,7 +133,7 @@ public class JRuleCompiler {
         Arrays.stream(classItems).forEach(classItem -> classNames
                 .add(JRuleUtil.removeExtension(classItem.getName(), JRuleBindingConstants.CLASS_FILE_TYPE)));
 
-        logger.debug("++ ClassNameSetSize: {}", classNames.size());
+        logger.debug("ClassNameSetSize: {}", classNames.size());
         Arrays.stream(javaItems)
                 .filter(javaItem -> !classNames
                         .contains(JRuleUtil.removeExtension(javaItem.getName(), JRuleBindingConstants.JAVA_FILE_TYPE)))
@@ -152,7 +152,7 @@ public class JRuleCompiler {
 
     public void compileRules() {
         String rulesClassPath = //
-                System.getProperty("java.class.path") + File.pathSeparator //
+                System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator //
                         + getJarPath(JAR_JRULE_ITEMS_NAME) + File.pathSeparator //
                         + getJarPath(JAR_JRULE_NAME) + File.pathSeparator //
                         + getJarPath(JAR_ECLIPSE_ANNOTATIONS_NAME) + File.pathSeparator //
@@ -177,17 +177,12 @@ public class JRuleCompiler {
         Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
     }
 
-    public void compileRule(String ruleName) {
-    }
-
     private static class GeneratedFileNameFilter implements FilenameFilter {
 
-        private static final String PREFIX = "_";
         private static final GeneratedFileNameFilter JAVA_FILTER = new GeneratedFileNameFilter(
                 JRuleBindingConstants.JAVA_FILE_TYPE);
         private static final GeneratedFileNameFilter CLASS_FILTER = new GeneratedFileNameFilter(
                 JRuleBindingConstants.CLASS_FILE_TYPE);
-
         private final String fileType;
 
         public GeneratedFileNameFilter(String fileType) {
