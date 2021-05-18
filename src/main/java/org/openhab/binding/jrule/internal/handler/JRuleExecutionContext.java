@@ -22,6 +22,9 @@ import org.openhab.binding.jrule.rules.JRule;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleExecutionContext {
+    private static final String FROM_PREFIX = " from ";
+    private static final String TO_PREFIX = " to ";
+    private static final String SPACE = " ";
     private final String trigger;
     private final String ruleName;
     private final String itemClass;
@@ -32,7 +35,6 @@ public class JRuleExecutionContext {
     private final Double gte;
     private final Double lt;
     private final Double lte;
-
     private final String update;
     private final JRule jRule;
     private final Method method;
@@ -75,18 +77,40 @@ public class JRuleExecutionContext {
 
     public String getTriggerFullString() {
         if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
-            return trigger + " from " + from + " to " + to;
+            return buildFromToString(trigger, from, to);
         }
         if (from != null && !from.isEmpty()) {
-            return trigger + " from " + from;
+            return buildFromToString(trigger, from, null);
         }
         if (to != null && !to.isEmpty()) {
-            return trigger + " to " + to;
+            return buildFromToString(trigger, null, to);
         }
         if (update != null && !update.isEmpty()) {
-            return trigger + " " + update;
+            return buildUpdateString(trigger, update);
         }
         return trigger;
+    }
+
+    private String buildUpdateString(String trigger, String update) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(trigger);
+        builder.append(SPACE);
+        builder.append(update);
+        return builder.toString();
+    }
+
+    private String buildFromToString(String trigger, String from, String to) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(trigger);
+        if (from != null) {
+            builder.append(FROM_PREFIX);
+            builder.append(from);
+        }
+        if (to != null) {
+            builder.append(TO_PREFIX);
+            builder.append(to);
+        }
+        return builder.toString();
     }
 
     public String getItemClass() {

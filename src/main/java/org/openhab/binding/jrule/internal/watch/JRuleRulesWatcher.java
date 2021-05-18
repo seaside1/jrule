@@ -70,7 +70,6 @@ public class JRuleRulesWatcher implements Runnable {
                 logger.error("Failed to watch folder since it is not a directory: {}",
                         watchFolder.toFile().getAbsolutePath());
                 return;
-                // return false;
             }
         } catch (IOException ioe) {
             logger.error("Failed to start watching folder: {}", watchFolder.toFile().getAbsolutePath(), ioe);
@@ -107,7 +106,7 @@ public class JRuleRulesWatcher implements Runnable {
                 }
 
                 if (!key.reset()) {
-                    break; // loop
+                    break;
                 }
             }
         } catch (InterruptedException e) {

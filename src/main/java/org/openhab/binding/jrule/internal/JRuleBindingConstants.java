@@ -30,4 +30,6 @@ public class JRuleBindingConstants {
 
     public static final String BINDING_ID = "jrule";
     public static final ThingTypeUID THING_TYPE_JRULE = new ThingTypeUID(BINDING_ID, "jruleengine");
+
+    public static final String EMPTY = "";
 }

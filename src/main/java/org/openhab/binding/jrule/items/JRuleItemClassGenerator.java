@@ -149,17 +149,4 @@ public class JRuleItemClassGenerator {
         }
         return false;
     }
-
-    // private void getMd5Hash(String generatedClass) {
-    // MessageDigest md;
-    // try {
-    // md = MessageDigest.getInstance("MD5");
-    // md.update(generatedClass.getBytes());
-    // byte[] digest = md.digest();
-    // logger.debug("Digest: " + new String(digest));// String myHash =
-    // // DatatypeConverter.printHexBinary(digest).toUpperCase();
-    // } catch (NoSuchAlgorithmException e) {
-    //
-    // }
-    // }
 }

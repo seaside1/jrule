@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.FileNameMap;
-import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -56,6 +55,12 @@ import org.slf4j.LoggerFactory;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleUtil {
+    private static final String BACKSLASH_ESCAPE = "\\";
+
+    private static final String SEPARATOR = "/";
+
+    private static final String ITEMS_START = "items/";
+
     private static final Logger logger = LoggerFactory.getLogger(JRuleUtil.class);
 
     protected static final String ERROR_RESOURCE = "Can't find resource: {}";
@@ -144,55 +149,31 @@ public class JRuleUtil {
 
     @SuppressWarnings("rawtypes")
     public static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
-
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) {
             throw new ClassNotFoundException("Could not get classloder");
         }
-
-        //
-        final ClassLoader cld = Thread.currentThread().getContextClassLoader();
-        final Enumeration<URL> res = cld.getResources(packageName.replace('.', '/'));
-        logger.debug("Get ResClasses enum: {}", res.hasMoreElements());
-
-        //
-
-        final String path = packageName.replace('.', '/');
-        // packageName.replaceAll(".", "/");
-        Enumeration<URL> resources = classLoader.getResources(path);
-        logger.debug("Get classes enum: {}", resources.hasMoreElements());
-        List<File> dirs = new ArrayList<File>();
+        final String pathFromPackage = packageName.replace('.', '/');
+        final Enumeration<URL> resources = (Enumeration<URL>) classLoader.getResources(pathFromPackage);
+        logger.debug("Get ResClasses enum: {}", resources.hasMoreElements());
+        final List<File> dirs = new ArrayList<File>();
         while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            URLConnection connection = resource.openConnection();
-            // InputStream openStream = resource.openStream();
+            final URL resource = resources.nextElement();
+            final URLConnection connection = resource.openConnection();
             InputStream openStream = connection.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(openStream));
             String line = null;
-            logger.debug("Getting lines");
             while ((line = reader.readLine()) != null) {
                 logger.debug("line: {}", line);
             }
-            FileNameMap fileNameMap = URLConnection.getFileNameMap();
+            final FileNameMap fileNameMap = URLConnection.getFileNameMap();
             URI uri;
             try {
                 uri = connection.getURL().toURI();
                 logger.debug("Uri: {}", uri.toString());
-                // Path of = Path.of(uri);
-                // logger.debug("of: {}", of.toString());
-
             } catch (URISyntaxException e) {
-
+                logger.debug("Uri syntax exception", e);
             }
-            // String fileName = of.getName(0);
-
-            logger.debug("Filenamepa: {}", fileNameMap);
-            if (connection instanceof JarURLConnection) {
-                logger.debug("Jar url connection");
-                // ((JarURLConnection) connection, pckgname, classes);
-            }
-            logger.debug("Noconnection: {}", connection.getClass().getCanonicalName());
-
             logger.debug("++Add file: {}", resource.getFile());
             dirs.add(new File(resource.getFile()));
         }
@@ -225,7 +206,7 @@ public class JRuleUtil {
                     continue;
                 }
                 classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            } else if (file.getName().endsWith(".class")) {
+            } else if (file.getName().endsWith(JRuleBindingConstants.CLASS_FILE_TYPE)) {
                 classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6),
                         false, JRuleUtil.class.getClassLoader()));
             }
@@ -272,11 +253,11 @@ public class JRuleUtil {
     private static void add(String parents, File source, JarOutputStream target) throws IOException {
         BufferedInputStream in = null;
         try {
-            String name = (parents + source.getName()).replace("\\", "/");
+            String name = (parents + source.getName()).replace(BACKSLASH_ESCAPE, SEPARATOR);
             if (source.isDirectory()) {
                 if (!name.isEmpty()) {
-                    if (!name.endsWith("/")) {
-                        name += "/";
+                    if (!name.endsWith(SEPARATOR)) {
+                        name += SEPARATOR;
                     }
                     JarEntry entry = new JarEntry(name);
                     entry.setTime(source.lastModified());
@@ -311,18 +292,14 @@ public class JRuleUtil {
     }
 
     public static String getItemNameFromTopic(@NonNull String topic) {
-        logger.debug("Parse topic: {}", topic);
         if (topic.isEmpty()) {
-            // TODO: VAR
-            return "";
+            return JRuleBindingConstants.EMPTY;
         }
-        final int start = topic.indexOf("items/") + "items/".length();
-        int end = topic.lastIndexOf("/");
+        final int start = topic.indexOf(ITEMS_START) + ITEMS_START.length();
+        int end = topic.lastIndexOf(SEPARATOR);
         if (start > end) {
             end = topic.length();
         }
-        return end > 0 && end > start ? topic.substring(start, end) : "";
-        // final String[] fragments = topic.split("//");
-        // return (fragments.length > 0) ? fragments[fragments.length - 1] : "";
+        return end > 0 && end > start ? topic.substring(start, end) : JRuleBindingConstants.EMPTY;
     }
 }
