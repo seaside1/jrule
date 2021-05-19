@@ -10,9 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.jrule.items.generated;
+package org.openhab.automation.jrule.items.generated;
 
-import org.openhab.binding.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRuleNumberItem;
 
 /**
  * Automatically Generated Class
