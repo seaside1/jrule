@@ -3,8 +3,8 @@ Write OpenHAB Rules using Java
 
 This binding aims to enable Java development of OpenHAB Rules. The binding will allow the user to create custom OpenHAB rules
 in one or several .java-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers
-are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execture rules based on items defined in .items-files (the regular OpenHAB Items), the binding needs to know about the items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
-For the binding to be able to pick up rules, they need to be compiled first. The source .java rules-files are placed in a specific rules folder and
+are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execute rules based on items defined in OpenHAB either in .items-files or the GUI. The binding needs to know about these items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
+For the binding to be able to pick up rules, they need to be compiled first by the binding. The source .java rules-files are placed in a specific rules folder and
 will be automatically compiled and loaded into OpenHAB when the binding is started. The syntax for rules as well as the design and thinking behind the binding is to provide something that is similar to Rules DSL but more powerful and customizable.
 
 # Why?
@@ -43,8 +43,8 @@ The following jar files can be found under the jrule/jar-folder:
 | jrule-items.jar                        | Contains all generated items, which will be used when developing rules                        |
 | jrule.jar                              | JRule Binding classes neeed as dependency when doing development                              |
 | org.eclipse.jdt.annotation-2.2.100.jar | eclipse annotations jar file needed for development to be able to compile                     |
-| slf4j-api-1.7.16.jar                   | Used for logging also needed in local rule development                                        |
-| used-rules.jar                         | The user compiled rules, used internally by the binding in the classpath for rules execution  |
+| slf4j-api-1.7.16.jar                   | Used for logging in local rule development                                        |
+| user-rules.jar                         | The user compiled rules, used internally by the binding in the classpath for rules execution  |
 
 
 # Get started with the binding
