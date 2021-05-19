@@ -80,7 +80,7 @@ package org.openhab.automation.jrule.rules.user;
 import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.autopmation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
