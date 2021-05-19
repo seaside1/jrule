@@ -10,18 +10,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
+package org.openhab.automation.jrule.rules;
 
-import org.openhab.automation.jrule.items.JRuleItem;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * The {@link JRuleWhen}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleItem {
-
-    public static final String ITEM = "ITEMNAME";
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+public @interface JRuleWhens {
+    JRuleWhen[] value();
 }

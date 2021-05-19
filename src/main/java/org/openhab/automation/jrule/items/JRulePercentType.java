@@ -10,18 +10,22 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
-
-import org.openhab.automation.jrule.items.JRuleItem;
+package org.openhab.automation.jrule.items;
 
 /**
- * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * The {@link JRulePercentType}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleItem {
+public class JRulePercentType {
 
-    public static final String ITEM = "ITEMNAME";
+    private final int value;
 
+    public JRulePercentType(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 }

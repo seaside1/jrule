@@ -10,18 +10,25 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
-
-import org.openhab.automation.jrule.items.JRuleItem;
+package org.openhab.automation.jrule.items;
 
 /**
- * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * The {@link JRuleItemType} .
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleItem {
+public enum JRuleItemType {
 
-    public static final String ITEM = "ITEMNAME";
-
+    SWITCH,
+    CONTACT,
+    STRING,
+    ROLLERSHUTTER,
+    PLAYER,
+    NUMBER,
+    LOCATION,
+    IMAGE,
+    GROUP,
+    DIMMER,
+    DATETIME,
+    COLOR
 }

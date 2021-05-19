@@ -10,18 +10,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
-
-import org.openhab.automation.jrule.items.JRuleItem;
+package org.openhab.automation.jrule.rules;
 
 /**
- * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * The {@link JRuleOnOffValue} JRule Command
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleItem {
-
-    public static final String ITEM = "ITEMNAME";
-
+public enum JRuleOnOffValue {
+    ON,
+    OFF,
+    UNDEF;
 }
