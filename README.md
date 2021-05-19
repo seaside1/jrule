@@ -153,9 +153,9 @@ Create a Rules class that extends: JRuleUser.java
 JRuleUser.java should be placed in the same folder as your rules:
 
 ```java
-package org.openhab.binding.jrule.rules.user;
+package org.openhab.automation.jrule.rules.user;
 
-import org.openhab.binding.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRule;
 
 public class JRuleUser extends JRule {
 
@@ -164,14 +164,14 @@ public class JRuleUser extends JRule {
 ```
 
 Your class rules can now extend the JRuleUser
-package org.openhab.binding.jrule.rules.user;
+package org.openhab.automation.jrule.rules.user;
 ```java
-import static org.openhab.binding.jrule.rules.JRuleOnOffValue.ON;
-import org.openhab.binding.jrule.items.generated._MyTestSwitch;
-import org.openhab.binding.jrule.rules.JRule;
-import org.openhab.binding.jrule.rules.user.JRuleUser;
-import org.openhab.binding.jrule.rules.JRuleName;
-import org.openhab.binding.jrule.rules.JRuleWhen;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import org.openhab.automation.jrule.items.generated._MyTestSwitch;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.user.JRuleUser;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,9 +186,9 @@ We want to add a function that checks if it is ok to send notifications debing o
 We'll do this:
 
 ```java
-package org.openhab.binding.jrule.rules.user;
+package org.openhab.automation.jrule.rules.user;
 
-import org.openhab.binding.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRule;
 
 public class JRuleUser extends JRule {
 
@@ -207,12 +207,12 @@ public class JRuleUser extends JRule {
 We then extend the rule from the Java Rules file:
 
 ```java
-package org.openhab.binding.jrule.rules.user;
+package org.openhab.automation.jrule.rules.user;
 
-import org.openhab.binding.jrule.items.generated._MyTestSwitch;
-import org.openhab.binding.jrule.rules.JRuleEvent;
-import org.openhab.binding.jrule.rules.JRuleName;
-import org.openhab.binding.jrule.rules.JRuleWhen;
+import org.openhab.automation.jrule.items.generated._MyTestSwitch;
+import org.openhab.automation.jrule.rules.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -305,7 +305,7 @@ eq = equals
 Use case: Using say command for tts
 
 
-# Current Binding Limitations (this will be fixed)
+# Current Addon Limitations (this will be fixed)
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Roadmap
