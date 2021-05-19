@@ -7,6 +7,10 @@ are very similar to the triggers in Rules DSL but expressed using java annotatio
 For the binding to be able to pick up rules, they need to be compiled first by the binding. The source .java rules-files are placed in a specific rules folder and
 will be automatically compiled and loaded into OpenHAB when the binding is started. The syntax for rules as well as the design and thinking behind the binding is to provide something that is similar to Rules DSL but more powerful and customizable.
 
+# Limitations
+- Currently only working for OpenHab installations under Linux / Unix Operating Systems, not supported in Windows (for rules development its fine to use windows)
+- Not supporting OH3 GUI rules, script actions and script conditions 
+
 # Why?
  - You will be able to use a standard Java IDE to develop your rules. 
  - Full auto completion (Shift space) for all items, less chance of errors and typos
