@@ -1,11 +1,11 @@
 # J Rule
 Write OpenHAB Rules using Java
 
-This binding aims to enable Java development of OpenHAB Rules. The binding will allow the user to create custom OpenHAB rules
+This automation package aims to enable Java development of OpenHAB Rules. The addon will allow the user to create custom OpenHAB rules
 in one or several .java-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers
-are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execute rules based on items defined in OpenHAB either in .items-files or the GUI. The binding needs to know about these items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
-For the binding to be able to pick up rules, they need to be compiled first by the binding. The source .java rules-files are placed in a specific rules folder and
-will be automatically compiled and loaded into OpenHAB when the binding is started. The syntax for rules as well as the design and thinking behind the binding is to provide something that is similar to Rules DSL but more powerful and customizable.
+are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execute rules based on items defined in OpenHAB either in .items-files or the GUI. The addon needs to know about these items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
+For the addon to be able to pick up rules, they first need to be compiled by the addon. The source .java rules-files are placed in a specific rules folder and
+will be automatically compiled and loaded into OpenHAB when the addon is started. The syntax for rules as well as the design and thinking behind the addon is to provide something that is similar to Rules DSL but more powerful and customizable.
 
 # Limitations
 - Currently only working for OpenHab installations under Linux / Unix Operating Systems, not supported in Windows (for rules development its fine to use windows)
@@ -21,7 +21,7 @@ will be automatically compiled and loaded into OpenHAB when the binding is start
  - Use any 3rd party dependencies and libraries in your rules
 
 # Who?
-This binding is not for beginners, you should have knowledge in writing java-programs or a desire to do so.
+This addon is not for beginners, you should have knowledge in writing java-programs or a desire to do so.
 
 # Maturity
 Alpha, you can expect big changes in syntax and everything else. Please contribute if you can
@@ -30,12 +30,11 @@ Alpha, you can expect big changes in syntax and everything else. Please contribu
 Prebuilt jar file is available in the bin folder under https://github.com/seaside1/jrule
 
 # Java Rule Engine
-The only configuration that has to be done in the binding is the working directory. For instance the default location is:
-/etc/openhab/jrule
+
 
 Input rules files
 will be placed under:
-/etc/openhab/jrule/rules/org/openhab/binding/jrule/rules/user/
+/etc/openhab/jrule/rules/org/openhab/automation/jrule/rules/user/
 
 Output jar files to be added by the user as dependencies when doing rule development will be located under:
 /etc/openhab/jrule/jar
@@ -45,19 +44,19 @@ The following jar files can be found under the jrule/jar-folder:
 | Jar File                               | Description                                                                                   |
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
 | jrule-items.jar                        | Contains all generated items, which will be used when developing rules                        |
-| jrule.jar                              | JRule Binding classes neeed as dependency when doing development                              |
+| jrule.jar                              | JRule Addon classes neeed as dependency when doing development                              |
 | org.eclipse.jdt.annotation-2.2.100.jar | eclipse annotations jar file needed for development to be able to compile                     |
 | slf4j-api-1.7.16.jar                   | Used for logging in local rule development                                        |
-| user-rules.jar                         | The user compiled rules, used internally by the binding in the classpath for rules execution  |
+| user-rules.jar                         | The user compiled rules, used internally by the addon in the classpath for rules execution  |
 
 
-# Get started with the binding
-- Install the binding by copying the org.openhab.binding.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
-- In the GUI add a new JRule Engine as a Thing, specify a working directory (default /etc/openhab/jrule)
-- When the binding is started it will:
+# Get started with the JRule Automation Addon
+- Install the addon by copying the org.openhab.automation.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
+- In default location is /etc/openhab/automation/jrule
+- When the addon is started it will:
 1. Create JAVA source files for all items 
 2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/jrule/jar
-3. Compile any java rules file under  /etc/openhab/jrule/rules/org/openhab/binding/jrule/rules/user/
+3. Compile any java rules file under  /etc/openhab/jrule/rules/org/openhab/automation/jrule/rules/user/
 4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar)
 
 Once the JAVA rule engine has started and compiled items successfully you can either copy the jar files
@@ -65,7 +64,7 @@ form /etc/openhab/jrule/jar/* to the place where you intend to develop the Java-
 using samba / CIFS / NFS or similar.
 - Set up your favourite IDEA as a standard java IDEA. 
 - Create a new empty java project
-- Create a package / folder org.openhab.binding.jrule.rules.user
+- Create a package / folder org.openhab.automation.jrule.rules.user
 - Place your Java rules file in this folder.
 
 Designing your Java Rules File (Hello World)
@@ -77,12 +76,12 @@ Switch MyTestSwitch2  "Test Switch 2" (JRule)
 2. Create the following class
 
 ```java
-package org.openhab.binding.jrule.rules.user;
-import static org.openhab.binding.jrule.rules.JRuleOnOffValue.ON;
-import org.openhab.binding.jrule.items.generated._MyTestSwitch;
-import org.openhab.binding.jrule.rules.JRule;
-import org.openhab.binding.jrule.rules.JRuleName;
-import org.openhab.binding.jrule.rules.JRuleWhen;
+package org.openhab.automation.jrule.rules.user;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import org.openhab.automation.jrule.items.generated._MyTestSwitch;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.autopmation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
