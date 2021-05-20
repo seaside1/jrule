@@ -57,13 +57,4 @@ public class JRuleFactory {
     public void dispose() {
         jRuleHandler.dispose();
     }
-    //
-    // @Override
-    // protected @Nullable ThingHandler createHandler(Thing thing) {
-    // ThingTypeUID thingTypeUID = thing.getThingTypeUID();
-    // if (JRuleThingHandler.supportsThingType(thingTypeUID)) {
-    // return new JRuleThingHandler(thing, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
-    // }
-    // return null;
-    // }
 }

@@ -35,6 +35,7 @@ public class JRuleExecutionContext {
     private final Double gte;
     private final Double lt;
     private final Double lte;
+    private final Double eq;
     private final String update;
     private final JRule jRule;
     private final Method method;
@@ -42,11 +43,12 @@ public class JRuleExecutionContext {
 
     public JRuleExecutionContext(JRule jRule, String trigger, String from, String to, String update, String ruleName,
             String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt, Double lte,
-            Double gt, Double gte) {
+            Double gt, Double gte, Double eq) {
         this.gt = gt;
         this.gte = gte;
         this.lt = lt;
         this.lte = lte;
+        this.eq = eq;
         this.jRule = jRule;
         this.trigger = trigger;
         this.from = from;
@@ -60,14 +62,15 @@ public class JRuleExecutionContext {
     }
 
     public JRuleExecutionContext(JRule jRule, Method method, String ruleName, boolean jRuleEventPresent) {
-        this(jRule, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null, null);
+        this(jRule, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null, null,
+                null);
     }
 
     @Override
     public String toString() {
         return "JRuleExecutionContext [trigger=" + trigger + ", ruleName=" + ruleName + ", itemClass=" + itemClass
                 + ", itemName=" + itemName + ", from=" + from + ", to=" + to + ", gt=" + gt + ", gte=" + gte + ", lt="
-                + lt + ", lte=" + lte + ", update=" + update + ", jRule=" + jRule + ", method=" + method
+                + lt + ", lte=" + lte + ", eq=" + eq + ", update=" + update + ", jRule=" + jRule + ", method=" + method
                 + ", eventParameterPresent=" + eventParameterPresent + "]";
     }
 
@@ -167,6 +170,10 @@ public class JRuleExecutionContext {
 
     public Double getLte() {
         return lte;
+    }
+
+    public Double getEq() {
+        return eq;
     }
 
     public boolean isNumericOperation() {
