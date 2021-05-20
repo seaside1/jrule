@@ -13,8 +13,8 @@
 package org.openhab.binding.jrule.items.generated;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.jrule.items.JRuleItemType;
-import org.openhab.binding.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.items.JRuleItemType;
+import org.openhab.automation.jrule.items.JRuleSwitchItem;
 
 /**
  * Automatically Generated Class

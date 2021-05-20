@@ -158,7 +158,8 @@ public class JRuleEngine implements PropertyChangeListener {
                 addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
                         jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
                         getDoubelFromAnnotation(jRuleWhen.lt()), getDoubelFromAnnotation(jRuleWhen.lte()),
-                        getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()));
+                        getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()),
+                        getDoubelFromAnnotation(jRuleWhen.eq()));
                 itemNames.add(jRuleWhen.item());
 
                 // HERE: Put trigger to rule hashmap or item to rule hashmao
@@ -227,7 +228,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void addExecutionContext(JRule jRule, String itemClass, String ruleName, String trigger, String from,
             String to, String update, String itemName, Method method, boolean eventParameterPresent, Double lt,
-            Double lte, Double gt, Double gte) {
+            Double lte, Double gt, Double gte, Double eq) {
         List<JRuleExecutionContext> contextList = itemToExecutionContexts.get(itemName);
         if (contextList == null) {
             contextList = new ArrayList<>();
@@ -235,7 +236,7 @@ public class JRuleEngine implements PropertyChangeListener {
         }
         logger.debug("++ContextList add: {} itemName: {}", ruleName, itemName);
         contextList.add(new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName, itemClass, itemName,
-                method, eventParameterPresent, lt, lte, gt, gte));
+                method, eventParameterPresent, lt, lte, gt, gte, eq));
     }
 
     private String getTypeOfEventFromTrigger(String trigger) {
@@ -358,6 +359,10 @@ public class JRuleEngine implements PropertyChangeListener {
 
             } else if (context.getLte() != null) {
                 if (value <= context.getLte()) {
+                    invokeRule(context, jRuleEvent);
+                }
+            } else if (context.getEq() != null) {
+                if (value.equals(context.getEq())) {
                     invokeRule(context, jRuleEvent);
                 }
             }
