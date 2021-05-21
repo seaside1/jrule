@@ -146,6 +146,9 @@ public class JRuleHandler implements PropertyChangeListener {
         if (!initializeFolder(config.getWorkingDirectory())) {
             return;
         }
+        if (!initializeFolder(config.getExtlibDirectory())) {
+            return;
+        }
         if (!initializeFolder(config.getJarDirectory())) {
             return;
         }

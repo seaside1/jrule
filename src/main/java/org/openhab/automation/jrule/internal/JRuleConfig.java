@@ -44,6 +44,8 @@ public class JRuleConfig {
 
     private static final String CLASS_DIR = "class";
 
+    private static final String EXT_LIB_DIR = "ext-lib";
+
     private final Map<String, Object> properties;
 
     public JRuleConfig(Map<String, Object> properties) {
@@ -79,5 +81,9 @@ public class JRuleConfig {
     public String getRulesRootDirectory() {
         return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(RULES_DIR_START)
                 .toString();
+    }
+
+    public String getExtlibDirectory() {
+        return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(EXT_LIB_DIR).toString();
     }
 }
