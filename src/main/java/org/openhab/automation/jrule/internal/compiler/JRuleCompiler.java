@@ -60,7 +60,7 @@ public class JRuleCompiler {
 
     public void loadClasses(ClassLoader classLoader, File classFolder, String classPackage, boolean createInstance) {
         try {
-            final File[] classItems = classFolder.listFiles(GeneratedFileNameFilter.CLASS_FILTER);
+            final File[] classItems = classFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
             if (classItems == null || classItems.length == 0) {
                 logger.info("Found no user defined java rules to load into memory in folder: {}",
                         classFolder.getAbsolutePath());
@@ -120,7 +120,7 @@ public class JRuleCompiler {
     }
 
     public File[] getJavaSourceItemsFromFolder(File folder) {
-        return folder.listFiles(GeneratedFileNameFilter.JAVA_FILTER);
+        return folder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
     }
 
     public void compileIitemsInFolder(File itemsFolder) {
@@ -128,7 +128,7 @@ public class JRuleCompiler {
                 + getJarPath(JAR_JRULE_NAME);
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
         final File[] javaItems = getJavaSourceItemsFromFolder(itemsFolder);
-        final File[] classItems = itemsFolder.listFiles(GeneratedFileNameFilter.CLASS_FILTER);
+        final File[] classItems = itemsFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
         final Set<String> classNames = new HashSet<>();
         Arrays.stream(classItems).forEach(classItem -> classNames
                 .add(JRuleUtil.removeExtension(classItem.getName(), JRuleConstants.CLASS_FILE_TYPE)));
@@ -157,6 +157,11 @@ public class JRuleCompiler {
                         + getJarPath(JAR_JRULE_NAME) + File.pathSeparator //
                         + getJarPath(JAR_ECLIPSE_ANNOTATIONS_NAME) + File.pathSeparator //
                         + getJarPath(JAR_SLF4J_API_NAME) + File.pathSeparator;
+        String extLibPath = getExtLibPaths();
+        logger.debug("extLibPath: {}", extLibPath);
+        if (extLibPath != null && !extLibPath.isEmpty()) {
+            rulesClassPath = rulesClassPath.concat(extLibPath);
+        }
         logger.debug("Compiling rules in folder: {}", jRuleConfig.getRulesDirectory());
         File userFile = new File(jRuleConfig.getRulesDirectory() + File.separator + JRULE_USER_JAVA);
         if (userFile.exists()) {
@@ -167,8 +172,7 @@ public class JRuleCompiler {
         final String finalClassPath = jarUserFilerFile.exists()
                 ? rulesClassPath + File.separator + jarUserFilerFile.getAbsolutePath()
                 : rulesClassPath;
-        final File[] javaFiles = new File(jRuleConfig.getRulesDirectory())
-                .listFiles(GeneratedFileNameFilter.JAVA_FILTER);
+        final File[] javaFiles = new File(jRuleConfig.getRulesDirectory()).listFiles(JRuleFileNameFilter.JAVA_FILTER);
         if (javaFiles == null || javaFiles.length == 0) {
             logger.info("Found no java rules to compile and use in folder: {}, no rules are loaded",
                     jRuleConfig.getRulesDirectory());
@@ -177,15 +181,32 @@ public class JRuleCompiler {
         Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
     }
 
-    private static class GeneratedFileNameFilter implements FilenameFilter {
+    private String getExtLibPaths() {
+        final File[] extLibs = new File(jRuleConfig.getExtlibDirectory()).listFiles(JRuleFileNameFilter.JAR_FILTER);
+        final StringBuilder builder = new StringBuilder();
+        if (extLibs != null && extLibs.length > 0) {
+            Arrays.stream(extLibs).forEach(extLib -> builder.append(createJarPath(extLib)));
+        }
+        return builder.toString();
+    }
 
-        private static final GeneratedFileNameFilter JAVA_FILTER = new GeneratedFileNameFilter(
-                JRuleConstants.JAVA_FILE_TYPE);
-        private static final GeneratedFileNameFilter CLASS_FILTER = new GeneratedFileNameFilter(
-                JRuleConstants.CLASS_FILE_TYPE);
+    private String createJarPath(File extLib) {
+        if (!extLib.canRead()) {
+            logger.error("Invalid permissions for external lib jar, ignored: {}", extLib.getAbsolutePath());
+            return JRuleConstants.EMPTY;
+        }
+        return extLib.getAbsolutePath().concat(File.pathSeparator);
+    }
+
+    private static class JRuleFileNameFilter implements FilenameFilter {
+
+        private static final JRuleFileNameFilter JAVA_FILTER = new JRuleFileNameFilter(JRuleConstants.JAVA_FILE_TYPE);
+        private static final JRuleFileNameFilter CLASS_FILTER = new JRuleFileNameFilter(JRuleConstants.CLASS_FILE_TYPE);
+        private static final JRuleFileNameFilter JAR_FILTER = new JRuleFileNameFilter(JRuleConstants.JAR_FILE_TYPE);
+
         private final String fileType;
 
-        public GeneratedFileNameFilter(String fileType) {
+        public JRuleFileNameFilter(String fileType) {
             this.fileType = fileType;
         }
 
