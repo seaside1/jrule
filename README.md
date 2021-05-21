@@ -320,7 +320,7 @@ Use case: Using say command for tts
 # Changelog
 ## ALPHA2
 - Added possibility to include 3rd party libraries when developing rules
-## ALPHA: 
+## ALPHA1
 - Refactored internal jar dependencies and jar-generation
 - Added eq comparator for number triggers in rules
 
