@@ -20,7 +20,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.JRuleUtil;
-import org.openhab.automation.jrule.internal.handler.JRuleEngine;
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;

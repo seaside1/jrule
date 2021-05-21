@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.internal.handler;
+package org.openhab.automation.jrule.internal.compiler;
 
 import java.io.File;
 import java.io.FilenameFilter;

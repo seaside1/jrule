@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.internal.handler;
+package org.openhab.automation.jrule.internal.engine;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -234,7 +234,7 @@ public class JRuleEngine implements PropertyChangeListener {
             contextList = new ArrayList<>();
             itemToExecutionContexts.put(itemName, contextList);
         }
-        logger.debug("++ContextList add: {} itemName: {}", ruleName, itemName);
+        logger.debug("ContextList add: {} itemName: {}", ruleName, itemName);
         contextList.add(new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName, itemClass, itemName,
                 method, eventParameterPresent, lt, lte, gt, gte, eq));
     }

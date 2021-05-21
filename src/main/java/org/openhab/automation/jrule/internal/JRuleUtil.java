@@ -174,7 +174,6 @@ public class JRuleUtil {
             } catch (URISyntaxException e) {
                 logger.debug("Uri syntax exception", e);
             }
-            logger.debug("++Add file: {}", resource.getFile());
             dirs.add(new File(resource.getFile()));
         }
         ArrayList<Class> classes = new ArrayList<Class>();
@@ -241,7 +240,7 @@ public class JRuleUtil {
             JarOutputStream target = new JarOutputStream(new FileOutputStream(targetFile), manifest);
             File inputDir = new File(inputDirectory);
             for (File nestedFile : inputDir.listFiles()) {
-                add("", nestedFile, target);
+                add(JRuleConstants.EMPTY, nestedFile, target);
             }
             target.close();
         } catch (IOException e) {
