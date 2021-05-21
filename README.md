@@ -318,9 +318,9 @@ Use case: Using say command for tts
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Changelog
-ALPHA2:
+## ALPHA2
 - Added possibility to include 3rd party libraries when developing rules
-ALPHA1: 
+## ALPHA: 
 - Refactored internal jar dependencies and jar-generation
 - Added eq comparator for number triggers in rules
 
