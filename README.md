@@ -19,6 +19,7 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
  - Advanced timers and locks are built in and can be used without cluttering the code
  - Possibility to write junit-tests to test your rules
  - Use any 3rd party dependencies and libraries in your rules
+ - You will be able to use JRule in parallell with any other Rules engine if you want to give it a try
 
 # Who?
 This addon is not for beginners, you should have knowledge in writing java-programs or a desire to do so.
