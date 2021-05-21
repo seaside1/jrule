@@ -104,7 +104,11 @@ public class MySwitchRule extends JRule {
 
 Make sure you add the Jar-files from /etc/openhab/jrule/jar as dependencies.
 
-Examples 
+# Third Party External Dependencies
+You can add any 3rd party library as dependency. Copy the jar files needed to /etc/openhab/automation/jrule/ext-lib
+The Automation Engine will automatically pick these dependencies up when it is compiling the rules.
+
+# Examples 
 
 Use Case: Invoke another item Switch from rule
 ```java
@@ -314,6 +318,8 @@ Use case: Using say command for tts
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Changelog
+ALPHA2:
+- Added possibility to include 3rd party libraries when developing rules
 ALPHA1: 
 - Refactored internal jar dependencies and jar-generation
 - Added eq comparator for number triggers in rules
@@ -322,4 +328,3 @@ ALPHA1:
 - Locks and timers by annotation
 - Built in expire functionality
 - Built in shell exec functionality
-- 3rd party jar files included in class path
