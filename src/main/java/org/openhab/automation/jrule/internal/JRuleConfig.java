@@ -42,6 +42,8 @@ public class JRuleConfig {
             + "user" + File.separator;
     private static final String DEFAULT_WORKING_DIR = "/etc/openhab/automation/jrule";
 
+    private static final String CLASS_DIR = "class";
+
     private final Map<String, Object> properties;
 
     public JRuleConfig(Map<String, Object> properties) {
@@ -51,6 +53,10 @@ public class JRuleConfig {
     public String getWorkingDirectory() {
         final String workingDir = (String) properties.get(WORKING_DIR_PROPERTY);
         return workingDir == null ? DEFAULT_WORKING_DIR : workingDir;
+    }
+
+    public String getClassDirectory() {
+        return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(CLASS_DIR).toString();
     }
 
     public String getItemsDirectory() {

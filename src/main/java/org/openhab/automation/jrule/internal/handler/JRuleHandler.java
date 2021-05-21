@@ -30,6 +30,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
+import org.openhab.automation.jrule.internal.compiler.JRuleJarExtractor;
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.watch.JRuleRulesWatcher;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
@@ -77,6 +80,7 @@ public class JRuleHandler implements PropertyChangeListener {
     private JRuleCompiler compiler;
 
     private final JRuleConfig config;
+    private final JRuleJarExtractor jarExtractor = new JRuleJarExtractor();
 
     @Nullable
     private Thread rulesDirWatcherThread;
@@ -138,7 +142,7 @@ public class JRuleHandler implements PropertyChangeListener {
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
         logger.debug("SettingConfig name: {} config: {}", config.getClass(), config.toString());
-        logger.info("Initializing JRule automation folder: {}", config.getWorkingDirectory());
+        logger.debug("Initializing JRule automation folder: {}", config.getWorkingDirectory());
         if (!initializeFolder(config.getWorkingDirectory())) {
             return;
         }
@@ -152,6 +156,7 @@ public class JRuleHandler implements PropertyChangeListener {
             return;
         }
         logger.info("Initializing JRule writing external Jars: {}", config.getJarDirectory());
+        writeAndExtractJruleJar();
         writeExternalJars();
         handleItemSources();
         logger.info("Compiling rules");
@@ -160,6 +165,11 @@ public class JRuleHandler implements PropertyChangeListener {
         startDirectoryWatcher();
         eventSubscriber.startSubscriper();
         logger.info("Initializing, done!");
+    }
+
+    private void writeAndExtractJruleJar() {
+        jarExtractor.extractJRuleJar(compiler.getJarPath(JRuleCompiler.JAR_JRULE_NAME));
+        // JRuleUtil.createJarFile(config.getClassDirectory(), compiler.getJarPath(JRuleCompiler.JAR_JRULE_NAME));
     }
 
     private void handleItemSources() {
@@ -193,7 +203,7 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     private synchronized void writeExternalJars() {
-        writeJar(JRuleCompiler.JAR_JRULE_NAME);
+        // writeJar(JRuleCompiler.JAR_JRULE_NAME);
         writeJar(JRuleCompiler.JAR_SLF4J_API_NAME);
         writeJar(JRuleCompiler.JAR_ECLIPSE_ANNOTATIONS_NAME);
     }
