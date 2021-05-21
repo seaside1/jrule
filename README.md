@@ -31,13 +31,12 @@ Prebuilt jar file is available in the bin folder under https://github.com/seasid
 
 # Java Rule Engine
 
-
 Input rules files
 will be placed under:
-/etc/openhab/jrule/rules/org/openhab/automation/jrule/rules/user/
+/etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
 
 Output jar files to be added by the user as dependencies when doing rule development will be located under:
-/etc/openhab/jrule/jar
+/etc/openhab/automation/jrule/jar
 
 The following jar files can be found under the jrule/jar-folder:
 
@@ -45,27 +44,32 @@ The following jar files can be found under the jrule/jar-folder:
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
 | jrule-items.jar                        | Contains all generated items, which will be used when developing rules                        |
 | jrule.jar                              | JRule Addon classes neeed as dependency when doing development                              |
-| org.eclipse.jdt.annotation-2.2.100.jar | eclipse annotations jar file needed for development to be able to compile                     |
+| org.eclipse.jdt.annotation-2.2.100.jar | Eclipse annotations jar file needed for development to be able to compile                     |
 | slf4j-api-1.7.16.jar                   | Used for logging in local rule development                                        |
 | user-rules.jar                         | The user compiled rules, used internally by the addon in the classpath for rules execution  |
 
 
 # Get started with the JRule Automation Addon
 - Install the addon by copying the org.openhab.automation.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
+  Download latest release from https://github.com/seaside1/jrule/tree/main/bin
 - In default location is /etc/openhab/automation/jrule
 - When the addon is started it will:
 1. Create JAVA source files for all items 
-2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/jrule/jar
-3. Compile any java rules file under  /etc/openhab/jrule/rules/org/openhab/automation/jrule/rules/user/
-4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar)
+2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/automation/jrule/jar
+3. Compile any java rules file under  /etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
+4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar).
+All dependencies need for Java rules development can be found under /etc/openhab/automation/jrule/jar
 
 Once the JAVA rule engine has started and compiled items successfully you can either copy the jar files
-form /etc/openhab/jrule/jar/* to the place where you intend to develop the Java- Rules, or share that folder
+form /etc/openhab/automation/jrule/jar/* to the place where you intend to develop the Java- Rules, or share that folder
 using samba / CIFS / NFS or similar.
 - Set up your favourite IDEA as a standard java IDEA. 
 - Create a new empty java project
 - Create a package / folder org.openhab.automation.jrule.rules.user
-- Place your Java rules file in this folder.
+- Place your Java rules file in this folder
+
+NOTE: The rules will be reloaded if they are modified. Any java file you place under /etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
+will be compiled or recompiled, you don't have to restart OpenHAB.
 
 Designing your Java Rules File (Hello World)
 1. Start by adding an item in Openhab.
