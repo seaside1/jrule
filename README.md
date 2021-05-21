@@ -64,7 +64,7 @@ All dependencies need for Java rules development can be found under /etc/openhab
 Once the JAVA rule engine has started and compiled items successfully you can either copy the jar files
 form /etc/openhab/automation/jrule/jar/* to the place where you intend to develop the Java- Rules, or share that folder
 using samba / CIFS / NFS or similar.
-- Set up your favourite IDEA as a standard java IDEA. 
+- Set up your favourite IDE as a standard java IDE. 
 - Create a new empty java project
 - Create a package / folder org.openhab.automation.jrule.rules.user
 - Place your Java rules file in this folder
