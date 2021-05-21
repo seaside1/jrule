@@ -308,6 +308,11 @@ Use case: Using say command for tts
 # Current Addon Limitations (this will be fixed)
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
+# Changelog
+ALPHA1: 
+    - Refactored internal jar dependencies and jar-generation
+    - Added eq comparator for number triggers in rules
+
 # Roadmap
 - Locks and timers by annotation
 - Built in expire functionality
