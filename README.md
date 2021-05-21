@@ -310,8 +310,8 @@ Use case: Using say command for tts
 
 # Changelog
 ALPHA1: 
-    - Refactored internal jar dependencies and jar-generation
-    - Added eq comparator for number triggers in rules
+- Refactored internal jar dependencies and jar-generation
+- Added eq comparator for number triggers in rules
 
 # Roadmap
 - Locks and timers by annotation
