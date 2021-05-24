@@ -318,6 +318,9 @@ Use case: Using say command for tts
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Changelog
+## ALPHA3
+- Fixed issue when reloading rules if they are changed with monitored items
+- Fixed classpath issue when executing rules using 3rd party libraries 
 ## ALPHA2
 - Added possibility to include 3rd party libraries when developing rules
 ## ALPHA1
