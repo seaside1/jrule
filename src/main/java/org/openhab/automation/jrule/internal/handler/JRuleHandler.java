@@ -19,9 +19,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,17 +104,23 @@ public class JRuleHandler implements PropertyChangeListener {
         logger.debug("New instance JRuleHandler: {}", properties);
     }
 
+    @SuppressWarnings("null")
     private void createRuleInstances() {
-        try {
-            final URL[] urls = new URL[] { new File(config.getItemsRootDirectory()).toURI().toURL(),
-                    new File(config.getRulesRootDirectory()).toURI().toURL() };
-
-            final ClassLoader loader = new URLClassLoader(urls, JRuleUtil.class.getClassLoader());
-            compiler.loadClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
-
-        } catch (MalformedURLException e) {
-            logger.debug("Failed to create instance", e);
+        if (compiler == null) {
+            logger.error("No compiler set failed to create rule instances");
+            return;
         }
+        final List<URL> urlList = new ArrayList<>();
+        final List<URL> extLibPath = compiler.getExtLibsAsUrls();
+        try {
+            urlList.add(new File(config.getItemsRootDirectory()).toURI().toURL());
+            urlList.add(new File(config.getRulesRootDirectory()).toURI().toURL());
+        } catch (MalformedURLException x) {
+            logger.error("Failed to build class path for creating rule instance");
+        }
+        urlList.addAll(extLibPath);
+        final ClassLoader loader = new URLClassLoader(urlList.toArray(URL[]::new), JRuleUtil.class.getClassLoader());
+        compiler.loadClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
     }
 
     private void compileUserRules() {
@@ -339,5 +347,7 @@ public class JRuleHandler implements PropertyChangeListener {
         compileUserRules();
         JRuleEngine.get().reset();
         createRuleInstances();
+        eventSubscriber.stopSubscriber();
+        eventSubscriber.startSubscriper();
     }
 }

@@ -15,11 +15,14 @@ package org.openhab.automation.jrule.internal.compiler;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -181,8 +184,32 @@ public class JRuleCompiler {
         Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
     }
 
+    public List<URL> getExtLibsAsUrls() {
+        try {
+            File[] extLibsFiles = getExtLibsAsFiles();
+            final List<URL> urlList = Arrays.stream(extLibsFiles).map(f -> getUrl(f)).collect(Collectors.toList());
+            return urlList;
+        } catch (Exception x) {
+            logger.error("Failed to get extLib urls");
+            return new ArrayList<>();
+        }
+    }
+
+    private URL getUrl(File f) {
+        try {
+            return f.toURI().toURL();
+        } catch (MalformedURLException e) {
+            logger.error("Failed to convert to URL: {}", f.getAbsolutePath(), e);
+        }
+        return null;
+    }
+
+    public File[] getExtLibsAsFiles() {
+        return new File(jRuleConfig.getExtlibDirectory()).listFiles(JRuleFileNameFilter.JAR_FILTER);
+    }
+
     private String getExtLibPaths() {
-        final File[] extLibs = new File(jRuleConfig.getExtlibDirectory()).listFiles(JRuleFileNameFilter.JAR_FILTER);
+        final File[] extLibs = getExtLibsAsFiles();
         final StringBuilder builder = new StringBuilder();
         if (extLibs != null && extLibs.length > 0) {
             Arrays.stream(extLibs).forEach(extLib -> builder.append(createJarPath(extLib)));
