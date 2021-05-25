@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +81,9 @@ public class JRuleRulesWatcher implements Runnable {
         FileSystem fs = watchFolder.getFileSystem();
         try {
             WatchService service = fs.newWatchService();
-            watchFolder.register(service, ENTRY_CREATE);
-            watchFolder.register(service, ENTRY_MODIFY);
-            watchFolder.register(service, ENTRY_DELETE);
+            watchFolder.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
+
             WatchKey key = null;
             while (true) {
                 key = service.take();
@@ -89,22 +91,26 @@ public class JRuleRulesWatcher implements Runnable {
                 for (WatchEvent<?> watchEvent : key.pollEvents()) {
                     kind = watchEvent.kind();
                     if (OVERFLOW == kind) {
+                        logger.debug("overflow");
                         continue;
-                    } else if (ENTRY_CREATE == kind) {
-                        Path newPath = ((WatchEvent<Path>) watchEvent).context();
+                    }
+                    Path newPath = ((WatchEvent<Path>) watchEvent).context();
+                    if (!newPath.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)) {
+                        continue;
+                    }
+                    if (ENTRY_CREATE == kind) {
                         logger.debug("New Path created in watchFolder");
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_CREATE, null, newPath);
                     } else if (ENTRY_MODIFY == kind) {
-                        Path newPath = ((WatchEvent<Path>) watchEvent).context();
-                        logger.debug("New path modified: {}", newPath);
+                        logger.debug("New path modified: {} fn: {}", newPath, newPath.getFileName());
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_MODIFY, null, newPath);
                     } else if (ENTRY_DELETE == kind) {
-                        Path newPath = ((WatchEvent<Path>) watchEvent).context();
                         logger.debug("New path deleted: {}", newPath);
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_DELETE, null, newPath);
+                    } else {
+                        logger.debug("Unhandled case: {}", kind.name());
                     }
                 }
-
                 if (!key.reset()) {
                     break;
                 }

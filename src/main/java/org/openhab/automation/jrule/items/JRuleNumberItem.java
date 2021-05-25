@@ -21,15 +21,15 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  */
 public class JRuleNumberItem extends JRuleItem {
 
-    protected static void sendCommand(String itemName, double value) {
+    public static void sendCommand(String itemName, double value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    protected static void postUpdate(String itemName, double value) {
+    public static void postUpdate(String itemName, double value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    protected static Double getState(String name) {
+    public static Double getState(String name) {
         return JRuleEventHandler.get().getStateFromItemAsDouble(name);
     }
 }

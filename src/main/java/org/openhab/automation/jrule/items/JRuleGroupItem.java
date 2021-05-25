@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
 
 /**
  * The {@link JRuleGroupItem} Items
@@ -22,12 +23,20 @@ import org.openhab.automation.jrule.rules.JRuleOnOffValue;
  */
 public class JRuleGroupItem extends JRuleItem {
 
-    protected static String getState(String itemName) {
+    public static String getState(String itemName) {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
-    protected static JRuleOnOffValue getStateAsOnOffValue(String itemName) {
+    public static JRuleOnOffValue getStateAsOnOffValue(String itemName) {
         return JRuleEventHandler.get().getOnOffValue(itemName);
+    }
+
+    public static JRulePlayPauseValue getStateAsPlayPauseValue(String itemName) {
+        return JRuleEventHandler.get().getPauseValue(itemName);
+    }
+
+    public static void sendCommand(String itemName, JRulePlayPauseValue value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
     public static void sendCommand(String itemName, JRuleOnOffValue value) {
@@ -39,6 +48,10 @@ public class JRuleGroupItem extends JRuleItem {
     }
 
     public static void postUpdate(String itemName, String value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
+    public static void postUpdate(String itemName, JRulePlayPauseValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 

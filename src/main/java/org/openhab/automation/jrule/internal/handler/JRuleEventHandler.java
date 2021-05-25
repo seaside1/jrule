@@ -19,6 +19,7 @@ import java.util.Date;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -30,6 +31,7 @@ import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.PlayPauseType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -64,6 +66,10 @@ public class JRuleEventHandler {
 
     public void setEventPublisher(EventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
+    }
+
+    public void sendCommand(String itemName, JRulePlayPauseValue command) {
+        sendCommand(itemName, getCommand(command));
     }
 
     public void sendCommand(String itemName, JRuleOnOffValue command) {
@@ -107,6 +113,10 @@ public class JRuleEventHandler {
         postUpdate(itemName, new PercentType(value.getValue()));
     }
 
+    public void postUpdate(String itemName, JRulePlayPauseValue state) {
+        postUpdate(itemName, getStateFromValue(state));
+    }
+
     public void postUpdate(String itemName, JRuleOnOffValue state) {
         postUpdate(itemName, getStateFromValue(state));
     }
@@ -127,9 +137,27 @@ public class JRuleEventHandler {
         eventPublisher.post(itemEvent);
     }
 
+    public JRulePlayPauseValue getPauseValue(String itemName) {
+        State state = getStateFromItem(itemName);
+        return getPlayPauseValueFromState(state);
+    }
+
     public JRuleOnOffValue getOnOffValue(String itemName) {
         State state = getStateFromItem(itemName);
         return getOnOffValueFromState(state);
+    }
+
+    private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
+        PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
+        switch (playPauseType) {
+            case PLAY:
+                return JRulePlayPauseValue.PLAY;
+            case PAUSE:
+                return JRulePlayPauseValue.PAUSE;
+            default:
+                logger.error("Fail to transform switch value");
+                return JRulePlayPauseValue.UNDEF;
+        }
     }
 
     private JRuleOnOffValue getOnOffValueFromState(State state) {
@@ -167,6 +195,32 @@ public class JRuleEventHandler {
             case UNDEF:
             default:
                 logger.error("Unhandled getCommand: {}", value);
+                return null;
+        }
+    }
+
+    private State getStateFromValue(JRulePlayPauseValue value) {
+        switch (value) {
+            case PLAY:
+                return PlayPauseType.PLAY;
+            case PAUSE:
+                return PlayPauseType.PAUSE;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", value);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRulePlayPauseValue command) {
+        switch (command) {
+            case PLAY:
+                return PlayPauseType.PLAY;
+            case PAUSE:
+                return PlayPauseType.PAUSE;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
                 return null;
         }
     }

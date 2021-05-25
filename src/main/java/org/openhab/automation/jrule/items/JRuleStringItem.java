@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  */
 public class JRuleStringItem extends JRuleItem {
 
-    protected static String getState(String itemName) {
+    public static String getState(String itemName) {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
