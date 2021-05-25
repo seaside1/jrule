@@ -33,23 +33,23 @@ public class JRuleDimmerItem extends JRuleItem {
     public static final String TRIGGER_CHANGED_TO_ON = "Changed to ON";
     public static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from OFF to ON";
 
-    protected static int getState(String itemName) {
+    public static int getState(String itemName) {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
     }
 
-    protected static void sendCommand(String itemName, JRuleOnOffValue command) {
+    public static void sendCommand(String itemName, JRuleOnOffValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    protected static void sendCommand(String itemName, int value) {
+    public static void sendCommand(String itemName, int value) {
         JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
     }
 
-    protected static void postUpdate(String itemName, JRuleOnOffValue state) {
+    public static void postUpdate(String itemName, JRuleOnOffValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 
-    protected static void postUpdate(String itemName, int value) {
+    public static void postUpdate(String itemName, int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 }

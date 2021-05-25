@@ -39,6 +39,7 @@ public class JRuleItemClassGenerator {
 
     private final URL itemClassTemplateUrl;
     private final URL switchItemClassTemplateUrl;
+    private final URL playerItemClassTemplateUrl;
     private final URL dimmerItemClassTemplateUrl;
     private final URL numberItemClassTemplateUrl;
     private final URL stringItemClassTemplateUrl;
@@ -47,6 +48,7 @@ public class JRuleItemClassGenerator {
 
     private final String itemClassTemplate;
     private final String switchItemClassTemplate;
+    private final String playerItemClassTemplate;
     private final String dimmerItemClassTemplate;
     private final String numberItemClassTemplate;
     private final String stringItemClassTemplate;
@@ -60,6 +62,8 @@ public class JRuleItemClassGenerator {
         itemClassTemplate = JRuleUtil.getResourceAsString(itemClassTemplateUrl);
         switchItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassSwitch.template");
         switchItemClassTemplate = JRuleUtil.getResourceAsString(switchItemClassTemplateUrl);
+        playerItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassPlayer.template");
+        playerItemClassTemplate = JRuleUtil.getResourceAsString(playerItemClassTemplateUrl);
         dimmerItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassDimmer.template");
         dimmerItemClassTemplate = JRuleUtil.getResourceAsString(dimmerItemClassTemplateUrl);
         numberItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassNumber.template");
@@ -108,7 +112,7 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(CoreItemFactory.CONTACT)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.PLAYER)) {
-            generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            generatedClass = playerItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.DATETIME)) {
             generatedClass = dateTimeItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(GroupItem.TYPE)) {
