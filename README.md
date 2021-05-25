@@ -108,8 +108,8 @@ Make sure you add the Jar-files from /etc/openhab/jrule/jar as dependencies.
 You can add any 3rd party library as dependency. Copy the jar files needed to /etc/openhab/automation/jrule/ext-lib
 The Automation Engine will automatically pick these dependencies up when it is compiling the rules.
 
-# Actions
-Built in actions that can be used
+# Core Actions
+Built in Core Actions that can be used
 | Action                                 | Description                                                                                   |
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
 | say                                    | Will use VoiceManager to say action see Example 13                        |
