@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleEventHandler} is responsible for handling commands and status
- * updates for JRule State Machines.
+ * updates for JRule
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */

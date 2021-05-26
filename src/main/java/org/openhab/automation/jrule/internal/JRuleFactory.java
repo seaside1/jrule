@@ -13,8 +13,11 @@
 package org.openhab.automation.jrule.internal;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.core.events.EventPublisher;
@@ -24,6 +27,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleFactory} is responsible for creating things and thing
@@ -35,11 +40,18 @@ import org.osgi.service.component.annotations.Reference;
 @NonNullByDefault
 public class JRuleFactory {
 
+    private static final long INIT_DELAY_DEFAULT = 5;
     private final ItemRegistry itemRegistry;
     private final JRuleEventSubscriber eventSubscriber;
     private final EventPublisher eventPublisher;
     private final VoiceManager voiceManager;
     private final JRuleHandler jRuleHandler;
+    @Nullable
+    private static CompletableFuture<Void> initFuture = null;
+
+    private static final Logger logger = LoggerFactory.getLogger(JRuleFactory.class);
+    private static final Object INIT_DELAY_PROPERTY = "init.delay";
+    private static final int DEFAULT_INIT_DELAY = 5;
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
@@ -50,11 +62,37 @@ public class JRuleFactory {
         this.eventPublisher = eventPublisher;
         this.voiceManager = voiceManager;
         jRuleHandler = new JRuleHandler(properties, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
-        jRuleHandler.initialize();
+        createDelayedInitialization(getInitDelaySeconds(properties));
+    }
+
+    private int getInitDelaySeconds(Map<String, Object> properties) {
+        Object initDelay = properties.get(INIT_DELAY_PROPERTY);
+        int delay = DEFAULT_INIT_DELAY;
+        if (initDelay != null) {
+            try {
+                delay = Integer.parseInt((String) initDelay);
+            } catch (Exception x) {
+                // Best effort
+            }
+        }
+        return delay;
+    }
+
+    private synchronized CompletableFuture<Void> createDelayedInitialization(int delayInSeconds) {
+        initFuture = JRuleUtil.delayedExecution(delayInSeconds, TimeUnit.SECONDS);
+        return initFuture.thenAccept(s -> {
+            logger.info("Initializing Java Rules Engine");
+            jRuleHandler.initialize();
+            initFuture = null;
+        });
     }
 
     @Deactivate
-    public void dispose() {
+    public synchronized void dispose() {
+        if (initFuture != null) {
+            initFuture.cancel(true);
+            initFuture = null;
+        }
         jRuleHandler.dispose();
     }
 }

@@ -21,18 +21,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.items.JRulePercentType;
-import org.openhab.core.common.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +45,6 @@ public abstract class JRule {
 
     private final static Map<String, CompletableFuture<Void>> ruleNameToCompletableFuture = new HashMap<>();
     private final static Map<String, List<CompletableFuture<Void>>> ruleNametoCompletableableFutureList = new HashMap<>();
-    protected final ScheduledExecutorService scheduler = ThreadPoolManager
-            .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
     public JRule() {
         JRuleEngine.get().add(this);
@@ -94,8 +90,7 @@ public abstract class JRule {
             logger.debug("Future already running for ruleName: {}", ruleName);
             return ruleNameToCompletableFuture.get(ruleName);
         }
-        Executor delayedExecutor = CompletableFuture.delayedExecutor(timeInSeconds, TimeUnit.SECONDS, scheduler);
-        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
+        CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
         ruleNameToCompletableFuture.put(ruleName, future);
         logger.info("Start timer for rule: {}, timeSeconds: {}", ruleName, timeInSeconds);
         return future.thenAccept(fn).thenAccept(s -> {
@@ -131,9 +126,7 @@ public abstract class JRule {
         ruleNametoCompletableableFutureList.put(ruleName, futures);
         CompletableFuture<Void> lastFuture = null;
         for (int i = 0; i < numberOfRepeats; i++) {
-            Executor delayedExecutor = CompletableFuture.delayedExecutor(dealyInSeconds * i, TimeUnit.SECONDS,
-                    scheduler);
-            lastFuture = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
+            lastFuture = JRuleUtil.delayedExecution(dealyInSeconds * i, TimeUnit.SECONDS);
             futures.add(lastFuture);
         }
         futures.stream().forEach(f -> f.thenAccept(fn));
@@ -151,6 +144,14 @@ public abstract class JRule {
 
     protected void say(String text) {
         JRuleVoiceHandler.get().say(text);
+    }
+
+    protected void executeCommandLine(String... commandLine) {
+        JRuleActionHandler.get().executeCommandLine(commandLine);
+    }
+
+    protected String executeCommandLineAndAwaitResponse(long delayInSeconds, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(delayInSeconds, commandLine);
     }
 
     protected void say(String text, String voiceId, String sinkId) {
@@ -203,7 +204,7 @@ public abstract class JRule {
             return false;
         }
         Supplier<CompletableFuture<Void>> asyncTask = () -> CompletableFuture.completedFuture(null);
-        future = JRuleUtil.scheduleAsync(scheduler, asyncTask, seconds, TimeUnit.SECONDS);
+        future = JRuleUtil.scheduleAsync(asyncTask, seconds, TimeUnit.SECONDS);
         ruleNameToCompletableFuture.put(ruleName, future);
         future.thenAccept(itemName -> {
             logger.info("{}: Timer completed! Releasing lock", ruleName);

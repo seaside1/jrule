@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +46,7 @@ import java.util.jar.Manifest;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
+import org.openhab.core.common.ThreadPoolManager;
 import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,8 @@ public class JRuleUtil {
 
     protected static final String ERROR_RESOURCE = "Can't find resource: {}";
     protected static final String DEBUG_RESOURCE = "Resources: {}";
+    protected static final ScheduledExecutorService scheduler = ThreadPoolManager
+            .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
     public static String URLReader(URL url, Charset encoding) throws IOException {
         try (InputStream in = url.openStream()) {
@@ -89,10 +93,15 @@ public class JRuleUtil {
         return null;
     }
 
-    public static <T> CompletableFuture<T> scheduleAsync(ScheduledExecutorService executor,
-            Supplier<CompletableFuture<T>> command, long delay, TimeUnit unit) {
+    public static <T> CompletableFuture<T> delayedExecution(long delay, TimeUnit unit) {
+        Executor delayedExecutor = CompletableFuture.delayedExecutor(delay, unit, scheduler);
+        return CompletableFuture.supplyAsync(() -> null, delayedExecutor);
+    }
+
+    public static <T> CompletableFuture<T> scheduleAsync(Supplier<CompletableFuture<T>> command, long delay,
+            TimeUnit unit) {
         CompletableFuture<T> completableFuture = new CompletableFuture<>();
-        executor.schedule((() -> {
+        scheduler.schedule((() -> {
             command.get().thenAccept(t -> {
                 completableFuture.complete(t);
             }).exceptionally(t -> {
@@ -154,7 +163,7 @@ public class JRuleUtil {
             throw new ClassNotFoundException("Could not get classloder");
         }
         final String pathFromPackage = packageName.replace('.', '/');
-        final Enumeration<URL> resources = (Enumeration<URL>) classLoader.getResources(pathFromPackage);
+        final Enumeration<URL> resources = classLoader.getResources(pathFromPackage);
         logger.debug("Get ResClasses enum: {}", resources.hasMoreElements());
         final List<File> dirs = new ArrayList<File>();
         while (resources.hasMoreElements()) {
