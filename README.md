@@ -113,7 +113,7 @@ Built in Core Actions that can be used
 | Action                                 | Description                                                                                   |
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
 | say                                    | Will use VoiceManager to say action see Example 13                        |
-| mail                                   |                               |
+| commandLineExecute                     | See Example 14                               |
 
 
 # Examples 
@@ -343,6 +343,11 @@ Use case: Using say command for tts
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Changelog
+## ALPHA4
+- Refactored completable futures
+- Added 5 seconds of delay for initialization of the rule engine to avoid multiple reloads
+- Added support for play & pause for player item
+- Added commandLineExecute
 ## ALPHA3
 - Fixed issue when reloading rules if they are changed with monitored items
 - Fixed classpath issue when executing rules using 3rd party libraries 
