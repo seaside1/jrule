@@ -14,7 +14,7 @@ package org.openhab.automation.jrule.internal.compiler;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -46,12 +46,8 @@ public class JRuleCompiler {
 
     private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
     private static final String CLASSPATH_OPTION = "-classpath";
-    private static final String JRULE_USER_JAVA = "JRuleUser.java";
-    private static final String JAR_USER_RULES = "user-rules.jar";
     public static final String JAR_JRULE_NAME = "jrule.jar";
     public static final String JAR_JRULE_ITEMS_NAME = "jrule-items.jar";
-    public static final String JAR_ECLIPSE_ANNOTATIONS_NAME = "org.eclipse.jdt.annotation-2.2.100.jar";
-    public static final String JAR_SLF4J_API_NAME = "slf4j-api-1.7.16.jar";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleCompiler.class);
 
@@ -74,18 +70,28 @@ public class JRuleCompiler {
             Arrays.stream(classItems).forEach(classItem -> logger.debug("Attempting to load class: {}", classItem));
 
             Arrays.stream(classItems).forEach(classItem -> {
+                logger.debug("Loading instance for class: {}", classItem.getName());
+
                 try {
                     Class<?> loadedClass = classLoader.loadClass(classPackage
                             + JRuleUtil.removeExtension(classItem.getName(), JRuleConstants.CLASS_FILE_TYPE));
-                    if (createInstance) {
-                        Object obj = loadedClass.getDeclaredConstructor().newInstance();
-                        logger.debug("Loaded and instance: {} obj: {}", classItem.getName(), obj);
+                    logger.debug("Loaded class with classLoader: {}", classItem.getName());
 
+                    if (createInstance) {
+                        if (Modifier.isAbstract(loadedClass.getModifiers())) {
+                            logger.debug("Not creating and instance of abstract class: {}", classItem.getName());
+                        } else {
+                            try {
+                                final Object obj = loadedClass.getDeclaredConstructor().newInstance();
+                                logger.debug("Created instance: {} obj: {}", classItem.getName(), obj);
+                            } catch (Exception x) {
+                                logger.debug("Could not create create instance using default constructor: {}",
+                                        classItem.getName());
+                            }
+                        }
                     }
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                        | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-                        | SecurityException e) {
-                    logger.error("Could not find class", e);
+                } catch (ClassNotFoundException | IllegalArgumentException | SecurityException e) {
+                    logger.error("Could not load class", e);
                 }
             });
         } catch (Exception e) {
@@ -93,32 +99,38 @@ public class JRuleCompiler {
         }
     }
 
-    public void compileClass(File javaSourceFile, String classPath) {
-        logger.debug("Compiling java Source file: {} classPath: {}", javaSourceFile, classPath);
-        if (javaSourceFile.exists()) {
-            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-            List<String> optionList = new ArrayList<String>();
-            optionList.add(CLASSPATH_OPTION);
-            optionList.add(classPath);
-            Iterable<? extends JavaFileObject> compilationUnit = fileManager
-                    .getJavaFileObjectsFromFiles(Arrays.asList(javaSourceFile));
-            JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null,
-                    compilationUnit);
-            try {
-                if (task.call()) {
-                    logger.debug("Compilation of class successfull!");
-                } else {
-                    for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                        logger.info("Error on line {} in {}", diagnostic.getLineNumber(),
-                                diagnostic.getSource().toUri());
-                    }
+    public void compile(File javaSourceFile, String classPath) {
+        compile(Arrays.asList(javaSourceFile), classPath);
+    }
+
+    public void compile(List<File> javaSourceFiles, String classPath) {
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+        final List<String> optionList = new ArrayList<String>();
+        optionList.add(CLASSPATH_OPTION);
+        optionList.add(classPath);
+        logger.debug("Compiling classes using classpath: {}", classPath);
+        javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
+                .forEach(javaSourceFile -> {
+                    logger.debug("Compiling java Source file: {}", javaSourceFile);
+                });
+
+        final Iterable<? extends JavaFileObject> compilationUnit = fileManager
+                .getJavaFileObjectsFromFiles(javaSourceFiles);
+        final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, optionList, null,
+                compilationUnit);
+        try {
+            if (task.call()) {
+                logger.debug("Compilation of classes successfull!");
+            } else {
+                for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                    logger.info("Error on line {} in {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
                 }
-                fileManager.close();
-            } catch (Exception x) {
-                logger.error("error", x);
             }
+            fileManager.close();
+        } catch (Exception x) {
+            logger.error("error", x);
         }
     }
 
@@ -140,7 +152,7 @@ public class JRuleCompiler {
         Arrays.stream(javaItems)
                 .filter(javaItem -> !classNames
                         .contains(JRuleUtil.removeExtension(javaItem.getName(), JRuleConstants.JAVA_FILE_TYPE)))
-                .forEach(javaItem -> compileClass(javaItem, itemsClassPath));
+                .forEach(javaItem -> compile(javaItem, itemsClassPath));
         classNames.clear();
     }
 
@@ -157,31 +169,20 @@ public class JRuleCompiler {
         String rulesClassPath = //
                 System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator //
                         + getJarPath(JAR_JRULE_ITEMS_NAME) + File.pathSeparator //
-                        + getJarPath(JAR_JRULE_NAME) + File.pathSeparator //
-                        + getJarPath(JAR_ECLIPSE_ANNOTATIONS_NAME) + File.pathSeparator //
-                        + getJarPath(JAR_SLF4J_API_NAME) + File.pathSeparator;
+                        + getJarPath(JAR_JRULE_NAME) + File.pathSeparator; //
         String extLibPath = getExtLibPaths();
         logger.debug("extLibPath: {}", extLibPath);
         if (extLibPath != null && !extLibPath.isEmpty()) {
             rulesClassPath = rulesClassPath.concat(extLibPath);
         }
         logger.debug("Compiling rules in folder: {}", jRuleConfig.getRulesDirectory());
-        File userFile = new File(jRuleConfig.getRulesDirectory() + File.separator + JRULE_USER_JAVA);
-        if (userFile.exists()) {
-            compileClass(userFile, rulesClassPath);
-            JRuleUtil.createJarFile(jRuleConfig.getRulesRootDirectory(), getJarPath(JAR_USER_RULES));
-        }
-        File jarUserFilerFile = new File(getJarPath(JAR_USER_RULES));
-        final String finalClassPath = jarUserFilerFile.exists()
-                ? rulesClassPath + File.separator + jarUserFilerFile.getAbsolutePath()
-                : rulesClassPath;
         final File[] javaFiles = new File(jRuleConfig.getRulesDirectory()).listFiles(JRuleFileNameFilter.JAVA_FILTER);
         if (javaFiles == null || javaFiles.length == 0) {
             logger.info("Found no java rules to compile and use in folder: {}, no rules are loaded",
                     jRuleConfig.getRulesDirectory());
             return;
         }
-        Arrays.stream(javaFiles).forEach(javaFile -> compileClass(javaFile, finalClassPath));
+        compile(Arrays.asList(javaFiles), rulesClassPath);
     }
 
     public List<URL> getExtLibsAsUrls() {
