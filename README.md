@@ -349,6 +349,10 @@ Use case: Using say command for tts
 - Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
 
 # Changelog
+## ALPHA5
+- Removed dependencies on slf4japi and eclipse annotations
+- Added logInfo logDebug (to wrap slf4j and remove dep)
+- Fixed compilation of rules to be more robust with internal dependencies 
 ## ALPHA4
 - Refactored completable futures
 - Added 5 seconds of delay for initialization of the rule engine to avoid multiple reloads
