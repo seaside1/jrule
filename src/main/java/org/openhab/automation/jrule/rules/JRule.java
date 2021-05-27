@@ -33,6 +33,8 @@ import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  * The {@link JRule} .
@@ -45,6 +47,8 @@ public abstract class JRule {
 
     private final static Map<String, CompletableFuture<Void>> ruleNameToCompletableFuture = new HashMap<>();
     private final static Map<String, List<CompletableFuture<Void>>> ruleNametoCompletableableFutureList = new HashMap<>();
+    private static final String PREFIX_INFO_LOG = "[{}] {}";
+    private static final String PREFIX_DEBUG_LOG = "[+{}+] {}";
 
     public JRule() {
         JRuleEngine.get().add(this);
@@ -224,4 +228,16 @@ public abstract class JRule {
     protected int getIntValueOrDefault(Double doubleValue, int defaultValue) {
         return doubleValue == null ? defaultValue : doubleValue.intValue();
     }
+
+    protected void logDebug(String message, Object... parameters) {
+        final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
+        logger.info(PREFIX_DEBUG_LOG, getRuleLogName(), logMessage.getMessage());
+    }
+
+    protected void logInfo(String message, Object... parameters) {
+        final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
+        logger.info(PREFIX_INFO_LOG, getRuleLogName(), logMessage.getMessage());
+    }
+
+    protected abstract String getRuleLogName();
 }

@@ -44,7 +44,8 @@ public class JRuleJarExtractor {
             return;
         }
         Class<?> clazz = loadedClasses.get(0);
-        writeJarToFolder(clazz, jarFilePath);
+        final URL jarUrl = getClassLocation(clazz);
+        writeJarToFolder(jarUrl, jarFilePath);
     }
 
     private Vector<Class<?>> getLoadedClasses(ClassLoader classLoader) {
@@ -65,16 +66,14 @@ public class JRuleJarExtractor {
         return null;
     }
 
-    private void writeJarToFolder(Class<?> clazz, String jarFilePath) {
-        final String className = clazz.getName();
-        final URL classLocation = getClassLocation(clazz);
-        if (classLocation == null) {
-            logger.debug("ignoring class: {}", className);
+    private void writeJarToFolder(URL jarUrl, String jarFilePath) {
+        if (jarUrl == null) {
+            logger.debug("ignoring jar: {}", jarUrl);
             return;
         }
-        logger.debug("Extracting jar: {} from: {}", className, classLocation);
+        logger.debug("Extracting jar: {} to: {}", jarFilePath, jarFilePath);
         try {
-            copyFile(classLocation, jarFilePath);
+            copyFile(jarUrl, jarFilePath);
         } catch (IOException x) {
             logger.error("Failed to write file to: {}", jarFilePath, x);
         }

@@ -168,7 +168,6 @@ public class JRuleHandler implements PropertyChangeListener {
         }
         logger.info("Initializing JRule writing external Jars: {}", config.getJarDirectory());
         writeAndExtractJruleJar();
-        writeExternalJars();
         handleItemSources();
         logger.info("Compiling rules");
         compileUserRules();
@@ -180,7 +179,6 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private void writeAndExtractJruleJar() {
         jarExtractor.extractJRuleJar(compiler.getJarPath(JRuleCompiler.JAR_JRULE_NAME));
-        // JRuleUtil.createJarFile(config.getClassDirectory(), compiler.getJarPath(JRuleCompiler.JAR_JRULE_NAME));
     }
 
     private void handleItemSources() {
@@ -211,18 +209,6 @@ public class JRuleHandler implements PropertyChangeListener {
         } else {
             logger.error("Failed to create items due to config {}, compiler {}", config, compiler);
         }
-    }
-
-    private synchronized void writeExternalJars() {
-        // writeJar(JRuleCompiler.JAR_JRULE_NAME);
-        writeJar(JRuleCompiler.JAR_SLF4J_API_NAME);
-        writeJar(JRuleCompiler.JAR_ECLIPSE_ANNOTATIONS_NAME);
-    }
-
-    private synchronized void writeJar(String name) {
-        final URL jarUrl = JRuleUtil.getResourceUrl(JAR_LIB_PATH.concat(name));
-        final byte[] jarBytes = JRuleUtil.getResourceAsBytes(jarUrl);
-        JRuleUtil.writeFile(jarBytes, config.getJarDirectory() + File.separator + name);
     }
 
     public synchronized void dispose() {

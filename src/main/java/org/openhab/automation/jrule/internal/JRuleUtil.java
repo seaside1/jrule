@@ -232,14 +232,16 @@ public class JRuleUtil {
         return null;
     }
 
-    public static void writeFile(byte[] bytes, String file) {
+    public static File writeFile(byte[] bytes, String file) {
+        final File f = new File(file);
         try {
-            FileOutputStream out = new FileOutputStream(new File(file));
+            FileOutputStream out = new FileOutputStream(f);
             out.write(bytes);
             out.close();
         } catch (IOException e) {
             logger.error("Failed to write file: {}", file, e);
         }
+        return f;
     }
 
     public static File createJarFile(String inputDirectory, String targetFile) {
