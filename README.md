@@ -45,9 +45,6 @@ The following jar files can be found under the jrule/jar-folder:
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
 | jrule-items.jar                        | Contains all generated items, which will be used when developing rules                        |
 | jrule.jar                              | JRule Addon classes neeed as dependency when doing development                              |
-| org.eclipse.jdt.annotation-2.2.100.jar | Eclipse annotations jar file needed for development to be able to compile                     |
-| slf4j-api-1.7.16.jar                   | Used for logging in local rule development                                        |
-| user-rules.jar                         | The user compiled rules, used internally by the addon in the classpath for rules execution  |
 
 
 # Get started with the JRule Automation Addon
@@ -59,7 +56,7 @@ The following jar files can be found under the jrule/jar-folder:
 2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/automation/jrule/jar
 3. Compile any java rules file under  /etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
 4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar).
-All dependencies need for Java rules development can be found under /etc/openhab/automation/jrule/jar
+The two jar files needed for Java rules development can be found under /etc/openhab/automation/jrule/jar
 
 Once the JAVA rule engine has started and compiled items successfully you can either copy the jar files
 form /etc/openhab/automation/jrule/jar/* to the place where you intend to develop the Java- Rules, or share that folder
@@ -87,17 +84,20 @@ import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MySwitchRule extends JRule {
 
-    private final Logger logger = LoggerFactory.getLogger(MySwitchRule.class);
-
+    private static final String LOG_NAME="MY_TEST";
+    
     @JRuleName("MySwitchRule")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execOffToOnRule() {
-        logger.info("||||| --> Hello World!");
+	logInfo("||||| --> Hello World!");
+    }
+    
+    @Override
+    protected String getRuleLogName() {
+        return LOG_NAME;
     }
 }
 ```
@@ -124,7 +124,7 @@ Use Case: Invoke another item Switch from rule
     @JRuleName("MyRuleTurnSwich2On")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
-        logger.info("||||| --> Executing rule MyRule: changed to on");
+    	logInfo("||||| --> Executing rule MyRule: changed to on");
         _MySwitch2.sendCommand(ON);
     }
 ```
@@ -139,9 +139,9 @@ This is done by aquiring a lock getTimedLock("MyLockTestRule1", 20).
     public void execLockTestRule() {
         if (getTimedLock("MyLockTestRule1", 20)) {
             _MyDoorBellItem.sendCommand(ON);
-            logger.info("||||| --> Got Lock! Ding-dong !");
+            logInfo("||||| --> Got Lock! Ding-dong !");
         } else {
-            logger.info("||||| --> Ignoring call to rule it is locked!");
+            logInfo("||||| --> Ignoring call to rule it is locked!");
         }
     }
 ```
@@ -153,7 +153,7 @@ When the rule is triggered, the triggered value is stored in the event.
    @JRuleName("MyEventValueTest")
    @JRuleWhen(item = __MyTestSwitch2.ITEM, trigger = __MyTestSwitch2.TRIGGER_RECEIVED_COMMAND)
    public void myEventValueTest(JRuleEvent event) {
-	  logger.info("Got value from event: {}", event.getValue());
+	  logInfo("Got value from event: {}", event.getValue());
    }
 ```
 ## Example 4
@@ -165,7 +165,7 @@ To add an OR statement we simply add multiple @JRuleWhen statements
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "14", to = "10")
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "10", to = "12")
    public void myOrRuleNumber(JRuleEvent event) {
-	logger.info("Got change number: {}", event.getValue());
+	logInfo("Got change number: {}", event.getValue());
    }
 ```
 
@@ -179,7 +179,7 @@ package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.JRule;
 
-public class JRuleUser extends JRule {
+public abstract class JRuleUser extends JRule {
 
 	
 }
@@ -195,12 +195,15 @@ import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.user.JRuleUser;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MySwitchRule extends JRuleUser {
 
-    private final Logger logger = LoggerFactory.getLogger(MySwitchRule.class);
+    private static final String LOG_NAME="MY_RULE";
+    
+    @Override
+    protected String getRuleLogName() {
+        return LOG_NAME;
+    }
 }
 ```
 
@@ -214,7 +217,7 @@ package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.JRule;
 
-public class JRuleUser extends JRule {
+public abstract class JRuleUser extends JRule {
 
 	private static final int startDay = 8;
 	private static final int endDay = 21;
@@ -237,19 +240,22 @@ import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MyTestUserRule extends JRuleUser {
-	private final Logger logger = LoggerFactory.getLogger(MyTestUserRule.class);
+	private static final String MY_LOGNAME = "TEST";
 
 	@JRuleName("TestUserDefinedRule")
 	@JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
 	public void mySendNotificationRUle(JRuleEvent event) {
 		if (timeIsOkforDisturbance()) {
-			logger.info("It's ok to send a distrubing notification");
+			logInfo("It's ok to send a distrubing notification");
 		}
 	}
+	
+    @Override
+    protected String getRuleLogName() {
+        return MY_LOGNAME;
+    }
 
 }
 ```
@@ -261,7 +267,7 @@ Use case create a timer for automatically turning of a light when it is turned o
     public synchronized void myTimerRule(JRuleEvent event) {
         logger.info("myTimerRule Turning on light it will be turned off in 2 mins");
         createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
-            logger.info("Time is up! Turning off lights");
+            logInfo("Time is up! Turning off lights");
             _MyLightSwitch.sendCommand(OFF);
         });
     }
@@ -278,7 +284,7 @@ to send multiple ON statements to be sure it actually turns on.
     public synchronized void repeatRuleExample(JRuleEvent event) {
         createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 10, (Void) -> { // Lambda Expression
             final String messageOn = "repeatRuleExample Repeating.....";
-            looger.info(messageOn);
+            logInfo(messageOn);
             _MyBad433Switch.sendCommand(ON);
         });
     }
@@ -293,7 +299,7 @@ it will not reschedule the timer, if the timer is already running it won't resch
     public synchronized void timerRuleExample(JRuleEvent event) {
         createTimer("myTimer", 10, (Void) -> { // Lambda Expression
             final String messageOn = "timer example.";
-            looger.info(messageOn);
+            logInfo(messageOn);
             _MyTestWitch2.sendCommand(ON);
         });
     }
@@ -304,7 +310,7 @@ Use case trigger a rule at 22:30 in the evening to set initial brightness for a 
   @JRuleName("setDayBrightness")
   @JRuleWhen(hours=22, minutes=30)
   public synchronized void setDayBrightness(JRuleEvent event) {
-      logger.info("Setting night brightness to 30%");
+      logInfo("Setting night brightness to 30%");
       int dimLevel = 30;
       _ZwaveDimmerBrightness.sendCommand(dimLevel);
   }
@@ -322,7 +328,7 @@ eq = equals
   @JRuleName("turnOnFanIfTemperatureIsLow")
   @JRuleWhen(item = _MyTemperatureSensor.ITEM, trigger = _MyTemperatureSensor.TRIGGER_RECEIVED_UPDATE, lte = 20)
   public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
-      logger.info("Starting fan since temeprature dropped below 20");
+      logInfo("Starting fan since temeprature dropped below 20");
       _MyHeatinFanSwitch.sendCommand(ON);
   }
 ```
@@ -333,7 +339,7 @@ Use case: Using say command for tts
     @JRuleName("testSystemTts")
     @JRuleWhen(item = _TestSystemTts.ITEM, trigger = _TestSystemTts.TRIGGER_CHANGED_TO_ON)
     public synchronized void testSystemTts(JRuleEvent event) {
-        logger.info("System TTS Test");
+        logInfo("System TTS Test");
         String message = "Testing tts! I hope you can hear it!";
         say(message, null, "sonos:PLAY5:RINCON_XXYY5857B06E0ZZOO");
     }
