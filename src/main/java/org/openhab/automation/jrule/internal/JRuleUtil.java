@@ -306,7 +306,7 @@ public class JRuleUtil {
             return JRuleConstants.EMPTY;
         }
         final int start = topic.indexOf(ITEMS_START) + ITEMS_START.length();
-        int end = topic.lastIndexOf(SEPARATOR);
+        int end = topic.indexOf(SEPARATOR, start);
         if (start > end) {
             end = topic.length();
         }

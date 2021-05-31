@@ -15,12 +15,15 @@ package org.openhab.automation.jrule.internal.handler;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
 import org.openhab.core.events.EventPublisher;
+import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
@@ -277,5 +280,22 @@ public class JRuleEventHandler {
         }
         DateTimeType dateTimeType = state.as(DateTimeType.class);
         return dateTimeType != null ? Date.from(dateTimeType.getZonedDateTime().toInstant()) : null;
+    }
+
+    public Set<String> getGroupMemberNames(String groupName) {
+        Item item = null;
+        final Set<String> memberNames = new HashSet<>();
+        try {
+            item = itemRegistry.getItem(groupName);
+        } catch (ItemNotFoundException e) {
+            logger.error("Item not found in registry for group: {}", groupName);
+            return null;
+        }
+        if (item instanceof GroupItem) {
+            GroupItem g = (GroupItem) item;
+            Set<@NonNull Item> members = g.getMembers();
+            members.stream().forEach(m -> memberNames.add(m.getName()));
+        }
+        return memberNames;
     }
 }

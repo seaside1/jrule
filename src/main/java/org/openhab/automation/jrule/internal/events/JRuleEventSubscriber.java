@@ -24,6 +24,7 @@ import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
+import org.openhab.core.items.events.GroupItemStateChangedEvent;
 import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
@@ -58,6 +59,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     public JRuleEventSubscriber() {
         propertyChangeSupport = new PropertyChangeSupport(this);
+        subscribedEventTypes.add(GroupItemStateChangedEvent.TYPE);
         subscribedEventTypes.add(ItemStateEvent.TYPE);
         subscribedEventTypes.add(ItemCommandEvent.TYPE);
         subscribedEventTypes.add(ItemStateChangedEvent.TYPE);
@@ -94,6 +96,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     @Override
     public void receive(Event event) {
+
         final String itemFromTopic = JRuleUtil.getItemNameFromTopic(event.getTopic());
         if (event.getType().equals(ItemAddedEvent.TYPE) //
                 || event.getType().equals(ItemRemovedEvent.TYPE) //

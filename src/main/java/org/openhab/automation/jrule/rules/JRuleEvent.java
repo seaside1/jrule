@@ -21,12 +21,23 @@ public class JRuleEvent {
 
     private final String value;
 
+    private String memberName;
+
     public JRuleEvent(String value) {
         this.value = value;
     }
 
+    public JRuleEvent(String value, String memberName) {
+        this.value = value;
+        this.memberName = memberName;
+    }
+
     public String getValue() {
         return value;
+    }
+
+    public JRuleOnOffValue getValueAsOnOffValue() {
+        return JRuleOnOffValue.getValueFromString(value);
     }
 
     public Double getValueAsDouble() {
@@ -47,5 +58,9 @@ public class JRuleEvent {
             // ignore
         }
         return i;
+    }
+
+    public String getMemberName() {
+        return memberName;
     }
 }
