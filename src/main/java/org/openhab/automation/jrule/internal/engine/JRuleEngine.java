@@ -47,6 +47,7 @@ import org.openhab.automation.jrule.rules.JRuleTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.openhab.core.common.ThreadPoolManager;
 import org.openhab.core.events.Event;
+import org.openhab.core.items.events.GroupItemStateChangedEvent;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemStateChangedEvent;
@@ -234,9 +235,10 @@ public class JRuleEngine implements PropertyChangeListener {
             contextList = new ArrayList<>();
             itemToExecutionContexts.put(itemName, contextList);
         }
-        logger.debug("ContextList add: {} itemName: {}", ruleName, itemName);
-        contextList.add(new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName, itemClass, itemName,
-                method, eventParameterPresent, lt, lte, gt, gte, eq));
+        final JRuleExecutionContext context = new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName,
+                itemClass, itemName, method, eventParameterPresent, lt, lte, gt, gte, eq);
+        logger.debug("ContextList add context: {}", context);
+        contextList.add(context);
     }
 
     private String getTypeOfEventFromTrigger(String trigger) {
@@ -301,8 +303,14 @@ public class JRuleEngine implements PropertyChangeListener {
             return;
         }
         final String type = ((ItemEvent) event).getType();
+
         final Set<String> triggerValues = new HashSet<>(5);
         String stringValue;
+        String memberName = null;
+        if (event instanceof GroupItemStateChangedEvent) {
+            memberName = ((GroupItemStateChangedEvent) event).getMemberName();
+        }
+
         if (event instanceof ItemStateEvent) {
             stringValue = ((ItemStateEvent) event).getItemState().toFullString();
             triggerValues.add(RECEIVED_UPDATE);
@@ -315,13 +323,6 @@ public class JRuleEngine implements PropertyChangeListener {
             final String newValue = ((ItemStateChangedEvent) event).getItemState().toFullString();
             final String oldValue = ((ItemStateChangedEvent) event).getOldItemState().toFullString();
             stringValue = newValue;
-            logger.debug("StringValue: {} type: {}", newValue, type);
-            logger.debug("Invoked execution contexts: {}", exectionContexts.size());
-            logger.debug("Execution topic Topic: {}", event.getTopic());
-            logger.debug("Execution topic Payload: {}", event.getPayload());
-            logger.debug("Execution topic Source: {}", event.getSource());
-            logger.debug("Execution topic Type: {}", event.getType());
-            logger.debug("Execution eventToString: {}", event);
 
             if (JRuleUtil.isNotEmpty(oldValue) && JRuleUtil.isNotEmpty(newValue)) {
                 triggerValues.add(String.format(CHANGED_FROM_TO_PATTERN, oldValue, newValue));
@@ -329,14 +330,25 @@ public class JRuleEngine implements PropertyChangeListener {
                 triggerValues.add(CHANGED_TO.concat(newValue));
                 triggerValues.add(CHANGED);
             }
+
+            logger.debug("newValue: {} oldValue: {} type: {}", newValue, oldValue, type);
+            logger.debug("Invoked execution contexts: {}", exectionContexts.size());
+            logger.debug("Execution topic Topic: {}", event.getTopic());
+            logger.debug("Execution topic Payload: {}", event.getPayload());
+            logger.debug("Execution topic Source: {}", event.getSource());
+            logger.debug("Execution topic Type: {}", event.getType());
+            logger.debug("Execution eventToString: {}", event);
         } else {
             logger.debug("Unhandled case: {}", event.getClass());
             return;
         }
 
         if (triggerValues.size() > 0) {
+            String member = memberName == null ? "" : memberName;
             exectionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
-                    .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(stringValue)));
+                    .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(stringValue, member)));
+        } else {
+            logger.debug("Execution ignored, no trigger values for itemName: {} eventType: {}", itemName, type);
         }
     }
 

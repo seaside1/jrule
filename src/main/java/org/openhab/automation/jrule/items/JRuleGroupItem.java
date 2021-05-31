@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Set;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
@@ -22,6 +24,15 @@ import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleGroupItem extends JRuleItem {
+
+    public static Set<String> members(String groupName) {
+        return JRuleEventHandler.get().getGroupMemberNames(groupName);
+    }
+
+    public static void sendCommandToAll(String groupName, String value) {
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(groupName);
+        groupMemberNames.forEach(m -> sendCommand(m, value));
+    }
 
     public static String getState(String itemName) {
         return JRuleEventHandler.get().getStringValue(itemName);

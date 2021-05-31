@@ -21,4 +21,14 @@ public enum JRuleOnOffValue {
     ON,
     OFF,
     UNDEF;
+
+    public static JRuleOnOffValue getValueFromString(String value) {
+        if (value.equals("ON")) {
+            return ON;
+        }
+        if (value.equals("OFF")) {
+            return OFF;
+        }
+        return UNDEF;
+    }
 }

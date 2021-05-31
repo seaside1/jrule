@@ -59,7 +59,7 @@ public abstract class JRule {
         return completableFuture == null ? false : completableFuture.isDone();
     }
 
-    protected synchronized CompletableFuture<Void> createOrReplaceTimer(String ruleName, int timeInSeconds,
+    protected synchronized CompletableFuture<Void> createOrReplaceTimer(String ruleName, long timeInSeconds,
             Consumer<Void> fn) {
         CompletableFuture<Void> future = ruleNameToCompletableFuture.get(ruleName);
         if (future != null) {
@@ -71,6 +71,10 @@ public abstract class JRule {
                     cancelled);
         }
         return createTimer(ruleName, timeInSeconds, fn);
+    }
+
+    protected boolean timerIsRunning(String ruleName) {
+        return ruleNameToCompletableFuture.containsKey(ruleName);
     }
 
     protected synchronized boolean cancelTimer(String ruleName) {
@@ -90,6 +94,10 @@ public abstract class JRule {
     }
 
     protected synchronized CompletableFuture<Void> createTimer(String ruleName, int timeInSeconds, Consumer<Void> fn) {
+        return createTimer(ruleName, (long) timeInSeconds, fn);
+    }
+
+    protected synchronized CompletableFuture<Void> createTimer(String ruleName, long timeInSeconds, Consumer<Void> fn) {
         if (ruleNameToCompletableFuture.get(ruleName) != null) {
             logger.debug("Future already running for ruleName: {}", ruleName);
             return ruleNameToCompletableFuture.get(ruleName);
@@ -105,6 +113,11 @@ public abstract class JRule {
 
     protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String ruleName,
             int dealyInSeconds, int numberOfReapts, Consumer<Void> fn) {
+        return createOrReplaceRepeatingTimer(ruleName, (long) dealyInSeconds, numberOfReapts, fn);
+    }
+
+    protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String ruleName,
+            long dealyInSeconds, int numberOfReapts, Consumer<Void> fn) {
         List<CompletableFuture<Void>> completableFutures = ruleNametoCompletableableFutureList.get(ruleName);
         if (completableFutures != null) {
             logger.debug("Repeating Future already running for ruleName: {}", ruleName);
@@ -116,7 +129,7 @@ public abstract class JRule {
         return createRepeatingTimer(ruleName, dealyInSeconds, numberOfReapts, fn);
     }
 
-    protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String ruleName, int dealyInSeconds,
+    protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String ruleName, long dealyInSeconds,
             int numberOfRepeats, Consumer<Void> fn) {
         List<CompletableFuture<Void>> futures = ruleNametoCompletableableFutureList.get(ruleName);
         if (futures != null) {
@@ -144,6 +157,11 @@ public abstract class JRule {
             }));
         }
         return futures;
+    }
+
+    protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String ruleName, int dealyInSeconds,
+            int numberOfRepeats, Consumer<Void> fn) {
+        return createRepeatingTimer(ruleName, (long) dealyInSeconds, numberOfRepeats, fn);
     }
 
     protected void say(String text) {
