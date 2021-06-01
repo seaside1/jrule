@@ -174,7 +174,7 @@ public class JRuleHandler implements PropertyChangeListener {
         createRuleInstances();
         startDirectoryWatcher();
         eventSubscriber.startSubscriper();
-        logger.info("Initializing, done!");
+        logger.info("JRule Engine Initializing done!");
     }
 
     private void writeAndExtractJruleJar() {
@@ -335,5 +335,6 @@ public class JRuleHandler implements PropertyChangeListener {
         createRuleInstances();
         eventSubscriber.stopSubscriber();
         eventSubscriber.startSubscriper();
+        logger.info("JRule Engine Rules Reloaded!");
     }
 }
