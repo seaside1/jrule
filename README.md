@@ -345,10 +345,9 @@ Use case: Using say command for tts
     }
 ```
 
-# Current Addon Limitations (this will be fixed)
-- Some items are not supported for instance Player, Group:TEMPERATURE Group:SWITCH they will be added later on
-
 # Changelog
+## ALPHA6
+- Added group functionality getMember will return who triggered a change for a group
 ## ALPHA5
 - Removed dependencies on slf4japi and eclipse annotations
 - Added logInfo logDebug (to wrap slf4j and remove dep)
@@ -370,4 +369,3 @@ Use case: Using say command for tts
 # Roadmap
 - Locks and timers by annotation
 - Built in expire functionality
-- Built in shell exec functionality
