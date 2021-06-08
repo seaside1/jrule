@@ -8,7 +8,7 @@ For the addon to be able to pick up rules, they first need to be compiled by the
 will be automatically compiled and loaded into OpenHAB when the addon is started. The syntax for rules as well as the design and thinking behind the addon is to provide something that is similar to Rules DSL but more powerful and customizable.
 
 # Limitations
-- Currently only working for OpenHab installations under Linux / Unix Operating Systems, not supported in Windows (for rules development its fine to use windows)
+- Currently only working for OpenHAB installations under Linux / Unix Operating Systems, not supported in Windows (for rules development its fine to use windows)
 - Not supporting OH3 GUI rules, script actions and script conditions 
 
 # Why?
@@ -34,7 +34,7 @@ Prebuilt jar file is available in the bin folder under https://github.com/seasid
 
 Input rules files
 will be placed under:
-/etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
+/etc/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
 
 Output jar files to be added by the user as dependencies when doing rule development will be located under:
 /etc/openhab/automation/jrule/jar
@@ -344,6 +344,34 @@ Use case: Using say command for tts
         say(message, null, "sonos:PLAY5:RINCON_XXYY5857B06E0ZZOO");
     }
 ```
+
+## Example 14
+Use case: Using say command line execute
+```java
+   
+```
+## Example 15
+Use case: A group of switches, see if status is changed, and also which member in the group changed state
+```java
+    @JRuleName("groupMySwitchesChanged")
+    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED)
+    public synchronized void groupMySwitchGroupChanged(JRuleEvent event) {
+        final boolean groupIsOnline = event.getValueAsOnOffValue() == ON;
+        final String memberThatChangedStatus = event.getMemberName();
+	logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
+    }
+```
+
+## Example 16
+Use case: A group of switches , trigger when it's changed from OFF to ON
+```java
+    @JRuleName("groupMySwitchesChangedOffToOn")
+    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED, from="OFF", to="ON")
+    public synchronized void groupMySwitchesChangedOffToOn(JRuleEvent event) {
+	logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberName());
+    }
+```
+
 
 # Changelog
 ## ALPHA6
