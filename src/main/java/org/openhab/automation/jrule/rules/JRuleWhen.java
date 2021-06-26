@@ -35,6 +35,8 @@ public @interface JRuleWhen {
 
     String item() default "";
 
+    String channel() default "";
+
     String trigger() default "";
 
     String update() default "";

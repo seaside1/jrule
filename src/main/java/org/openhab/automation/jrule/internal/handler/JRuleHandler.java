@@ -51,7 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link JRuleClientThingHandler} is responsible for handling commands and status
+ * The {@link JRuleHandler} is responsible for handling commands and status
  * updates for JRule State Machines.
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
@@ -173,7 +173,7 @@ public class JRuleHandler implements PropertyChangeListener {
         compileUserRules();
         createRuleInstances();
         startDirectoryWatcher();
-        eventSubscriber.startSubscriper();
+        eventSubscriber.startSubscriber();
         logger.info("JRule Engine Initializing done!");
     }
 
@@ -334,7 +334,7 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleEngine.get().reset();
         createRuleInstances();
         eventSubscriber.stopSubscriber();
-        eventSubscriber.startSubscriper();
+        eventSubscriber.startSubscriber();
         logger.info("JRule Engine Rules Reloaded!");
     }
 }
