@@ -31,6 +31,7 @@ import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
+import org.openhab.core.thing.events.ChannelTriggeredEvent;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +50,15 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     public static final String PROPERTY_ITEM_REGISTRY_EVENT = "PROPERTY_ITEM_REGESTRY_EVENT";
 
+    public static final String PROPERTY_CHANNEL_EVENT = "CHANNEL_EVENT";
+
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
 
     private final Set<String> subscribedEventTypes = new HashSet<String>();
 
     private final Set<String> jRuleMonitoredItems = new HashSet<>();
+
+    private final Set<String> jRuleMonitoredChannels = new HashSet<>();
 
     private final PropertyChangeSupport propertyChangeSupport;
 
@@ -66,6 +71,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
         subscribedEventTypes.add(ItemUpdatedEvent.TYPE);
         subscribedEventTypes.add(ItemAddedEvent.TYPE);
         subscribedEventTypes.add(ItemRemovedEvent.TYPE);
+        subscribedEventTypes.add(ChannelTriggeredEvent.TYPE);
     }
 
     @Override
@@ -83,32 +89,50 @@ public class JRuleEventSubscriber implements EventSubscriber {
         jRuleMonitoredItems.add(name);
     }
 
-    public void startSubscriper() {
-        logger.debug("starting subscriper");
-        JRuleEngine.get().getItemNames().stream().forEach(itemName -> addItemItemName(itemName));
+    public void startSubscriber() {
+        logger.debug("starting subscriber");
+        JRuleEngine.get().getItemNames().forEach(this::addItemItemName);
+        jRuleMonitoredChannels.addAll(JRuleEngine.get().getChannelNames());
         propertyChangeSupport.addPropertyChangeListener(JRuleEngine.get());
     }
 
     public void stopSubscriber() {
         jRuleMonitoredItems.clear();
+        jRuleMonitoredChannels.clear();
         propertyChangeSupport.removePropertyChangeListener(JRuleEngine.get());
     }
 
     @Override
     public void receive(Event event) {
 
+        logger.debug("Received event: {} of type: {}, topic: {}, payload: {}, source: {}", event, event.getType(),
+                event.getTopic(), event.getPayload(), event.getSource());
+
         final String itemFromTopic = JRuleUtil.getItemNameFromTopic(event.getTopic());
         if (event.getType().equals(ItemAddedEvent.TYPE) //
                 || event.getType().equals(ItemRemovedEvent.TYPE) //
                 || event.getType().equals(ItemUpdatedEvent.TYPE)) {
+            logger.debug("event processed as {}: topic {} payload: {}", PROPERTY_ITEM_REGISTRY_EVENT, event.getTopic(),
+                    event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_REGISTRY_EVENT, null, event);
             return;
         }
-        if (!jRuleMonitoredItems.contains(itemFromTopic)) {
-            return;
+        if (jRuleMonitoredItems.contains(itemFromTopic)) {
+            logger.debug("event processed as {}: topic {} payload: {}", PROPERTY_ITEM_EVENT, event.getTopic(),
+                    event.getPayload());
+            propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
         }
-        logger.debug("Got Event event: topic {} payload: {}", event.getTopic(), event.getPayload());
-        propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
+        if (event.getType().equals(ChannelTriggeredEvent.TYPE)) {
+
+            ChannelTriggeredEvent channelTriggeredEvent = (ChannelTriggeredEvent) event;
+            String channel = channelTriggeredEvent.getChannel().toString();
+
+            if (jRuleMonitoredChannels.contains(channel)) {
+                logger.debug("event processed as {}: topic {} payload: {}", PROPERTY_CHANNEL_EVENT, event.getTopic(),
+                        event.getPayload());
+                propertyChangeSupport.firePropertyChange(PROPERTY_CHANNEL_EVENT, null, event);
+            }
+        }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {

@@ -52,6 +52,7 @@ import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateEvent;
+import org.openhab.core.thing.events.ChannelTriggeredEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,8 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private Map<String, List<JRuleExecutionContext>> itemToExecutionContexts = new HashMap<>();
 
+    private Map<String, List<JRuleExecutionContext>> channelToExecutionContexts = new HashMap<>();
+
     private Set<String> itemNames = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
     private Set<CompletableFuture<Void>> timers = new HashSet<>();
@@ -106,6 +109,10 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public Set<String> getItemNames() {
         return itemNames;
+    }
+
+    public Set<String> getChannelNames() {
+        return channelToExecutionContexts.keySet();
     }
 
     public synchronized void reset() {
@@ -146,22 +153,31 @@ public class JRuleEngine implements PropertyChangeListener {
             // Make sure when has item ref
             // Loop and find the other and ors
             for (JRuleWhen jRuleWhen : jRuleWhens) {
-                if (jRuleWhen.item() == null || jRuleWhen.item().isEmpty()) {
-                    if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1) {
-                        addTimedExecution(jRule, jRuleName.value(), jRuleWhen, method, jRuleEventPresent);
-                    }
-                    continue;
-                }
-                final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
-                logger.debug("Got item class: {}", itemClass);
-                logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
 
-                addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
-                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
-                        getDoubelFromAnnotation(jRuleWhen.lt()), getDoubelFromAnnotation(jRuleWhen.lte()),
-                        getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()),
-                        getDoubelFromAnnotation(jRuleWhen.eq()));
-                itemNames.add(jRuleWhen.item());
+                logger.debug("- processing jRule when: {}", jRuleWhen);
+
+                if (!jRuleWhen.item().isEmpty()) {
+                    // JRuleWhen for an item
+                    final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
+                    logger.debug("Got item class: {}", itemClass);
+                    logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
+
+                    addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
+                            jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
+                            getDoubelFromAnnotation(jRuleWhen.lt()), getDoubelFromAnnotation(jRuleWhen.lte()),
+                            getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()),
+                            getDoubelFromAnnotation(jRuleWhen.eq()));
+                    itemNames.add(jRuleWhen.item());
+
+                } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1) {
+                    // JRuleWhen for a time trigger
+                    addTimedExecution(jRule, jRuleName.value(), jRuleWhen, method, jRuleEventPresent);
+
+                } else if (!jRuleWhen.channel().isEmpty()) {
+                    // JRuleWhen for a channel
+                    addChannelExecutionContext(jRule, jRuleWhen.channel(), jRuleName.value(), method,
+                            jRuleEventPresent);
+                }
 
                 // HERE: Put trigger to rule hashmap or item to rule hashmao
                 // Check what you get from item notification
@@ -230,14 +246,21 @@ public class JRuleEngine implements PropertyChangeListener {
     private void addExecutionContext(JRule jRule, String itemClass, String ruleName, String trigger, String from,
             String to, String update, String itemName, Method method, boolean eventParameterPresent, Double lt,
             Double lte, Double gt, Double gte, Double eq) {
-        List<JRuleExecutionContext> contextList = itemToExecutionContexts.get(itemName);
-        if (contextList == null) {
-            contextList = new ArrayList<>();
-            itemToExecutionContexts.put(itemName, contextList);
-        }
+        List<JRuleExecutionContext> contextList = itemToExecutionContexts.computeIfAbsent(itemName,
+                k -> new ArrayList<>());
         final JRuleExecutionContext context = new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName,
                 itemClass, itemName, method, eventParameterPresent, lt, lte, gt, gte, eq);
-        logger.debug("ContextList add context: {}", context);
+        logger.debug("ItemContextList add context: {}", context);
+        contextList.add(context);
+    }
+
+    private void addChannelExecutionContext(JRule jRule, String channel, String ruleName, Method method,
+            boolean eventParameterPresent) {
+        List<JRuleExecutionContext> contextList = channelToExecutionContexts.computeIfAbsent(channel,
+                k -> new ArrayList<>());
+        final JRuleExecutionContext context = new JRuleExecutionContext(jRule, null, null, null, null, ruleName, null,
+                null, method, eventParameterPresent, null, null, null, null, null);
+        logger.debug("ChannelContextList add context: {}", context);
         contextList.add(context);
     }
 
@@ -291,8 +314,22 @@ public class JRuleEngine implements PropertyChangeListener {
         if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_ITEM_EVENT)) {
             logger.debug("Property change item event! : {}", ((Event) evt.getNewValue()).getTopic());
             handleEventUpdate((Event) evt.getNewValue());
+
+        } else if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_CHANNEL_EVENT)) {
+            logger.debug("Channel event! : {}", ((Event) evt.getNewValue()).getTopic());
+            handleChannelEvent((ChannelTriggeredEvent) evt.getNewValue());
+        }
+    }
+
+    private void handleChannelEvent(ChannelTriggeredEvent channelEvent) {
+        List<JRuleExecutionContext> executionContexts = channelToExecutionContexts
+                .get(channelEvent.getChannel().toString());
+        if (executionContexts == null || executionContexts.isEmpty()) {
+            logger.debug("No execution context for channelEvent: {}", channelEvent);
             return;
         }
+        executionContexts
+                .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(channelEvent.getEvent())));
     }
 
     private void handleEventUpdate(Event event) {
