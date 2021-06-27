@@ -260,8 +260,8 @@ public class JRuleEventHandler {
             return null;
         }
         StringType stringType = state.as(StringType.class);
-        logger.debug("Got state: {} {}", state, stringType);
-        return stringType == null ? null : stringType.toString();
+        logger.debug("Got state: {} stringType: {} fullString: {}", state, stringType, state.toFullString());
+        return stringType == null ? state.toFullString() : stringType.toString();
     }
 
     public Integer getStateFromItemAsInt(String itemName) {
