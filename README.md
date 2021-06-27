@@ -374,6 +374,9 @@ Use case: A group of switches , trigger when it's changed from OFF to ON
 
 
 # Changelog
+
+## ALPHA7
+- Fixed bug with group member value was null for non StringType types
 ## ALPHA6
 - Added group functionality getMember will return who triggered a change for a group
 ## ALPHA5
