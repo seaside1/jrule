@@ -105,9 +105,6 @@ public class JRuleEventSubscriber implements EventSubscriber {
     @Override
     public void receive(Event event) {
 
-        logger.debug("Received event: {} of type: {}, topic: {}, payload: {}, source: {}", event, event.getType(),
-                event.getTopic(), event.getPayload(), event.getSource());
-
         final String itemFromTopic = JRuleUtil.getItemNameFromTopic(event.getTopic());
         if (event.getType().equals(ItemAddedEvent.TYPE) //
                 || event.getType().equals(ItemRemovedEvent.TYPE) //
