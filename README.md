@@ -1,4 +1,5 @@
 # J Rule
+
 Write OpenHAB Rules using Java
 
 This automation package aims to enable Java development of OpenHAB Rules. The addon will allow the user to create custom OpenHAB rules
@@ -8,10 +9,12 @@ For the addon to be able to pick up rules, they first need to be compiled by the
 will be automatically compiled and loaded into OpenHAB when the addon is started. The syntax for rules as well as the design and thinking behind the addon is to provide something that is similar to Rules DSL but more powerful and customizable.
 
 # Limitations
+
 - Currently only working for OpenHAB installations under Linux / Unix Operating Systems, not supported in Windows (for rules development its fine to use windows)
 - Not supporting OH3 GUI rules, script actions and script conditions 
 
 # Why?
+
  - You will be able to use a standard Java IDE to develop your rules. 
  - Full auto completion (Shift space) for all items, less chance of errors and typos
  - Take full advantage of all java design patters
@@ -22,12 +25,15 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
  - You will be able to use JRule in parallell with any other Rules engine if you want to give it a try
 
 # Who?
+
 This addon is not for beginners, you should have knowledge in writing java-programs or a desire to do so.
 
 # Maturity
+
 Alpha, you can expect big changes in syntax and everything else. Please contribute if you can
 
 # Download
+
 Prebuilt jar file is available in the bin folder under https://github.com/seaside1/jrule
 
 # Java Rule Engine
@@ -48,6 +54,7 @@ The following jar files can be found under the jrule/jar-folder:
 
 
 # Get started with the JRule Automation Addon
+
 - Install the addon by copying the org.openhab.automation.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
   Download latest release from https://github.com/seaside1/jrule/tree/main/bin
 - In default location is /etc/openhab/automation/jrule
@@ -105,10 +112,12 @@ public class MySwitchRule extends JRule {
 Make sure you add the Jar-files from /etc/openhab/jrule/jar as dependencies.
 
 # Third Party External Dependencies
+
 You can add any 3rd party library as dependency. Copy the jar files needed to /etc/openhab/automation/jrule/ext-lib
 The Automation Engine will automatically pick these dependencies up when it is compiling the rules.
 
 # Core Actions
+
 Built in Core Actions that can be used
 | Action                                 | Description                                                                                   |
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
@@ -119,6 +128,7 @@ Built in Core Actions that can be used
 # Examples 
 
 ## Example 1
+
 Use Case: Invoke another item Switch from rule
 ```java
     @JRuleName("MyRuleTurnSwich2On")
@@ -130,6 +140,7 @@ Use Case: Invoke another item Switch from rule
 ```
 
 ## Example 2
+
 Use case: Invoke a Doorbell, but only allow the rule to be invoke once every 20 seconds.
 This is done by aquiring a lock getTimedLock("MyLockTestRule1", 20).
 
@@ -146,6 +157,7 @@ This is done by aquiring a lock getTimedLock("MyLockTestRule1", 20).
     }
 ```
 ## Example 3
+
 Use case: Use the value that caused the trigger
 When the rule is triggered, the triggered value is stored in the event.
 
@@ -157,6 +169,7 @@ When the rule is triggered, the triggered value is stored in the event.
    }
 ```
 ## Example 4
+
 Use case: Or statement for rule trigger
 To add an OR statement we simply add multiple @JRuleWhen statements
 
@@ -170,6 +183,7 @@ To add an OR statement we simply add multiple @JRuleWhen statements
 ```
 
 ## Example 5
+
 Use case: Define your own functionality
 Create a Rules class that extends: JRuleUser.java
 JRuleUser.java should be placed in the same folder as your rules:
@@ -186,6 +200,7 @@ public abstract class JRuleUser extends JRule {
 ```
 
 ## Example 6
+
 Your class rules can now extend the JRuleUser
 package org.openhab.automation.jrule.rules.user;
 ```java
@@ -208,6 +223,7 @@ public class MySwitchRule extends JRuleUser {
 ```
 
 ## Example 7
+
 Let's say we want to add a common function that should be available for all user rules.
 We want to add a function that checks if it is ok to send notifications debing on what time it is.
 We'll do this:
@@ -260,6 +276,7 @@ public class MyTestUserRule extends JRuleUser {
 }
 ```
 ## Example 8
+
 Use case create a timer for automatically turning of a light when it is turned on. If it's running cancel it and schedule a new one. 
 ```java
     @JRuleName("myTimerRule")
@@ -273,6 +290,7 @@ Use case create a timer for automatically turning of a light when it is turned o
     }
 ```
 ## Example 9
+
 Use case: Let's say we have a 433 MHz wall socket with no ON/OFF feedback and a bit of bad radio reception. We can then create a repeating timer
 to send multiple ON statements to be sure it actually turns on.
  createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 4, will create a repeating timer that will trigger after 0 seconds, 7s, 14s and 21s 
@@ -291,6 +309,7 @@ to send multiple ON statements to be sure it actually turns on.
 ```
 
 ## Example 10
+
 Use case Create a simple timer. When MyTestSwitch turns on it will wait 10 seconds and then turn MyTestSwitch2 to on. Note that
 it will not reschedule the timer, if the timer is already running it won't reschedule it.
 ```java
@@ -305,6 +324,7 @@ it will not reschedule the timer, if the timer is already running it won't resch
     }
 ```
 ## Example 11
+
 Use case trigger a rule at 22:30 in the evening to set initial brightness for a ZwaveDimmer to 30%
 ```java
   @JRuleName("setDayBrightness")
@@ -317,6 +337,7 @@ Use case trigger a rule at 22:30 in the evening to set initial brightness for a 
 ```
 
 ## Example 12
+
 Use case: If temperature is below or equals to 20 degrees send command on to a heating fan 
 It is possible to use:
 lte = less than or equals
@@ -334,6 +355,7 @@ eq = equals
 ```
 
 ## Example 13
+
 Use case: Using say command for tts
 ```java
     @JRuleName("testSystemTts")
@@ -346,11 +368,13 @@ Use case: Using say command for tts
 ```
 
 ## Example 14
+
 Use case: Using say command line execute
 ```java
    
 ```
 ## Example 15
+
 Use case: A group of switches, see if status is changed, and also which member in the group changed state
 ```java
     @JRuleName("groupMySwitchesChanged")
@@ -363,6 +387,7 @@ Use case: A group of switches, see if status is changed, and also which member i
 ```
 
 ## Example 16
+
 Use case: A group of switches , trigger when it's changed from OFF to ON
 ```java
     @JRuleName("groupMySwitchesChangedOffToOn")
@@ -372,28 +397,51 @@ Use case: A group of switches , trigger when it's changed from OFF to ON
     }
 ```
 
+## Example 17
+
+Use case: Listen for a Channel Trigger Event
+```java
+    @JRuleName("channelTriggered")
+    @JRuleWhen(channel = "binding:thing:buttonevent")
+    public synchronized void channelTriggered(JRuleEvent event) {
+	logInfo("Channel triggered with value: {}", event.getValue());
+    }
+```
 
 # Changelog
+
 ## ALPHA6
+
 - Added group functionality getMember will return who triggered a change for a group
+
 ## ALPHA5
+
 - Removed dependencies on slf4japi and eclipse annotations
 - Added logInfo logDebug (to wrap slf4j and remove dep)
 - Fixed compilation of rules to be more robust with internal dependencies 
+
 ## ALPHA4
+
 - Refactored completable futures
 - Added 5 seconds of delay for initialization of the rule engine to avoid multiple reloads
 - Added support for play & pause for player item
 - Added commandLineExecute
+
 ## ALPHA3
+
 - Fixed issue when reloading rules if they are changed with monitored items
 - Fixed classpath issue when executing rules using 3rd party libraries 
+
 ## ALPHA2
+
 - Added possibility to include 3rd party libraries when developing rules
+
 ## ALPHA1
+
 - Refactored internal jar dependencies and jar-generation
 - Added eq comparator for number triggers in rules
 
 # Roadmap
+
 - Locks and timers by annotation
 - Built in expire functionality
