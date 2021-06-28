@@ -409,6 +409,10 @@ Use case: Listen for a Channel Trigger Event
 ```
 
 # Changelog
+
+## ALPHA8
+- Channel triggers provided by @roth see example 17
+
 ## ALPHA7
 - Fixed bug with group member value was null for non StringType types
 
