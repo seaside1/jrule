@@ -409,39 +409,34 @@ Use case: Listen for a Channel Trigger Event
 ```
 
 # Changelog
+## ALPHA7
+- Fixed bug with group member value was null for non StringType types
 
 ## ALPHA6
-
 - Added group functionality getMember will return who triggered a change for a group
 
 ## ALPHA5
-
 - Removed dependencies on slf4japi and eclipse annotations
 - Added logInfo logDebug (to wrap slf4j and remove dep)
 - Fixed compilation of rules to be more robust with internal dependencies 
 
 ## ALPHA4
-
 - Refactored completable futures
 - Added 5 seconds of delay for initialization of the rule engine to avoid multiple reloads
 - Added support for play & pause for player item
 - Added commandLineExecute
 
 ## ALPHA3
-
 - Fixed issue when reloading rules if they are changed with monitored items
 - Fixed classpath issue when executing rules using 3rd party libraries 
 
 ## ALPHA2
-
 - Added possibility to include 3rd party libraries when developing rules
 
 ## ALPHA1
-
 - Refactored internal jar dependencies and jar-generation
 - Added eq comparator for number triggers in rules
 
 # Roadmap
-
 - Locks and timers by annotation
 - Built in expire functionality
