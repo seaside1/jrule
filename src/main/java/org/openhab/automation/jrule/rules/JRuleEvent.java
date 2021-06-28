@@ -63,4 +63,9 @@ public class JRuleEvent {
     public String getMemberName() {
         return memberName;
     }
+
+    @Override
+    public String toString() {
+        return "JRuleEvent{" + "value='" + value + '\'' + ", memberName='" + memberName + '\'' + '}';
+    }
 }
