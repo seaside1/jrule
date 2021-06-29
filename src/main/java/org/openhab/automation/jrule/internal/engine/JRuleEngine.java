@@ -118,6 +118,7 @@ public class JRuleEngine implements PropertyChangeListener {
     public synchronized void reset() {
         itemNames.clear();
         itemToExecutionContexts.clear();
+        channelToExecutionContexts.clear();
         itemToRules.clear();
         clearTimers();
     }
