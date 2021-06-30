@@ -420,6 +420,9 @@ Use case: Cron based expression to trigger rule
 ```
 
 # Changelog
+## ALPHA9
+- Added cron expressions for rules see example 18
+- Bug fix by @roth for reloading channel triggers
 
 ## ALPHA8
 - Channel triggers provided by @roth see example 17
