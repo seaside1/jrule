@@ -408,6 +408,17 @@ Use case: Listen for a Channel Trigger Event
     }
 ```
 
+## Example 18
+
+Use case: Cron based expression to trigger rule
+```java
+    @JRuleName("testCron")
+    @JRuleWhen(cron = "4 * * * * *")
+    public void testCron(JRuleEvent event) {
+        logInfo("CRON: Running cron from string every minute when seconds is at 4: {}", event.getValue());
+    }
+```
+
 # Changelog
 
 ## ALPHA8
