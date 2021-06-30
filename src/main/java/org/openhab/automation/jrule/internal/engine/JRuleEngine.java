@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -37,6 +38,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.cron.JRuleCronExpression;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemType;
@@ -150,13 +152,11 @@ public class JRuleEngine implements PropertyChangeListener {
             Parameter[] parameters = method.getParameters();
             boolean jRuleEventPresent = Arrays.stream(parameters)
                     .filter(param -> (param.getType().equals(JRuleEvent.class))).count() > 0;
-            // Validate make sure name and when is there
-            // Make sure when has item ref
-            // Loop and find the other and ors
+
+            // TODO: Do validation on syntax in when annotations
+            // Loop for other ORs
             for (JRuleWhen jRuleWhen : jRuleWhens) {
-
                 logger.debug("- processing jRule when: {}", jRuleWhen);
-
                 if (!jRuleWhen.item().isEmpty()) {
                     // JRuleWhen for an item
                     final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
@@ -170,20 +170,15 @@ public class JRuleEngine implements PropertyChangeListener {
                             getDoubelFromAnnotation(jRuleWhen.eq()));
                     itemNames.add(jRuleWhen.item());
 
-                } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1) {
+                } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1
+                        || !jRuleWhen.cron().isEmpty()) {
                     // JRuleWhen for a time trigger
                     addTimedExecution(jRule, jRuleName.value(), jRuleWhen, method, jRuleEventPresent);
-
                 } else if (!jRuleWhen.channel().isEmpty()) {
                     // JRuleWhen for a channel
                     addChannelExecutionContext(jRule, jRuleWhen.channel(), jRuleName.value(), method,
                             jRuleEventPresent);
                 }
-
-                // HERE: Put trigger to rule hashmap or item to rule hashmao
-                // Check what you get from item notification
-                // Take the item used in rule and put to subscripe hashmap so we don't have to listen to it all
-                // items probably item to list of rules
             }
         }
     }
@@ -193,6 +188,18 @@ public class JRuleEngine implements PropertyChangeListener {
             return null;
         }
         return Double.valueOf(d);
+    }
+
+    private CompletableFuture<Void> createTimer(String cronExpressionStr) {
+        try {
+            final JRuleCronExpression cronExpression = new JRuleCronExpression(cronExpressionStr);
+            final ZonedDateTime nextTimeAfter = cronExpression.nextTimeAfter(ZonedDateTime.now());
+            Date futureTime = Date.from(nextTimeAfter.toInstant());
+            return createTimer(futureTime);
+        } catch (IllegalArgumentException x) {
+            logger.error("Failed to parse cron expression for cron: {} message: {}", cronExpressionStr, x.getMessage());
+            return null;
+        }
     }
 
     private CompletableFuture<Void> createTimer(int hours, int minutes, int seconds) {
@@ -212,9 +219,12 @@ public class JRuleEngine implements PropertyChangeListener {
                 calFuture.add(Calendar.MINUTE, 1);
             }
         }
-        Date date = calFuture.getTime();
+        return createTimer(calFuture.getTime());
+    }
+
+    private CompletableFuture<Void> createTimer(Date date) {
         long initialDelay = new Date(date.getTime() - System.currentTimeMillis()).getTime();
-        logger.debug("Schedule crond: {} initialDelay: {}", date, initialDelay);
+        logger.debug("Schedule cron: {} initialDelay: {}", date, initialDelay);
         Executor delayedExecutor = CompletableFuture.delayedExecutor(initialDelay, TimeUnit.MILLISECONDS, scheduler);
         CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
         return future;
@@ -222,10 +232,11 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private synchronized void addTimedExecution(JRule jRule, String jRuleName, JRuleWhen jRuleWhen, Method method,
             boolean jRuleEventPresent) {
-        CompletableFuture<Void> future = createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+        CompletableFuture<Void> future = (!jRuleWhen.cron().isEmpty()) ? createTimer(jRuleWhen.cron())
+                : createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
         timers.add(future);
-        logger.info("Scheduling timer for rule: {} hours: {} minutes: {} seconds: {}", jRule, jRuleWhen.hours(),
-                jRuleWhen.minutes(), jRuleWhen.seconds());
+        logger.info("Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}", jRule,
+                jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
         JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, method, jRuleName, jRuleEventPresent);
         Consumer<Void> consumer = new Consumer<Void>() {
             @Override
@@ -239,7 +250,7 @@ public class JRuleEngine implements PropertyChangeListener {
         };
         future.thenAccept(consumer).thenAccept(s -> {
             logger.info("Timer has finsihed rule: {}", jRuleName);
-            createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+            // createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
             addTimedExecution(jRule, jRuleName, jRuleWhen, method, jRuleEventPresent);
         });
     }

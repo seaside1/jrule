@@ -27,6 +27,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
 public @interface JRuleWhen {
+    String cron() default "";
+
     int hours() default -1;
 
     int minutes() default -1;
