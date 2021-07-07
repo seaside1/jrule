@@ -20,7 +20,7 @@ import org.openhab.automation.jrule.rules.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDimmerItem extends JRuleItem {
+public abstract class JRuleDimmerItem extends JRuleItem {
 
     public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update ON";
     public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update OFF";

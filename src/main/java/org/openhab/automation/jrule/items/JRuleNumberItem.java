@@ -19,7 +19,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleNumberItem extends JRuleItem {
+public abstract class JRuleNumberItem extends JRuleItem {
 
     public static void sendCommand(String itemName, double value) {
         JRuleEventHandler.get().sendCommand(itemName, value);

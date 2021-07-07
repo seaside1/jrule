@@ -20,7 +20,7 @@ import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePlayerItem extends JRuleItem {
+public abstract class JRulePlayerItem extends JRuleItem {
 
     public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update PLAY";
     public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update PAUSE";

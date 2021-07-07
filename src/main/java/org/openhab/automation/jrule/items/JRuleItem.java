@@ -17,15 +17,8 @@ package org.openhab.automation.jrule.items;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleItem {
+public abstract class JRuleItem {
     public static final String TRIGGER_CHANGED = "Changed";
     public static final String TRIGGER_RECEIVED_COMMAND = "received command";
     public static final String TRIGGER_RECEIVED_UPDATE = "received update";
-
-    //
-    private String type;
-    private String label;
-    private String icon;
-    private String[] groups;
-    private String binding;
 }

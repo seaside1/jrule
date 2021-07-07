@@ -298,4 +298,8 @@ public class JRuleEventHandler {
         }
         return memberNames;
     }
+
+    public ItemRegistry getItemRegistry() {
+        return itemRegistry;
+    }
 }

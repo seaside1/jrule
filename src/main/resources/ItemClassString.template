@@ -24,11 +24,11 @@ public class _ITEMNAME extends JRuleStringItem {
 
     public static final String ITEM = "ITEMNAME";
     
-     public static String getState() {
+    public static String getState() {
         return JRuleStringItem.getState(ITEM);
     }
     
-     public static void sendCommand(String value) {
+    public static void sendCommand(String value) {
         JRuleStringItem.sendCommand(ITEM, value);
     }
 

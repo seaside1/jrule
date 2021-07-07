@@ -25,11 +25,11 @@ public class _ITEMNAME extends JRuleDateTimeItem {
 
     public static final String ITEM = "ITEMNAME";
     
-     public static Date getState() {
+    public static Date getState() {
         return JRuleDateTimeItem.getState(ITEM);
     }
     
-     public static void sendCommand(Date date) {
+    public static void sendCommand(Date date) {
         JRuleDateTimeItem.sendCommand(ITEM, date);
     }
 
