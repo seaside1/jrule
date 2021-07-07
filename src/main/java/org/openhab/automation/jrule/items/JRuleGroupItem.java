@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleGroupItem extends JRuleItem {
+public abstract class JRuleGroupItem extends JRuleItem {
 
     public static Set<String> members(String groupName) {
         return JRuleEventHandler.get().getGroupMemberNames(groupName);

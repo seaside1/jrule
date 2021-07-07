@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDateTimeItem extends JRuleItem {
+public abstract class JRuleDateTimeItem extends JRuleItem {
 
     protected static void sendCommand(String itemName, Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
