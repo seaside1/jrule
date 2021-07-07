@@ -419,7 +419,30 @@ Use case: Cron based expression to trigger rule
     }
 ```
 
+
+## Example 19
+
+Use case: getLastUpdated for an item
+Note that JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");
+can be called without serviceId argument:
+JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
+```java
+  
+    @JRuleName("testLastUpdate")
+    @JRuleWhen(cron = "4 * * * * *")
+    public  void testLastUpdate(JRuleEvent event) {
+        logInfo("CRON: Running cron from string: {}", event.getValue());
+        ZonedDateTime lastUpdate = JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
+        String lastUpdateFormatted = lastUpdate.format(formatter);
+        logInfo("Last Update: {}", lastUpdateFormatted);    
+```
+
+
 # Changelog
+## ALPHA10
+- Added LatUpdate via JRulePresistenceExtensions see example 19
+
 ## ALPHA9
 - Added cron expressions for rules see example 18
 - Bug fix by @roth for reloading channel triggers
