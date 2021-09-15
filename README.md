@@ -440,6 +440,8 @@ JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
 
 
 # Changelog
+## ALPHA11
+- Added check for working dir via system properties
 ## ALPHA10
 - Added LatUpdate via JRulePresistenceExtensions see example 19
 
