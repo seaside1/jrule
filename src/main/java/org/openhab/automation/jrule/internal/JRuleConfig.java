@@ -16,6 +16,8 @@ import java.io.File;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleMachineThingConfig} encapsulates all the configuration options for an instance of the
@@ -25,11 +27,15 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  */
 @NonNullByDefault
 public class JRuleConfig {
+    private static final Logger logger = LoggerFactory.getLogger(JRuleConfig.class);
+    private static final String AUTOMATION_JRULE = "/automation/jrule";
+    private static final String OPENHAB_CONF_PROPERTY = "openhab.conf";
+
     private static final String JAR_DIR = "jar";
 
     public static final String ITEMS_PACKAGE = "org.openhab.automation.jrule.items.generated.";
     public static final String RULES_PACKAGE = "org.openhab.automation.jrule.rules.user.";
-    private static final String WORKING_DIR_PROPERTY = "workingDirectory";
+    private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     public static final String ITEMS_DIR_START = "items";
 
     public static final String ITEMS_DIR = ITEMS_DIR_START + File.separator + "org" + File.separator + "openhab"
@@ -53,7 +59,14 @@ public class JRuleConfig {
     }
 
     public String getWorkingDirectory() {
-        final String workingDir = (String) properties.get(WORKING_DIR_PROPERTY);
+        String workingDir = (String) properties.get(WORKING_DIR_PROPERTY);
+        if (workingDir == null) {
+            String openhabConf = System.getProperty(OPENHAB_CONF_PROPERTY);
+            logger.debug("Openhab Conf Property: {}", openhabConf);
+            if (openhabConf != null) {
+                workingDir = openhabConf.concat(AUTOMATION_JRULE);
+            }
+        }
         return workingDir == null ? DEFAULT_WORKING_DIR : workingDir;
     }
 
