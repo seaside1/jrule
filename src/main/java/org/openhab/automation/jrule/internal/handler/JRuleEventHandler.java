@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleEventHandler {
 
-    private static JRuleEventHandler instance;
+    private static volatile JRuleEventHandler instance;
 
     private EventPublisher eventPublisher;
 
@@ -62,7 +62,11 @@ public class JRuleEventHandler {
 
     public static JRuleEventHandler get() {
         if (instance == null) {
-            instance = new JRuleEventHandler();
+            synchronized(JRuleEventHandler.class) {
+                if (instance == null) {
+                    instance = new JRuleEventHandler();
+                }
+            }
         }
         return instance;
     }
@@ -283,7 +287,7 @@ public class JRuleEventHandler {
     }
 
     public Set<String> getGroupMemberNames(String groupName) {
-        Item item = null;
+        Item item;
         final Set<String> memberNames = new HashSet<>();
         try {
             item = itemRegistry.getItem(groupName);
@@ -294,7 +298,7 @@ public class JRuleEventHandler {
         if (item instanceof GroupItem) {
             GroupItem g = (GroupItem) item;
             Set<@NonNull Item> members = g.getMembers();
-            members.stream().forEach(m -> memberNames.add(m.getName()));
+            members.forEach(m -> memberNames.add(m.getName()));
         }
         return memberNames;
     }
