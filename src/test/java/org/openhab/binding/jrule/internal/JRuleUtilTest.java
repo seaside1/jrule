@@ -22,6 +22,9 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * The {@link JRuleUtilTest}
  *
@@ -31,19 +34,19 @@ public class JRuleUtilTest {
     private static final Logger logger = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         Logger rootLogger = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.ALL);
     }
 
     @Test
-    public void testParseItemName() throws URISyntaxException, InterruptedException {
+    public void testParseItemName() {
         String itemTopicGroup = JRuleUtil
                 .getItemNameFromTopic("openhab/items/gSensorPowerSum/ZwaveULRDimmerSensorPower/statechanged");
         logger.info("Topic Group: {}", itemTopicGroup);
         String topic = "openhab/items/ZwaveEye3Motion/statechanged";
         String itemTopic = JRuleUtil.getItemNameFromTopic(topic);
-        org.junit.jupiter.api.Assertions.assertTrue(itemTopicGroup.equals("gSensorPowerSum"));
-        org.junit.jupiter.api.Assertions.assertTrue(itemTopic.equals("ZwaveEye3Motion"));
+        assertEquals("gSensorPowerSum", itemTopicGroup);
+        assertEquals("ZwaveEye3Motion", itemTopic);
     }
 }

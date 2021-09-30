@@ -60,8 +60,7 @@ public class JRuleJarExtractor {
             @SuppressWarnings("unchecked")
             final Vector<Class<?>> classes = (Vector<Class<?>>) field.get(classLoader);
             return classes;
-        } catch (IllegalArgumentException e) {
-        } catch (IllegalAccessException e) {
+        } catch (IllegalArgumentException | IllegalAccessException ignored) {
         }
         return null;
     }

@@ -129,7 +129,6 @@ public class JRuleHandler implements PropertyChangeListener {
             compiler.compileRules();
         } else {
             logger.debug("Compiler is null aborting");
-            return;
         }
     }
 
@@ -202,12 +201,12 @@ public class JRuleHandler implements PropertyChangeListener {
 
     @SuppressWarnings("null")
     private synchronized void createItemsJar() {
-        if (config != null && compiler != null) {
+        if (compiler != null) {
             JRuleUtil.createJarFile(config.getItemsRootDirectory(),
                     compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
             recompileJar = false;
         } else {
-            logger.error("Failed to create items due to config {}, compiler {}", config, compiler);
+            logger.error("Failed to create items due to config {}, compiler is null", config);
         }
     }
 
@@ -237,9 +236,9 @@ public class JRuleHandler implements PropertyChangeListener {
         // Delete items that are not present anymore
         Arrays.stream(javaSourceItemsFromFolder)
                 .filter(f -> itemNames.contains(JRuleUtil.removeExtension(f.getName(), JRuleConstants.JAVA_FILE_TYPE)))
-                .forEach(f -> deleteFile(f));
+                .forEach(this::deleteFile);
 
-        items.stream().forEach(item -> generateItemSource(item));
+        items.forEach(this::generateItemSource);
     }
 
     private synchronized boolean deleteFile(File f) {
@@ -318,9 +317,9 @@ public class JRuleHandler implements PropertyChangeListener {
                 compileItems();
                 createItemsJar();
             }
-        } else if (property == JRuleRulesWatcher.PROPERTY_ENTRY_CREATE
-                || property == JRuleRulesWatcher.PROPERTY_ENTRY_MODIFY
-                || property == JRuleRulesWatcher.PROPERTY_ENTRY_DELETE) {
+        } else if (JRuleRulesWatcher.PROPERTY_ENTRY_CREATE.equals(property)
+                || JRuleRulesWatcher.PROPERTY_ENTRY_MODIFY.equals(property)
+                || JRuleRulesWatcher.PROPERTY_ENTRY_DELETE.equals(property)) {
             Path newValue = (Path) evt.getNewValue();
             logger.debug("Directory watcher new value: {}", newValue);
             reloadRules();

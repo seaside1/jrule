@@ -85,17 +85,17 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private static final String ITEM_TYPE = "TYPE";
 
-    private static JRuleEngine instance;
+    private static volatile JRuleEngine instance;
 
-    private Map<String, List<JRule>> itemToRules = new HashMap<>();
+    private final Map<String, List<JRule>> itemToRules = new HashMap<>();
 
-    private Map<String, List<JRuleExecutionContext>> itemToExecutionContexts = new HashMap<>();
+    private final Map<String, List<JRuleExecutionContext>> itemToExecutionContexts = new HashMap<>();
 
-    private Map<String, List<JRuleExecutionContext>> channelToExecutionContexts = new HashMap<>();
+    private final Map<String, List<JRuleExecutionContext>> channelToExecutionContexts = new HashMap<>();
 
-    private Set<String> itemNames = new HashSet<>();
+    private final Set<String> itemNames = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
-    private Set<CompletableFuture<Void>> timers = new HashSet<>();
+    private final Set<CompletableFuture<Void>> timers = new HashSet<>();
     protected final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
@@ -104,7 +104,11 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public static JRuleEngine get() {
         if (instance == null) {
-            instance = new JRuleEngine();
+            synchronized(JRuleEngine.class) {
+                if (instance == null) {
+                    instance = new JRuleEngine();
+                }
+            }
         }
         return instance;
     }
@@ -126,7 +130,7 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private synchronized void clearTimers() {
-        timers.stream().forEach(d -> d.cancel(true));
+        timers.forEach(timer -> timer.cancel(true));
         timers.clear();
     }
 
@@ -151,7 +155,7 @@ public class JRuleEngine implements PropertyChangeListener {
             logger.debug("Got jrule whens size: {}", jRuleWhens.length);
             Parameter[] parameters = method.getParameters();
             boolean jRuleEventPresent = Arrays.stream(parameters)
-                    .filter(param -> (param.getType().equals(JRuleEvent.class))).count() > 0;
+                                              .anyMatch(param -> (param.getType().equals(JRuleEvent.class)));
 
             // TODO: Do validation on syntax in when annotations
             // Loop for other ORs
@@ -164,10 +168,10 @@ public class JRuleEngine implements PropertyChangeListener {
                     logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
 
                     addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
-                            jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
-                            getDoubelFromAnnotation(jRuleWhen.lt()), getDoubelFromAnnotation(jRuleWhen.lte()),
-                            getDoubelFromAnnotation(jRuleWhen.gt()), getDoubelFromAnnotation(jRuleWhen.gte()),
-                            getDoubelFromAnnotation(jRuleWhen.eq()));
+                                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
+                                        getDoubleFromAnnotation(jRuleWhen.lt()), getDoubleFromAnnotation(jRuleWhen.lte()),
+                                        getDoubleFromAnnotation(jRuleWhen.gt()), getDoubleFromAnnotation(jRuleWhen.gte()),
+                                        getDoubleFromAnnotation(jRuleWhen.eq()));
                     itemNames.add(jRuleWhen.item());
 
                 } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1
@@ -183,7 +187,7 @@ public class JRuleEngine implements PropertyChangeListener {
         }
     }
 
-    private Double getDoubelFromAnnotation(double d) {
+    private Double getDoubleFromAnnotation(double d) {
         if (d == Double.MIN_VALUE) {
             return null;
         }
@@ -226,8 +230,7 @@ public class JRuleEngine implements PropertyChangeListener {
         long initialDelay = new Date(date.getTime() - System.currentTimeMillis()).getTime();
         logger.debug("Schedule cron: {} initialDelay: {}", date, initialDelay);
         Executor delayedExecutor = CompletableFuture.delayedExecutor(initialDelay, TimeUnit.MILLISECONDS, scheduler);
-        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> null, delayedExecutor);
-        return future;
+        return CompletableFuture.supplyAsync(() -> null, delayedExecutor);
     }
 
     private synchronized void addTimedExecution(JRule jRule, String jRuleName, JRuleWhen jRuleWhen, Method method,
@@ -238,18 +241,15 @@ public class JRuleEngine implements PropertyChangeListener {
         logger.info("Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}", jRule,
                 jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
         JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, method, jRuleName, jRuleEventPresent);
-        Consumer<Void> consumer = new Consumer<Void>() {
-            @Override
-            public void accept(Void t) {
-                try {
-                    invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
-                } finally {
-                    timers.remove(future);
-                }
+        Consumer<Void> consumer = t -> {
+            try {
+                invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
+            } finally {
+                timers.remove(future);
             }
         };
         future.thenAccept(consumer).thenAccept(s -> {
-            logger.info("Timer has finsihed rule: {}", jRuleName);
+            logger.info("Timer has finished rule: {}", jRuleName);
             // createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
             addTimedExecution(jRule, jRuleName, jRuleWhen, method, jRuleEventPresent);
         });
@@ -346,8 +346,8 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void handleEventUpdate(Event event) {
         final String itemName = getItemNameFromEvent(event);
-        final List<JRuleExecutionContext> exectionContexts = itemToExecutionContexts.get(itemName);
-        if (exectionContexts == null || exectionContexts.isEmpty()) {
+        final List<JRuleExecutionContext> executionContexts = itemToExecutionContexts.get(itemName);
+        if (executionContexts == null || executionContexts.isEmpty()) {
             logger.debug("No execution context for changeEvent ");
             return;
         }
@@ -381,7 +381,7 @@ public class JRuleEngine implements PropertyChangeListener {
             }
 
             logger.debug("newValue: {} oldValue: {} type: {}", newValue, oldValue, type);
-            logger.debug("Invoked execution contexts: {}", exectionContexts.size());
+            logger.debug("Invoked execution contexts: {}", executionContexts.size());
             logger.debug("Execution topic Topic: {}", event.getTopic());
             logger.debug("Execution topic Payload: {}", event.getPayload());
             logger.debug("Execution topic Source: {}", event.getSource());
@@ -394,7 +394,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         if (triggerValues.size() > 0) {
             String member = memberName == null ? "" : memberName;
-            exectionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
+            executionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
                     .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(stringValue, member)));
         } else {
             logger.debug("Execution ignored, no trigger values for itemName: {} eventType: {}", itemName, type);
@@ -404,7 +404,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
         logger.debug("invoke when context matches");
         if (context.isNumericOperation()) {
-            Double value = getValuAsDouble(jRuleEvent.getValue());
+            Double value = getValueAsDouble(jRuleEvent.getValue());
             if (context.getGt() != null) {
                 if (value > context.getGt()) {
                     invokeRule(context, jRuleEvent);
@@ -432,7 +432,7 @@ public class JRuleEngine implements PropertyChangeListener {
         }
     }
 
-    private Double getValuAsDouble(String value) {
+    private Double getValueAsDouble(String value) {
         double parseDouble = 0;
         if (value == null || value.isEmpty()) {
             return null;
@@ -461,13 +461,7 @@ public class JRuleEngine implements PropertyChangeListener {
         logger.debug("Invoking context: {}", context);
         try {
             final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
-        } catch (IllegalAccessException e) {
-            logger.error("Error", e);
-        } catch (IllegalArgumentException e) {
-            logger.error("Error", e);
-        } catch (InvocationTargetException e) {
-            logger.error("Error", e);
-        } catch (SecurityException e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
             logger.error("Error", e);
         }
     }
