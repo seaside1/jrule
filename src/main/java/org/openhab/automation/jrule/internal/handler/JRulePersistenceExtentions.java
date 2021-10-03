@@ -44,7 +44,7 @@ public class JRulePersistenceExtentions {
                     : PersistenceExtensions.lastUpdate(itemRegistry.getItem(itemName), serviceId);
         } catch (ItemNotFoundException e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Faied to get item: {} in order to getLastUpdate", itemName, e);
+                logger.debug("Failed to get item: {} in order to getLastUpdate", itemName, e);
             } else {
                 logger.error("Failed to get item: {} in order to getLastUpdate", itemName);
             }

@@ -77,8 +77,8 @@ public class JRuleUtil {
         }
     }
 
-    public static String removeExtension(@NonNull String name, String extention) {
-        return name.substring(0, name.lastIndexOf(extention));
+    public static String removeExtension(@NonNull String name, String extension) {
+        return name.substring(0, name.lastIndexOf(extension));
     }
 
     public static @Nullable String getResourceAsString(@Nullable URL resource) {
@@ -185,7 +185,7 @@ public class JRuleUtil {
             }
             dirs.add(new File(resource.getFile()));
         }
-        ArrayList<Class> classes = new ArrayList<Class>();
+        ArrayList<Class> classes = new ArrayList<>();
         for (File directory : dirs) {
             classes.addAll(findClasses(directory, packageName));
         }
@@ -202,7 +202,7 @@ public class JRuleUtil {
      */
     @SuppressWarnings("rawtypes")
     private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-        final List<Class> classes = new ArrayList<Class>();
+        final List<Class> classes = new ArrayList<>();
         if (!directory.exists()) {
             return classes;
         }
