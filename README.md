@@ -10,19 +10,19 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
 
 # Limitations
 
-- Currently only working for OpenHAB installations under Linux / Unix Operating Systems, not supported in Windows (for rules development its fine to use windows)
+- Currently, only working for OpenHAB installations under Linux / Unix Operating Systems, not supported in Windows (for rules development it's fine to use windows)
 - Not supporting OH3 GUI rules, script actions and script conditions 
 
 # Why?
 
  - You will be able to use a standard Java IDE to develop your rules. 
- - Full auto completion (Shift space) for all items, less chance of errors and typos
+ - Full auto-completion (Shift space) for all items, less chance of errors and typos
  - Take full advantage of all java design patters
  - Share and reuse code for you rules
  - Advanced timers and locks are built in and can be used without cluttering the code
  - Possibility to write junit-tests to test your rules
  - Use any 3rd party dependencies and libraries in your rules
- - You will be able to use JRule in parallell with any other Rules engine if you want to give it a try
+ - You will be able to use JRule in parallel with any other Rules engine if you want to give it a try
 
 # Who?
 
@@ -56,7 +56,7 @@ The following jar files can be found under the jrule/jar-folder:
 # Get started with the JRule Automation Addon
 
 - Install the addon by copying the org.openhab.automation.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
-  Download latest release from https://github.com/seaside1/jrule/tree/main/bin
+  Download the latest release from https://github.com/seaside1/jrule/tree/main/bin
 - In default location is /etc/openhab/automation/jrule
 - When the addon is started it will:
 1. Create JAVA source files for all items 
@@ -141,8 +141,8 @@ Use Case: Invoke another item Switch from rule
 
 ## Example 2
 
-Use case: Invoke a Doorbell, but only allow the rule to be invoke once every 20 seconds.
-This is done by aquiring a lock getTimedLock("MyLockTestRule1", 20).
+Use case: Invoke a Doorbell, but only allow the rule to be invoked once every 20 seconds.
+This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
 
 ```java
     @JRuleName("MyLockTestRule1")
@@ -225,7 +225,7 @@ public class MySwitchRule extends JRuleUser {
 ## Example 7
 
 Let's say we want to add a common function that should be available for all user rules.
-We want to add a function that checks if it is ok to send notifications debing on what time it is.
+We want to add a function that checks if it is ok to send notifications depends on what time it is.
 We'll do this:
 
 ```java
@@ -264,7 +264,7 @@ public class MyTestUserRule extends JRuleUser {
 	@JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
 	public void mySendNotificationRUle(JRuleEvent event) {
 		if (timeIsOkforDisturbance()) {
-			logInfo("It's ok to send a distrubing notification");
+			logInfo("It's ok to send a disturbing notification");
 		}
 	}
 	
@@ -369,9 +369,15 @@ Use case: Using say command for tts
 
 ## Example 14
 
-Use case: Using say command line execute
+Use case: Executing command from CLI
 ```java
-   
+
+    @JRuleName("testExecutingCommandLine")
+    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED)
+    public synchronized void testExecutingCommandLine(JRuleEvent event) {
+        logInfo("Creating dummy file using CLI");
+        executeCommandLine("touch ~/example.txt");
+    }
 ```
 ## Example 15
 
@@ -443,7 +449,7 @@ JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
 ## ALPHA11
 - Added check for working dir via system properties
 ## ALPHA10
-- Added LatUpdate via JRulePresistenceExtensions see example 19
+- Added LatUpdate via JRulePersistenceExtentions see example 19
 
 ## ALPHA9
 - Added cron expressions for rules see example 18

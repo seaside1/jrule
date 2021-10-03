@@ -24,14 +24,18 @@ import org.openhab.core.io.net.exec.ExecUtil;
  */
 public class JRuleActionHandler {
 
-    private static JRuleActionHandler instance = null;
+    private static volatile JRuleActionHandler instance = null;
 
     private JRuleActionHandler() {
     }
 
     public static JRuleActionHandler get() {
-        if (instance == null) {
-            instance = new JRuleActionHandler();
+        if(instance == null) {
+            synchronized(JRuleActionHandler.class) {
+                if (instance == null) {
+                    instance = new JRuleActionHandler();
+                }
+            }
         }
         return instance;
     }

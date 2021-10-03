@@ -100,21 +100,20 @@ public class JRuleCompiler {
     }
 
     public void compile(File javaSourceFile, String classPath) {
-        compile(Arrays.asList(javaSourceFile), classPath);
+        compile(List.of(javaSourceFile), classPath);
     }
 
     public void compile(List<File> javaSourceFiles, String classPath) {
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-        final List<String> optionList = new ArrayList<String>();
+        final List<String> optionList = new ArrayList<>();
         optionList.add(CLASSPATH_OPTION);
         optionList.add(classPath);
         logger.debug("Compiling classes using classpath: {}", classPath);
-        javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
-                .forEach(javaSourceFile -> {
-                    logger.debug("Compiling java Source file: {}", javaSourceFile);
-                });
+        javaSourceFiles.stream()
+                .filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
+                .forEach(javaSourceFile -> logger.debug("Compiling java Source file: {}", javaSourceFile));
 
         final Iterable<? extends JavaFileObject> compilationUnit = fileManager
                 .getJavaFileObjectsFromFiles(javaSourceFiles);
@@ -122,7 +121,7 @@ public class JRuleCompiler {
                 compilationUnit);
         try {
             if (task.call()) {
-                logger.debug("Compilation of classes successfull!");
+                logger.debug("Compilation of classes successfully!");
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
                     logger.info("Error on line {} in {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
@@ -138,7 +137,7 @@ public class JRuleCompiler {
         return folder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
     }
 
-    public void compileIitemsInFolder(File itemsFolder) {
+    public void compileItemsInFolder(File itemsFolder) {
         final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
                 + getJarPath(JAR_JRULE_NAME);
         logger.debug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
@@ -162,7 +161,7 @@ public class JRuleCompiler {
     }
 
     public void compileItems() {
-        compileIitemsInFolder(new File(jRuleConfig.getItemsDirectory()));
+        compileItemsInFolder(new File(jRuleConfig.getItemsDirectory()));
     }
 
     public void compileRules() {
@@ -188,8 +187,7 @@ public class JRuleCompiler {
     public List<URL> getExtLibsAsUrls() {
         try {
             File[] extLibsFiles = getExtLibsAsFiles();
-            final List<URL> urlList = Arrays.stream(extLibsFiles).map(f -> getUrl(f)).collect(Collectors.toList());
-            return urlList;
+            return Arrays.stream(extLibsFiles).map(this::getUrl).collect(Collectors.toList());
         } catch (Exception x) {
             logger.error("Failed to get extLib urls");
             return new ArrayList<>();

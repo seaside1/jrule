@@ -48,13 +48,13 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     public static final String PROPERTY_ITEM_EVENT = "PROPERTY_ITEM_EVENT";
 
-    public static final String PROPERTY_ITEM_REGISTRY_EVENT = "PROPERTY_ITEM_REGESTRY_EVENT";
+    public static final String PROPERTY_ITEM_REGISTRY_EVENT = "PROPERTY_ITEM_REGISTRY_EVENT";
 
     public static final String PROPERTY_CHANNEL_EVENT = "CHANNEL_EVENT";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
 
-    private final Set<String> subscribedEventTypes = new HashSet<String>();
+    private final Set<String> subscribedEventTypes = new HashSet<>();
 
     private final Set<String> jRuleMonitoredItems = new HashSet<>();
 
