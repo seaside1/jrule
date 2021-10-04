@@ -35,8 +35,8 @@ public class JRuleVoiceHandler {
     }
 
     public static JRuleVoiceHandler get() {
-        if(instance == null) {
-            synchronized(JRuleVoiceHandler.class) {
+        if (instance == null) {
+            synchronized (JRuleVoiceHandler.class) {
                 if (instance == null) {
                     instance = new JRuleVoiceHandler();
                 }
