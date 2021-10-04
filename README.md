@@ -446,6 +446,8 @@ JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
 
 
 # Changelog
+## ALPHA12
+-  Fix some language typos, some refactor of java classes, improved initialization of singletons due to concurrency aspects
 ## ALPHA11
 - Added check for working dir via system properties
 ## ALPHA10
