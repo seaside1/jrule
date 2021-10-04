@@ -62,7 +62,7 @@ public class JRuleEventHandler {
 
     public static JRuleEventHandler get() {
         if (instance == null) {
-            synchronized(JRuleEventHandler.class) {
+            synchronized (JRuleEventHandler.class) {
                 if (instance == null) {
                     instance = new JRuleEventHandler();
                 }

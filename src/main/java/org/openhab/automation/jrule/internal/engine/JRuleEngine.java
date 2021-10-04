@@ -104,7 +104,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public static JRuleEngine get() {
         if (instance == null) {
-            synchronized(JRuleEngine.class) {
+            synchronized (JRuleEngine.class) {
                 if (instance == null) {
                     instance = new JRuleEngine();
                 }
@@ -155,7 +155,7 @@ public class JRuleEngine implements PropertyChangeListener {
             logger.debug("Got jrule whens size: {}", jRuleWhens.length);
             Parameter[] parameters = method.getParameters();
             boolean jRuleEventPresent = Arrays.stream(parameters)
-                                              .anyMatch(param -> (param.getType().equals(JRuleEvent.class)));
+                    .anyMatch(param -> (param.getType().equals(JRuleEvent.class)));
 
             // TODO: Do validation on syntax in when annotations
             // Loop for other ORs
@@ -168,10 +168,10 @@ public class JRuleEngine implements PropertyChangeListener {
                     logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
 
                     addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
-                                        jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
-                                        getDoubleFromAnnotation(jRuleWhen.lt()), getDoubleFromAnnotation(jRuleWhen.lte()),
-                                        getDoubleFromAnnotation(jRuleWhen.gt()), getDoubleFromAnnotation(jRuleWhen.gte()),
-                                        getDoubleFromAnnotation(jRuleWhen.eq()));
+                            jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
+                            getDoubleFromAnnotation(jRuleWhen.lt()), getDoubleFromAnnotation(jRuleWhen.lte()),
+                            getDoubleFromAnnotation(jRuleWhen.gt()), getDoubleFromAnnotation(jRuleWhen.gte()),
+                            getDoubleFromAnnotation(jRuleWhen.eq()));
                     itemNames.add(jRuleWhen.item());
 
                 } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1

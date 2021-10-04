@@ -111,8 +111,7 @@ public class JRuleCompiler {
         optionList.add(CLASSPATH_OPTION);
         optionList.add(classPath);
         logger.debug("Compiling classes using classpath: {}", classPath);
-        javaSourceFiles.stream()
-                .filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
+        javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
                 .forEach(javaSourceFile -> logger.debug("Compiling java Source file: {}", javaSourceFile));
 
         final Iterable<? extends JavaFileObject> compilationUnit = fileManager

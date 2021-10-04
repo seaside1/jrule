@@ -30,8 +30,8 @@ public class JRuleActionHandler {
     }
 
     public static JRuleActionHandler get() {
-        if(instance == null) {
-            synchronized(JRuleActionHandler.class) {
+        if (instance == null) {
+            synchronized (JRuleActionHandler.class) {
                 if (instance == null) {
                     instance = new JRuleActionHandler();
                 }

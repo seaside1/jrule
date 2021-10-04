@@ -12,7 +12,6 @@
  */
 package org.openhab.automation.jrule.internal;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -40,7 +39,6 @@ public enum JRuleChannel {
     public static JRuleChannel fromString(String str) {
         return JRuleChannel.stream()
                 .filter(channelList -> str.replaceAll(DASH, UNDERSCORE).equalsIgnoreCase(channelList.name()))
-                .findFirst()
-                .orElse(null);
+                .findFirst().orElse(null);
     }
 }
