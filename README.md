@@ -1,5 +1,3 @@
-# J Rule
-
 Write OpenHAB Rules using Java
 
 This automation package aims to enable Java development of OpenHAB Rules. The addon will allow the user to create custom OpenHAB rules
@@ -491,3 +489,7 @@ JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
 # Roadmap
 - Locks and timers by annotation
 - Built in expire functionality
+
+## Resources
+
+[https://github.com/seaside1/jrule/raw/main/bin/org.openhab.automation.jrule-3.x.x-ALPHA12.jar ](https://github.com/seaside1/jrule/raw/main/bin/org.openhab.automation.jrule-3.x.x-ALPHA12.jar)
