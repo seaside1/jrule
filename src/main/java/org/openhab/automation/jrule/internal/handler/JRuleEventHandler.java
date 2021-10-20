@@ -20,8 +20,12 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.items.JRulePercentType;
-import org.openhab.automation.jrule.rules.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleColorValue;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
+import org.openhab.automation.jrule.rules.value.JRuleXyValue;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -32,6 +36,7 @@ import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.HSBType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
@@ -103,6 +108,43 @@ public class JRuleEventHandler {
         sendCommand(itemName, new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())));
     }
 
+    public void sendCommand(String itemName, JRuleColorValue colorValue) {
+        final HSBType hsbType = getHsbType(colorValue);
+        if (hsbType == null) {
+            logger.error("Failed to sen command for colorValue: {}", colorValue);
+            return;
+        }
+        sendCommand(itemName, hsbType);
+    }
+
+    private HSBType getHsbType(JRuleColorValue colorValue) {
+        final JRuleHsbValue hsbValue = colorValue.getHsbValue();
+        if (hsbValue != null) {
+            return new HSBType(new DecimalType(hsbValue.getHue()), new PercentType(hsbValue.getSaturation()),
+                    new PercentType(hsbValue.getBrightness()));
+        }
+
+        final JRuleRgbValue rgbValue = colorValue.getRgbValue();
+        if (rgbValue != null) {
+            return HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue());
+        }
+
+        final JRuleXyValue xyValue = colorValue.getXyValue();
+        if (xyValue != null) {
+            return HSBType.fromXY(xyValue.getX(), xyValue.getY());
+        }
+
+        return null;
+    }
+
+    public void sendCommand(String itemName, JRuleRgbValue rgbValue) {
+        sendCommand(itemName, HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue()));
+    }
+
+    public void sendCommand(String itemName, JRuleXyValue xyValue) {
+        sendCommand(itemName, HSBType.fromXY(xyValue.getX(), xyValue.getY()));
+    }
+
     public void sendCommand(String itemName, Command command) {
         if (eventPublisher == null) {
             return;
@@ -110,6 +152,23 @@ public class JRuleEventHandler {
         logger.info("SendCommand itemName: {} command: {}", itemName, command);
         final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
         eventPublisher.post(commandEvent);
+    }
+
+    public void postUpdate(String itemName, JRuleColorValue colorValue) {
+        final HSBType hsbType = getHsbType(colorValue);
+        if (hsbType == null) {
+            logger.error("Failed to get HSB Type from ColorValue: {}", colorValue);
+            return;
+        }
+        postUpdate(itemName, hsbType);
+    }
+
+    public void postUpdate(String itemName, JRuleRgbValue rgbValue) {
+        postUpdate(itemName, HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue()));
+    }
+
+    public void postUpdate(String itemName, JRuleXyValue xyValue) {
+        postUpdate(itemName, HSBType.fromXY(xyValue.getX(), xyValue.getY()));
     }
 
     public void postUpdate(String itemName, Date date) {
@@ -149,13 +208,37 @@ public class JRuleEventHandler {
         return getPlayPauseValueFromState(state);
     }
 
+    public JRuleColorValue getColorValue(String itemName) {
+        State state = getStateFromItem(itemName);
+        return getColorValueFromState(state);
+    }
+
     public JRuleOnOffValue getOnOffValue(String itemName) {
         State state = getStateFromItem(itemName);
         return getOnOffValueFromState(state);
     }
 
+    private JRuleColorValue getColorValueFromState(State state) {
+        HSBType hsbValue = null;
+        try {
+            hsbValue = HSBType.valueOf(state.toFullString());
+        } catch (IllegalArgumentException x) {
+            logger.error("Failed to parse state: {}", state.toFullString());
+            return null;
+        }
+        final JRuleHsbValue jRuleHsbValue = new JRuleHsbValue(hsbValue.getHue().intValue(),
+                hsbValue.getSaturation().intValue(), hsbValue.getBrightness().intValue());
+        final JRuleRgbValue jRuleRgbValue = new JRuleRgbValue(hsbValue.getRed().intValue(),
+                hsbValue.getGreen().intValue(), hsbValue.getBlue().intValue());
+        PercentType[] xyY = hsbValue.toXY();
+        final JRuleXyValue jRuleXyValue = new JRuleXyValue(xyY[0].floatValue(), xyY[1].floatValue(),
+                xyY[2].floatValue());
+
+        return new JRuleColorValue(jRuleHsbValue, jRuleRgbValue, jRuleXyValue);
+    }
+
     private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
-        PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
+        final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
         switch (playPauseType) {
             case PLAY:
                 return JRulePlayPauseValue.PLAY;

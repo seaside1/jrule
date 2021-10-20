@@ -97,7 +97,7 @@ public class MySwitchRule extends JRule {
     @JRuleName("MySwitchRule")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execOffToOnRule() {
-	logInfo("||||| --> Hello World!");
+        logInfo("||||| --> Hello World!");
     }
     
     @Override
@@ -163,7 +163,7 @@ When the rule is triggered, the triggered value is stored in the event.
    @JRuleName("MyEventValueTest")
    @JRuleWhen(item = __MyTestSwitch2.ITEM, trigger = __MyTestSwitch2.TRIGGER_RECEIVED_COMMAND)
    public void myEventValueTest(JRuleEvent event) {
-	  logInfo("Got value from event: {}", event.getValue());
+      logInfo("Got value from event: {}", event.getValue());
    }
 ```
 ## Example 4
@@ -176,7 +176,7 @@ To add an OR statement we simply add multiple @JRuleWhen statements
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "14", to = "10")
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "10", to = "12")
    public void myOrRuleNumber(JRuleEvent event) {
-	logInfo("Got change number: {}", event.getValue());
+      logInfo("Got change number: {}", event.getValue());
    }
 ```
 
@@ -193,7 +193,6 @@ import org.openhab.automation.jrule.rules.JRule;
 
 public abstract class JRuleUser extends JRule {
 
-	
 }
 ```
 
@@ -233,14 +232,12 @@ import org.openhab.automation.jrule.rules.JRule;
 
 public abstract class JRuleUser extends JRule {
 
-	private static final int startDay = 8;
-	private static final int endDay = 21;
-	
-	
-	protected boolean timeIsOkforDisturbance() {
-		return nowHour() >= startDay && nowHour() <= endDay;
-	}
-	
+    private static final int startDay = 8;
+    private static final int endDay = 21;
+
+    protected boolean timeIsOkforDisturbance() {
+       return nowHour() >= startDay && nowHour() <= endDay;
+    }
 }
 ```
 
@@ -256,16 +253,16 @@ import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MyTestUserRule extends JRuleUser {
-	private static final String MY_LOGNAME = "TEST";
+    private static final String MY_LOGNAME = "TEST";
 
-	@JRuleName("TestUserDefinedRule")
-	@JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
-	public void mySendNotificationRUle(JRuleEvent event) {
-		if (timeIsOkforDisturbance()) {
-			logInfo("It's ok to send a disturbing notification");
-		}
-	}
-	
+    @JRuleName("TestUserDefinedRule")
+    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
+    public void mySendNotificationRUle(JRuleEvent event) {
+        if (timeIsOkforDisturbance()) {
+            logInfo("It's ok to send a disturbing notification");
+        }
+    }
+
     @Override
     protected String getRuleLogName() {
         return MY_LOGNAME;
@@ -386,7 +383,7 @@ Use case: A group of switches, see if status is changed, and also which member i
     public synchronized void groupMySwitchGroupChanged(JRuleEvent event) {
         final boolean groupIsOnline = event.getValueAsOnOffValue() == ON;
         final String memberThatChangedStatus = event.getMemberName();
-	logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
+        logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
     }
 ```
 
@@ -397,7 +394,7 @@ Use case: A group of switches , trigger when it's changed from OFF to ON
     @JRuleName("groupMySwitchesChangedOffToOn")
     @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED, from="OFF", to="ON")
     public synchronized void groupMySwitchesChangedOffToOn(JRuleEvent event) {
-	logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberName());
+        logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberName());
     }
 ```
 
@@ -408,7 +405,7 @@ Use case: Listen for a Channel Trigger Event
     @JRuleName("channelTriggered")
     @JRuleWhen(channel = "binding:thing:buttonevent")
     public synchronized void channelTriggered(JRuleEvent event) {
-	logInfo("Channel triggered with value: {}", event.getValue());
+        logInfo("Channel triggered with value: {}", event.getValue());
     }
 ```
 
@@ -434,7 +431,7 @@ JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
   
     @JRuleName("testLastUpdate")
     @JRuleWhen(cron = "4 * * * * *")
-    public  void testLastUpdate(JRuleEvent event) {
+    public void testLastUpdate(JRuleEvent event) {
         logInfo("CRON: Running cron from string: {}", event.getValue());
         ZonedDateTime lastUpdate = JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
@@ -443,7 +440,29 @@ JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
 ```
 
 
+## Example 20
+
+Use case: Get the brigtness from a color item, set a color item to white (HSB 0, 0, 100)
+```java
+  
+    @JRuleName("testBrightnessFromColorItem")
+    @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED)
+    public void testBrightnessFromColorItem(JRuleEvent event) {
+       JRuleColorValue color = _MyTestColorItem.getState();
+       int brightness = color.getHsbValue().getBrightness();
+    }
+   
+    @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED) 
+    public void testSetWhiteOnColorItem(JRuleEvent event) {
+        _MyTestColorItem.sendCommand(JRuleColorValue.fromHsb(0,  0,  100));
+    }
+```
+
 # Changelog
+## BETA1
+- Added color item see example 20
+- Moved org.openhab.automation.jrule.rules.JRuleOnOffvalue, JRulePlayPause etc to org.openhab.automation.jrule.rules.value
+
 ## ALPHA12
 -  Fix some language typos, some refactor of java classes, improved initialization of singletons due to concurrency aspects
 ## ALPHA11

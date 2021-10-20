@@ -13,7 +13,7 @@
 package org.openhab.automation.jrule.items.generated;
 
 import org.openhab.automation.jrule.items.JRulePlayerItem;
-import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**
  * Automatically Generated Class

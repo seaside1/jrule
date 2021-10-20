@@ -13,7 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * The {@link JRuleSwitchItem} Items

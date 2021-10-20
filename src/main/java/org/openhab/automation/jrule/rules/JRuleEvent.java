@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.rules;
 
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+
 /**
  * The {@link JRuleEvent}
  *
