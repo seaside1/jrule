@@ -15,8 +15,8 @@ package org.openhab.automation.jrule.items.generated;
 import java.util.Set;
 
 import org.openhab.automation.jrule.items.JRuleGroupItem;
-import org.openhab.automation.jrule.rules.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**
  * Automatically Generated Class

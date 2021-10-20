@@ -15,8 +15,8 @@ package org.openhab.automation.jrule.items;
 import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**
  * The {@link JRuleGroupItem} Items

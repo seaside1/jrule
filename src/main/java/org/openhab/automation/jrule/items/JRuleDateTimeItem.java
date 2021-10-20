@@ -23,15 +23,15 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  */
 public abstract class JRuleDateTimeItem extends JRuleItem {
 
-    protected static void sendCommand(String itemName, Date date) {
+    public static void sendCommand(String itemName, Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
     }
 
-    protected static void postUpdate(String itemName, Date date) {
+    public static void postUpdate(String itemName, Date date) {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
-    protected static Date getState(String name) {
+    public static Date getState(String name) {
         return JRuleEventHandler.get().getStateFromItemAsDate(name);
     }
 }
