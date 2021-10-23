@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2020 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -45,6 +45,7 @@ public class JRuleItemClassGenerator {
     private final URL stringItemClassTemplateUrl;
     private final URL dateTimeItemClassTemplateUrl;
     private final URL colorItemClassTemplateUrl;
+    private final URL openClosedItemClassTemplateUrl;
     private final URL groupItemClassTemplateUrl;
 
     private final String itemClassTemplate;
@@ -54,6 +55,7 @@ public class JRuleItemClassGenerator {
     private final String numberItemClassTemplate;
     private final String stringItemClassTemplate;
     private final String colorItemClassTemplate;
+    private final String openClosedItemClassTemplate;
     private final String dateTimeItemClassTemplate;
     private final String groupItemClassTemplate;
 
@@ -74,6 +76,8 @@ public class JRuleItemClassGenerator {
         stringItemClassTemplate = JRuleUtil.getResourceAsString(stringItemClassTemplateUrl);
         colorItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassColor.template");
         colorItemClassTemplate = JRuleUtil.getResourceAsString(colorItemClassTemplateUrl);
+        openClosedItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassOpenClosed.template");
+        openClosedItemClassTemplate = JRuleUtil.getResourceAsString(openClosedItemClassTemplateUrl);
         dateTimeItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassDateTime.template");
         dateTimeItemClassTemplate = JRuleUtil.getResourceAsString(dateTimeItemClassTemplateUrl);
         groupItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassGroup.template");
@@ -114,15 +118,13 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(CoreItemFactory.COLOR)) {
             generatedClass = colorItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.CONTACT)) {
-            generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            generatedClass = openClosedItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.PLAYER)) {
             generatedClass = playerItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.DATETIME)) {
             generatedClass = dateTimeItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(GroupItem.TYPE)) {
             generatedClass = groupItemClassTemplate.replaceAll("ITEMNAME", item.getName());
-        } else if (type.equals(CoreItemFactory.COLOR)) {
-            generatedClass = colorItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else {
             logger.debug("Unsupported item type for item: {} type: {}", item.getName(), item.getType());
             return false;

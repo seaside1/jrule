@@ -12,23 +12,17 @@
  */
 package org.openhab.automation.jrule.items;
 
-/**
- * The {@link JRuleItemType} .
- *
- * @author Joseph (Seaside) Hagberg - Initial contribution
- */
-public enum JRuleItemType {
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
-    SWITCH,
-    CONTACT,
-    STRING,
-    ROLLERSHUTTER,
-    PLAYER,
-    NUMBER,
-    LOCATION,
-    IMAGE,
-    GROUP,
-    DIMMER,
-    DATETIME,
-    COLOR
+/**
+ * The {@link JRuleOpenClosedItem} Items
+ *
+ * @author Timo Litzius - Initial contribution
+ */
+public abstract class JRuleOpenClosedItem extends JRuleItem {
+
+    public static JRuleOpenClosedValue getState(String itemName) {
+        return JRuleEventHandler.get().getOpenClosedValue(itemName);
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2020 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -20,12 +20,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.items.JRulePercentType;
-import org.openhab.automation.jrule.rules.value.JRuleColorValue;
-import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
-import org.openhab.automation.jrule.rules.value.JRuleXyValue;
+import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -34,13 +29,7 @@ import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemEventFactory;
-import org.openhab.core.library.types.DateTimeType;
-import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.HSBType;
-import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.PercentType;
-import org.openhab.core.library.types.PlayPauseType;
-import org.openhab.core.library.types.StringType;
+import org.openhab.core.library.types.*;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
@@ -218,6 +207,11 @@ public class JRuleEventHandler {
         return getOnOffValueFromState(state);
     }
 
+    public JRuleOpenClosedValue getOpenClosedValue(String itemName) {
+        State state = getStateFromItem(itemName);
+        return getOpenClosedValueFromState(state);
+    }
+
     private JRuleColorValue getColorValueFromState(State state) {
         HSBType hsbValue = null;
         try {
@@ -263,6 +257,19 @@ public class JRuleEventHandler {
         }
     }
 
+    private JRuleOpenClosedValue getOpenClosedValueFromState(State state) {
+        OpenClosedType openClosedType = OpenClosedType.valueOf(state.toFullString());
+        switch (openClosedType) {
+            case OPEN:
+                return JRuleOpenClosedValue.OPEN;
+            case CLOSED:
+                return JRuleOpenClosedValue.CLOSED;
+            default:
+                logger.error("Fail to transform switch value");
+                return JRuleOpenClosedValue.UNDEF;
+        }
+    }
+
     public State getStateFromItem(String itemName) {
         if (itemRegistry == null) {
             return null;
@@ -282,6 +289,19 @@ public class JRuleEventHandler {
                 return OnOffType.OFF;
             case ON:
                 return OnOffType.ON;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", value);
+                return null;
+        }
+    }
+
+    private State getStateFromValue(JRuleOpenClosedValue value) {
+        switch (value) {
+            case OPEN:
+                return OpenClosedType.OPEN;
+            case CLOSED:
+                return OpenClosedType.CLOSED;
             case UNDEF:
             default:
                 logger.error("Unhandled getCommand: {}", value);
