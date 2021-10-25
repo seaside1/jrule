@@ -10,15 +10,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.rules;
+package org.openhab.automation.jrule.rules.value;
 
 /**
- * The {@link JRuleState} JRule State
+ * The {@link JRuleOpenClosedValue} JRule Command
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Timo Litzius - Initial contribution
  */
-public enum JRuleState {
-    STATE_ON,
-    STATE_OFF,
-    UNDEF;
+public enum JRuleOpenClosedValue {
+    OPEN,
+    CLOSED,
+    UNDEF
 }

@@ -12,27 +12,20 @@
  */
 package org.openhab.automation.jrule.items.generated;
 
-import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRuleOpenClosedItem;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
  * Automatically Generated Class
  * The {@link _ITEMNAME} 
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Timo Litzius - Initial contribution
  */
-public class _ITEMNAME extends JRuleNumberItem {
-
+public class _ITEMNAME extends JRuleOpenClosedItem {
+ 
     public static final String ITEM = "ITEMNAME";
     
-    public static Double getState() {
-        return JRuleNumberItem.getState(ITEM);
-    }
-    
-    public static void sendCommand(double value) {
-        JRuleNumberItem.sendCommand(ITEM, value);
-    }
-
-    public static void postUpdate(double value) {
-        JRuleNumberItem.postUpdate(ITEM, value);
+    public static JRuleOpenClosedValue getState() {
+        return JRuleOpenClosedItem.getState(ITEM);
     }
 }
