@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
@@ -38,6 +39,7 @@ import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.IncreaseDecreaseType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
@@ -87,6 +89,10 @@ public class JRuleEventHandler {
     }
 
     public void sendCommand(String itemName, JRuleOnOffValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
+    public void sendCommand(String itemName, JRuleIncreaseDecreaseValue command) {
         sendCommand(itemName, getCommand(command));
     }
 
@@ -309,19 +315,6 @@ public class JRuleEventHandler {
         }
     }
 
-    private State getStateFromValue(JRuleOpenClosedValue value) {
-        switch (value) {
-            case OPEN:
-                return OpenClosedType.OPEN;
-            case CLOSED:
-                return OpenClosedType.CLOSED;
-            case UNDEF:
-            default:
-                logger.error("Unhandled getCommand: {}", value);
-                return null;
-        }
-    }
-
     private State getStateFromValue(JRulePlayPauseValue value) {
         switch (value) {
             case PLAY:
@@ -354,6 +347,19 @@ public class JRuleEventHandler {
                 return OnOffType.OFF;
             case ON:
                 return OnOffType.ON;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleIncreaseDecreaseValue command) {
+        switch (command) {
+            case INCREASE:
+                return IncreaseDecreaseType.INCREASE;
+            case DECREASE:
+                return IncreaseDecreaseType.DECREASE;
             case UNDEF:
             default:
                 logger.error("Unhandled getCommand: {}", command);

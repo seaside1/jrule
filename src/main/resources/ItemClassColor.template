@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.items.generated;
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 
 /**
  * Automatically Generated Class
@@ -43,6 +44,10 @@ public class _ITEMNAME extends JRuleColorItem {
     }
 
     public static void sendCommand(JRuleOnOffValue command) {
+        JRuleColorItem.sendCommand(ITEM, command);
+    }
+
+    public static void sendCommand(JRuleIncreaseDecreaseValue command) {
         JRuleColorItem.sendCommand(ITEM, command);
     }
 
