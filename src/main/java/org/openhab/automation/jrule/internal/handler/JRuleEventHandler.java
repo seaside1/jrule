@@ -27,6 +27,8 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 import org.openhab.automation.jrule.rules.value.JRuleXyValue;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
@@ -44,7 +46,9 @@ import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
+import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.StringType;
+import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
@@ -93,6 +97,14 @@ public class JRuleEventHandler {
     }
 
     public void sendCommand(String itemName, JRuleIncreaseDecreaseValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
+    public void sendCommand(String itemName, JRuleUpDownValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
+    public void sendCommand(String itemName, JRuleStopMoveValue command) {
         sendCommand(itemName, getCommand(command));
     }
 
@@ -192,6 +204,10 @@ public class JRuleEventHandler {
     }
 
     public void postUpdate(String itemName, JRuleOnOffValue state) {
+        postUpdate(itemName, getStateFromValue(state));
+    }
+
+    public void postUpdate(String itemName, JRuleUpDownValue state) {
         postUpdate(itemName, getStateFromValue(state));
     }
 
@@ -315,6 +331,19 @@ public class JRuleEventHandler {
         }
     }
 
+    private State getStateFromValue(JRuleUpDownValue value) {
+        switch (value) {
+            case UP:
+                return UpDownType.UP;
+            case DOWN:
+                return UpDownType.DOWN;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", value);
+                return null;
+        }
+    }
+
     private State getStateFromValue(JRulePlayPauseValue value) {
         switch (value) {
             case PLAY:
@@ -347,6 +376,32 @@ public class JRuleEventHandler {
                 return OnOffType.OFF;
             case ON:
                 return OnOffType.ON;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleUpDownValue command) {
+        switch (command) {
+            case UP:
+                return UpDownType.UP;
+            case DOWN:
+                return UpDownType.DOWN;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleStopMoveValue command) {
+        switch (command) {
+            case STOP:
+                return StopMoveType.STOP;
+            case MOVE:
+                return StopMoveType.MOVE;
             case UNDEF:
             default:
                 logger.error("Unhandled getCommand: {}", command);

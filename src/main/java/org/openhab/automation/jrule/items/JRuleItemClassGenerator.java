@@ -46,6 +46,7 @@ public class JRuleItemClassGenerator {
     private final URL dateTimeItemClassTemplateUrl;
     private final URL colorItemClassTemplateUrl;
     private final URL contactItemClassTemplateUrl;
+    private final URL rollershutterItemClassTemplateUrl;
     private final URL groupItemClassTemplateUrl;
 
     private final String itemClassTemplate;
@@ -56,6 +57,7 @@ public class JRuleItemClassGenerator {
     private final String stringItemClassTemplate;
     private final String colorItemClassTemplate;
     private final String contactItemClassTemplate;
+    private final String rollershutterItemClassTemplate;
     private final String dateTimeItemClassTemplate;
     private final String groupItemClassTemplate;
 
@@ -78,6 +80,8 @@ public class JRuleItemClassGenerator {
         colorItemClassTemplate = JRuleUtil.getResourceAsString(colorItemClassTemplateUrl);
         contactItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassContact.template");
         contactItemClassTemplate = JRuleUtil.getResourceAsString(contactItemClassTemplateUrl);
+        rollershutterItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassRollershutter.template");
+        rollershutterItemClassTemplate = JRuleUtil.getResourceAsString(rollershutterItemClassTemplateUrl);
         dateTimeItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassDateTime.template");
         dateTimeItemClassTemplate = JRuleUtil.getResourceAsString(dateTimeItemClassTemplateUrl);
         groupItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassGroup.template");
@@ -112,7 +116,7 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(CoreItemFactory.CALL)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
-            generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            generatedClass = rollershutterItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.LOCATION)) {
             generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.COLOR)) {
