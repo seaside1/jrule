@@ -12,7 +12,7 @@
  */
 package org.openhab.automation.jrule.items.generated;
 
-import org.openhab.automation.jrule.items.JRuleOpenClosedItem;
+import org.openhab.automation.jrule.items.JRuleContactItem;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Timo Litzius - Initial contribution
  */
-public class _ITEMNAME extends JRuleOpenClosedItem {
+public class _ITEMNAME extends JRuleContactItem {
  
     public static final String ITEM = "ITEMNAME";
     

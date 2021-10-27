@@ -16,11 +16,11 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
- * The {@link JRuleOpenClosedItem} Items
+ * The {@link JRuleContactItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public abstract class JRuleOpenClosedItem extends JRuleItem {
+public abstract class JRuleContactItem extends JRuleItem {
 
     public static JRuleOpenClosedValue getState(String itemName) {
         return JRuleEventHandler.get().getOpenClosedValue(itemName);
