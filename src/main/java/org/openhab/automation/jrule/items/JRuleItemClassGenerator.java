@@ -45,7 +45,7 @@ public class JRuleItemClassGenerator {
     private final URL stringItemClassTemplateUrl;
     private final URL dateTimeItemClassTemplateUrl;
     private final URL colorItemClassTemplateUrl;
-    private final URL openClosedItemClassTemplateUrl;
+    private final URL contactItemClassTemplateUrl;
     private final URL groupItemClassTemplateUrl;
 
     private final String itemClassTemplate;
@@ -55,7 +55,7 @@ public class JRuleItemClassGenerator {
     private final String numberItemClassTemplate;
     private final String stringItemClassTemplate;
     private final String colorItemClassTemplate;
-    private final String openClosedItemClassTemplate;
+    private final String contactItemClassTemplate;
     private final String dateTimeItemClassTemplate;
     private final String groupItemClassTemplate;
 
@@ -76,8 +76,8 @@ public class JRuleItemClassGenerator {
         stringItemClassTemplate = JRuleUtil.getResourceAsString(stringItemClassTemplateUrl);
         colorItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassColor.template");
         colorItemClassTemplate = JRuleUtil.getResourceAsString(colorItemClassTemplateUrl);
-        openClosedItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassOpenClosed.template");
-        openClosedItemClassTemplate = JRuleUtil.getResourceAsString(openClosedItemClassTemplateUrl);
+        contactItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassContact.template");
+        contactItemClassTemplate = JRuleUtil.getResourceAsString(contactItemClassTemplateUrl);
         dateTimeItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassDateTime.template");
         dateTimeItemClassTemplate = JRuleUtil.getResourceAsString(dateTimeItemClassTemplateUrl);
         groupItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassGroup.template");
@@ -118,7 +118,7 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(CoreItemFactory.COLOR)) {
             generatedClass = colorItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.CONTACT)) {
-            generatedClass = openClosedItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            generatedClass = contactItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.PLAYER)) {
             generatedClass = playerItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else if (type.equals(CoreItemFactory.DATETIME)) {
