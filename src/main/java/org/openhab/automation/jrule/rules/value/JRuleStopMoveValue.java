@@ -13,21 +13,21 @@
 package org.openhab.automation.jrule.rules.value;
 
 /**
- * The {@link JRuleIncreaseDecreaseValue} JRule Command
+ * The {@link JRuleStopMoveValue} JRule Command
  *
- * @author Timo Litzius - Initial contribution
+ * @author Timo Litzius- Initial contribution
  */
-public enum JRuleIncreaseDecreaseValue {
-    INCREASE,
-    DECREASE,
+public enum JRuleStopMoveValue {
+    STOP,
+    MOVE,
     UNDEF;
 
-    public static JRuleIncreaseDecreaseValue getValueFromString(String value) {
-        if (value.equals("INCREASE")) {
-            return INCREASE;
+    public static JRuleStopMoveValue getValueFromString(String value) {
+        if (value.equals("STOP")) {
+            return STOP;
         }
-        if (value.equals("DECREASE")) {
-            return DECREASE;
+        if (value.equals("MOVE")) {
+            return MOVE;
         }
         return UNDEF;
     }

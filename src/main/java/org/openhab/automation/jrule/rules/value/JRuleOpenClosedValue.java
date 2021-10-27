@@ -20,5 +20,15 @@ package org.openhab.automation.jrule.rules.value;
 public enum JRuleOpenClosedValue {
     OPEN,
     CLOSED,
-    UNDEF
+    UNDEF;
+
+    public static JRuleOpenClosedValue getValueFromString(String value) {
+        if (value.equals("OPEN")) {
+            return OPEN;
+        }
+        if (value.equals("CLOSED")) {
+            return CLOSED;
+        }
+        return UNDEF;
+    }
 }
