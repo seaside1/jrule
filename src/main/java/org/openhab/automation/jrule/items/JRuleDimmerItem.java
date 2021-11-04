@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
@@ -38,6 +39,10 @@ public abstract class JRuleDimmerItem extends JRuleItem {
     }
 
     public static void sendCommand(String itemName, JRuleOnOffValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public static void sendCommand(String itemName, JRuleIncreaseDecreaseValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 

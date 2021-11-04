@@ -22,10 +22,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 import org.openhab.automation.jrule.rules.value.JRuleXyValue;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
@@ -38,11 +41,14 @@ import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.IncreaseDecreaseType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
+import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.StringType;
+import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.slf4j.Logger;
@@ -87,6 +93,18 @@ public class JRuleEventHandler {
     }
 
     public void sendCommand(String itemName, JRuleOnOffValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
+    public void sendCommand(String itemName, JRuleIncreaseDecreaseValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
+    public void sendCommand(String itemName, JRuleUpDownValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
+    public void sendCommand(String itemName, JRuleStopMoveValue command) {
         sendCommand(itemName, getCommand(command));
     }
 
@@ -186,6 +204,10 @@ public class JRuleEventHandler {
     }
 
     public void postUpdate(String itemName, JRuleOnOffValue state) {
+        postUpdate(itemName, getStateFromValue(state));
+    }
+
+    public void postUpdate(String itemName, JRuleUpDownValue state) {
         postUpdate(itemName, getStateFromValue(state));
     }
 
@@ -309,12 +331,12 @@ public class JRuleEventHandler {
         }
     }
 
-    private State getStateFromValue(JRuleOpenClosedValue value) {
+    private State getStateFromValue(JRuleUpDownValue value) {
         switch (value) {
-            case OPEN:
-                return OpenClosedType.OPEN;
-            case CLOSED:
-                return OpenClosedType.CLOSED;
+            case UP:
+                return UpDownType.UP;
+            case DOWN:
+                return UpDownType.DOWN;
             case UNDEF:
             default:
                 logger.error("Unhandled getCommand: {}", value);
@@ -354,6 +376,45 @@ public class JRuleEventHandler {
                 return OnOffType.OFF;
             case ON:
                 return OnOffType.ON;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleUpDownValue command) {
+        switch (command) {
+            case UP:
+                return UpDownType.UP;
+            case DOWN:
+                return UpDownType.DOWN;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleStopMoveValue command) {
+        switch (command) {
+            case STOP:
+                return StopMoveType.STOP;
+            case MOVE:
+                return StopMoveType.MOVE;
+            case UNDEF:
+            default:
+                logger.error("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleIncreaseDecreaseValue command) {
+        switch (command) {
+            case INCREASE:
+                return IncreaseDecreaseType.INCREASE;
+            case DECREASE:
+                return IncreaseDecreaseType.DECREASE;
             case UNDEF:
             default:
                 logger.error("Unhandled getCommand: {}", command);

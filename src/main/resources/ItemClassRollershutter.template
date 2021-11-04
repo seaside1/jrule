@@ -1,0 +1,52 @@
+/**
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package org.openhab.automation.jrule.items.generated;
+
+import org.openhab.automation.jrule.items.JRuleRollershutterItem;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+
+/**
+ * Automatically Generated Class
+ * The {@link _ITEMNAME} 
+ *
+ * @author Timo Litzius - Initial contribution
+ */
+public class _ITEMNAME extends JRuleRollershutterItem {
+ 
+    public static final String ITEM = "ITEMNAME";
+    
+    public static int getState() {
+        return JRuleRollershutterItem.getState(ITEM);
+    }
+
+    public static void sendCommand(JRuleUpDownValue command) {
+        JRuleRollershutterItem.sendCommand(ITEM, command);
+    }
+
+    public static void sendCommand(JRuleStopMoveValue command) {
+        JRuleRollershutterItem.sendCommand(ITEM, command);
+    }
+
+    public static void sendCommand(int value) {
+        JRuleRollershutterItem.sendCommand(ITEM, value);
+    }
+
+    public static void postUpdate(JRuleUpDownValue command) {
+        JRuleRollershutterItem.postUpdate(ITEM, command);
+    }
+
+    public static void postUpdate(int value) {
+        JRuleRollershutterItem.postUpdate(ITEM, value);
+    }
+}
