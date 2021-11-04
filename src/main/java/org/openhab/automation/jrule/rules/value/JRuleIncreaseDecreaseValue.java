@@ -10,19 +10,25 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items;
-
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+package org.openhab.automation.jrule.rules.value;
 
 /**
- * The {@link JRuleOpenClosedItem} Items
+ * The {@link JRuleIncreaseDecreaseValue} JRule Command
  *
  * @author Timo Litzius - Initial contribution
  */
-public abstract class JRuleOpenClosedItem extends JRuleItem {
+public enum JRuleIncreaseDecreaseValue {
+    INCREASE,
+    DECREASE,
+    UNDEF;
 
-    public static JRuleOpenClosedValue getState(String itemName) {
-        return JRuleEventHandler.get().getOpenClosedValue(itemName);
+    public static JRuleIncreaseDecreaseValue getValueFromString(String value) {
+        if (value.equals("INCREASE")) {
+            return INCREASE;
+        }
+        if (value.equals("DECREASE")) {
+            return DECREASE;
+        }
+        return UNDEF;
     }
 }

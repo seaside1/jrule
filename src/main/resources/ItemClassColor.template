@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.items.generated;
 
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 
 /**
  * Automatically Generated Class
@@ -28,12 +30,40 @@ public class _ITEMNAME extends JRuleColorItem {
     public static JRuleColorValue getState() {
         return JRuleColorItem.getState(ITEM);
     }
+
+    public static JRuleOnOffValue getOnOffState() {
+        return JRuleColorItem.getOnOffState(ITEM);
+    }
+
+    public static int getPercentState() {
+        return JRuleColorItem.getPercentState(ITEM);
+    }
     
     public static void sendCommand(JRuleColorValue command) {
         JRuleColorItem.sendCommand(ITEM, command);
     }
 
+    public static void sendCommand(JRuleOnOffValue command) {
+        JRuleColorItem.sendCommand(ITEM, command);
+    }
+
+    public static void sendCommand(JRuleIncreaseDecreaseValue command) {
+        JRuleColorItem.sendCommand(ITEM, command);
+    }
+
+    public static void sendCommand(int value) {
+        JRuleColorItem.sendCommand(ITEM, value);
+    }
+
     public static void postUpdate(JRuleColorValue value) {
+        JRuleColorItem.postUpdate(ITEM, value);
+    }
+
+    public static void postUpdate(JRuleOnOffValue value) {
+        JRuleColorItem.postUpdate(ITEM, value);
+    }
+
+    public static void postUpdate(int value) {
         JRuleColorItem.postUpdate(ITEM, value);
     }
 }

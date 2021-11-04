@@ -10,25 +10,19 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.rules.value;
+package org.openhab.automation.jrule.items;
+
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
- * The {@link JRuleOpenClosedValue} JRule Command
+ * The {@link JRuleContactItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public enum JRuleOpenClosedValue {
-    OPEN,
-    CLOSED,
-    UNDEF;
+public abstract class JRuleContactItem extends JRuleItem {
 
-    public static JRuleOpenClosedValue getValueFromString(String value) {
-        if (value.equals("OPEN")) {
-            return OPEN;
-        }
-        if (value.equals("CLOSED")) {
-            return CLOSED;
-        }
-        return UNDEF;
+    public static JRuleOpenClosedValue getState(String itemName) {
+        return JRuleEventHandler.get().getOpenClosedValue(itemName);
     }
 }

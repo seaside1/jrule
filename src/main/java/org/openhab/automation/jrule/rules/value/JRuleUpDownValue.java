@@ -13,21 +13,21 @@
 package org.openhab.automation.jrule.rules.value;
 
 /**
- * The {@link JRuleOpenClosedValue} JRule Command
+ * The {@link JRuleUpDownValue} JRule Command
  *
- * @author Timo Litzius - Initial contribution
+ * @author Timo Litzius- Initial contribution
  */
-public enum JRuleOpenClosedValue {
-    OPEN,
-    CLOSED,
+public enum JRuleUpDownValue {
+    UP,
+    DOWN,
     UNDEF;
 
-    public static JRuleOpenClosedValue getValueFromString(String value) {
-        if (value.equals("OPEN")) {
-            return OPEN;
+    public static JRuleUpDownValue getValueFromString(String value) {
+        if (value.equals("UP")) {
+            return UP;
         }
-        if (value.equals("CLOSED")) {
-            return CLOSED;
+        if (value.equals("DOWN")) {
+            return DOWN;
         }
         return UNDEF;
     }
