@@ -13,6 +13,8 @@
 package org.openhab.automation.jrule.rules;
 
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
  * The {@link JRuleEvent}
@@ -40,6 +42,14 @@ public class JRuleEvent {
 
     public JRuleOnOffValue getValueAsOnOffValue() {
         return JRuleOnOffValue.getValueFromString(value);
+    }
+
+    public JRuleOpenClosedValue getValueAsOpenClosedValue() {
+        return JRuleOpenClosedValue.getValueFromString(value);
+    }
+
+    public JRuleUpDownValue getValueAsUpDownValue() {
+        return JRuleUpDownValue.getValueFromString(value);
     }
 
     public Double getValueAsDouble() {
