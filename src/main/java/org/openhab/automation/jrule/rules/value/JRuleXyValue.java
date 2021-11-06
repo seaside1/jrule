@@ -19,10 +19,6 @@ package org.openhab.automation.jrule.rules.value;
  */
 public class JRuleXyValue {
 
-    public float getyY() {
-        return yY;
-    }
-
     private final float x;
     private final float y;
     private final float yY;
@@ -36,6 +32,10 @@ public class JRuleXyValue {
         this.x = x;
         this.y = y;
         this.yY = yY;
+    }
+
+    public float getyY() {
+        return yY;
     }
 
     public float getX() {

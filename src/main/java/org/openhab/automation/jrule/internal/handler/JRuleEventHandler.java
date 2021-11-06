@@ -19,9 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.openhab.automation.jrule.internal.JRuleItemUtil;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
-import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
@@ -129,32 +129,12 @@ public class JRuleEventHandler {
     }
 
     public void sendCommand(String itemName, JRuleColorValue colorValue) {
-        final HSBType hsbType = getHsbType(colorValue);
+        final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
         if (hsbType == null) {
             logger.error("Failed to sen command for colorValue: {}", colorValue);
             return;
         }
         sendCommand(itemName, hsbType);
-    }
-
-    private HSBType getHsbType(JRuleColorValue colorValue) {
-        final JRuleHsbValue hsbValue = colorValue.getHsbValue();
-        if (hsbValue != null) {
-            return new HSBType(new DecimalType(hsbValue.getHue()), new PercentType(hsbValue.getSaturation()),
-                    new PercentType(hsbValue.getBrightness()));
-        }
-
-        final JRuleRgbValue rgbValue = colorValue.getRgbValue();
-        if (rgbValue != null) {
-            return HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue());
-        }
-
-        final JRuleXyValue xyValue = colorValue.getXyValue();
-        if (xyValue != null) {
-            return HSBType.fromXY(xyValue.getX(), xyValue.getY());
-        }
-
-        return null;
     }
 
     public void sendCommand(String itemName, JRuleRgbValue rgbValue) {
@@ -175,7 +155,7 @@ public class JRuleEventHandler {
     }
 
     public void postUpdate(String itemName, JRuleColorValue colorValue) {
-        final HSBType hsbType = getHsbType(colorValue);
+        final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
         if (hsbType == null) {
             logger.error("Failed to get HSB Type from ColorValue: {}", colorValue);
             return;
@@ -234,7 +214,7 @@ public class JRuleEventHandler {
 
     public JRuleColorValue getColorValue(String itemName) {
         State state = getStateFromItem(itemName);
-        return getColorValueFromState(state);
+        return JRuleItemUtil.getColorValueFromState(state);
     }
 
     public JRuleOnOffValue getOnOffValue(String itemName) {
@@ -245,25 +225,6 @@ public class JRuleEventHandler {
     public JRuleOpenClosedValue getOpenClosedValue(String itemName) {
         State state = getStateFromItem(itemName);
         return getOpenClosedValueFromState(state);
-    }
-
-    private JRuleColorValue getColorValueFromState(State state) {
-        HSBType hsbValue = null;
-        try {
-            hsbValue = HSBType.valueOf(state.toFullString());
-        } catch (IllegalArgumentException x) {
-            logger.error("Failed to parse state: {}", state.toFullString());
-            return null;
-        }
-        final JRuleHsbValue jRuleHsbValue = new JRuleHsbValue(hsbValue.getHue().intValue(),
-                hsbValue.getSaturation().intValue(), hsbValue.getBrightness().intValue());
-        final JRuleRgbValue jRuleRgbValue = new JRuleRgbValue(hsbValue.getRed().intValue(),
-                hsbValue.getGreen().intValue(), hsbValue.getBlue().intValue());
-        PercentType[] xyY = hsbValue.toXY();
-        final JRuleXyValue jRuleXyValue = new JRuleXyValue(xyY[0].floatValue(), xyY[1].floatValue(),
-                xyY[2].floatValue());
-
-        return new JRuleColorValue(jRuleHsbValue, jRuleRgbValue, jRuleXyValue);
     }
 
     private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
