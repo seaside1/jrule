@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.automation.jrule.internal.JRuleItemUtil;
+
 /**
  * The {@link JRuleColorValue} JRule Command
  *
@@ -29,34 +31,16 @@ public class JRuleColorValue {
         this.rgbValue = rgbValue;
     }
 
-    private JRuleColorValue(JRuleHsbValue hsbValue) {
-        this.hsbValue = hsbValue;
-        xyValue = null;
-        rgbValue = null;
-    }
-
-    private JRuleColorValue(JRuleRgbValue rgbValue) {
-        this.rgbValue = rgbValue;
-        xyValue = null;
-        hsbValue = null;
-    }
-
-    private JRuleColorValue(JRuleXyValue xyValue) {
-        this.xyValue = xyValue;
-        rgbValue = null;
-        hsbValue = null;
-    }
-
     public static JRuleColorValue fromHsb(int hue, int saturation, int brightness) {
-        return new JRuleColorValue(new JRuleHsbValue(hue, saturation, brightness));
+        return JRuleItemUtil.getColorValueHsb(hue, saturation, brightness);
     }
 
     public static JRuleColorValue fromRgb(int red, int green, int blue) {
-        return new JRuleColorValue(new JRuleRgbValue(red, green, blue));
+        return JRuleItemUtil.getColorValueRgb(red, green, blue);
     }
 
-    public static JRuleColorValue fromXy(float x, float y, float yY) {
-        return new JRuleColorValue(new JRuleXyValue(x, y, yY));
+    public static JRuleColorValue fromXy(float x, float y) {
+        return JRuleItemUtil.getColorValueXy(x, y);
     }
 
     public JRuleHsbValue getHsbValue() {
