@@ -26,6 +26,6 @@ public class _ITEMNAME extends JRuleContactItem {
     public static final String ITEM = "ITEMNAME";
     
     public static JRuleOpenClosedValue getState() {
-        return JRuleOpenClosedItem.getState(ITEM);
+        return JRuleContactItem.getState(ITEM);
     }
 }
