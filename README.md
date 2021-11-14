@@ -91,18 +91,11 @@ import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MySwitchRule extends JRule {
-
-    private static final String LOG_NAME="MY_TEST";
     
     @JRuleName("MySwitchRule")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execOffToOnRule() {
         logInfo("||||| --> Hello World!");
-    }
-    
-    @Override
-    protected String getRuleLogName() {
-        return LOG_NAME;
     }
 }
 ```
@@ -122,6 +115,11 @@ Built in Core Actions that can be used
 | say                                    | Will use VoiceManager to say action see Example 13                        |
 | commandLineExecute                     | See Example 14                               |
 
+# Logging from rules
+Logging from rule can be done in 3 different ways
+1. Not specifying anything will result in the usage of JRuleName as perfix when calling JRule.logInfo/Debug/Error etc see example 20
+2. Overriding method JRule.getRuleLogName will result in the same log prefix for all rules defined in that file in see example 21
+3. Specifically add rependency on log4j and define your own logger to do logging
 
 # Examples 
 
@@ -184,14 +182,15 @@ To add an OR statement we simply add multiple @JRuleWhen statements
 
 Use case: Define your own functionality
 Create a Rules class that extends: JRuleUser.java
-JRuleUser.java should be placed in the same folder as your rules:
+JRuleUser.java should be placed in the same folder as your rules
+The JRuleUser class can contain common functions and functionality you want to reuse in your rules:
 
 ```java
 package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.JRule;
 
-public abstract class JRuleUser extends JRule {
+public class JRuleUser extends JRule {
 
 }
 ```
@@ -209,13 +208,7 @@ import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MySwitchRule extends JRuleUser {
-
-    private static final String LOG_NAME="MY_RULE";
-    
-    @Override
-    protected String getRuleLogName() {
-        return LOG_NAME;
-    }
+ 
 }
 ```
 
@@ -230,7 +223,7 @@ package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.JRule;
 
-public abstract class JRuleUser extends JRule {
+public class JRuleUser extends JRule {
 
     private static final int startDay = 8;
     private static final int endDay = 21;
@@ -253,8 +246,7 @@ import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MyTestUserRule extends JRuleUser {
-    private static final String MY_LOGNAME = "TEST";
-
+  
     @JRuleName("TestUserDefinedRule")
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
     public void mySendNotificationRUle(JRuleEvent event) {
@@ -262,12 +254,6 @@ public class MyTestUserRule extends JRuleUser {
             logInfo("It's ok to send a disturbing notification");
         }
     }
-
-    @Override
-    protected String getRuleLogName() {
-        return MY_LOGNAME;
-    }
-
 }
 ```
 ## Example 8
@@ -277,7 +263,7 @@ Use case create a timer for automatically turning of a light when it is turned o
     @JRuleName("myTimerRule")
     @JRuleWhen(item = _MyLightSwitch.ITEM, trigger = _MyLightSwitch.TRIGGER_CHANGED_TO_ON)
     public synchronized void myTimerRule(JRuleEvent event) {
-        logger.info("myTimerRule Turning on light it will be turned off in 2 mins");
+        logInfo("Turning on light it will be turned off in 2 mins");
         createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
             logInfo("Time is up! Turning off lights");
             _MyLightSwitch.sendCommand(OFF);
@@ -457,6 +443,39 @@ Use case: Get the brigtness from a color item, set a color item to white (HSB 0,
         _MyTestColorItem.sendCommand(JRuleColorValue.fromHsb(0,  0,  100));
     }
 ```
+
+## Example 21
+Use case: Set logging name for a specific rule
+```java
+    @JRuleName("MyCustomLoggingRule")
+    @JRuleLogName("MYLOG")
+    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    public void execChangedToRule() {
+    	logInfo("||||| --> Executing rule MyRule: changed to on");
+        _MySwitch2.sendCommand(ON);
+    }
+```
+
+## Example 21
+Use case: Override logging for all rules defined in one file
+```java
+   public class ColorRules extends JRule {
+
+    @JRuleName("MyCustomLoggingRuleOnClass")
+    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    public void execChangedToRule() {
+    	logInfo("||||| --> Executing rule MyRule: changed to on");
+        _MySwitch2.sendCommand(ON);
+    }
+    
+    @Override
+    protected String getRuleLogName() {
+        return "CustomLogExample";
+    }
+}
+```
+
+
 
 # Changelog
 ## BETA1
