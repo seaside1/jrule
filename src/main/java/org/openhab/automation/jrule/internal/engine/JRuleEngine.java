@@ -44,6 +44,7 @@ import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemType;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhen;
@@ -151,11 +152,21 @@ public class JRuleEngine implements PropertyChangeListener {
                 continue;
             }
             final JRuleName jRuleName = method.getDeclaredAnnotation(JRuleName.class);
+            final JRuleLogName jRuleLogName = method.isAnnotationPresent(JRuleLogName.class)
+                    ? method.getDeclaredAnnotation(JRuleLogName.class)
+                    : null;
+
             final JRuleWhen[] jRuleWhens = method.getAnnotationsByType(JRuleWhen.class);
             logger.debug("Got jrule whens size: {}", jRuleWhens.length);
             Parameter[] parameters = method.getParameters();
             boolean jRuleEventPresent = Arrays.stream(parameters)
                     .anyMatch(param -> (param.getType().equals(JRuleEvent.class)));
+
+            if (jRuleLogName != null && !jRuleLogName.value().isEmpty()) {
+                jRule.setRuleLogName(jRuleName.value());
+            } else {
+                jRule.setRuleLogName(jRuleName.value());
+            }
 
             // TODO: Do validation on syntax in when annotations
             // Loop for other ORs
@@ -166,7 +177,6 @@ public class JRuleEngine implements PropertyChangeListener {
                     final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
                     logger.debug("Got item class: {}", itemClass);
                     logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
-
                     addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
                             jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
                             getDoubleFromAnnotation(jRuleWhen.lt()), getDoubleFromAnnotation(jRuleWhen.lte()),

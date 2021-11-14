@@ -50,6 +50,8 @@ public abstract class JRule {
     private static final String PREFIX_INFO_LOG = "[{}] {}";
     private static final String PREFIX_DEBUG_LOG = "[+{}+] {}";
 
+    private String logName = "";
+
     public JRule() {
         JRuleEngine.get().add(this);
     }
@@ -257,5 +259,11 @@ public abstract class JRule {
         logger.info(PREFIX_INFO_LOG, getRuleLogName(), logMessage.getMessage());
     }
 
-    protected abstract String getRuleLogName();
+    protected String getRuleLogName() {
+        return logName;
+    }
+
+    public void setRuleLogName(String logName) {
+        this.logName = logName;
+    }
 }
