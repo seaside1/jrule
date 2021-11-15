@@ -456,7 +456,7 @@ Use case: Set logging name for a specific rule
     }
 ```
 
-## Example 21
+## Example 22
 Use case: Override logging for all rules defined in one file
 ```java
    public class ColorRules extends JRule {
@@ -478,6 +478,14 @@ Use case: Override logging for all rules defined in one file
 
 
 # Changelog
+## BETA2
+- Fixed color item
+- Added annotation for setting logger on a rule see example 21 and 22
+- Optional to override getLogName on class
+- Contact item update
+- Rollershutter item support added
+- UpDown, Increase Decrease support added to various items
+- OnOff and Percent commands added to ColorItem
 ## BETA1
 - Added color item see example 20
 - Moved org.openhab.automation.jrule.rules.JRuleOnOffvalue, JRulePlayPause etc to org.openhab.automation.jrule.rules.value
