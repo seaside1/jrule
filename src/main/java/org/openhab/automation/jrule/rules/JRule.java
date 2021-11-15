@@ -41,7 +41,7 @@ import org.slf4j.helpers.MessageFormatter;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRule {
+public class JRule {
 
     private final Logger logger = LoggerFactory.getLogger(JRule.class);
 
