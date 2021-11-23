@@ -84,7 +84,7 @@ Switch MyTestSwitch2  "Test Switch 2" (JRule)
 
 ```java
 package org.openhab.automation.jrule.rules.user;
-import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.ON;
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
