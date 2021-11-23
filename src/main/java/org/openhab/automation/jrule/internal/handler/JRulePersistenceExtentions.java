@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.internal.handler;
 
 import java.time.ZonedDateTime;
 
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 public class JRulePersistenceExtentions {
 
     private final static Logger logger = LoggerFactory.getLogger(JRulePersistenceExtentions.class);
+    private static final String LOG_NAME_PERSISTENCE = "JRulePersistence";
 
     public static ZonedDateTime getLastUpdate(String itemName) {
         return getLastUpdate(itemName, null);
@@ -37,16 +39,18 @@ public class JRulePersistenceExtentions {
         try {
             ItemRegistry itemRegistry = JRuleEventHandler.get().getItemRegistry();
             if (itemRegistry == null) {
-                logger.error("Item registry is not set can't get LastUpdate");
+                JRuleLog.error(logger, LOG_NAME_PERSISTENCE, "Item registry is not set can't get LastUpdate");
                 return null;
             }
             return serviceId == null ? PersistenceExtensions.lastUpdate(itemRegistry.getItem(itemName))
                     : PersistenceExtensions.lastUpdate(itemRegistry.getItem(itemName), serviceId);
         } catch (ItemNotFoundException e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Failed to get item: {} in order to getLastUpdate", itemName, e);
+                JRuleLog.debug(logger, LOG_NAME_PERSISTENCE, "Failed to get item: {} in order to getLastUpdate",
+                        itemName, e);
             } else {
-                logger.error("Failed to get item: {} in order to getLastUpdate", itemName);
+                JRuleLog.error(logger, LOG_NAME_PERSISTENCE, "Failed to get item: {} in order to getLastUpdate",
+                        itemName);
             }
         }
         return null;

@@ -25,6 +25,7 @@ public class JRuleExecutionContext {
     private static final String FROM_PREFIX = " from ";
     private static final String TO_PREFIX = " to ";
     private static final String SPACE = " ";
+    private final String logName;
     private final String trigger;
     private final String ruleName;
     private final String itemClass;
@@ -41,9 +42,10 @@ public class JRuleExecutionContext {
     private final Method method;
     private final boolean eventParameterPresent;
 
-    public JRuleExecutionContext(JRule jRule, String trigger, String from, String to, String update, String ruleName,
-            String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt, Double lte,
-            Double gt, Double gte, Double eq) {
+    public JRuleExecutionContext(JRule jRule, String logName, String trigger, String from, String to, String update,
+            String ruleName, String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt,
+            Double lte, Double gt, Double gte, Double eq) {
+        this.logName = logName;
         this.gt = gt;
         this.gte = gte;
         this.lt = lt;
@@ -61,9 +63,10 @@ public class JRuleExecutionContext {
         this.eventParameterPresent = eventParameterPresent;
     }
 
-    public JRuleExecutionContext(JRule jRule, Method method, String ruleName, boolean jRuleEventPresent) {
-        this(jRule, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null, null,
-                null);
+    public JRuleExecutionContext(JRule jRule, String logName, Method method, String ruleName,
+            boolean jRuleEventPresent) {
+        this(jRule, logName, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null,
+                null, null);
     }
 
     @Override
@@ -178,5 +181,9 @@ public class JRuleExecutionContext {
 
     public boolean isNumericOperation() {
         return lte != null || lt != null || gt != null || gte != null;
+    }
+
+    public String getLogName() {
+        return logName;
     }
 }

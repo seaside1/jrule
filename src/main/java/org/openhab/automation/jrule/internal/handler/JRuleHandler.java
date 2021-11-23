@@ -31,6 +31,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.internal.compiler.JRuleJarExtractor;
@@ -60,6 +61,8 @@ import org.slf4j.LoggerFactory;
 public class JRuleHandler implements PropertyChangeListener {
 
     private static final String JAR_LIB_PATH = "lib/";
+
+    private static final String LOG_NAME_HANDLER = "JRuleHandler";
 
     @NonNullByDefault({})
     private ItemRegistry itemRegistry;
@@ -101,13 +104,29 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
         config = new JRuleConfig(properties);
-        logger.debug("New instance JRuleHandler: {}", properties);
+        logDebug("New instance: {}", properties);
+    }
+
+    private void logDebug(String message, Object... parameters) {
+        JRuleLog.debug(logger, LOG_NAME_HANDLER, message, parameters);
+    }
+
+    private void logInfo(String message, Object... parameters) {
+        JRuleLog.info(logger, LOG_NAME_HANDLER, message, parameters);
+    }
+
+    private void logWarn(String message, Object... parameters) {
+        JRuleLog.warn(logger, LOG_NAME_HANDLER, message, parameters);
+    }
+
+    private void logError(String message, Object... parameters) {
+        JRuleLog.error(logger, LOG_NAME_HANDLER, message, parameters);
     }
 
     @SuppressWarnings("null")
     private void createRuleInstances() {
         if (compiler == null) {
-            logger.error("No compiler set failed to create rule instances");
+            logError("No compiler set failed to create rule instances");
             return;
         }
         final List<URL> urlList = new ArrayList<>();
@@ -116,7 +135,7 @@ public class JRuleHandler implements PropertyChangeListener {
             urlList.add(new File(config.getItemsRootDirectory()).toURI().toURL());
             urlList.add(new File(config.getRulesRootDirectory()).toURI().toURL());
         } catch (MalformedURLException x) {
-            logger.error("Failed to build class path for creating rule instance");
+            logError("Failed to build class path for creating rule instance");
         }
         urlList.addAll(extLibPath);
         final ClassLoader loader = new URLClassLoader(urlList.toArray(URL[]::new), JRuleUtil.class.getClassLoader());
@@ -124,11 +143,10 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     private void compileUserRules() {
-        logger.debug("Compile User Rules");
         if (compiler != null) {
             compiler.compileRules();
         } else {
-            logger.debug("Compiler is null aborting");
+            logDebug("Compiler is null aborting");
         }
     }
 
@@ -138,18 +156,18 @@ public class JRuleHandler implements PropertyChangeListener {
             fileFolder.mkdirs();
         }
         if (!fileFolder.canRead() || !fileFolder.canWrite()) {
-            logger.error("JarFolder can not read or write: {}", folder);
+            logError("JarFolder can not read or write: {}", folder);
             return false;
         }
         return true;
     }
 
     public synchronized final void initialize() {
-        logger.info("Start Initializing JRule Automation");
+        logInfo("Start Initializing JRule Automation");
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
-        logger.debug("SettingConfig name: {} config: {}", config.getClass(), config.toString());
-        logger.debug("Initializing JRule automation folder: {}", config.getWorkingDirectory());
+        logDebug("SettingConfig name: {} config: {}", config.getClass(), config.toString());
+        logDebug("Initializing JRule automation folder: {}", config.getWorkingDirectory());
         if (!initializeFolder(config.getWorkingDirectory())) {
             return;
         }
@@ -165,15 +183,15 @@ public class JRuleHandler implements PropertyChangeListener {
         if (!initializeFolder(config.getRulesDirectory())) {
             return;
         }
-        logger.info("Initializing JRule writing external Jars: {}", config.getJarDirectory());
+        logInfo("Initializing JRule writing external Jars: {}", config.getJarDirectory());
         writeAndExtractJruleJar();
         handleItemSources();
-        logger.info("Compiling rules");
+        logInfo("Compiling rules");
         compileUserRules();
         createRuleInstances();
         startDirectoryWatcher();
         eventSubscriber.startSubscriber();
-        logger.info("JRule Engine Initializing done!");
+        logInfo("JRule Engine Initializing done!");
     }
 
     private void writeAndExtractJruleJar() {
@@ -181,12 +199,12 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     private void handleItemSources() {
-        logger.info("Generating items");
+        logInfo("Generating items");
         generateItemSources();
         if (recompileJar) {
-            logger.info("Compiling items");
+            logInfo("Compiling items");
             compileItems();
-            logger.info("Creating items jar");
+            logInfo("Creating items jar");
             createItemsJar();
         }
     }
@@ -206,12 +224,12 @@ public class JRuleHandler implements PropertyChangeListener {
                     compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
             recompileJar = false;
         } else {
-            logger.error("Failed to create items due to config {}, compiler is null", config);
+            logError("Failed to create items due to config {}, compiler is null", config);
         }
     }
 
     public synchronized void dispose() {
-        logger.debug("JRuleHandler dispose");
+        logDebug("Dispose called!");
         JRuleEngine.get().reset();
         if (directoryWatcher != null) {
             directoryWatcher.removePropertyChangeListener(this);
@@ -243,7 +261,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private synchronized boolean deleteFile(File f) {
         if (f.exists()) {
-            logger.debug("Deleting file: {}", f.getAbsolutePath());
+            logDebug("Deleting file: {}", f.getAbsolutePath());
             return f.delete();
         }
         return false;
@@ -257,7 +275,7 @@ public class JRuleHandler implements PropertyChangeListener {
                 deleteClassFileForItem(item);
             }
         } else {
-            logger.error("Failed to generate Item sources, not initialized");
+            logError("Failed to generate Item sources, not initialized");
         }
     }
 
@@ -267,13 +285,13 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private synchronized void deleteClassFileForItem(String itemName) {
         deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
-                .append(JRuleConstants.JRULE_GENERATION_PREFIX).append(itemName).append(JRuleConstants.CLASS_FILE_TYPE)
+                .append(config.getGeneratedItemPrefix()).append(itemName).append(JRuleConstants.CLASS_FILE_TYPE)
                 .toString()));
     }
 
     private synchronized void deleteSourceFileForItem(String itemName) {
         deleteFile(new File(new StringBuilder().append(config.getItemsDirectory()).append(File.separator)
-                .append(JRuleConstants.JRULE_GENERATION_PREFIX).append(itemName).append(JRuleConstants.JAVA_FILE_TYPE)
+                .append(config.getGeneratedItemPrefix()).append(itemName).append(JRuleConstants.JAVA_FILE_TYPE)
                 .toString()));
     }
 
@@ -291,27 +309,27 @@ public class JRuleHandler implements PropertyChangeListener {
         if (property.equals(JRuleEventSubscriber.PROPERTY_ITEM_REGISTRY_EVENT)) {
             Event event = (Event) evt.getNewValue();
             if (event == null) {
-                logger.debug("Event value null. ignoring: {}", evt);
+                logDebug("Event value null. ignoring: {}", evt);
                 return;
             }
             String eventType = event.getType();
             String itemName = JRuleUtil.getItemNameFromTopic(event.getTopic());
 
             if (eventType.equals(ItemRemovedEvent.TYPE)) {
-                logger.debug("RemovedType: {}", evt);
+                logDebug("RemovedType: {}", evt);
                 deleteClassFileForItem(itemName);
                 deleteSourceFileForItem(itemName);
                 recompileJar = true;
             } else if (eventType.equals(ItemAddedEvent.TYPE) || event.getType().equals(ItemUpdatedEvent.TYPE)) {
                 try {
-                    logger.debug("Added/updatedType: {}", evt);
+                    logDebug("Added/updatedType: {}", evt);
                     Item item = itemRegistry.getItem(itemName);
                     generateItemSource(item);
                 } catch (ItemNotFoundException e) {
-                    logger.debug("Could not find new item", e);
+                    logDebug("Could not find new item", e);
                 }
             } else {
-                logger.debug("Fauled to do something with item event");
+                logDebug("Failed to do something with item event");
             }
             if (recompileJar) {
                 compileItems();
@@ -321,9 +339,9 @@ public class JRuleHandler implements PropertyChangeListener {
                 || JRuleRulesWatcher.PROPERTY_ENTRY_MODIFY.equals(property)
                 || JRuleRulesWatcher.PROPERTY_ENTRY_DELETE.equals(property)) {
             Path newValue = (Path) evt.getNewValue();
-            logger.debug("Directory watcher new value: {}", newValue);
+            logDebug("Directory watcher new value: {}", newValue);
             reloadRules();
-            logger.debug("All Rules reloaded");
+            logDebug("All Rules reloaded");
 
         }
     }
@@ -334,6 +352,6 @@ public class JRuleHandler implements PropertyChangeListener {
         createRuleInstances();
         eventSubscriber.stopSubscriber();
         eventSubscriber.startSubscriber();
-        logger.info("JRule Engine Rules Reloaded!");
+        logInfo("JRule Engine Rules Reloaded!");
     }
 }

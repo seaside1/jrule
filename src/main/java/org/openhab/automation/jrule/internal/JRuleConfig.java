@@ -36,6 +36,8 @@ public class JRuleConfig {
     public static final String ITEMS_PACKAGE = "org.openhab.automation.jrule.items.generated.";
     public static final String RULES_PACKAGE = "org.openhab.automation.jrule.rules.user.";
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
+    private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
+
     public static final String ITEMS_DIR_START = "items";
 
     public static final String ITEMS_DIR = ITEMS_DIR_START + File.separator + "org" + File.separator + "openhab"
@@ -47,10 +49,12 @@ public class JRuleConfig {
             + File.separator + "automation" + File.separator + "jrule" + File.separator + "rules" + File.separator
             + "user" + File.separator;
     private static final String DEFAULT_WORKING_DIR = "/etc/openhab/automation/jrule";
+    private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
 
     private static final String CLASS_DIR = "class";
 
     private static final String EXT_LIB_DIR = "ext-lib";
+    private static final String LOG_NAME_CONF = "JRuleConf";
 
     private final Map<String, Object> properties;
 
@@ -62,7 +66,7 @@ public class JRuleConfig {
         String workingDir = (String) properties.get(WORKING_DIR_PROPERTY);
         if (workingDir == null) {
             String openhabConf = System.getProperty(OPENHAB_CONF_PROPERTY);
-            logger.debug("Openhab Conf Property: {}", openhabConf);
+            JRuleLog.debug(logger, LOG_NAME_CONF, "Openhab Conf Property: {}", openhabConf);
             if (openhabConf != null) {
                 workingDir = openhabConf.concat(AUTOMATION_JRULE);
             }
@@ -98,5 +102,14 @@ public class JRuleConfig {
 
     public String getExtlibDirectory() {
         return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(EXT_LIB_DIR).toString();
+    }
+
+    private String getConfigPropertyOrDefaultValue(String property, String defaultValue) {
+        final String propertyValue = (String) properties.get(property);
+        return propertyValue == null ? defaultValue : propertyValue;
+    }
+
+    public String getGeneratedItemPrefix() {
+        return getConfigPropertyOrDefaultValue(GENERATED_ITEM_PREFIX_PROPERTY, DEFAULT_GENERATED_ITEM_PREFIX);
     }
 }

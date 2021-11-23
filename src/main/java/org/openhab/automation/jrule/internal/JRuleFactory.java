@@ -23,6 +23,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.voice.VoiceManager;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -52,6 +53,7 @@ public class JRuleFactory {
     private static final Logger logger = LoggerFactory.getLogger(JRuleFactory.class);
     private static final Object INIT_DELAY_PROPERTY = "init.delay";
     private static final int DEFAULT_INIT_DELAY = 5;
+    private static final String LOG_NAME_FACTORY = "JRuleFactory";
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
@@ -61,6 +63,7 @@ public class JRuleFactory {
         this.eventSubscriber = eventSubscriber;
         this.eventPublisher = eventPublisher;
         this.voiceManager = voiceManager;
+
         jRuleHandler = new JRuleHandler(properties, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
         createDelayedInitialization(getInitDelaySeconds(properties));
     }
@@ -81,10 +84,14 @@ public class JRuleFactory {
     private synchronized CompletableFuture<Void> createDelayedInitialization(int delayInSeconds) {
         initFuture = JRuleUtil.delayedExecution(delayInSeconds, TimeUnit.SECONDS);
         return initFuture.thenAccept(s -> {
-            logger.info("Initializing Java Rules Engine");
+            JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getLastModifiedBundle());
             jRuleHandler.initialize();
             initFuture = null;
         });
+    }
+
+    private String getLastModifiedBundle() {
+        return JRuleUtil.getDateStr(FrameworkUtil.getBundle(JRuleHandler.class).getLastModified());
     }
 
     @Deactivate

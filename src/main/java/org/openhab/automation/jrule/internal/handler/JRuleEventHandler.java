@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.internal.JRuleItemUtil;
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -61,6 +62,8 @@ import org.slf4j.LoggerFactory;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleEventHandler {
+
+    private static final String LOG_NAME_EVENT = "JRuleEvent";
 
     private static volatile JRuleEventHandler instance;
 
@@ -131,7 +134,7 @@ public class JRuleEventHandler {
     public void sendCommand(String itemName, JRuleColorValue colorValue) {
         final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
         if (hsbType == null) {
-            logger.error("Failed to sen command for colorValue: {}", colorValue);
+            logError("Failed to sen command for colorValue: {}", colorValue);
             return;
         }
         sendCommand(itemName, hsbType);
@@ -149,7 +152,7 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
-        logger.info("SendCommand itemName: {} command: {}", itemName, command);
+        logInfo("SendCommand itemName: {} command: {}", itemName, command);
         final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
         eventPublisher.post(commandEvent);
     }
@@ -157,7 +160,7 @@ public class JRuleEventHandler {
     public void postUpdate(String itemName, JRuleColorValue colorValue) {
         final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
         if (hsbType == null) {
-            logger.error("Failed to get HSB Type from ColorValue: {}", colorValue);
+            logError("Failed to get HSB Type from ColorValue: {} itemName: {}", colorValue, itemName);
             return;
         }
         postUpdate(itemName, hsbType);
@@ -235,7 +238,7 @@ public class JRuleEventHandler {
             case PAUSE:
                 return JRulePlayPauseValue.PAUSE;
             default:
-                logger.error("Fail to transform switch value");
+                logError("Fail to transform switch value");
                 return JRulePlayPauseValue.UNDEF;
         }
     }
@@ -248,7 +251,7 @@ public class JRuleEventHandler {
             case ON:
                 return JRuleOnOffValue.ON;
             default:
-                logger.error("Fail to transform switch value");
+                logError("Fail to transform switch value");
                 return JRuleOnOffValue.UNDEF;
         }
     }
@@ -261,7 +264,7 @@ public class JRuleEventHandler {
             case CLOSED:
                 return JRuleOpenClosedValue.CLOSED;
             default:
-                logger.error("Fail to transform switch value");
+                logError("Fail to transform switch value");
                 return JRuleOpenClosedValue.UNDEF;
         }
     }
@@ -274,7 +277,7 @@ public class JRuleEventHandler {
             Item item = itemRegistry.getItem(itemName);
             return item.getState();
         } catch (ItemNotFoundException e) {
-            logger.error("Failed to find item: {}", itemName);
+            logError("Failed to find item: {}", itemName);
             return null;
         }
     }
@@ -287,7 +290,7 @@ public class JRuleEventHandler {
                 return OnOffType.ON;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", value);
+                logError("Unhandled getCommand: {}", value);
                 return null;
         }
     }
@@ -300,7 +303,7 @@ public class JRuleEventHandler {
                 return UpDownType.DOWN;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", value);
+                logError("Unhandled getCommand: {}", value);
                 return null;
         }
     }
@@ -313,7 +316,7 @@ public class JRuleEventHandler {
                 return PlayPauseType.PAUSE;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", value);
+                logError("Unhandled getCommand: {}", value);
                 return null;
         }
     }
@@ -326,7 +329,7 @@ public class JRuleEventHandler {
                 return PlayPauseType.PAUSE;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", command);
+                logError("Unhandled getCommand: {}", command);
                 return null;
         }
     }
@@ -339,7 +342,7 @@ public class JRuleEventHandler {
                 return OnOffType.ON;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", command);
+                logError("Unhandled getCommand: {}", command);
                 return null;
         }
     }
@@ -352,7 +355,7 @@ public class JRuleEventHandler {
                 return UpDownType.DOWN;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", command);
+                logError("Unhandled getCommand: {}", command);
                 return null;
         }
     }
@@ -365,7 +368,7 @@ public class JRuleEventHandler {
                 return StopMoveType.MOVE;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", command);
+                logError("Unhandled getCommand: {}", command);
                 return null;
         }
     }
@@ -378,7 +381,7 @@ public class JRuleEventHandler {
                 return IncreaseDecreaseType.DECREASE;
             case UNDEF:
             default:
-                logger.error("Unhandled getCommand: {}", command);
+                logError("Unhandled getCommand: {}", command);
                 return null;
         }
     }
@@ -402,7 +405,8 @@ public class JRuleEventHandler {
             return null;
         }
         StringType stringType = state.as(StringType.class);
-        logger.debug("Got state: {} stringType: {} fullString: {}", state, stringType, state.toFullString());
+        logDebug("Got state: {} stringType: {} fullString: {} item: {}", state, stringType, state.toFullString(),
+                itemName);
         return stringType == null ? state.toFullString() : stringType.toString();
     }
 
@@ -430,7 +434,7 @@ public class JRuleEventHandler {
         try {
             item = itemRegistry.getItem(groupName);
         } catch (ItemNotFoundException e) {
-            logger.error("Item not found in registry for group: {}", groupName);
+            logError("Item not found in registry for group: {}", groupName);
             return null;
         }
         if (item instanceof GroupItem) {
@@ -443,5 +447,21 @@ public class JRuleEventHandler {
 
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
+    }
+
+    private void logDebug(String message, Object... parameters) {
+        JRuleLog.debug(logger, LOG_NAME_EVENT, message, parameters);
+    }
+
+    private void logInfo(String message, Object... parameters) {
+        JRuleLog.info(logger, LOG_NAME_EVENT, message, parameters);
+    }
+
+    private void logWarn(String message, Object... parameters) {
+        JRuleLog.warn(logger, LOG_NAME_EVENT, message, parameters);
+    }
+
+    private void logError(String message, Object... parameters) {
+        JRuleLog.error(logger, LOG_NAME_EVENT, message, parameters);
     }
 }

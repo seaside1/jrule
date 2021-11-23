@@ -23,6 +23,7 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Vector;
 
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.rules.JRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +37,12 @@ public class JRuleJarExtractor {
 
     private final static int BUFFER_SIZE = 4096;
     private static final Logger logger = LoggerFactory.getLogger(JRuleJarExtractor.class);
+    private static final String LOG_NAME_JAR = "JRuleJar";
 
     public void extractJRuleJar(String jarFilePath) {
         Vector<Class<?>> loadedClasses = getLoadedClasses(JRule.class.getClassLoader());
         if (loadedClasses == null || loadedClasses.isEmpty()) {
-            logger.error("Failed to write and extract jar: {}", jarFilePath);
+            JRuleLog.error(logger, LOG_NAME_JAR, "Failed to write and extract jar: {}", jarFilePath);
             return;
         }
         Class<?> clazz = loadedClasses.get(0);
@@ -67,14 +69,14 @@ public class JRuleJarExtractor {
 
     private void writeJarToFolder(URL jarUrl, String jarFilePath) {
         if (jarUrl == null) {
-            logger.debug("ignoring jar: {}", jarUrl);
+            JRuleLog.debug(logger, LOG_NAME_JAR, "ignoring jar: {}", jarUrl);
             return;
         }
-        logger.debug("Extracting jar: {} to: {}", jarFilePath, jarFilePath);
+        JRuleLog.info(logger, LOG_NAME_JAR, "Extracting jar: {} to: {}", jarFilePath, jarFilePath);
         try {
             copyFile(jarUrl, jarFilePath);
         } catch (IOException x) {
-            logger.error("Failed to write file to: {}", jarFilePath, x);
+            JRuleLog.error(logger, LOG_NAME_JAR, "Failed to write file to: {}", jarFilePath, x);
         }
     }
 
@@ -82,7 +84,7 @@ public class JRuleJarExtractor {
         final ProtectionDomain pd = clazz.getProtectionDomain();
         final CodeSource cs = pd.getCodeSource();
         if (cs == null) {
-            logger.error("Code source is null failed to get location for jarClass: {}", clazz);
+            JRuleLog.error(logger, LOG_NAME_JAR, "Code source is null failed to get location for jarClass: {}", clazz);
             return null;
         }
         return cs.getLocation();

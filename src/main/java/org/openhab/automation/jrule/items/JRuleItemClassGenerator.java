@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -34,6 +35,8 @@ import org.slf4j.LoggerFactory;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleItemClassGenerator {
+
+    private static final String LOG_NAME_CLASS_GENERATOR = "JRuleItemClassGen";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
@@ -91,7 +94,7 @@ public class JRuleItemClassGenerator {
 
     public File getJavaItemForFile(Item item) {
         return new File(new StringBuilder().append(jRuleConfig.getItemsDirectory()).append(File.separator)
-                .append(JRuleConstants.JRULE_GENERATION_PREFIX).append(item.getName())
+                .append(jRuleConfig.getGeneratedItemPrefix()).append(item.getName())
                 .append(JRuleConstants.JAVA_FILE_TYPE).toString());
     }
 
@@ -130,13 +133,14 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(GroupItem.TYPE)) {
             generatedClass = groupItemClassTemplate.replaceAll("ITEMNAME", item.getName());
         } else {
-            logger.debug("Unsupported item type for item: {} type: {}", item.getName(), item.getType());
+            JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Unsupported item type for item: {} type: {}",
+                    item.getName(), item.getType());
             return false;
         }
         if (f.exists()) {
             String existingClass = JRuleUtil.getFileAsString(f);
             if (existingClass.equals(generatedClass)) {
-                logger.debug("Item: {} already exists, ignoring", item.getName());
+                JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Item: {} already exists, ignoring", item.getName());
                 return false;
             }
 
@@ -145,12 +149,12 @@ public class JRuleItemClassGenerator {
         try {
             fout = new FileOutputStream(f);
             fout.write(generatedClass.getBytes(StandardCharsets.UTF_8));
-            logger.debug("Wrote Generated class: {}", f.getAbsolutePath());
+            JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}", f.getAbsolutePath());
             return true;
         } catch (FileNotFoundException e1) {
-            logger.error("Failed to write generated class", e1);
+            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR, "Failed to write generated class", e1);
         } catch (IOException e) {
-            logger.error("Failed to write generated class", e);
+            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR, "Failed to write generated class", e);
         } finally {
             if (fout != null) {
                 try {

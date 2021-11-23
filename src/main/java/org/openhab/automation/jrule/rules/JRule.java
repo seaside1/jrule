@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
@@ -33,8 +34,6 @@ import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.FormattingTuple;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
  * The {@link JRule} .
@@ -43,14 +42,12 @@ import org.slf4j.helpers.MessageFormatter;
  */
 public class JRule {
 
-    private final Logger logger = LoggerFactory.getLogger(JRule.class);
+    private static final Logger logger = LoggerFactory.getLogger(JRule.class);
 
     private final static Map<String, CompletableFuture<Void>> ruleNameToCompletableFuture = new HashMap<>();
     private final static Map<String, List<CompletableFuture<Void>>> ruleNameToCompletableFutureList = new HashMap<>();
-    private static final String PREFIX_INFO_LOG = "[{}] {}";
-    private static final String PREFIX_DEBUG_LOG = "[+{}+] {}";
 
-    private String logName = "";
+    private volatile String logName = "";
 
     public JRule() {
         JRuleEngine.get().add(this);
@@ -65,12 +62,10 @@ public class JRule {
             Consumer<Void> fn) {
         CompletableFuture<Void> future = ruleNameToCompletableFuture.get(ruleName);
         if (future != null) {
-            logger.debug("Future already running for ruleName: {}", ruleName);
-
+            JRuleLog.debug(logger, ruleName, "Future already running");
             boolean cancelled = future.cancel(false);
             ruleNameToCompletableFuture.remove(ruleName);
-            logger.info("Replacing existing timer by removing old timer for rule {} cancelled: {}", ruleName,
-                    cancelled);
+            JRuleLog.info(logger, ruleName, "Replacing existing timer by removing old timer cancelled: {}", cancelled);
         }
         return createTimer(ruleName, timeInSeconds, fn);
     }
@@ -83,11 +78,11 @@ public class JRule {
         boolean cancelled = false;
         final CompletableFuture<Void> completableFuture = ruleNameToCompletableFuture.get(ruleName);
         if (completableFuture != null) {
-            logger.debug("Future already running for ruleName: {}", ruleName);
+            JRuleLog.debug(logger, ruleName, "Future already running");
             try {
                 cancelled = completableFuture.cancel(false);
             } catch (Exception x) {
-                logger.debug("Failed to cancel timer for ruleName: {}", ruleName, x);
+                JRuleLog.debug(logger, ruleName, "Failed to cancel timer", x);
             } finally {
                 ruleNameToCompletableFuture.remove(ruleName);
             }
@@ -101,14 +96,14 @@ public class JRule {
 
     protected synchronized CompletableFuture<Void> createTimer(String ruleName, long timeInSeconds, Consumer<Void> fn) {
         if (ruleNameToCompletableFuture.get(ruleName) != null) {
-            logger.debug("Future already running for ruleName: {}", ruleName);
+            JRuleLog.debug(logger, ruleName, "Future already running");
             return ruleNameToCompletableFuture.get(ruleName);
         }
         CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
         ruleNameToCompletableFuture.put(ruleName, future);
-        logger.info("Start timer for rule: {}, timeSeconds: {}", ruleName, timeInSeconds);
+        JRuleLog.info(logger, ruleName, "Start timer timeSeconds: {}", timeInSeconds);
         return future.thenAccept(fn).thenAccept(s -> {
-            logger.info("Timer has finsihed rule: {}", ruleName);
+            JRuleLog.info(logger, ruleName, "Timer has finsihed");
             ruleNameToCompletableFuture.remove(ruleName);
         });
     }
@@ -122,11 +117,11 @@ public class JRule {
             long delayInSeconds, int numberOfRepeats, Consumer<Void> fn) {
         List<CompletableFuture<Void>> completableFutures = ruleNameToCompletableFutureList.get(ruleName);
         if (completableFutures != null) {
-            logger.debug("Repeating Future already running for ruleName: {}", ruleName);
+            JRuleLog.debug(logger, ruleName, "Repeating Future already running");
             completableFutures.forEach(cF -> cF.cancel(true));
             completableFutures.clear();
             ruleNameToCompletableFutureList.remove(ruleName);
-            logger.info("Replacing existing repeating timer by removing old timer for rule {}", ruleName);
+            JRuleLog.info(logger, ruleName, "Replacing existing repeating timer by removing old timer");
         }
         return createRepeatingTimer(ruleName, delayInSeconds, numberOfRepeats, fn);
     }
@@ -135,10 +130,10 @@ public class JRule {
             int numberOfRepeats, Consumer<Void> fn) {
         List<CompletableFuture<Void>> futures = ruleNameToCompletableFutureList.get(ruleName);
         if (futures != null) {
-            logger.debug("Repeating timer already running for ruleName: {}", ruleName);
+            JRuleLog.debug(logger, ruleName, "Repeating timer already running");
             return ruleNameToCompletableFutureList.get(ruleName);
         }
-        logger.info("Start Repeating timer for rule: {}, delay: {}s repeats: {}", ruleName, delayInSeconds,
+        JRuleLog.info(logger, ruleName, "Start Repeating timer, delay: {}s repeats: {}", delayInSeconds,
                 numberOfRepeats);
 
         futures = new ArrayList<>();
@@ -151,7 +146,7 @@ public class JRule {
         futures.forEach(f -> f.thenAccept(fn));
         if (lastFuture != null) {
             futures.add(lastFuture.thenAccept(s -> {
-                logger.info("Repeating Timer has finsihed rule: {}", ruleName);
+                JRuleLog.info(logger, ruleName, "Repeating Timer has finsihed");
                 List<CompletableFuture<Void>> finishedList = ruleNameToCompletableFutureList.remove(ruleName);
                 if (finishedList != null) {
                     finishedList.clear();
@@ -231,7 +226,7 @@ public class JRule {
         future = JRuleUtil.scheduleAsync(asyncTask, seconds, TimeUnit.SECONDS);
         ruleNameToCompletableFuture.put(ruleName, future);
         future.thenAccept(itemName -> {
-            logger.info("{}: Timer completed! Releasing lock", ruleName);
+            JRuleLog.info(logger, ruleName, "Timer completed! Releasing lock");
             ruleNameToCompletableFuture.remove(ruleName);
         });
         return true;
@@ -249,14 +244,20 @@ public class JRule {
         return doubleValue == null ? defaultValue : doubleValue.intValue();
     }
 
-    protected void logDebug(String message, Object... parameters) {
-        final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        logger.info(PREFIX_DEBUG_LOG, getRuleLogName(), logMessage.getMessage());
+    public void logDebug(String message, Object... parameters) {
+        JRuleLog.debug(logger, getRuleLogName(), message, parameters);
     }
 
-    protected void logInfo(String message, Object... parameters) {
-        final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        logger.info(PREFIX_INFO_LOG, getRuleLogName(), logMessage.getMessage());
+    public void logInfo(String message, Object... parameters) {
+        JRuleLog.info(logger, getRuleLogName(), message, parameters);
+    }
+
+    public void logError(String message, Object... parameters) {
+        JRuleLog.error(logger, getRuleLogName(), message, parameters);
+    }
+
+    public void logWarn(String message, Object... parameters) {
+        JRuleLog.warn(logger, getRuleLogName(), message, parameters);
     }
 
     protected String getRuleLogName() {

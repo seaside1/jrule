@@ -28,7 +28,10 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -64,11 +67,14 @@ public class JRuleUtil {
     private static final String ITEMS_START = "items/";
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleUtil.class);
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
 
     protected static final String ERROR_RESOURCE = "Can't find resource: {}";
     protected static final String DEBUG_RESOURCE = "Resources: {}";
     protected static final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
+
+    private static final String LOG_NAME_UTIL = "JRuleUtil";
 
     public static String URLReader(URL url, Charset encoding) throws IOException {
         try (InputStream in = url.openStream()) {
@@ -88,7 +94,7 @@ public class JRuleUtil {
             final byte[] bytes = is.readAllBytes();
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error(ERROR_RESOURCE, e.getMessage());
+            JRuleLog.error(logger, LOG_NAME_UTIL, ERROR_RESOURCE, e.getMessage());
         }
         return null;
     }
@@ -123,7 +129,7 @@ public class JRuleUtil {
             final InputStream is = resource.openStream();
             return is.readAllBytes();
         } catch (IOException e) {
-            logger.error(ERROR_RESOURCE, e.getMessage());
+            JRuleLog.error(logger, LOG_NAME_UTIL, ERROR_RESOURCE, e.getMessage());
         }
         return null;
     }
@@ -134,21 +140,22 @@ public class JRuleUtil {
         try {
             resourceUrl = FrameworkUtil.getBundle(JRuleHandler.class).getResource(resource);
         } catch (Exception x) {
-            logger.error("Exception caught trying to load resource as osgi resource: {} message: {}", resource,
+            JRuleLog.error(logger, LOG_NAME_UTIL,
+                    "Exception caught trying to load resource as osgi resource: {} message: {}", resource,
                     x.getMessage());
             try {
                 resourceUrl = JRuleUtil.class.getClassLoader().getResource(resource);
             } catch (Exception x2) {
-                logger.error("Exception caught trying to load class resource: {} message: {}", resource,
-                        x2.getMessage());
+                JRuleLog.error(logger, LOG_NAME_UTIL, "Exception caught trying to load class resource: {} message: {}",
+                        resource, x2.getMessage());
 
             }
         }
         if (resourceUrl == null) {
-            logger.error(ERROR_RESOURCE, resource);
+            JRuleLog.error(logger, LOG_NAME_UTIL, ERROR_RESOURCE, resource);
             return null;
         }
-        logger.debug(DEBUG_RESOURCE, resourceUrl);
+        JRuleLog.debug(logger, LOG_NAME_UTIL, DEBUG_RESOURCE, resourceUrl);
         return resourceUrl;
     }
 
@@ -164,7 +171,7 @@ public class JRuleUtil {
         }
         final String pathFromPackage = packageName.replace('.', '/');
         final Enumeration<URL> resources = classLoader.getResources(pathFromPackage);
-        logger.debug("Get ResClasses enum: {}", resources.hasMoreElements());
+        JRuleLog.debug(logger, LOG_NAME_UTIL, "Get ResClasses enum: {}", resources.hasMoreElements());
         final List<File> dirs = new ArrayList<File>();
         while (resources.hasMoreElements()) {
             final URL resource = resources.nextElement();
@@ -173,15 +180,15 @@ public class JRuleUtil {
             BufferedReader reader = new BufferedReader(new InputStreamReader(openStream));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                logger.debug("line: {}", line);
+                JRuleLog.debug(logger, LOG_NAME_UTIL, "line: {}", line);
             }
             final FileNameMap fileNameMap = URLConnection.getFileNameMap();
             URI uri;
             try {
                 uri = connection.getURL().toURI();
-                logger.debug("Uri: {}", uri.toString());
+                JRuleLog.debug(logger, LOG_NAME_UTIL, "Uri: {}", uri.toString());
             } catch (URISyntaxException e) {
-                logger.debug("Uri syntax exception", e);
+                JRuleLog.debug(logger, LOG_NAME_UTIL, "Uri syntax exception", e);
             }
             dirs.add(new File(resource.getFile()));
         }
@@ -226,7 +233,7 @@ public class JRuleUtil {
         try {
             return Files.readString(file.toPath());
         } catch (IOException e) {
-            logger.error("Failed to read file", e);
+            JRuleLog.error(logger, LOG_NAME_UTIL, "Failed to read file", e);
         }
 
         return null;
@@ -239,7 +246,7 @@ public class JRuleUtil {
             out.write(bytes);
             out.close();
         } catch (IOException e) {
-            logger.error("Failed to write file: {}", file, e);
+            JRuleLog.error(logger, LOG_NAME_UTIL, "Failed to write file: {}", file, e);
         }
         return f;
     }
@@ -255,7 +262,7 @@ public class JRuleUtil {
             }
             target.close();
         } catch (IOException e) {
-            logger.error("Error creating jar", e);
+            JRuleLog.error(logger, LOG_NAME_UTIL, "Error creating jar", e);
         }
         return new File(targetFile);
     }
@@ -311,5 +318,9 @@ public class JRuleUtil {
             end = topic.length();
         }
         return end > 0 && end > start ? topic.substring(start, end) : JRuleConstants.EMPTY;
+    }
+
+    public static String getDateStr(long lastModified) {
+        return formatter.format(Date.from(Instant.ofEpochMilli(lastModified)));
     }
 }
