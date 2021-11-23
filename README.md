@@ -478,6 +478,8 @@ Use case: Override logging for all rules defined in one file
 
 
 # Changelog
+## BETA3
+- Major refactoring of logging
 ## BETA2
 - Fixed color item
 - Added annotation for setting logger on a rule see example 21 and 22
