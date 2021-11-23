@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class JRuleItemUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleItemUtil.class);
+    private static final String LOG_NAME_ITEM_UTIL = "JRuleItemUtil";
 
     public static JRuleColorValue getColorValueFromHsbType(HSBType hsbValue) {
         final JRuleHsbValue jRuleHsbValue = new JRuleHsbValue(hsbValue.getHue().intValue(),
@@ -48,7 +49,7 @@ public class JRuleItemUtil {
         try {
             hsbValue = HSBType.valueOf(state.toFullString());
         } catch (IllegalArgumentException x) {
-            logger.error("Failed to parse state: {}", state.toFullString());
+            JRuleLog.error(logger, LOG_NAME_ITEM_UTIL, "Failed to parse state: {}", state.toFullString());
             return null;
         }
         return getColorValueFromHsbType(hsbValue);

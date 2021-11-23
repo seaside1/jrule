@@ -27,6 +27,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
 import org.openhab.automation.jrule.internal.JRuleConstants;
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,8 @@ public class JRuleRulesWatcher implements Runnable {
     public static final String PROPERTY_ENTRY_MODIFY = "ENTRY_MODIFY";
     public static final String PROPERTY_ENTRY_DELETE = "ENTRY_DELETE";
 
+    private static final String LOG_NAME_RULESWATCHER = "JRuleRulesWatcher";
+
     private final PropertyChangeSupport propertyChangeSupport;
 
     public JRuleRulesWatcher(Path watchFolder) {
@@ -55,12 +58,12 @@ public class JRuleRulesWatcher implements Runnable {
     }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        logger.debug("Adding listener for watcher");
+        logDebug("Adding listener for watcher");
         propertyChangeSupport.addPropertyChangeListener(pcl);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        logger.debug("Adding listener for Watcher");
+        logDebug("Adding listener for Watcher");
         propertyChangeSupport.removePropertyChangeListener(pcl);
     }
 
@@ -69,15 +72,15 @@ public class JRuleRulesWatcher implements Runnable {
         try {
             Boolean isFolder = (Boolean) Files.getAttribute(watchFolder, BASIC_IS_DIRECTORY);
             if (!isFolder) {
-                logger.error("Failed to watch folder since it is not a directory: {}",
+                logError("Failed to watch folder since it is not a directory: {}",
                         watchFolder.toFile().getAbsolutePath());
                 return;
             }
         } catch (IOException ioe) {
-            logger.error("Failed to start watching folder: {}", watchFolder.toFile().getAbsolutePath(), ioe);
+            logError("Failed to start watching folder: {}", watchFolder.toFile().getAbsolutePath(), ioe);
             return;
         }
-        logger.debug("Watching for rule changes: {}", watchFolder);
+        logDebug("Watching for rule changes: {}", watchFolder);
         FileSystem fs = watchFolder.getFileSystem();
         try {
             WatchService service = fs.newWatchService();
@@ -91,7 +94,7 @@ public class JRuleRulesWatcher implements Runnable {
                 for (WatchEvent<?> watchEvent : key.pollEvents()) {
                     kind = watchEvent.kind();
                     if (OVERFLOW == kind) {
-                        logger.debug("overflow");
+                        logDebug("overflow");
                         continue;
                     }
                     Path newPath = ((WatchEvent<Path>) watchEvent).context();
@@ -99,16 +102,16 @@ public class JRuleRulesWatcher implements Runnable {
                         continue;
                     }
                     if (ENTRY_CREATE == kind) {
-                        logger.debug("New Path created in watchFolder");
+                        logDebug("New Path created in watchFolder");
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_CREATE, null, newPath);
                     } else if (ENTRY_MODIFY == kind) {
-                        logger.debug("New path modified: {} fn: {}", newPath, newPath.getFileName());
+                        logDebug("New path modified: {} fn: {}", newPath, newPath.getFileName());
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_MODIFY, null, newPath);
                     } else if (ENTRY_DELETE == kind) {
-                        logger.debug("New path deleted: {}", newPath);
+                        logDebug("New path deleted: {}", newPath);
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_DELETE, null, newPath);
                     } else {
-                        logger.debug("Unhandled case: {}", kind.name());
+                        logDebug("Unhandled case: {}", kind.name());
                     }
                 }
                 if (!key.reset()) {
@@ -116,11 +119,27 @@ public class JRuleRulesWatcher implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            logger.debug("Watcher Thread interrupted, closing down");
+            logDebug("Watcher Thread interrupted, closing down");
             return;
         } catch (Exception e) {
-            logger.error("Folder watcher terminated due to exception", e);
+            logError("Folder watcher terminated due to exception", e);
             return;
         }
+    }
+
+    private void logDebug(String message, Object... parameters) {
+        JRuleLog.debug(logger, LOG_NAME_RULESWATCHER, message, parameters);
+    }
+
+    private void logInfo(String message, Object... parameters) {
+        JRuleLog.info(logger, LOG_NAME_RULESWATCHER, message, parameters);
+    }
+
+    private void logWarn(String message, Object... parameters) {
+        JRuleLog.warn(logger, LOG_NAME_RULESWATCHER, message, parameters);
+    }
+
+    private void logError(String message, Object... parameters) {
+        JRuleLog.error(logger, LOG_NAME_RULESWATCHER, message, parameters);
     }
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.core.events.Event;
@@ -51,6 +52,8 @@ public class JRuleEventSubscriber implements EventSubscriber {
     public static final String PROPERTY_ITEM_REGISTRY_EVENT = "PROPERTY_ITEM_REGISTRY_EVENT";
 
     public static final String PROPERTY_CHANNEL_EVENT = "CHANNEL_EVENT";
+
+    private static final String LOG_NAME_SUBSCRIBER = "JRuleSubscriber";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
 
@@ -85,12 +88,12 @@ public class JRuleEventSubscriber implements EventSubscriber {
     }
 
     public void addItemItemName(String name) {
-        logger.debug("Adding subscripted item: {}", name);
+        JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Adding subscripted item: {}", name);
         jRuleMonitoredItems.add(name);
     }
 
     public void startSubscriber() {
-        logger.debug("starting subscriber");
+        JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "starting subscriber");
         JRuleEngine.get().getItemNames().forEach(this::addItemItemName);
         jRuleMonitoredChannels.addAll(JRuleEngine.get().getChannelNames());
         propertyChangeSupport.addPropertyChangeListener(JRuleEngine.get());
@@ -109,14 +112,14 @@ public class JRuleEventSubscriber implements EventSubscriber {
         if (event.getType().equals(ItemAddedEvent.TYPE) //
                 || event.getType().equals(ItemRemovedEvent.TYPE) //
                 || event.getType().equals(ItemUpdatedEvent.TYPE)) {
-            logger.debug("event processed as {}: topic {} payload: {}", PROPERTY_ITEM_REGISTRY_EVENT, event.getTopic(),
-                    event.getPayload());
+            JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "event processed as {}: topic {} payload: {}",
+                    PROPERTY_ITEM_REGISTRY_EVENT, event.getTopic(), event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_REGISTRY_EVENT, null, event);
             return;
         }
         if (jRuleMonitoredItems.contains(itemFromTopic)) {
-            logger.debug("event processed as {}: topic {} payload: {}", PROPERTY_ITEM_EVENT, event.getTopic(),
-                    event.getPayload());
+            JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
+                    PROPERTY_ITEM_EVENT, event.getTopic(), event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
         }
         if (event.getType().equals(ChannelTriggeredEvent.TYPE)) {
@@ -125,15 +128,15 @@ public class JRuleEventSubscriber implements EventSubscriber {
             String channel = channelTriggeredEvent.getChannel().toString();
 
             if (jRuleMonitoredChannels.contains(channel)) {
-                logger.debug("event processed as {}: topic {} payload: {}", PROPERTY_CHANNEL_EVENT, event.getTopic(),
-                        event.getPayload());
+                JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
+                        PROPERTY_CHANNEL_EVENT, event.getTopic(), event.getPayload());
                 propertyChangeSupport.firePropertyChange(PROPERTY_CHANNEL_EVENT, null, event);
             }
         }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        logger.debug("Adding listener for EventSubscriber");
+        JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Adding listener for EventSubscriber");
         propertyChangeSupport.addPropertyChangeListener(pcl);
     }
 

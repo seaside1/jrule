@@ -37,10 +37,10 @@ import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.JRuleConstants;
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.cron.JRuleCronExpression;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
-import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemType;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleEvent;
@@ -85,6 +85,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final String STATE_CHANGED = "/statechanged";
 
     private static final String ITEM_TYPE = "TYPE";
+    private static final String LOG_NAME_ENGINE = "JRuleEngine";
 
     private static volatile JRuleEngine instance;
 
@@ -135,20 +136,32 @@ public class JRuleEngine implements PropertyChangeListener {
         timers.clear();
     }
 
+    private void logDebug(String message, Object... parameters) {
+        JRuleLog.debug(logger, LOG_NAME_ENGINE, message, parameters);
+    }
+
+    private void logWarn(String message, Object... parameters) {
+        JRuleLog.warn(logger, LOG_NAME_ENGINE, message, parameters);
+    }
+
+    private void logError(String message, Object... parameters) {
+        JRuleLog.error(logger, LOG_NAME_ENGINE, message, parameters);
+    }
+
     public void add(JRule jRule) {
-        logger.debug("Adding rule: {}", jRule);
+        logDebug("Adding rule: {}", jRule);
         Class<?> clazz = jRule.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(JRuleName.class)) {
-                logger.debug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
+                logDebug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
                 continue;
             }
 
             if (method.getAnnotationsByType(JRuleWhen.class).length == 0) {
-                logger.warn("Rule ignored since JWhens annotation is missing");
-                logger.warn("Rule JWhen present: {}", method.isAnnotationPresent(JRuleWhen.class));
+                logWarn("Rule ignored since JWhens annotation is missing");
+                logWarn("Rule JWhen present: {}", method.isAnnotationPresent(JRuleWhen.class));
                 final JRuleWhen[] jRuleWhens = method.getAnnotationsByType(JRuleWhen.class);
-                logger.debug("Got jrule whens size: {}", jRuleWhens.length);
+                logDebug("Got jrule whens size: {}", jRuleWhens.length);
                 continue;
             }
             final JRuleName jRuleName = method.getDeclaredAnnotation(JRuleName.class);
@@ -157,40 +170,38 @@ public class JRuleEngine implements PropertyChangeListener {
                     : null;
 
             final JRuleWhen[] jRuleWhens = method.getAnnotationsByType(JRuleWhen.class);
-            logger.debug("Got jrule whens size: {}", jRuleWhens.length);
-            Parameter[] parameters = method.getParameters();
+            logDebug("Got jrule whens size: {}", jRuleWhens.length);
+            final Parameter[] parameters = method.getParameters();
             boolean jRuleEventPresent = Arrays.stream(parameters)
                     .anyMatch(param -> (param.getType().equals(JRuleEvent.class)));
 
-            if (jRuleLogName != null && !jRuleLogName.value().isEmpty()) {
-                jRule.setRuleLogName(jRuleName.value());
-            } else {
-                jRule.setRuleLogName(jRuleName.value());
-            }
+            String logName = (jRuleLogName != null && !jRuleLogName.value().isEmpty()) ? jRuleLogName.value()
+                    : jRuleName.value();
 
             // TODO: Do validation on syntax in when annotations
             // Loop for other ORs
             for (JRuleWhen jRuleWhen : jRuleWhens) {
-                logger.debug("- processing jRule when: {}", jRuleWhen);
+                JRuleLog.debug(logger, logName, "Processing jRule when: {}", jRuleWhen);
                 if (!jRuleWhen.item().isEmpty()) {
                     // JRuleWhen for an item
+                    // TODO: Fix underscore
                     final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
-                    logger.debug("Got item class: {}", itemClass);
-                    logger.info("Validating JRule: name: {} trigger: {} ", jRuleName.value(), jRuleWhen.trigger());
-                    addExecutionContext(jRule, itemClass, jRuleName.value(), jRuleWhen.trigger(), jRuleWhen.from(),
-                            jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
-                            getDoubleFromAnnotation(jRuleWhen.lt()), getDoubleFromAnnotation(jRuleWhen.lte()),
-                            getDoubleFromAnnotation(jRuleWhen.gt()), getDoubleFromAnnotation(jRuleWhen.gte()),
-                            getDoubleFromAnnotation(jRuleWhen.eq()));
+                    JRuleLog.debug(logger, logName, "Got item class: {}", itemClass);
+                    JRuleLog.info(logger, logName, "Validating JRule: {} trigger: {} ", jRuleName.value(),
+                            jRuleWhen.trigger());
+                    addExecutionContext(jRule, logName, itemClass, jRuleName.value(), jRuleWhen.trigger(),
+                            jRuleWhen.from(), jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method,
+                            jRuleEventPresent, getDoubleFromAnnotation(jRuleWhen.lt()),
+                            getDoubleFromAnnotation(jRuleWhen.lte()), getDoubleFromAnnotation(jRuleWhen.gt()),
+                            getDoubleFromAnnotation(jRuleWhen.gte()), getDoubleFromAnnotation(jRuleWhen.eq()));
                     itemNames.add(jRuleWhen.item());
-
                 } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1
                         || !jRuleWhen.cron().isEmpty()) {
                     // JRuleWhen for a time trigger
-                    addTimedExecution(jRule, jRuleName.value(), jRuleWhen, method, jRuleEventPresent);
+                    addTimedExecution(jRule, logName, jRuleName.value(), jRuleWhen, method, jRuleEventPresent);
                 } else if (!jRuleWhen.channel().isEmpty()) {
                     // JRuleWhen for a channel
-                    addChannelExecutionContext(jRule, jRuleWhen.channel(), jRuleName.value(), method,
+                    addChannelExecutionContext(jRule, logName, jRuleWhen.channel(), jRuleName.value(), method,
                             jRuleEventPresent);
                 }
             }
@@ -204,25 +215,25 @@ public class JRuleEngine implements PropertyChangeListener {
         return Double.valueOf(d);
     }
 
-    private CompletableFuture<Void> createTimer(String cronExpressionStr) {
+    private CompletableFuture<Void> createTimer(String logName, String cronExpressionStr) {
         try {
             final JRuleCronExpression cronExpression = new JRuleCronExpression(cronExpressionStr);
             final ZonedDateTime nextTimeAfter = cronExpression.nextTimeAfter(ZonedDateTime.now());
             Date futureTime = Date.from(nextTimeAfter.toInstant());
-            return createTimer(futureTime);
+            return createTimer(logName, futureTime);
         } catch (IllegalArgumentException x) {
-            logger.error("Failed to parse cron expression for cron: {} message: {}", cronExpressionStr, x.getMessage());
+            JRuleLog.error(logger, logName, "Failed to parse cron expression for cron: {} message: {}",
+                    cronExpressionStr, x.getMessage());
             return null;
         }
     }
 
-    private CompletableFuture<Void> createTimer(int hours, int minutes, int seconds) {
+    private CompletableFuture<Void> createTimer(String logName, int hours, int minutes, int seconds) {
         Calendar calFuture = Calendar.getInstance();
         Calendar now = Calendar.getInstance();
         calFuture.set(Calendar.HOUR_OF_DAY, hours == -1 ? 0 : hours);
         calFuture.set(Calendar.MINUTE, minutes == -1 ? 0 : minutes);
         calFuture.set(Calendar.SECOND, seconds == -1 ? 0 : seconds);
-        logger.debug("Hours: {} calHours: {}", hours, calFuture.get(Calendar.HOUR_OF_DAY));
         calFuture.set(Calendar.HOUR_OF_DAY, hours);
         if (calFuture.before(now)) {
             if (hours != -1) {
@@ -233,24 +244,25 @@ public class JRuleEngine implements PropertyChangeListener {
                 calFuture.add(Calendar.MINUTE, 1);
             }
         }
-        return createTimer(calFuture.getTime());
+        return createTimer(logName, calFuture.getTime());
     }
 
-    private CompletableFuture<Void> createTimer(Date date) {
+    private CompletableFuture<Void> createTimer(String logName, Date date) {
         long initialDelay = new Date(date.getTime() - System.currentTimeMillis()).getTime();
-        logger.debug("Schedule cron: {} initialDelay: {}", date, initialDelay);
+        JRuleLog.debug(logger, logName, "Schedule cron: {} initialDelay: {}", date, initialDelay);
         Executor delayedExecutor = CompletableFuture.delayedExecutor(initialDelay, TimeUnit.MILLISECONDS, scheduler);
         return CompletableFuture.supplyAsync(() -> null, delayedExecutor);
     }
 
-    private synchronized void addTimedExecution(JRule jRule, String jRuleName, JRuleWhen jRuleWhen, Method method,
-            boolean jRuleEventPresent) {
-        CompletableFuture<Void> future = (!jRuleWhen.cron().isEmpty()) ? createTimer(jRuleWhen.cron())
-                : createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
+    private synchronized void addTimedExecution(JRule jRule, String logName, String jRuleName, JRuleWhen jRuleWhen,
+            Method method, boolean jRuleEventPresent) {
+        CompletableFuture<Void> future = (!jRuleWhen.cron().isEmpty()) ? createTimer(logName, jRuleWhen.cron())
+                : createTimer(logName, jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
         timers.add(future);
-        logger.info("Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}", jRule,
+        JRuleLog.info(logger, logName, "Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}",
                 jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
-        JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, method, jRuleName, jRuleEventPresent);
+        JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, logName, method, jRuleName,
+                jRuleEventPresent);
         Consumer<Void> consumer = t -> {
             try {
                 invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
@@ -259,47 +271,30 @@ public class JRuleEngine implements PropertyChangeListener {
             }
         };
         future.thenAccept(consumer).thenAccept(s -> {
-            logger.info("Timer has finished rule: {}", jRuleName);
-            // createTimer(jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
-            addTimedExecution(jRule, jRuleName, jRuleWhen, method, jRuleEventPresent);
+            JRuleLog.info(logger, logName, "Timer has finished");
+            addTimedExecution(jRule, logName, jRuleName, jRuleWhen, method, jRuleEventPresent);
         });
     }
 
-    private void addExecutionContext(JRule jRule, String itemClass, String ruleName, String trigger, String from,
-            String to, String update, String itemName, Method method, boolean eventParameterPresent, Double lt,
-            Double lte, Double gt, Double gte, Double eq) {
+    private void addExecutionContext(JRule jRule, String logName, String itemClass, String ruleName, String trigger,
+            String from, String to, String update, String itemName, Method method, boolean eventParameterPresent,
+            Double lt, Double lte, Double gt, Double gte, Double eq) {
         List<JRuleExecutionContext> contextList = itemToExecutionContexts.computeIfAbsent(itemName,
                 k -> new ArrayList<>());
-        final JRuleExecutionContext context = new JRuleExecutionContext(jRule, trigger, from, to, update, ruleName,
-                itemClass, itemName, method, eventParameterPresent, lt, lte, gt, gte, eq);
-        logger.debug("ItemContextList add context: {}", context);
+        final JRuleExecutionContext context = new JRuleExecutionContext(jRule, logName, trigger, from, to, update,
+                ruleName, itemClass, itemName, method, eventParameterPresent, lt, lte, gt, gte, eq);
+        JRuleLog.debug(logger, logName, "ItemContextList add context: {}", context);
         contextList.add(context);
     }
 
-    private void addChannelExecutionContext(JRule jRule, String channel, String ruleName, Method method,
+    private void addChannelExecutionContext(JRule jRule, String logName, String channel, String ruleName, Method method,
             boolean eventParameterPresent) {
         List<JRuleExecutionContext> contextList = channelToExecutionContexts.computeIfAbsent(channel,
                 k -> new ArrayList<>());
-        final JRuleExecutionContext context = new JRuleExecutionContext(jRule, null, null, null, null, ruleName, null,
-                null, method, eventParameterPresent, null, null, null, null, null);
-        logger.debug("ChannelContextList add context: {}", context);
+        final JRuleExecutionContext context = new JRuleExecutionContext(jRule, logName, null, null, null, null,
+                ruleName, null, null, method, eventParameterPresent, null, null, null, null, null);
+        JRuleLog.debug(logger, logName, "ChannelContextList add context: {}", context);
         contextList.add(context);
-    }
-
-    private String getTypeOfEventFromTrigger(String trigger) {
-        if (trigger.startsWith(JRuleItem.TRIGGER_CHANGED)) {
-            return STATE_CHANGED;
-        }
-
-        if (trigger.startsWith(JRuleItem.TRIGGER_RECEIVED_UPDATE)) {
-            return STATE;
-        }
-
-        if (trigger.startsWith(JRuleItem.TRIGGER_RECEIVED_COMMAND)) {
-            return COMMAND;
-        }
-        logger.error("Failed to return type of event for trigger: {}", trigger);
-        return "";
     }
 
     private boolean validateRule(String ruleName, String item, JRuleTrigger trigger) {
@@ -307,7 +302,7 @@ public class JRuleEngine implements PropertyChangeListener {
         try {
             cls = Class.forName(item);
         } catch (ClassNotFoundException e) {
-            logger.warn("Failed to validate rule: {}, could not find class for item: {}", ruleName, item);
+            JRuleLog.warn(logger, ruleName, "Failed to validate could not find class for item: {}", item);
             return false;
         }
         JRuleItemType type = null;
@@ -315,16 +310,16 @@ public class JRuleEngine implements PropertyChangeListener {
             final Field declaredField = cls.getDeclaredField(ITEM_TYPE);
             type = (JRuleItemType) (declaredField.get(null));
         } catch (NoSuchFieldException e) {
-            logger.warn("Failed to validate, missing Item type Field ruleName: {}, item: {}", ruleName, item);
+            JRuleLog.warn(logger, ruleName, "Failed to validate, missing Item type: {}", item);
             return false;
         } catch (SecurityException e) {
-            logger.warn("Failed to validate, security exception ruleName: {}, item: {}", ruleName, item, e);
+            JRuleLog.warn(logger, ruleName, "Failed to validate, security exception item: {}", item, e);
             return false;
         } catch (IllegalArgumentException e) {
-            logger.warn("Failed to validate ruleName: {}, item: {}", ruleName, item, e);
+            JRuleLog.warn(logger, ruleName, "Failed to validate item: {}", item, e);
             return false;
         } catch (IllegalAccessException e) {
-            logger.warn("Failed to validate, exception ruleName: {}, item: {}", ruleName, item, e);
+            JRuleLog.warn(logger, ruleName, "Failed to validate, exception for item: {}", item, e);
             return false;
         }
 
@@ -334,11 +329,11 @@ public class JRuleEngine implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_ITEM_EVENT)) {
-            logger.debug("Property change item event! : {}", ((Event) evt.getNewValue()).getTopic());
+            logDebug("Property change item event! : {}", ((Event) evt.getNewValue()).getTopic());
             handleEventUpdate((Event) evt.getNewValue());
 
         } else if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_CHANNEL_EVENT)) {
-            logger.debug("Channel event! : {}", ((Event) evt.getNewValue()).getTopic());
+            logDebug("Channel event! : {}", ((Event) evt.getNewValue()).getTopic());
             handleChannelEvent((ChannelTriggeredEvent) evt.getNewValue());
         }
     }
@@ -347,7 +342,7 @@ public class JRuleEngine implements PropertyChangeListener {
         List<JRuleExecutionContext> executionContexts = channelToExecutionContexts
                 .get(channelEvent.getChannel().toString());
         if (executionContexts == null || executionContexts.isEmpty()) {
-            logger.debug("No execution context for channelEvent: {}", channelEvent);
+            logDebug("No execution context for channelEvent: {}", channelEvent);
             return;
         }
         executionContexts
@@ -358,7 +353,7 @@ public class JRuleEngine implements PropertyChangeListener {
         final String itemName = getItemNameFromEvent(event);
         final List<JRuleExecutionContext> executionContexts = itemToExecutionContexts.get(itemName);
         if (executionContexts == null || executionContexts.isEmpty()) {
-            logger.debug("No execution context for changeEvent ");
+            logDebug("No execution context for changeEvent ");
             return;
         }
         final String type = ((ItemEvent) event).getType();
@@ -390,15 +385,15 @@ public class JRuleEngine implements PropertyChangeListener {
                 triggerValues.add(CHANGED);
             }
 
-            logger.debug("newValue: {} oldValue: {} type: {}", newValue, oldValue, type);
-            logger.debug("Invoked execution contexts: {}", executionContexts.size());
-            logger.debug("Execution topic Topic: {}", event.getTopic());
-            logger.debug("Execution topic Payload: {}", event.getPayload());
-            logger.debug("Execution topic Source: {}", event.getSource());
-            logger.debug("Execution topic Type: {}", event.getType());
-            logger.debug("Execution eventToString: {}", event);
+            logDebug("newValue: {} oldValue: {} type: {}", newValue, oldValue, type);
+            logDebug("Invoked execution contexts: {}", executionContexts.size());
+            logDebug("Execution topic Topic: {}", event.getTopic());
+            logDebug("Execution topic Payload: {}", event.getPayload());
+            logDebug("Execution topic Source: {}", event.getSource());
+            logDebug("Execution topic Type: {}", event.getType());
+            logDebug("Execution eventToString: {}", event);
         } else {
-            logger.debug("Unhandled case: {}", event.getClass());
+            logDebug("Unhandled case: {}", event.getClass());
             return;
         }
 
@@ -407,12 +402,12 @@ public class JRuleEngine implements PropertyChangeListener {
             executionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
                     .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(stringValue, member)));
         } else {
-            logger.debug("Execution ignored, no trigger values for itemName: {} eventType: {}", itemName, type);
+            logDebug("Execution ignored, no trigger values for itemName: {} eventType: {}", itemName, type);
         }
     }
 
     private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
-        logger.debug("invoke when context matches");
+        JRuleLog.debug(logger, context.getLogName(), "invoke when context matches");
         if (context.isNumericOperation()) {
             Double value = getValueAsDouble(jRuleEvent.getValue());
             if (context.getGt() != null) {
@@ -450,7 +445,7 @@ public class JRuleEngine implements PropertyChangeListener {
         try {
             parseDouble = Double.parseDouble(value);
         } catch (Exception x) {
-            logger.error("Failed to parse value: {} as double", value, x);
+            logError("Failed to parse value: {} as double", value, x);
             return null;
         }
         return parseDouble;
@@ -464,15 +459,15 @@ public class JRuleEngine implements PropertyChangeListener {
         return null;
     }
 
-    private void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
-        logger.debug("Invoking rule for context: {}", context);
+    private synchronized void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
+        JRuleLog.debug(logger, context.getLogName(), "Invoking rule for context: {}", context);
         final JRule rule = context.getJrule();
         final Method method = context.getMethod();
-        logger.debug("Invoking context: {}", context);
+        rule.setRuleLogName(context.getLogName());
         try {
             final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-            logger.error("Error", e);
+            JRuleLog.error(logger, context.getRuleName(), "Error", e);
         }
     }
 }
