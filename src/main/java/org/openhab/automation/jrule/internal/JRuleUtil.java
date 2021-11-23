@@ -28,10 +28,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -67,7 +64,6 @@ public class JRuleUtil {
     private static final String ITEMS_START = "items/";
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleUtil.class);
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
 
     protected static final String ERROR_RESOURCE = "Can't find resource: {}";
     protected static final String DEBUG_RESOURCE = "Resources: {}";
@@ -318,9 +314,5 @@ public class JRuleUtil {
             end = topic.length();
         }
         return end > 0 && end > start ? topic.substring(start, end) : JRuleConstants.EMPTY;
-    }
-
-    public static String getDateStr(long lastModified) {
-        return formatter.format(Date.from(Instant.ofEpochMilli(lastModified)));
     }
 }

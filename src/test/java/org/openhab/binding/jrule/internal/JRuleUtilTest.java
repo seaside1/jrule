@@ -46,10 +46,4 @@ public class JRuleUtilTest {
         assertEquals("gSensorPowerSum", itemTopicGroup);
         assertEquals("ZwaveEye3Motion", itemTopic);
     }
-
-    @Test
-    public void testParseVersion() {
-        JRuleUtil.getDateStr(1637663018263L);
-        assertEquals("202111231123", JRuleUtil.getDateStr(1637663018263L));
-    }
 }

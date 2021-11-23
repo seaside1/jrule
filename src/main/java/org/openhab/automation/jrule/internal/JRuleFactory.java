@@ -84,14 +84,14 @@ public class JRuleFactory {
     private synchronized CompletableFuture<Void> createDelayedInitialization(int delayInSeconds) {
         initFuture = JRuleUtil.delayedExecution(delayInSeconds, TimeUnit.SECONDS);
         return initFuture.thenAccept(s -> {
-            JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getLastModifiedBundle());
+            JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
             jRuleHandler.initialize();
             initFuture = null;
         });
     }
 
-    private String getLastModifiedBundle() {
-        return JRuleUtil.getDateStr(FrameworkUtil.getBundle(JRuleHandler.class).getLastModified());
+    private String getBundleVersion() {
+        return FrameworkUtil.getBundle(JRuleHandler.class).getVersion().toString();
     }
 
     @Deactivate
