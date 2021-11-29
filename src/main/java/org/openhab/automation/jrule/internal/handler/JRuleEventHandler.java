@@ -395,8 +395,12 @@ public class JRuleEventHandler {
         if (state == null) {
             return null;
         }
-        DecimalType decimalType = state.as(DecimalType.class);
-        return decimalType != null ? decimalType.doubleValue() : null;
+        if (state instanceof PercentType) {
+            return ((PercentType) state).doubleValue();
+        } else {
+            DecimalType decimalType = state.as(DecimalType.class);
+            return decimalType != null ? decimalType.doubleValue() : null;
+        }
     }
 
     public String getStringValue(String itemName) {
@@ -415,8 +419,12 @@ public class JRuleEventHandler {
         if (state == null) {
             return null;
         }
-        DecimalType decimalType = state.as(DecimalType.class);
-        return decimalType != null ? decimalType.intValue() : null;
+        if (state instanceof PercentType) {
+            return ((PercentType) state).intValue();
+        } else {
+            DecimalType decimalType = state.as(DecimalType.class);
+            return decimalType != null ? decimalType.intValue() : null;
+        }
     }
 
     public Date getStateFromItemAsDate(String itemName) {
