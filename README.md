@@ -32,7 +32,7 @@ Alpha, you can expect big changes in syntax and everything else. Please contribu
 
 # Download
 
-Prebuilt jar file is available in the bin folder under https://github.com/seaside1/jrule
+Prebuilt jar file is available in the bin folder under https://github.com/seaside1/jrule/releases
 
 # Java Rule Engine
 
@@ -54,7 +54,7 @@ The following jar files can be found under the jrule/jar-folder:
 # Get started with the JRule Automation Addon
 
 - Install the addon by copying the org.openhab.automation.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
-  Download the latest release from https://github.com/seaside1/jrule/tree/main/bin
+  Download the latest release from https://github.com/seaside1/jrule/releases
 - In default location is /etc/openhab/automation/jrule
 - When the addon is started it will:
 1. Create JAVA source files for all items 
@@ -540,4 +540,4 @@ Use case: Override logging for all rules defined in one file
 
 ## Resources
 
-[https://github.com/seaside1/jrule/raw/main/bin/org.openhab.automation.jrule-3.x.x-BETA3.jar ](https://github.com/seaside1/jrule/raw/main/bin/org.openhab.automation.jrule-3.x.x-BETA3.jar)
+[https://github.com/seaside1/jrule/releases/download/3.x.x-BETA4/org.openhab.automation.jrule-3.x.x-BETA4.jar](https://github.com/seaside1/jrule/releases/download/3.x.x-BETA4/org.openhab.automation.jrule-3.x.x-BETA4.jar)
