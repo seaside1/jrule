@@ -28,7 +28,7 @@ This addon is not for beginners, you should have knowledge in writing java-progr
 
 # Maturity
 
-Alpha, you can expect big changes in syntax and everything else. Please contribute if you can
+Beta, still major changes.
 
 # Download
 
@@ -120,6 +120,14 @@ Logging from rule can be done in 3 different ways
 1. Not specifying anything will result in the usage of JRuleName as perfix when calling JRule.logInfo/Debug/Error etc see example 20
 2. Overriding method JRule.getRuleLogName will result in the same log prefix for all rules defined in that file in see example 21
 3. Specifically add rependency on log4j and define your own logger to do logging
+
+# Configuration
+JRule has some optional configuration. Place config file under: /etc/openhab/automation/jrule/jrule.conf
+Example of config file.
+```
+#Prefix to be used when generating items, files
+org.openhab.automation.jrule.itemprefix=_
+```
 
 # Examples 
 
@@ -478,6 +486,8 @@ Use case: Override logging for all rules defined in one file
 
 
 # Changelog
+## BETA4
+- Added config for character to be used when generating items files
 ## BETA3
 - Major refactoring of logging
 ## BETA2
