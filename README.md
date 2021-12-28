@@ -1,4 +1,4 @@
-Write OpenHAB Rules using Java
+# OpenHAB Rules using Java
 
 This automation package aims to enable Java development of OpenHAB Rules. The addon will allow the user to create custom OpenHAB rules
 in one or several .java-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers
