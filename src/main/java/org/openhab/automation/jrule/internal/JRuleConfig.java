@@ -13,7 +13,10 @@
 package org.openhab.automation.jrule.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -55,11 +58,26 @@ public class JRuleConfig {
 
     private static final String EXT_LIB_DIR = "ext-lib";
     private static final String LOG_NAME_CONF = "JRuleConf";
+    private static final String JRULE_CONFIG_NAME = "jrule.conf";
 
     private final Map<String, Object> properties;
 
+    private final Properties jRuleProperties;
+
     public JRuleConfig(Map<String, Object> properties) {
         this.properties = properties;
+        jRuleProperties = new Properties();
+    }
+
+    public void initConfig() {
+        final String workingDirectory = getWorkingDirectory();
+        final String configFileName = workingDirectory.concat(File.separator).concat(JRULE_CONFIG_NAME);
+        try {
+            jRuleProperties.load(new FileInputStream(new File(configFileName)));
+        } catch (IOException e) {
+            logger.debug("Failed to load properties {}", configFileName);
+        }
+        properties.forEach((k, v) -> jRuleProperties.put(k, v));
     }
 
     public String getWorkingDirectory() {
@@ -90,6 +108,11 @@ public class JRuleConfig {
         return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(RULES_DIR).toString();
     }
 
+    public String getConfigFile() {
+        return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(JRULE_CONFIG_NAME)
+                .toString();
+    }
+
     public String getItemsRootDirectory() {
         return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(ITEMS_DIR_START)
                 .toString();
@@ -105,7 +128,7 @@ public class JRuleConfig {
     }
 
     private String getConfigPropertyOrDefaultValue(String property, String defaultValue) {
-        final String propertyValue = (String) properties.get(property);
+        final String propertyValue = (String) jRuleProperties.get(property);
         return propertyValue == null ? defaultValue : propertyValue;
     }
 

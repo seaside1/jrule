@@ -1,0 +1,2 @@
+# Prefix to be used when generating items, files
+#org.openhab.automation.jrule.itemprefix=_

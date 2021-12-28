@@ -104,6 +104,7 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
         config = new JRuleConfig(properties);
+
         logDebug("New instance: {}", properties);
     }
 
@@ -164,6 +165,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public synchronized final void initialize() {
         logInfo("Start Initializing JRule Automation");
+        config.initConfig();
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
         logDebug("SettingConfig name: {} config: {}", config.getClass(), config.toString());
@@ -183,6 +185,7 @@ public class JRuleHandler implements PropertyChangeListener {
         if (!initializeFolder(config.getRulesDirectory())) {
             return;
         }
+
         logInfo("Initializing JRule writing external Jars: {}", config.getJarDirectory());
         writeAndExtractJruleJar();
         handleItemSources();
