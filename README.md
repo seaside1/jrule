@@ -553,4 +553,4 @@ Use case: Override logging for all rules defined in one file
 
 ## Resources
 
-[https://github.com/seaside1/jrule/releases/download/3.x.x-BETA4/org.openhab.automation.jrule-3.x.x-BETA4.jar](https://github.com/seaside1/jrule/releases/download/3.x.x-BETA4/org.openhab.automation.jrule-3.x.x-BETA4.jar)
+[https://github.com/seaside1/jrule/releases/download/3.x.x-BETA5/org.openhab.automation.jrule-3.x.x-BETA5.jar](https://github.com/seaside1/jrule/releases/download/3.x.x-BETA5/org.openhab.automation.jrule-3.x.x-BETA5.jar)
