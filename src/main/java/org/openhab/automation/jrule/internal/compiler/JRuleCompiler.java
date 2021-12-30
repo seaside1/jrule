@@ -14,14 +14,18 @@ package org.openhab.automation.jrule.internal.compiler;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import javax.tools.Diagnostic;
@@ -31,6 +35,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -50,6 +55,7 @@ public class JRuleCompiler {
     public static final String JAR_JRULE_NAME = "jrule.jar";
     public static final String JAR_JRULE_ITEMS_NAME = "jrule-items.jar";
     private static final String LOG_NAME_COMPILER = "JRuleCompiler";
+    private static final String FRONT_SLASH = "/";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleCompiler.class);
 
@@ -59,42 +65,98 @@ public class JRuleCompiler {
         this.jRuleConfig = jRuleConfig;
     }
 
-    public void loadClasses(ClassLoader classLoader, File classFolder, String classPackage, boolean createInstance) {
+    public void loadJarClasses(ClassLoader classLoader, File sourceFolder, String classPackage,
+            boolean createInstance) {
         try {
-            final File[] classItems = classFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
+            final File[] jarItems = sourceFolder.listFiles(JRuleFileNameFilter.JAR_FILTER);
+            if (jarItems == null || jarItems.length == 0) {
+                logInfo("Found no user defined java rules to load into memory in folder: {}",
+                        sourceFolder.getAbsolutePath());
+                return;
+            } else {
+                logInfo("Found java rules to load into memory in folder: {}", sourceFolder.getAbsolutePath());
+            }
+
+            Arrays.stream(jarItems).forEach(jarItem -> logDebug("Attempting to load jar: {}", jarItem));
+            Arrays.stream(jarItems).forEach(jarItem -> {
+                logDebug("Loading instance for jar: {}", jarItem.getName());
+                JarFile jarFile = null;
+                try {
+                    jarFile = new JarFile(jarItem);
+                    final Enumeration<JarEntry> jarEntries = jarFile.entries();
+                    while (jarEntries.hasMoreElements()) {
+                        JarEntry je = jarEntries.nextElement();
+                        final @NonNull String jarEntryName = je.getName() == null ? "" : je.getName();
+                        final int lastIndexOfFronSlash = jarEntryName.lastIndexOf(FRONT_SLASH) + 1;
+                        if (jarEntryName.length() < 1 || je.isDirectory()
+                                || !jarEntryName.endsWith(JRuleConstants.CLASS_FILE_TYPE)
+                                || lastIndexOfFronSlash == -1) {
+                            continue;
+                        }
+
+                        logger.debug("Attempting to load: {}", je.getName());
+                        loadClass(je.getName().substring(je.getName().lastIndexOf(FRONT_SLASH) + 1), classLoader,
+                                classPackage, createInstance);
+                    }
+                } catch (IllegalArgumentException | SecurityException | IOException e) {
+                    logError("Could not load class", e);
+                } finally {
+                    if (jarFile != null) {
+                        try {
+                            jarFile.close();
+                        } catch (Exception x) {
+                            // Best effort
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            logError("error instance", e);
+        }
+    }
+
+    public void loadClass(String className, ClassLoader classLoader, String classPackage, boolean createInstance) {
+        Class<?> loadedClass = null;
+        try {
+            loadedClass = classLoader
+                    .loadClass(classPackage + JRuleUtil.removeExtension(className, JRuleConstants.CLASS_FILE_TYPE));
+        } catch (ClassNotFoundException e) {
+            logDebug("Failed to load class: {} loadingClass: {}", className, e,
+                    classPackage + JRuleUtil.removeExtension(className, JRuleConstants.CLASS_FILE_TYPE));
+            return;
+        }
+
+        logDebug("Loaded class with classLoader: {}", className);
+        if (createInstance) {
+            if (Modifier.isAbstract(loadedClass.getModifiers())) {
+                logDebug("Not creating and instance of abstract class: {}", className);
+            } else {
+                try {
+                    final Object obj = loadedClass.getDeclaredConstructor().newInstance();
+                    logDebug("Created instance: {} obj: {}", className, obj);
+                } catch (Exception x) {
+                    logDebug("Could not create create instance using default constructor: {}", className);
+                }
+            }
+        }
+    }
+
+    public void loadPlainClasses(ClassLoader classLoader, File sourceFolder, String classPackage,
+            boolean createInstance) {
+        try {
+            final File[] classItems = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
             if (classItems == null || classItems.length == 0) {
                 logInfo("Found no user defined java rules to load into memory in folder: {}",
-                        classFolder.getAbsolutePath());
+                        sourceFolder.getAbsolutePath());
                 return;
             }
             logInfo("Number of Java Rules classes to load in to memory: {} folder: {}", classItems.length,
-                    classFolder.getAbsolutePath());
-            Arrays.stream(classItems).forEach(classItem -> logDebug("Attempting to load class: {}", classItem));
+                    sourceFolder.getAbsolutePath());
 
+            Arrays.stream(classItems).forEach(classItem -> logDebug("Attempting to load class: {}", classItem));
             Arrays.stream(classItems).forEach(classItem -> {
                 logDebug("Loading instance for class: {}", classItem.getName());
-
-                try {
-                    Class<?> loadedClass = classLoader.loadClass(classPackage
-                            + JRuleUtil.removeExtension(classItem.getName(), JRuleConstants.CLASS_FILE_TYPE));
-                    logDebug("Loaded class with classLoader: {}", classItem.getName());
-
-                    if (createInstance) {
-                        if (Modifier.isAbstract(loadedClass.getModifiers())) {
-                            logDebug("Not creating and instance of abstract class: {}", classItem.getName());
-                        } else {
-                            try {
-                                final Object obj = loadedClass.getDeclaredConstructor().newInstance();
-                                logDebug("Created instance: {} obj: {}", classItem.getName(), obj);
-                            } catch (Exception x) {
-                                logDebug("Could not create create instance using default constructor: {}",
-                                        classItem.getName());
-                            }
-                        }
-                    }
-                } catch (ClassNotFoundException | IllegalArgumentException | SecurityException e) {
-                    logError("Could not load class", e);
-                }
+                loadClass(classItem.getName(), classLoader, classPackage, createInstance);
             });
         } catch (Exception e) {
             logError("error instance", e);
@@ -187,10 +249,20 @@ public class JRuleCompiler {
 
     public List<URL> getExtLibsAsUrls() {
         try {
-            File[] extLibsFiles = getExtLibsAsFiles();
+            final File[] extLibsFiles = getExtLibsAsFiles();
             return Arrays.stream(extLibsFiles).map(this::getUrl).collect(Collectors.toList());
         } catch (Exception x) {
             logError("Failed to get extLib urls");
+            return new ArrayList<>();
+        }
+    }
+
+    public List<URL> getJarRulesAsUrls() {
+        try {
+            final File[] jarRulesFiles = getJarRulesAsFiles();
+            return Arrays.stream(jarRulesFiles).map(this::getUrl).collect(Collectors.toList());
+        } catch (Exception x) {
+            logError("Failed to get jar-rules urls");
             return new ArrayList<>();
         }
     }
@@ -206,6 +278,10 @@ public class JRuleCompiler {
 
     public File[] getExtLibsAsFiles() {
         return new File(jRuleConfig.getExtlibDirectory()).listFiles(JRuleFileNameFilter.JAR_FILTER);
+    }
+
+    public File[] getJarRulesAsFiles() {
+        return new File(jRuleConfig.getJarRulesDirectory()).listFiles(JRuleFileNameFilter.JAR_FILTER);
     }
 
     private String getExtLibPaths() {

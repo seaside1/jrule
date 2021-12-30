@@ -51,12 +51,15 @@ public class JRuleConfig {
     public static final String RULES_DIR = RULES_DIR_START + File.separator + "org" + File.separator + "openhab"
             + File.separator + "automation" + File.separator + "jrule" + File.separator + "rules" + File.separator
             + "user" + File.separator;
+
     private static final String DEFAULT_WORKING_DIR = "/etc/openhab/automation/jrule";
     private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
 
     private static final String CLASS_DIR = "class";
 
     private static final String EXT_LIB_DIR = "ext-lib";
+    public static final String JAR_RULES_DIR = "rules-jar";
+
     private static final String LOG_NAME_CONF = "JRuleConf";
     private static final String JRULE_CONFIG_NAME = "jrule.conf";
 
@@ -125,6 +128,11 @@ public class JRuleConfig {
 
     public String getExtlibDirectory() {
         return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(EXT_LIB_DIR).toString();
+    }
+
+    public String getJarRulesDirectory() {
+        return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(JAR_RULES_DIR)
+                .toString();
     }
 
     private String getConfigPropertyOrDefaultValue(String property, String defaultValue) {

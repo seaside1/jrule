@@ -132,6 +132,7 @@ public class JRuleHandler implements PropertyChangeListener {
         }
         final List<URL> urlList = new ArrayList<>();
         final List<URL> extLibPath = compiler.getExtLibsAsUrls();
+        final List<URL> jarRulesPath = compiler.getJarRulesAsUrls();
         try {
             urlList.add(new File(config.getItemsRootDirectory()).toURI().toURL());
             urlList.add(new File(config.getRulesRootDirectory()).toURI().toURL());
@@ -139,8 +140,11 @@ public class JRuleHandler implements PropertyChangeListener {
             logError("Failed to build class path for creating rule instance");
         }
         urlList.addAll(extLibPath);
+        urlList.addAll(jarRulesPath);
+
         final ClassLoader loader = new URLClassLoader(urlList.toArray(URL[]::new), JRuleUtil.class.getClassLoader());
-        compiler.loadClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
+        compiler.loadPlainClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
+        compiler.loadJarClasses(loader, new File(config.getJarRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
     }
 
     private void compileUserRules() {
@@ -174,6 +178,9 @@ public class JRuleHandler implements PropertyChangeListener {
             return;
         }
         if (!initializeFolder(config.getExtlibDirectory())) {
+            return;
+        }
+        if (!initializeFolder(config.getJarRulesDirectory())) {
             return;
         }
         if (!initializeFolder(config.getJarDirectory())) {
@@ -213,8 +220,13 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     private void startDirectoryWatcher() {
-        final Path path = new File(config.getWorkingDirectory() + File.separator + JRuleConfig.RULES_DIR).toPath();
-        directoryWatcher = new JRuleRulesWatcher(path);
+        List<Path> paths = new ArrayList<>();
+        final Path pathRules = new File(config.getWorkingDirectory() + File.separator + JRuleConfig.RULES_DIR).toPath();
+        final Path pathJarRules = new File(config.getWorkingDirectory() + File.separator + JRuleConfig.JAR_RULES_DIR)
+                .toPath();
+        paths.add(pathRules);
+        paths.add(pathJarRules);
+        directoryWatcher = new JRuleRulesWatcher(paths);
         directoryWatcher.addPropertyChangeListener(this);
         rulesDirWatcherThread = new Thread(directoryWatcher);
         rulesDirWatcherThread.start();
