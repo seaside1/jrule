@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -25,6 +26,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.List;
 
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -40,8 +42,8 @@ public class JRuleRulesWatcher implements Runnable {
 
     private static final String BASIC_IS_DIRECTORY = "basic:isDirectory";
 
-    private final Path watchFolder;
-
+    private List<Path> watchFolders;
+    private WatchService watchService = null;
     private final Logger logger = LoggerFactory.getLogger(JRuleRulesWatcher.class);
 
     public static final String PROPERTY_ENTRY_CREATE = "ENTRY_CREATE";
@@ -52,9 +54,14 @@ public class JRuleRulesWatcher implements Runnable {
 
     private final PropertyChangeSupport propertyChangeSupport;
 
-    public JRuleRulesWatcher(Path watchFolder) {
+    public JRuleRulesWatcher(List<Path> watchFolders) {
         propertyChangeSupport = new PropertyChangeSupport(this);
-        this.watchFolder = watchFolder;
+        this.watchFolders = watchFolders;
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+        } catch (IOException e) {
+            logger.error("Failed to watch directory", e);
+        }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
@@ -67,8 +74,7 @@ public class JRuleRulesWatcher implements Runnable {
         propertyChangeSupport.removePropertyChangeListener(pcl);
     }
 
-    @Override
-    public void run() {
+    private void registerListnerForFolder(Path watchFolder) throws IOException {
         try {
             Boolean isFolder = (Boolean) Files.getAttribute(watchFolder, BASIC_IS_DIRECTORY);
             if (!isFolder) {
@@ -81,15 +87,27 @@ public class JRuleRulesWatcher implements Runnable {
             return;
         }
         logDebug("Watching for rule changes: {}", watchFolder);
-        FileSystem fs = watchFolder.getFileSystem();
-        try {
-            WatchService service = fs.newWatchService();
-            watchFolder.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
-                    StandardWatchEventKinds.ENTRY_MODIFY);
+        if (watchService == null) {
+            final FileSystem fs = watchFolder.getFileSystem();
+            watchService = fs.newWatchService();
+        }
+        watchFolder.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
+                StandardWatchEventKinds.ENTRY_MODIFY);
+    }
 
+    @Override
+    public void run() {
+        try {
+            watchFolders.stream().forEach(folder -> {
+                try {
+                    registerListnerForFolder(folder);
+                } catch (IOException e) {
+                    logger.error("Failed to setup listener for folder: {}", folder);
+                }
+            });
             WatchKey key = null;
             while (true) {
-                key = service.take();
+                key = watchService.take();
                 Kind<?> kind = null;
                 for (WatchEvent<?> watchEvent : key.pollEvents()) {
                     kind = watchEvent.kind();
@@ -98,7 +116,8 @@ public class JRuleRulesWatcher implements Runnable {
                         continue;
                     }
                     Path newPath = ((WatchEvent<Path>) watchEvent).context();
-                    if (!newPath.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)) {
+                    if (!(newPath.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)
+                            || newPath.getFileName().toString().endsWith(JRuleConstants.JAR_FILE_TYPE))) {
                         continue;
                     }
                     if (ENTRY_CREATE == kind) {
