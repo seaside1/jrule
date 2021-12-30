@@ -40,6 +40,9 @@ Input rules files
 will be placed under:
 /etc/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
 
+It is also possible to add rules as pre-compiled jar files under:
+/etc/automation/jrule/rules-jar/
+
 Output jar files to be added by the user as dependencies when doing rule development will be located under:
 /etc/openhab/automation/jrule/jar
 
@@ -483,9 +486,9 @@ Use case: Override logging for all rules defined in one file
 }
 ```
 
-
-
 # Changelog
+## BETA5
+- Addes support for adding rules in jar-files, as an alternative.
 ## BETA4
 - Added config for character to be used when generating items files
 ## BETA3
