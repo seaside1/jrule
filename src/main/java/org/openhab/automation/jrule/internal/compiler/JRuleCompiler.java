@@ -170,6 +170,11 @@ public class JRuleCompiler {
     public void compile(List<File> javaSourceFiles, String classPath) {
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            logError(
+                    "Failed to get compiler, are you sure you are using a JDK? ToolProvider.getSystemJavaCompiler() returned null");
+            return;
+        }
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
         optionList.add(CLASSPATH_OPTION);
