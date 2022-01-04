@@ -16,6 +16,8 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 import org.openhab.core.library.types.QuantityType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleEvent}
@@ -23,6 +25,8 @@ import org.openhab.core.library.types.QuantityType;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleEvent {
+
+    private static final Logger logger = LoggerFactory.getLogger(JRuleEvent.class);
 
     private final String value;
 
@@ -54,11 +58,21 @@ public class JRuleEvent {
     }
 
     public Double getValueAsDouble() {
-        return QuantityType.valueOf(value).doubleValue();
+        try {
+           return QuantityType.valueOf(value).doubleValue();
+        } catch (Exception e) {
+           logger.warn("Error converting {} to double: {}",value,e.getMessage());
+            return null;
+        }
     }
 
     public Integer getValueAsInteger() {
-        return QuantityType.valueOf(value).intValue();
+        try {
+            return QuantityType.valueOf(value).intValue();
+        } catch (Exception e) {
+            logger.warn("Error converting {} to int: {}",value,e.getMessage());
+            return null;
+        }
     }
 
     public String getMemberName() {
