@@ -59,9 +59,9 @@ public class JRuleEvent {
 
     public Double getValueAsDouble() {
         try {
-           return QuantityType.valueOf(value).doubleValue();
+            return QuantityType.valueOf(value).doubleValue();
         } catch (Exception e) {
-           logger.warn("Error converting {} to double: {}",value,e.getMessage());
+            logger.warn("Error converting {} to double: {}", value, e.getMessage());
             return null;
         }
     }
@@ -70,7 +70,7 @@ public class JRuleEvent {
         try {
             return QuantityType.valueOf(value).intValue();
         } catch (Exception e) {
-            logger.warn("Error converting {} to int: {}",value,e.getMessage());
+            logger.warn("Error converting {} to int: {}", value, e.getMessage());
             return null;
         }
     }
