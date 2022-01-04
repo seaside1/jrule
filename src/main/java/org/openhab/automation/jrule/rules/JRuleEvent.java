@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.rules;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+import org.openhab.core.library.types.QuantityType;
 
 /**
  * The {@link JRuleEvent}
@@ -53,23 +54,11 @@ public class JRuleEvent {
     }
 
     public Double getValueAsDouble() {
-        Double d = null;
-        try {
-            d = Double.parseDouble(value);
-        } catch (NumberFormatException x) {
-            // ignore
-        }
-        return d;
+        return QuantityType.valueOf(value).doubleValue();
     }
 
     public Integer getValueAsInteger() {
-        Integer i = null;
-        try {
-            i = Integer.parseInt(value);
-        } catch (NumberFormatException x) {
-            // ignore
-        }
-        return i;
+        return QuantityType.valueOf(value).intValue();
     }
 
     public String getMemberName() {
