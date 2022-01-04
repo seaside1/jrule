@@ -230,6 +230,11 @@ public class JRuleEventHandler {
         return getOpenClosedValueFromState(state);
     }
 
+    public JRuleUpDownValue getUpDownValue(String itemName) {
+        State state = getStateFromItem(itemName);
+        return getUpDownValueFromState(state);
+    }
+
     private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
         final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
         switch (playPauseType) {
@@ -266,6 +271,19 @@ public class JRuleEventHandler {
             default:
                 logError("Fail to transform switch value");
                 return JRuleOpenClosedValue.UNDEF;
+        }
+    }
+
+    private JRuleUpDownValue getUpDownValueFromState(State state) {
+        final UpDownType playPauseType = UpDownType.valueOf(state.toFullString());
+        switch (playPauseType) {
+            case UP:
+                return JRuleUpDownValue.UP;
+            case DOWN:
+                return JRuleUpDownValue.DOWN;
+            default:
+                logError("Fail to transform up/down value");
+                return JRuleUpDownValue.UNDEF;
         }
     }
 
