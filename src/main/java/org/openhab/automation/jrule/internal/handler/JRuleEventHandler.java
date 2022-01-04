@@ -47,6 +47,7 @@ import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
@@ -397,6 +398,8 @@ public class JRuleEventHandler {
         }
         if (state instanceof PercentType) {
             return ((PercentType) state).doubleValue();
+        } else if (state instanceof QuantityType) {
+            return ((QuantityType) state).doubleValue();
         } else {
             DecimalType decimalType = state.as(DecimalType.class);
             return decimalType != null ? decimalType.doubleValue() : null;
