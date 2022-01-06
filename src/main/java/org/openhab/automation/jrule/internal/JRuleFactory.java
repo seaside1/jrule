@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.core.events.EventPublisher;
@@ -47,8 +48,13 @@ public class JRuleFactory {
     private final EventPublisher eventPublisher;
     private final VoiceManager voiceManager;
     private final JRuleHandler jRuleHandler;
+
+    private final JRuleEngine jRuleEngine;
+
     @Nullable
     private static CompletableFuture<Void> initFuture = null;
+
+    private final JRuleConfig config;
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleFactory.class);
     private static final Object INIT_DELAY_PROPERTY = "init.delay";
@@ -64,7 +70,12 @@ public class JRuleFactory {
         this.eventPublisher = eventPublisher;
         this.voiceManager = voiceManager;
 
-        jRuleHandler = new JRuleHandler(properties, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
+        config = new JRuleConfig(properties);
+        config.initConfig();
+
+        jRuleEngine = new JRuleEngine(config);
+
+        jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
         createDelayedInitialization(getInitDelaySeconds(properties));
     }
 

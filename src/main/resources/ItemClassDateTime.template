@@ -10,20 +10,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
+package ${package};
 
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 import java.util.Date;
 
 /**
  * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * for Item ${ItemName}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleDateTimeItem {
+public class ${ItemClass} extends JRuleDateTimeItem {
 
-    public static final String ITEM = "ITEMNAME";
+    public static final String ITEM = "${ItemName}";
     
     public static Date getState() {
         return JRuleDateTimeItem.getState(ITEM);
