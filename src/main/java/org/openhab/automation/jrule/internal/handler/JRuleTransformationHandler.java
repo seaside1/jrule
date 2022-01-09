@@ -49,7 +49,7 @@ public class JRuleTransformationHandler {
         this.bundleContext = bundleContext;
     }
 
-    public String transform(String format, String value) throws TransformationException {
-        return TransformationHelper.transform(bundleContext, format, value);
+    public String transform(String stateDescPattern, String state) throws TransformationException {
+        return TransformationHelper.transform(bundleContext, stateDescPattern, state);
     }
 }

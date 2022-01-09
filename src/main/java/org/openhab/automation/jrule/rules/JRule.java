@@ -167,8 +167,8 @@ public class JRule {
         JRuleVoiceHandler.get().say(text);
     }
 
-    protected String transform(String value, String format) throws TransformationException {
-        return JRuleTransformationHandler.get().transform(value, format);
+    protected String transform(String stateDescPattern, String state) throws TransformationException {
+        return JRuleTransformationHandler.get().transform(stateDescPattern, state);
     }
 
     protected void executeCommandLine(String... commandLine) {
