@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -192,7 +193,8 @@ public class JRuleCompiler {
                 logDebug("Compilation of classes successfully!");
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    logInfo("Error on line {} in {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
+                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri(),
+                            diagnostic.getMessage(Locale.getDefault()));
                 }
             }
             fileManager.close();
