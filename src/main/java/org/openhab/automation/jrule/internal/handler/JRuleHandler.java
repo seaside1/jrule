@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -96,12 +95,14 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private volatile boolean recompileJar = true;
 
-    public JRuleHandler(Map<String, Object> properties, ItemRegistry itemRegistry, EventPublisher eventPublisher,
+    public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, EventPublisher eventPublisher,
             JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.voiceManager = voiceManager;
+        this.config = config;
         this.bundleContext = bundleContext;
+
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
@@ -110,10 +111,7 @@ public class JRuleHandler implements PropertyChangeListener {
         jRuleVoiceHandler.setVoiceManager(voiceManager);
         JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
         jRuleTransformationHandler.setBundleContext(bundleContext);
-
-        config = new JRuleConfig(properties);
-
-        logDebug("New instance: {}", properties);
+        logDebug("JRuleHandler()");
     }
 
     private void logDebug(String message, Object... parameters) {
@@ -177,7 +175,6 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public synchronized final void initialize() {
         logInfo("Start Initializing JRule Automation");
-        config.initConfig();
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
         logDebug("SettingConfig name: {} config: {}", config.getClass(), config.toString());

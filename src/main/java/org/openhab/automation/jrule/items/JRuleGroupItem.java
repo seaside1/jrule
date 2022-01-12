@@ -17,6 +17,7 @@ import java.util.Set;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
  * The {@link JRuleGroupItem} Items
@@ -46,11 +47,19 @@ public abstract class JRuleGroupItem extends JRuleItem {
         return JRuleEventHandler.get().getPauseValue(itemName);
     }
 
+    public static JRuleUpDownValue getStateAsUpDownValue(String itemName) {
+        return JRuleEventHandler.get().getUpDownValue(itemName);
+    }
+
     public static void sendCommand(String itemName, JRulePlayPauseValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
     public static void sendCommand(String itemName, JRuleOnOffValue value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    public static void sendCommand(String itemName, JRuleUpDownValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
@@ -67,6 +76,10 @@ public abstract class JRuleGroupItem extends JRuleItem {
     }
 
     public static void postUpdate(String itemName, JRuleOnOffValue value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
+    public static void postUpdate(String itemName, JRuleUpDownValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 }

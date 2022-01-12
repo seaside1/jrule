@@ -14,6 +14,9 @@ package org.openhab.automation.jrule.internal.engine;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,6 +39,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
@@ -88,6 +92,8 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final String LOG_NAME_ENGINE = "JRuleEngine";
 
     private static volatile JRuleEngine instance;
+
+    private JRuleConfig config;
 
     private final Map<String, List<JRule>> itemToRules = new HashMap<>();
 
@@ -152,6 +158,7 @@ public class JRuleEngine implements PropertyChangeListener {
         logDebug("Adding rule: {}", jRule);
         Class<?> clazz = jRule.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
+            logDebug("Adding rule method: {}", method.getName());
             if (!method.isAnnotationPresent(JRuleName.class)) {
                 logDebug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
                 continue;
@@ -184,8 +191,11 @@ public class JRuleEngine implements PropertyChangeListener {
                 JRuleLog.debug(logger, logName, "Processing jRule when: {}", jRuleWhen);
                 if (!jRuleWhen.item().isEmpty()) {
                     // JRuleWhen for an item
-                    // TODO: Fix underscore
-                    final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
+
+                    String itemPackage = config.getGeneratedItemPackage();
+                    String prefix = config.getGeneratedItemPrefix();
+                    String itemClass = String.format("%s.%s%s", itemPackage, prefix, jRuleWhen.item());
+
                     JRuleLog.debug(logger, logName, "Got item class: {}", itemClass);
                     JRuleLog.info(logger, logName, "Validating JRule: {} trigger: {} ", jRuleName.value(),
                             jRuleWhen.trigger());
@@ -466,8 +476,25 @@ public class JRuleEngine implements PropertyChangeListener {
         rule.setRuleLogName(context.getLogName());
         try {
             final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-            JRuleLog.error(logger, context.getRuleName(), "Error", e);
+        } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
+            JRuleLog.error(logger, context.getRuleName(), "Error {}", e);
+        } catch (InvocationTargetException e) {
+            Throwable ex = e.getCause() != null ? e.getCause() : null;
+            JRuleLog.error(logger, context.getRuleName(), "Error message: {}", ex.getMessage());
+            JRuleLog.error(logger, context.getRuleName(), "Error Stacktrace: {}", getStackTraceAsString(ex));
         }
+    }
+
+    private synchronized static String getStackTraceAsString(Throwable throwable) {
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+            throwable.printStackTrace(pw);
+            return sw.toString();
+        } catch (IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+    }
+
+    public void setConfig(@NonNull JRuleConfig config) {
+        this.config = config;
     }
 }

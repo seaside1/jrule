@@ -10,19 +10,19 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
+package ${package};
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 
 /**
  * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * for Item ${ItemName}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleNumberItem {
+public class ${ItemClass} extends JRuleNumberItem {
 
-    public static final String ITEM = "ITEMNAME";
+    public static final String ITEM = "${ItemName}";
     
     public static Double getState() {
         return JRuleNumberItem.getState(ITEM);
