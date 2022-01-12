@@ -99,14 +99,10 @@ public class JRuleConfig {
     }
 
     public String getItemsDirectory() {
-        StringBuilder sb = new StringBuilder(getWorkingDirectory());
-
+        final StringBuilder sb = new StringBuilder(getWorkingDirectory());
         sb.append(File.separator).append(ITEMS_DIR_START).append(File.separator);
-
-        String p = getGeneratedItemPackage().replaceAll("\\.", File.separator);
-
+        final String p = getGeneratedItemPackage().replaceAll("\\.", File.separator);
         sb.append(p);
-
         return sb.toString();
     }
 

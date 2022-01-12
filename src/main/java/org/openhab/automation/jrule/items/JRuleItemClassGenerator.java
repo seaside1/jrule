@@ -140,11 +140,8 @@ public class JRuleItemClassGenerator {
 
         String itemName = item.getName();
         String className = jRuleConfig.getGeneratedItemPrefix() + itemName;
-
         String itemPackage = jRuleConfig.getGeneratedItemPackage();
-
         generatedClass = template;
-
         generatedClass = generatedClass.replaceAll("\\$\\{package\\}", itemPackage);
         generatedClass = generatedClass.replaceAll("\\$\\{ItemName\\}", itemName);
         generatedClass = generatedClass.replaceAll("\\$\\{ItemClass\\}", className);
