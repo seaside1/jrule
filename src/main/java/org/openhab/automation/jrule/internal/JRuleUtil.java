@@ -84,9 +84,7 @@ public class JRuleUtil {
     }
 
     public static @Nullable String getResourceAsString(@Nullable URL resource) {
-        try {
-            @SuppressWarnings("null")
-            final InputStream is = resource.openStream();
+        try (InputStream is = resource.openStream()) {
             final byte[] bytes = is.readAllBytes();
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -120,9 +118,7 @@ public class JRuleUtil {
     }
 
     public static byte[] getResourceAsBytes(@Nullable URL resource) {
-        try {
-            @SuppressWarnings("null")
-            final InputStream is = resource.openStream();
+        try (InputStream is = resource.openStream()) {
             return is.readAllBytes();
         } catch (IOException e) {
             JRuleLog.error(logger, LOG_NAME_UTIL, ERROR_RESOURCE, e.getMessage());
@@ -237,10 +233,8 @@ public class JRuleUtil {
 
     public static File writeFile(byte[] bytes, String file) {
         final File f = new File(file);
-        try {
-            FileOutputStream out = new FileOutputStream(f);
+        try (FileOutputStream out = new FileOutputStream(f)) {
             out.write(bytes);
-            out.close();
         } catch (IOException e) {
             JRuleLog.error(logger, LOG_NAME_UTIL, "Failed to write file: {}", file, e);
         }

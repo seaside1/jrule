@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
@@ -40,12 +41,9 @@ public class JRuleConfig {
     public static final String RULES_PACKAGE = "org.openhab.automation.jrule.rules.user.";
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
+    private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
 
     public static final String ITEMS_DIR_START = "items";
-
-    public static final String ITEMS_DIR = ITEMS_DIR_START + File.separator + "org" + File.separator + "openhab"
-            + File.separator + "automation" + File.separator + "jrule" + File.separator + "items" + File.separator
-            + "generated" + File.separator;
 
     public static final String RULES_DIR_START = "rules";
     public static final String RULES_DIR = RULES_DIR_START + File.separator + "org" + File.separator + "openhab"
@@ -54,6 +52,7 @@ public class JRuleConfig {
 
     private static final String DEFAULT_WORKING_DIR = "/etc/openhab/automation/jrule";
     private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
+    private static final String DEFAULT_GENERATED_ITEM_PACKAGE = "org.openhab.automation.jrule.items.generated";
 
     private static final String CLASS_DIR = "class";
 
@@ -75,8 +74,8 @@ public class JRuleConfig {
     public void initConfig() {
         final String workingDirectory = getWorkingDirectory();
         final String configFileName = workingDirectory.concat(File.separator).concat(JRULE_CONFIG_NAME);
-        try {
-            jRuleProperties.load(new FileInputStream(new File(configFileName)));
+        try (InputStream is = new FileInputStream(new File(configFileName))) {
+            jRuleProperties.load(is);
         } catch (IOException e) {
             logger.debug("Failed to load properties {}", configFileName);
         }
@@ -100,7 +99,15 @@ public class JRuleConfig {
     }
 
     public String getItemsDirectory() {
-        return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(ITEMS_DIR).toString();
+        StringBuilder sb = new StringBuilder(getWorkingDirectory());
+
+        sb.append(File.separator).append(ITEMS_DIR_START).append(File.separator);
+
+        String p = getGeneratedItemPackage().replaceAll("\\.", File.separator);
+
+        sb.append(p);
+
+        return sb.toString();
     }
 
     public String getJarDirectory() {
@@ -142,5 +149,9 @@ public class JRuleConfig {
 
     public String getGeneratedItemPrefix() {
         return getConfigPropertyOrDefaultValue(GENERATED_ITEM_PREFIX_PROPERTY, DEFAULT_GENERATED_ITEM_PREFIX);
+    }
+
+    public String getGeneratedItemPackage() {
+        return getConfigPropertyOrDefaultValue(GENERATED_ITEM_PACKAGE_PROPERTY, DEFAULT_GENERATED_ITEM_PACKAGE);
     }
 }

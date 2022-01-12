@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.internal.compiler;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -127,7 +128,11 @@ public class JRuleCompiler {
             return;
         }
 
-        logDebug("Loaded class with classLoader: {}", className);
+        Method[] declaredMethods = loadedClass.getDeclaredMethods();
+
+        logDebug("Loaded class with classLoader: {}", loadedClass.getName());
+        logDebug("Loaded class with methods: {}", Arrays.asList(declaredMethods));
+
         if (createInstance) {
             if (Modifier.isAbstract(loadedClass.getModifiers())) {
                 logDebug("Not creating and instance of abstract class: {}", className);
