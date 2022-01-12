@@ -14,9 +14,6 @@ package org.openhab.automation.jrule.internal.engine;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -107,19 +104,17 @@ public class JRuleEngine implements PropertyChangeListener {
     protected final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
-    public JRuleEngine(JRuleConfig config) {
-        this.config = config;
-        instance = this;
+    private JRuleEngine() {
     }
 
     public static JRuleEngine get() {
-        // if (instance == null) {
-        // synchronized (JRuleEngine.class) {
-        // if (instance == null) {
-        // instance = new JRuleEngine();
-        // }
-        // }
-        // }
+        if (instance == null) {
+            synchronized (JRuleEngine.class) {
+                if (instance == null) {
+                    instance = new JRuleEngine();
+                }
+            }
+        }
         return instance;
     }
 
@@ -160,9 +155,7 @@ public class JRuleEngine implements PropertyChangeListener {
         logDebug("Adding rule: {}", jRule);
         Class<?> clazz = jRule.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
-
             logDebug("Adding rule method: {}", method.getName());
-
             if (!method.isAnnotationPresent(JRuleName.class)) {
                 logDebug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
                 continue;
@@ -480,21 +473,12 @@ public class JRuleEngine implements PropertyChangeListener {
         rule.setRuleLogName(context.getLogName());
         try {
             final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
-        } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
-            JRuleLog.error(logger, context.getRuleName(), "Error {}", e);
-        } catch (InvocationTargetException e) {
-            Throwable ex = e.getCause() != null ? e.getCause() : null;
-            JRuleLog.error(logger, context.getRuleName(), "Error message: {}", ex.getMessage());
-            JRuleLog.error(logger, context.getRuleName(), "Error Stacktrace: {}", getStackTraceAsString(ex));
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
+            JRuleLog.error(logger, context.getRuleName(), "Error", e);
         }
     }
 
-    private synchronized static String getStackTraceAsString(Throwable throwable) {
-        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
-            throwable.printStackTrace(pw);
-            return sw.toString();
-        } catch (IOException ioe) {
-            throw new IllegalStateException(ioe);
-        }
+    public void setConfig(@NonNull JRuleConfig config) {
+        this.config = config;
     }
 }

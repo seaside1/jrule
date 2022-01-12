@@ -97,14 +97,12 @@ public class JRuleHandler implements PropertyChangeListener {
         this.eventSubscriber = eventSubscriber;
         this.voiceManager = voiceManager;
         this.config = config;
-
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
         eventSubscriber.addPropertyChangeListener(this);
         JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
-
         logDebug("JRuleHandler()");
     }
 
@@ -169,7 +167,6 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public synchronized final void initialize() {
         logInfo("Start Initializing JRule Automation");
-
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
         logDebug("SettingConfig name: {} config: {}", config.getClass(), config.toString());

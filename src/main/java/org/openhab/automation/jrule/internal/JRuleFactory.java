@@ -48,7 +48,6 @@ public class JRuleFactory {
     private final EventPublisher eventPublisher;
     private final VoiceManager voiceManager;
     private final JRuleHandler jRuleHandler;
-
     private final JRuleEngine jRuleEngine;
 
     @Nullable
@@ -69,12 +68,10 @@ public class JRuleFactory {
         this.eventSubscriber = eventSubscriber;
         this.eventPublisher = eventPublisher;
         this.voiceManager = voiceManager;
-
         config = new JRuleConfig(properties);
         config.initConfig();
-
-        jRuleEngine = new JRuleEngine(config);
-
+        jRuleEngine = JRuleEngine.get();
+        jRuleEngine.setConfig(config);
         jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
         createDelayedInitialization(getInitDelaySeconds(properties));
     }
