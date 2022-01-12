@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
@@ -92,6 +93,8 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private static volatile JRuleEngine instance;
 
+    private JRuleConfig config;
+
     private final Map<String, List<JRule>> itemToRules = new HashMap<>();
 
     private final Map<String, List<JRuleExecutionContext>> itemToExecutionContexts = new HashMap<>();
@@ -104,17 +107,19 @@ public class JRuleEngine implements PropertyChangeListener {
     protected final ScheduledExecutorService scheduler = ThreadPoolManager
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
-    private JRuleEngine() {
+    public JRuleEngine(JRuleConfig config) {
+        this.config = config;
+        instance = this;
     }
 
     public static JRuleEngine get() {
-        if (instance == null) {
-            synchronized (JRuleEngine.class) {
-                if (instance == null) {
-                    instance = new JRuleEngine();
-                }
-            }
-        }
+        // if (instance == null) {
+        // synchronized (JRuleEngine.class) {
+        // if (instance == null) {
+        // instance = new JRuleEngine();
+        // }
+        // }
+        // }
         return instance;
     }
 
@@ -155,6 +160,9 @@ public class JRuleEngine implements PropertyChangeListener {
         logDebug("Adding rule: {}", jRule);
         Class<?> clazz = jRule.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
+
+            logDebug("Adding rule method: {}", method.getName());
+
             if (!method.isAnnotationPresent(JRuleName.class)) {
                 logDebug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
                 continue;
@@ -187,8 +195,11 @@ public class JRuleEngine implements PropertyChangeListener {
                 JRuleLog.debug(logger, logName, "Processing jRule when: {}", jRuleWhen);
                 if (!jRuleWhen.item().isEmpty()) {
                     // JRuleWhen for an item
-                    // TODO: Fix underscore
-                    final String itemClass = "org.openhab.automation.jrule.items.generated._" + jRuleWhen.item();
+
+                    String itemPackage = config.getGeneratedItemPackage();
+                    String prefix = config.getGeneratedItemPrefix();
+                    String itemClass = String.format("%s.%s%s", itemPackage, prefix, jRuleWhen.item());
+
                     JRuleLog.debug(logger, logName, "Got item class: {}", itemClass);
                     JRuleLog.info(logger, logName, "Validating JRule: {} trigger: {} ", jRuleName.value(),
                             jRuleWhen.trigger());
