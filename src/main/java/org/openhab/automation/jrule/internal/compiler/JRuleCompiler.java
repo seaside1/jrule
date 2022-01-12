@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.internal.compiler;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -126,7 +128,11 @@ public class JRuleCompiler {
             return;
         }
 
-        logDebug("Loaded class with classLoader: {}", className);
+        Method[] declaredMethods = loadedClass.getDeclaredMethods();
+
+        logDebug("Loaded class with classLoader: {}", loadedClass.getName());
+        logDebug("Loaded class with methods: {}", Arrays.asList(declaredMethods));
+
         if (createInstance) {
             if (Modifier.isAbstract(loadedClass.getModifiers())) {
                 logDebug("Not creating and instance of abstract class: {}", className);
@@ -192,7 +198,8 @@ public class JRuleCompiler {
                 logDebug("Compilation of classes successfully!");
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    logInfo("Error on line {} in {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
+                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri(),
+                            diagnostic.getMessage(Locale.getDefault()));
                 }
             }
             fileManager.close();

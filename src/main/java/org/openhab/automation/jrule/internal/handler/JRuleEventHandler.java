@@ -47,6 +47,7 @@ import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
@@ -230,6 +231,11 @@ public class JRuleEventHandler {
         return getOpenClosedValueFromState(state);
     }
 
+    public JRuleUpDownValue getUpDownValue(String itemName) {
+        State state = getStateFromItem(itemName);
+        return getUpDownValueFromState(state);
+    }
+
     private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
         final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
         switch (playPauseType) {
@@ -266,6 +272,19 @@ public class JRuleEventHandler {
             default:
                 logError("Fail to transform switch value");
                 return JRuleOpenClosedValue.UNDEF;
+        }
+    }
+
+    private JRuleUpDownValue getUpDownValueFromState(State state) {
+        final UpDownType playPauseType = UpDownType.valueOf(state.toFullString());
+        switch (playPauseType) {
+            case UP:
+                return JRuleUpDownValue.UP;
+            case DOWN:
+                return JRuleUpDownValue.DOWN;
+            default:
+                logError("Fail to transform up/down value");
+                return JRuleUpDownValue.UNDEF;
         }
     }
 
@@ -397,6 +416,8 @@ public class JRuleEventHandler {
         }
         if (state instanceof PercentType) {
             return ((PercentType) state).doubleValue();
+        } else if (state instanceof QuantityType) {
+            return ((QuantityType) state).doubleValue();
         } else {
             DecimalType decimalType = state.as(DecimalType.class);
             return decimalType != null ? decimalType.doubleValue() : null;

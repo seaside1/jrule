@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -100,6 +99,7 @@ public class JRuleItemClassGenerator {
 
     public boolean generateItemSource(Item item) {
         File f = getJavaItemForFile(item);
+        String template = null;
         String generatedClass = null;
         String type = item.getType();
         if (type.contains(":")) {
@@ -107,65 +107,59 @@ public class JRuleItemClassGenerator {
             type = split[0];
         }
         if (type.equals(CoreItemFactory.SWITCH)) {
-            generatedClass = switchItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = switchItemClassTemplate;
         } else if (type.equals(CoreItemFactory.DIMMER)) {
-            generatedClass = dimmerItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = dimmerItemClassTemplate;
         } else if (type.equals(CoreItemFactory.NUMBER)) {
-            generatedClass = numberItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = numberItemClassTemplate;
         } else if (type.equals(CoreItemFactory.STRING)) {
-            generatedClass = stringItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = stringItemClassTemplate;
         } else if (type.equals(CoreItemFactory.IMAGE)) {
-            generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = itemClassTemplate;
         } else if (type.equals(CoreItemFactory.CALL)) {
-            generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = itemClassTemplate;
         } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
-            generatedClass = rollershutterItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = rollershutterItemClassTemplate;
         } else if (type.equals(CoreItemFactory.LOCATION)) {
-            generatedClass = itemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = itemClassTemplate;
         } else if (type.equals(CoreItemFactory.COLOR)) {
-            generatedClass = colorItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = colorItemClassTemplate;
         } else if (type.equals(CoreItemFactory.CONTACT)) {
-            generatedClass = contactItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = contactItemClassTemplate;
         } else if (type.equals(CoreItemFactory.PLAYER)) {
-            generatedClass = playerItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = playerItemClassTemplate;
         } else if (type.equals(CoreItemFactory.DATETIME)) {
-            generatedClass = dateTimeItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = dateTimeItemClassTemplate;
         } else if (type.equals(GroupItem.TYPE)) {
-            generatedClass = groupItemClassTemplate.replaceAll("ITEMNAME", item.getName());
+            template = groupItemClassTemplate;
         } else {
             JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Unsupported item type for item: {} type: {}",
                     item.getName(), item.getType());
             return false;
         }
+
+        String itemName = item.getName();
+        String className = jRuleConfig.getGeneratedItemPrefix() + itemName;
+        String itemPackage = jRuleConfig.getGeneratedItemPackage();
+        generatedClass = template;
+        generatedClass = generatedClass.replaceAll("\\$\\{package\\}", itemPackage);
+        generatedClass = generatedClass.replaceAll("\\$\\{ItemName\\}", itemName);
+        generatedClass = generatedClass.replaceAll("\\$\\{ItemClass\\}", className);
+
         if (f.exists()) {
             String existingClass = JRuleUtil.getFileAsString(f);
             if (existingClass.equals(generatedClass)) {
                 JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Item: {} already exists, ignoring", item.getName());
                 return false;
             }
-
         }
-        FileOutputStream fout = null;
-        try {
-            fout = new FileOutputStream(f);
+
+        try (FileOutputStream fout = new FileOutputStream(f)) {
             fout.write(generatedClass.getBytes(StandardCharsets.UTF_8));
             JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}", f.getAbsolutePath());
             return true;
-        } catch (FileNotFoundException e1) {
-            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR, "Failed to write generated class", e1);
         } catch (IOException e) {
-            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR, "Failed to write generated class", e);
-        } finally {
-            if (fout != null) {
-                try {
-                    fout.flush();
-                } catch (IOException e) {
-                }
-                try {
-                    fout.close();
-                } catch (IOException e) {
-                }
-            }
+            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR, "Failed to write generated class to " + f, e);
         }
         return false;
     }

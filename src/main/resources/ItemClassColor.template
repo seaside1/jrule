@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
+package ${package};
 
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
@@ -19,13 +19,13 @@ import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 
 /**
  * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * for Item ${ItemName}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleColorItem {
+public class ${ItemClass} extends JRuleColorItem {
  
-    public static final String ITEM = "ITEMNAME";
+    public static final String ITEM = "${ItemName}";
     
     public static JRuleColorValue getState() {
         return JRuleColorItem.getState(ITEM);

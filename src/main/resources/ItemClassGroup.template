@@ -10,23 +10,24 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items.generated;
+package ${package};
 
 import java.util.Set;
 
 import org.openhab.automation.jrule.items.JRuleGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
  * Automatically Generated Class
- * The {@link _ITEMNAME} 
+ * for Item ${ItemName}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class _ITEMNAME extends JRuleGroupItem {
+public class ${ItemClass} extends JRuleGroupItem {
 
-    public static final String ITEM = "ITEMNAME";
+    public static final String ITEM = "${ItemName}";
     
     public static String getState() {
         return JRuleGroupItem.getState(ITEM);
@@ -40,6 +41,10 @@ public class _ITEMNAME extends JRuleGroupItem {
         return JRuleGroupItem.getStateAsPlayPauseValue(ITEM); 
     }
     
+    public static JRuleUpDownValue getStateAsUpDownValue() {
+        return JRuleGroupItem.getStateAsUpDownValue(ITEM);
+    }
+
     public static void sendCommand(String value) {
         JRuleGroupItem.sendCommand(ITEM, value);
     }
@@ -69,6 +74,14 @@ public class _ITEMNAME extends JRuleGroupItem {
     }
 
     public static void postUpdate(JRulePlayPauseValue value) {
+        JRuleGroupItem.postUpdate(ITEM, value);
+    }
+
+    public static void sendCommand(JRuleUpDownValue value) {
+        JRuleGroupItem.sendCommand(ITEM, value);
+    }
+
+    public static void postUpdate(JRuleUpDownValue value) {
         JRuleGroupItem.postUpdate(ITEM, value);
     }
 }
