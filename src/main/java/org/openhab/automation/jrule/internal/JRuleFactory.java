@@ -109,5 +109,6 @@ public class JRuleFactory {
             initFuture = null;
         }
         jRuleHandler.dispose();
+        jRuleEngine.dispose();
     }
 }
