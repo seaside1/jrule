@@ -29,9 +29,11 @@ import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.core.transform.TransformationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,6 +165,10 @@ public class JRule {
 
     protected void say(String text) {
         JRuleVoiceHandler.get().say(text);
+    }
+
+    protected String transform(String stateDescPattern, String state) throws TransformationException {
+        return JRuleTransformationHandler.get().transform(stateDescPattern, state);
     }
 
     protected void executeCommandLine(String... commandLine) {

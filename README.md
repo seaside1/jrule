@@ -486,6 +486,23 @@ Use case: Override logging for all rules defined in one file
 }
 ```
 
+## Example 23
+
+Use case: Apply transformation using openHAB transformation service
+
+```java
+   public class TransformationRule extends JRule {
+
+    @JRuleName("MyTransformation")
+    @JRuleWhen(item = _MyStringValue.ITEM, trigger = _MyStringValue.TRIGGER_RECEIVED_COMMAND)
+    public void applyTransformation(JRuleEvent event) {
+        String transformedValue = transform("MAP(my.map):%s", event.getValue());
+        logInfo("Transformed {} to {}", event.getValue(), transformedValue);
+        _MyTransformationReceiver.sendCommand(transformedValue);
+    }
+}
+```
+
 # Changelog
 ## BETA5
 - Addes support for adding rules in jar-files, as an alternative.
