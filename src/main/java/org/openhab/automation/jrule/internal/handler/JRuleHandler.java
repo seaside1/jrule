@@ -47,6 +47,7 @@ import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
 import org.openhab.core.voice.VoiceManager;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +73,9 @@ public class JRuleHandler implements PropertyChangeListener {
     @NonNullByDefault({})
     private VoiceManager voiceManager;
 
+    @NonNullByDefault({})
+    private BundleContext bundleContext;
+
     private final Logger logger = LoggerFactory.getLogger(JRuleHandler.class);
 
     @Nullable
@@ -92,17 +96,21 @@ public class JRuleHandler implements PropertyChangeListener {
     private volatile boolean recompileJar = true;
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, EventPublisher eventPublisher,
-            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager) {
+            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.voiceManager = voiceManager;
         this.config = config;
+        this.bundleContext = bundleContext;
+
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
         eventSubscriber.addPropertyChangeListener(this);
         JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
+        JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
+        jRuleTransformationHandler.setBundleContext(bundleContext);
         logDebug("JRuleHandler()");
     }
 

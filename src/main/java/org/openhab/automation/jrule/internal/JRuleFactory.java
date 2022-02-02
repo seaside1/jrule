@@ -25,6 +25,7 @@ import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -63,7 +64,7 @@ public class JRuleFactory {
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
-            final @Reference VoiceManager voiceManager) {
+            final @Reference VoiceManager voiceManager, final ComponentContext componentContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.eventPublisher = eventPublisher;
@@ -72,7 +73,8 @@ public class JRuleFactory {
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
         jRuleEngine.setConfig(config);
-        jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager);
+        jRuleHandler = new JRuleHandler(properties, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
+                componentContext.getBundleContext());
         createDelayedInitialization(getInitDelaySeconds(properties));
     }
 
