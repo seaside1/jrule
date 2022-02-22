@@ -234,4 +234,8 @@ public class JRuleUtil {
         }
         return end > 0 && end > start ? topic.substring(start, end) : JRuleConstants.EMPTY;
     }
+
+    public static String packageNameToPath(String packageName) {
+        return packageName.replace('.', File.separatorChar);
+    }
 }
