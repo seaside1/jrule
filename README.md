@@ -8,7 +8,6 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
 
 # Limitations
 
-- Currently, only working for OpenHAB installations under Linux / Unix Operating Systems, not supported in Windows (for rules development it's fine to use windows)
 - Not supporting OH3 GUI rules, script actions and script conditions 
 
 # Why?
