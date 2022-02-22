@@ -73,7 +73,7 @@ public class JRuleFactory {
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
         jRuleEngine.setConfig(config);
-        jRuleHandler = new JRuleHandler(properties, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
+        jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
                 componentContext.getBundleContext());
         createDelayedInitialization(getInitDelaySeconds(properties));
     }
