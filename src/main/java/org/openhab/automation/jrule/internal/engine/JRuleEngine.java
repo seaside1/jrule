@@ -244,6 +244,7 @@ public class JRuleEngine implements PropertyChangeListener {
         calFuture.set(Calendar.HOUR_OF_DAY, hours == -1 ? 0 : hours);
         calFuture.set(Calendar.MINUTE, minutes == -1 ? 0 : minutes);
         calFuture.set(Calendar.SECOND, seconds == -1 ? 0 : seconds);
+        calFuture.set(Calendar.MILLISECOND, 0);
         calFuture.set(Calendar.HOUR_OF_DAY, hours);
         if (calFuture.before(now)) {
             if (hours != -1) {
