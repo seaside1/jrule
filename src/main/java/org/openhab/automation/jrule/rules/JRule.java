@@ -89,6 +89,13 @@ public class JRule {
                 ruleNameToCompletableFuture.remove(ruleName);
             }
         }
+
+        List<CompletableFuture<Void>> completableFutures = ruleNameToCompletableFutureList.get(ruleName);
+        if (completableFutures != null) {
+            cancelled |= cancelListOfCompletableFutures(ruleName, completableFutures);
+            JRuleLog.info(logger, ruleName, "Replacing existing repeating timer by removing old timer");
+        }
+
         return cancelled;
     }
 
@@ -119,13 +126,21 @@ public class JRule {
             long delayInSeconds, int numberOfRepeats, Consumer<Void> fn) {
         List<CompletableFuture<Void>> completableFutures = ruleNameToCompletableFutureList.get(ruleName);
         if (completableFutures != null) {
-            JRuleLog.debug(logger, ruleName, "Repeating Future already running");
-            completableFutures.forEach(cF -> cF.cancel(true));
-            completableFutures.clear();
-            ruleNameToCompletableFutureList.remove(ruleName);
+            cancelListOfCompletableFutures(ruleName, completableFutures);
             JRuleLog.info(logger, ruleName, "Replacing existing repeating timer by removing old timer");
         }
         return createRepeatingTimer(ruleName, delayInSeconds, numberOfRepeats, fn);
+    }
+
+    private boolean cancelListOfCompletableFutures(String ruleName, List<CompletableFuture<Void>> completableFutures) {
+        boolean cancelled = false;
+        JRuleLog.debug(logger, ruleName, "Repeating Future already running");
+        for (CompletableFuture<?> future : completableFutures) {
+            cancelled |= future.cancel(true);
+        }
+        completableFutures.clear();
+        ruleNameToCompletableFutureList.remove(ruleName);
+        return cancelled;
     }
 
     protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String ruleName, long delayInSeconds,
