@@ -73,7 +73,8 @@ public class JRule {
     }
 
     protected boolean timerIsRunning(String ruleName) {
-        return ruleNameToCompletableFuture.containsKey(ruleName);
+        return ruleNameToCompletableFuture.containsKey(ruleName)
+                || ruleNameToCompletableFutureList.containsKey(ruleName);
     }
 
     protected synchronized boolean cancelTimer(String ruleName) {
