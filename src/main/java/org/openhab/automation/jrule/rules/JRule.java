@@ -93,7 +93,6 @@ public class JRule {
         List<CompletableFuture<Void>> completableFutures = ruleNameToCompletableFutureList.get(ruleName);
         if (completableFutures != null) {
             cancelled |= cancelListOfCompletableFutures(ruleName, completableFutures);
-            JRuleLog.info(logger, ruleName, "Replacing existing repeating timer by removing old timer");
         }
 
         return cancelled;
