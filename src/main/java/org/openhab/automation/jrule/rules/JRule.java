@@ -142,7 +142,7 @@ public class JRule {
         ruleNameToCompletableFutureList.put(ruleName, futures);
         CompletableFuture<Void> lastFuture = null;
         for (int i = 0; i < numberOfRepeats; i++) {
-            lastFuture = JRuleUtil.delayedExecution(delayInSeconds * i, TimeUnit.SECONDS);
+            lastFuture = JRuleUtil.delayedExecution(delayInSeconds * (i + 1), TimeUnit.SECONDS);
             futures.add(lastFuture);
         }
         futures.forEach(f -> f.thenAccept(fn));
