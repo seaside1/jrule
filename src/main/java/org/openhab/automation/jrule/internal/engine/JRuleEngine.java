@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -244,6 +244,7 @@ public class JRuleEngine implements PropertyChangeListener {
         calFuture.set(Calendar.HOUR_OF_DAY, hours == -1 ? 0 : hours);
         calFuture.set(Calendar.MINUTE, minutes == -1 ? 0 : minutes);
         calFuture.set(Calendar.SECOND, seconds == -1 ? 0 : seconds);
+        calFuture.set(Calendar.MILLISECOND, 0);
         calFuture.set(Calendar.HOUR_OF_DAY, hours);
         if (calFuture.before(now)) {
             if (hours != -1) {
@@ -268,22 +269,27 @@ public class JRuleEngine implements PropertyChangeListener {
             Method method, boolean jRuleEventPresent) {
         CompletableFuture<Void> future = (!jRuleWhen.cron().isEmpty()) ? createTimer(logName, jRuleWhen.cron())
                 : createTimer(logName, jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds());
-        timers.add(future);
-        JRuleLog.info(logger, logName, "Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}",
-                jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
-        JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, logName, method, jRuleName,
-                jRuleEventPresent);
-        Consumer<Void> consumer = t -> {
-            try {
-                invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
-            } finally {
-                timers.remove(future);
-            }
-        };
-        future.thenAccept(consumer).thenAccept(s -> {
-            JRuleLog.info(logger, logName, "Timer has finished");
-            addTimedExecution(jRule, logName, jRuleName, jRuleWhen, method, jRuleEventPresent);
-        });
+        if (future != null) {
+            // If ie cron expression fails to parse, null will be returned
+            timers.add(future);
+            JRuleLog.info(logger, logName, "Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}",
+                    jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
+            JRuleExecutionContext executionContext = new JRuleExecutionContext(jRule, logName, method, jRuleName,
+                    jRuleEventPresent);
+            Consumer<Void> consumer = t -> {
+                try {
+                    invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
+                } finally {
+                    timers.remove(future);
+                }
+            };
+            future.thenAccept(consumer).thenAccept(s -> {
+                JRuleLog.info(logger, logName, "Timer has finished");
+                addTimedExecution(jRule, logName, jRuleName, jRuleWhen, method, jRuleEventPresent);
+            });
+        } else {
+            JRuleLog.error(logger, logName, "Failed to add timed execution - check previous log statements");
+        }
     }
 
     private void addExecutionContext(JRule jRule, String logName, String itemClass, String ruleName, String trigger,
