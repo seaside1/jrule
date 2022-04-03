@@ -101,7 +101,7 @@ public class JRuleConfig {
     public String getItemsDirectory() {
         final StringBuilder sb = new StringBuilder(getWorkingDirectory());
         sb.append(File.separator).append(ITEMS_DIR_START).append(File.separator);
-        final String p = getGeneratedItemPackage().replaceAll("\\.", File.separator);
+        final String p = JRuleUtil.packageNameToPath(getGeneratedItemPackage());
         sb.append(p);
         return sb.toString();
     }
