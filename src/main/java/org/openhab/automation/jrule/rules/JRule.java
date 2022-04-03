@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -73,7 +73,8 @@ public class JRule {
     }
 
     protected boolean timerIsRunning(String ruleName) {
-        return ruleNameToCompletableFuture.containsKey(ruleName);
+        return ruleNameToCompletableFuture.containsKey(ruleName)
+                || ruleNameToCompletableFutureList.containsKey(ruleName);
     }
 
     protected synchronized boolean cancelTimer(String ruleName) {
@@ -142,7 +143,7 @@ public class JRule {
         ruleNameToCompletableFutureList.put(ruleName, futures);
         CompletableFuture<Void> lastFuture = null;
         for (int i = 0; i < numberOfRepeats; i++) {
-            lastFuture = JRuleUtil.delayedExecution(delayInSeconds * i, TimeUnit.SECONDS);
+            lastFuture = JRuleUtil.delayedExecution(delayInSeconds * (i + 1), TimeUnit.SECONDS);
             futures.add(lastFuture);
         }
         futures.forEach(f -> f.thenAccept(fn));
