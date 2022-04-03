@@ -43,7 +43,6 @@
       </snapshots>
     </repository>
   </repositories>
-
   <profiles>
     <profile>
       <id>standalone</id>
@@ -52,6 +51,14 @@
       </activation>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.openhab.tools.sat</groupId>
+            <artifactId>sat-plugin</artifactId>
+            <configuration>
+              <checkstyleFilter>checkstyle-suppressions.xml</checkstyleFilter>
+              <checkstyleProperties>ruleset.properties</checkstyleProperties>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.commonjava.maven.plugins</groupId>
             <artifactId>directory-maven-plugin</artifactId>
