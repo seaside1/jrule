@@ -513,6 +513,24 @@ Use case: Apply transformation using openHAB transformation service
 ```
 
 # Changelog
+## BETA6
+- Added seprate thread executors supplied by seime: https://github.com/seaside1/jrule/pull/23
+- Added Windows Support by LumnitzF https://github.com/seaside1/jrule/pull/24
+- Added cancellation of repeating timers by seime: https://github.com/seaside1/jrule/pull/26
+- Null check on timers with futures by seime https://github.com/seaside1/jrule/pull/29
+- Update to Openhab 3.3.0
+- Fixed rescheduling of timers by seime: https://github.com/seaside1/jrule/pull/28
+- Added check for repeating timers by seime: https://github.com/seaside1/jrule/pull/27
+- Fixed repeated timer executing directly by seime: https://github.com/seaside1/jrule/pull/25
+- Added transformation sevice example 23 by seime: https://github.com/seaside1/jrule/pull/20
+- Improved compiler error logging by seime: https://github.com/seaside1/jrule/pull/12
+- Added UP/Down support for group items by seime: https://github.com/seaside1/jrule/pull/13
+- Quantity Type support by seime: https://github.com/seaside1/jrule/pull/14
+- Configurable item-prefix by weberjn https://github.com/seaside1/jrule/pull/16
+- Improve exception handling by No3x https://github.com/seaside1/jrule/pull/19
+- Made thread executors configurable, default disabled 
+- Possible to build jrule standalone https://github.com/seaside1/jrule/pull/24 or together with Openhab-addons
+- Cleaned up repostiory from binary files. Remove and old clones of jrule and clone a fresh repo
 ## BETA5
 - Addes support for adding rules in jar-files, as an alternative.
 ## BETA4
