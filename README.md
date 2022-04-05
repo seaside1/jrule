@@ -129,6 +129,16 @@ Example of config file.
 ```
 #Prefix to be used when generating items, files
 org.openhab.automation.jrule.itemprefix=_
+
+## Run rules in a separate threadpool
+org.openhab.automation.jrule.engine.executors.enable=false
+
+## Minimum number of threads
+org.openhab.automation.jrule.engine.executors.min=2
+
+## Maximum number of threads
+org.openhab.automation.jrule.engine.executors.max=10
+
 ```
 
 # Examples 
