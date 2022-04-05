@@ -579,4 +579,4 @@ Use case: Apply transformation using openHAB transformation service
 
 ## Resources
 
-[https://github.com/seaside1/jrule/releases/download/3.x.x-BETA5/org.openhab.automation.jrule-3.x.x-BETA5.jar](https://github.com/seaside1/jrule/releases/download/3.x.x-BETA5/org.openhab.automation.jrule-3.x.x-BETA5.jar)
+[https://github.com/seaside1/jrule/releases/download/3.x.x-BETA6/org.openhab.automation.jrule-3.x.x-BETA6.jar](https://github.com/seaside1/jrule/releases/download/3.x.x-BETA6/org.openhab.automation.jrule-3.x.x-BETA6.jar)
