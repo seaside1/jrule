@@ -43,11 +43,6 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class JRuleFactory {
 
-    private static final long INIT_DELAY_DEFAULT = 5;
-    private final ItemRegistry itemRegistry;
-    private final JRuleEventSubscriber eventSubscriber;
-    private final EventPublisher eventPublisher;
-    private final VoiceManager voiceManager;
     private final JRuleHandler jRuleHandler;
     private final JRuleEngine jRuleEngine;
 
@@ -65,10 +60,6 @@ public class JRuleFactory {
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
             final @Reference VoiceManager voiceManager, final ComponentContext componentContext) {
-        this.itemRegistry = itemRegistry;
-        this.eventSubscriber = eventSubscriber;
-        this.eventPublisher = eventPublisher;
-        this.voiceManager = voiceManager;
         config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
@@ -95,6 +86,7 @@ public class JRuleFactory {
         initFuture = JRuleUtil.delayedExecution(delayInSeconds, TimeUnit.SECONDS);
         return initFuture.thenAccept(s -> {
             JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
+            jRuleEngine.initialize();
             jRuleHandler.initialize();
             initFuture = null;
         });

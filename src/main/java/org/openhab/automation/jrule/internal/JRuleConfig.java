@@ -42,15 +42,24 @@ public class JRuleConfig {
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
     private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
-
+    private static final String EXECUTORS_MIN_PROPERTY = "org.openhab.automation.jrule.engine.executors.min";
+    private static final String EXECUTORS_MAX_PROPERTY = "org.openhab.automation.jrule.engine.executors.max";
+    private static final String EXECUTORS_ENABLE_PROPERTY = "org.openhab.automation.jrule.engine.executors.enable";
+    private static final String EXECUTORS_THREAD_KEEPALIVE_PROPERTY = "org.openhab.automation.jrule.engine.executors.keepalive";
     public static final String ITEMS_DIR_START = "items";
+
+    private static final int DEFAULT_MIN_EXECUTORS = 2;
+    private static final int DEFAULT_MAX_EXECUTORS = 10;
+    private static final long DEFAULT_KEEPALIVE_EXECUTORS = 2L;
+    private static final boolean DEFAULT_ENABLE_EXECUTORS = false;
 
     public static final String RULES_DIR_START = "rules";
     public static final String RULES_DIR = RULES_DIR_START + File.separator + "org" + File.separator + "openhab"
             + File.separator + "automation" + File.separator + "jrule" + File.separator + "rules" + File.separator
             + "user" + File.separator;
 
-    private static final String DEFAULT_WORKING_DIR = "/etc/openhab/automation/jrule";
+    private static final String DEFAULT_WORKING_DIR = File.separator + "etc" + File.separator + "openhab"
+            + File.separator + "automation" + File.separator + "jrule";
     private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
     private static final String DEFAULT_GENERATED_ITEM_PACKAGE = "org.openhab.automation.jrule.items.generated";
 
@@ -141,6 +150,47 @@ public class JRuleConfig {
     private String getConfigPropertyOrDefaultValue(String property, String defaultValue) {
         final String propertyValue = (String) jRuleProperties.get(property);
         return propertyValue == null ? defaultValue : propertyValue;
+    }
+
+    public long getKeepAliveExecutors() {
+        final String value = getConfigPropertyOrDefaultValue(EXECUTORS_THREAD_KEEPALIVE_PROPERTY,
+                "" + DEFAULT_KEEPALIVE_EXECUTORS);
+        try {
+            return Long.parseLong(value);
+        } catch (Exception x) {
+            logger.error("Failed to load Min Executors {}", value);
+        }
+        return DEFAULT_KEEPALIVE_EXECUTORS;
+    }
+
+    public int getMinExecutors() {
+        final String value = getConfigPropertyOrDefaultValue(EXECUTORS_MIN_PROPERTY, "" + DEFAULT_MIN_EXECUTORS);
+        try {
+            return Integer.parseInt(value);
+        } catch (Exception x) {
+            logger.error("Failed to load Min Executors {}", value);
+        }
+        return DEFAULT_MIN_EXECUTORS;
+    }
+
+    public boolean isExecutorsEnabled() {
+        final String value = getConfigPropertyOrDefaultValue(EXECUTORS_ENABLE_PROPERTY, "" + DEFAULT_ENABLE_EXECUTORS);
+        try {
+            return Boolean.parseBoolean(value);
+        } catch (Exception x) {
+            logger.error("Failed to load enable Executors {}", value);
+        }
+        return DEFAULT_ENABLE_EXECUTORS;
+    }
+
+    public int getMaxExecutors() {
+        final String value = getConfigPropertyOrDefaultValue(EXECUTORS_MAX_PROPERTY, "" + DEFAULT_MAX_EXECUTORS);
+        try {
+            return Integer.parseInt(value);
+        } catch (Exception x) {
+            logger.error("Failed to load Max Executors {}", value);
+        }
+        return DEFAULT_MAX_EXECUTORS;
     }
 
     public String getGeneratedItemPrefix() {

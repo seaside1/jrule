@@ -17,7 +17,6 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -49,12 +48,10 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.cron.JRuleCronExpression;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
-import org.openhab.automation.jrule.items.JRuleItemType;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.openhab.core.common.ThreadPoolManager;
 import org.openhab.core.events.Event;
@@ -75,6 +72,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleEngine implements PropertyChangeListener {
 
+    private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private static final String RECEIVED_COMMAND = "received command";
     private static final String RECEIVED_COMMAND_APPEND = RECEIVED_COMMAND + " ";
 
@@ -86,20 +84,11 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final String RECEIVED_UPDATE = "received update";
     private static final String RECEIVED_UPDATE_APPEND = RECEIVED_UPDATE + " ";
 
-    private static final String COMMAND = "/command";
-
-    private static final String STATE = "/state";
-
-    private static final String STATE_CHANGED = "/statechanged";
-
-    private static final String ITEM_TYPE = "TYPE";
     private static final String LOG_NAME_ENGINE = "JRuleEngine";
 
     private static volatile JRuleEngine instance;
 
     private ThreadPoolExecutor ruleExecutorService;
-    private final static int MIN_EXECUTORS = 2; // Should be made configurable
-    private final static int MAX_EXECUTORS = 10;// Should be made configurable
 
     private JRuleConfig config;
 
@@ -116,21 +105,6 @@ public class JRuleEngine implements PropertyChangeListener {
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
     private JRuleEngine() {
-
-        ThreadFactory ruleExecutorThreadFactory = new ThreadFactory() {
-            private final AtomicLong threadIndex = new AtomicLong(0);
-
-            @Override
-            public Thread newThread(Runnable runnable) {
-                Thread thread = new Thread(runnable);
-                thread.setName("JRule-Executor-" + threadIndex.getAndIncrement());
-                return thread;
-            }
-        };
-
-        // Keep unused threads for 2 minutes before scaling back
-        ruleExecutorService = new ThreadPoolExecutor(MIN_EXECUTORS, MAX_EXECUTORS, 2L, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(), ruleExecutorThreadFactory);
     }
 
     public static JRuleEngine get() {
@@ -163,6 +137,10 @@ public class JRuleEngine implements PropertyChangeListener {
     private synchronized void clearTimers() {
         timers.forEach(timer -> timer.cancel(true));
         timers.clear();
+    }
+
+    private void logInfo(String message, Object... paramteres) {
+        JRuleLog.info(logger, LOG_NAME_ENGINE, message, paramteres);
     }
 
     private void logDebug(String message, Object... parameters) {
@@ -336,35 +314,6 @@ public class JRuleEngine implements PropertyChangeListener {
         contextList.add(context);
     }
 
-    private boolean validateRule(String ruleName, String item, JRuleTrigger trigger) {
-        Class<?> cls = null;
-        try {
-            cls = Class.forName(item);
-        } catch (ClassNotFoundException e) {
-            JRuleLog.warn(logger, ruleName, "Failed to validate could not find class for item: {}", item);
-            return false;
-        }
-        JRuleItemType type = null;
-        try {
-            final Field declaredField = cls.getDeclaredField(ITEM_TYPE);
-            type = (JRuleItemType) (declaredField.get(null));
-        } catch (NoSuchFieldException e) {
-            JRuleLog.warn(logger, ruleName, "Failed to validate, missing Item type: {}", item);
-            return false;
-        } catch (SecurityException e) {
-            JRuleLog.warn(logger, ruleName, "Failed to validate, security exception item: {}", item, e);
-            return false;
-        } catch (IllegalArgumentException e) {
-            JRuleLog.warn(logger, ruleName, "Failed to validate item: {}", item, e);
-            return false;
-        } catch (IllegalAccessException e) {
-            JRuleLog.warn(logger, ruleName, "Failed to validate, exception for item: {}", item, e);
-            return false;
-        }
-
-        return true;
-    }
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_ITEM_EVENT)) {
@@ -499,16 +448,25 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
-        ruleExecutorService.submit(() -> invokeRuleInSeparateThread(context, event));
+        Object invokationResult = config.isExecutorsEnabled() ? invokeRuleInSeparateThread(context, event)
+                : invokeRuleSingleThread(context, event);
     }
 
-    private void invokeRuleInSeparateThread(JRuleExecutionContext context, JRuleEvent event) {
+    private Object invokeRuleInSeparateThread(JRuleExecutionContext context, JRuleEvent event) {
+        return ruleExecutorService.submit(() -> invokeRuleInternal(context, event));
+    }
+
+    private synchronized Object invokeRuleSingleThread(JRuleExecutionContext context, JRuleEvent event) {
+        return invokeRuleInternal(context, event);
+    }
+
+    private Object invokeRuleInternal(JRuleExecutionContext context, JRuleEvent event) {
         JRuleLog.debug(logger, context.getLogName(), "Invoking rule for context: {}", context);
         final JRule rule = context.getJrule();
         final Method method = context.getMethod();
         rule.setRuleLogName(context.getLogName());
         try {
-            final Object invoke = context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
+            return context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
         } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
             JRuleLog.error(logger, context.getRuleName(), "Error {}", e);
         } catch (InvocationTargetException e) {
@@ -516,6 +474,7 @@ public class JRuleEngine implements PropertyChangeListener {
             JRuleLog.error(logger, context.getRuleName(), "Error message: {}", ex.getMessage());
             JRuleLog.error(logger, context.getRuleName(), "Error Stacktrace: {}", getStackTraceAsString(ex));
         }
+        return null;
     }
 
     private synchronized static String getStackTraceAsString(Throwable throwable) {
@@ -531,12 +490,39 @@ public class JRuleEngine implements PropertyChangeListener {
         this.config = config;
     }
 
+    public void initialize() {
+        if (config.isExecutorsEnabled()) {
+            logInfo("Initializing Java Rule Engine with Separate Thread Executors min: {} max: {}",
+                    config.getMinExecutors(), config.getMaxExecutors());
+            final ThreadFactory ruleExecutorThreadFactory = new ThreadFactory() {
+                private final AtomicLong threadIndex = new AtomicLong(0);
+
+                @Override
+                public Thread newThread(Runnable runnable) {
+                    Thread thread = new Thread(runnable);
+                    thread.setName("JRule-Executor-" + threadIndex.getAndIncrement());
+                    return thread;
+                }
+            };
+
+            // Keep unused threads for 2 minutes before scaling back
+            ruleExecutorService = new ThreadPoolExecutor(config.getMinExecutors(), config.getMaxExecutors(),
+                    config.getKeepAliveExecutors(), TimeUnit.MINUTES, new LinkedBlockingQueue<>(),
+                    ruleExecutorThreadFactory);
+        } else {
+            logInfo("Initializing Java Rule Engine with Single Thread Execution");
+        }
+    }
+
     public void dispose() {
-        ruleExecutorService.shutdown();
-        try {
-            ruleExecutorService.awaitTermination(2, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logWarn("Not all rules ran to completion before rule engine shutdown");
+        if (config.isExecutorsEnabled()) {
+            ruleExecutorService.shutdown();
+            try {
+                ruleExecutorService.awaitTermination(AWAIT_TERMINATION_THREAD_SECONDS, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                logWarn("Not all rules ran to completion before rule engine shutdown");
+                logDebug("Not all rules ran to completion before rule engine shutdown", e);
+            }
         }
     }
 }
