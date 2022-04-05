@@ -33,8 +33,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -93,6 +97,10 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private static volatile JRuleEngine instance;
 
+    private ThreadPoolExecutor ruleExecutorService;
+    private final static int MIN_EXECUTORS = 2; // Should be made configurable
+    private final static int MAX_EXECUTORS = 10;// Should be made configurable
+
     private JRuleConfig config;
 
     private final Map<String, List<JRule>> itemToRules = new HashMap<>();
@@ -108,6 +116,21 @@ public class JRuleEngine implements PropertyChangeListener {
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
 
     private JRuleEngine() {
+
+        ThreadFactory ruleExecutorThreadFactory = new ThreadFactory() {
+            private final AtomicLong threadIndex = new AtomicLong(0);
+
+            @Override
+            public Thread newThread(Runnable runnable) {
+                Thread thread = new Thread(runnable);
+                thread.setName("JRule-Executor-" + threadIndex.getAndIncrement());
+                return thread;
+            }
+        };
+
+        // Keep unused threads for 2 minutes before scaling back
+        ruleExecutorService = new ThreadPoolExecutor(MIN_EXECUTORS, MAX_EXECUTORS, 2L, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<>(), ruleExecutorThreadFactory);
     }
 
     public static JRuleEngine get() {
@@ -475,7 +498,11 @@ public class JRuleEngine implements PropertyChangeListener {
         return null;
     }
 
-    private synchronized void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
+    private void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
+        ruleExecutorService.submit(() -> invokeRuleInSeparateThread(context, event));
+    }
+
+    private void invokeRuleInSeparateThread(JRuleExecutionContext context, JRuleEvent event) {
         JRuleLog.debug(logger, context.getLogName(), "Invoking rule for context: {}", context);
         final JRule rule = context.getJrule();
         final Method method = context.getMethod();
@@ -502,5 +529,14 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public void setConfig(@NonNull JRuleConfig config) {
         this.config = config;
+    }
+
+    public void dispose() {
+        ruleExecutorService.shutdown();
+        try {
+            ruleExecutorService.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logWarn("Not all rules ran to completion before rule engine shutdown");
+        }
     }
 }
