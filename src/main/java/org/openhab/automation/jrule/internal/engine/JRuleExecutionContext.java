@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.internal.engine;
 import java.lang.reflect.Method;
 
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRulePrecondition;
 
 /**
  * The {@link JRuleExecutionContext}
@@ -42,9 +43,15 @@ public class JRuleExecutionContext {
     private final Method method;
     private final boolean eventParameterPresent;
 
+    public JRulePrecondition[] getPreconditions() {
+        return preconditions;
+    }
+
+    private final JRulePrecondition[] preconditions;
+
     public JRuleExecutionContext(JRule jRule, String logName, String trigger, String from, String to, String update,
             String ruleName, String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt,
-            Double lte, Double gt, Double gte, Double eq) {
+            Double lte, Double gt, Double gte, Double eq, JRulePrecondition[] preconditions) {
         this.logName = logName;
         this.gt = gt;
         this.gte = gte;
@@ -61,12 +68,13 @@ public class JRuleExecutionContext {
         this.itemName = itemName;
         this.method = method;
         this.eventParameterPresent = eventParameterPresent;
+        this.preconditions = preconditions;
     }
 
-    public JRuleExecutionContext(JRule jRule, String logName, Method method, String ruleName,
-            boolean jRuleEventPresent) {
+    public JRuleExecutionContext(JRule jRule, String logName, Method method, String ruleName, boolean jRuleEventPresent,
+            JRulePrecondition[] preconditions) {
         this(jRule, logName, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null,
-                null, null);
+                null, null, preconditions);
     }
 
     @Override
