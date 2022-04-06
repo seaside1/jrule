@@ -409,9 +409,9 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private Boolean evaluateComparatorParameters(Double gt, Double gte, Double lt, Double lte, String eq, String neq,
             String stateValue) {
-        if (eq != null) {
+        if (eq != null && !eq.isEmpty()) {
             return stateValue.equals(eq);
-        } else if (neq != null) {
+        } else if (neq != null && !neq.isEmpty()) {
             return !stateValue.equals(neq);
         } else if (gt != null) {
             return getValueAsDouble(stateValue) > gt;
@@ -515,8 +515,9 @@ public class JRuleEngine implements PropertyChangeListener {
         try {
             final Item item = itemRegistry.getItem(precondition.item());
             final String state = item.getState().toString();
-            Boolean evalComparatorParams = evaluateComparatorParameters(precondition.gt(), precondition.gte(),
-                    precondition.lt(), precondition.lte(), precondition.eq(), precondition.neq(), state);
+            Boolean evalComparatorParams = evaluateComparatorParameters(getDoubleFromAnnotation(precondition.gt()),
+                    getDoubleFromAnnotation(precondition.gte()), getDoubleFromAnnotation(precondition.lt()),
+                    getDoubleFromAnnotation(precondition.lte()), precondition.eq(), precondition.neq(), state);
             if (evalComparatorParams == null) {
                 logError("Failed to evaluate precondition context: {} precondition: {}", context,
                         toString(precondition));
