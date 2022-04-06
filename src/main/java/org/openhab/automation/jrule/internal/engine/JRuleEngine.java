@@ -211,7 +211,8 @@ public class JRuleEngine implements PropertyChangeListener {
                             jRuleWhen.from(), jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method,
                             jRuleEventPresent, getDoubleFromAnnotation(jRuleWhen.lt()),
                             getDoubleFromAnnotation(jRuleWhen.lte()), getDoubleFromAnnotation(jRuleWhen.gt()),
-                            getDoubleFromAnnotation(jRuleWhen.gte()), jRuleWhen.eq(), jRuleWhen.neq(), preconditions);
+                            getDoubleFromAnnotation(jRuleWhen.gte()), getStringFromAnnotation(jRuleWhen.eq()),
+                            getStringFromAnnotation(jRuleWhen.neq()), preconditions);
                     itemNames.add(jRuleWhen.item());
                 } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1
                         || !jRuleWhen.cron().isEmpty()) {
@@ -237,6 +238,10 @@ public class JRuleEngine implements PropertyChangeListener {
             return null;
         }
         return Double.valueOf(d);
+    }
+
+    private String getStringFromAnnotation(String s) {
+        return s.isEmpty() ? null : s;
     }
 
     private CompletableFuture<Void> createTimer(String logName, String cronExpressionStr) {
@@ -409,9 +414,9 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private Boolean evaluateComparatorParameters(Double gt, Double gte, Double lt, Double lte, String eq, String neq,
             String stateValue) {
-        if (eq != null && !eq.isEmpty()) {
+        if (eq != null) {
             return stateValue.equals(eq);
-        } else if (neq != null && !neq.isEmpty()) {
+        } else if (neq != null) {
             return !stateValue.equals(neq);
         } else if (gt != null) {
             return getValueAsDouble(stateValue) > gt;
@@ -517,10 +522,11 @@ public class JRuleEngine implements PropertyChangeListener {
             final String state = item.getState().toString();
             Boolean evalComparatorParams = evaluateComparatorParameters(getDoubleFromAnnotation(precondition.gt()),
                     getDoubleFromAnnotation(precondition.gte()), getDoubleFromAnnotation(precondition.lt()),
-                    getDoubleFromAnnotation(precondition.lte()), precondition.eq(), precondition.neq(), state);
+                    getDoubleFromAnnotation(precondition.lte()), getStringFromAnnotation(precondition.eq()),
+                    getStringFromAnnotation(precondition.neq()), state);
             if (evalComparatorParams == null) {
-                logError("Failed to evaluate precondition context: {} precondition: {}", context,
-                        toString(precondition));
+                logError("Failed to evaluate precondition context: {} precondition: {} state: {}", context,
+                        toString(precondition), state);
             }
             return evalComparatorParams == null ? true : evalComparatorParams.booleanValue();
         } catch (ItemNotFoundException e) {
