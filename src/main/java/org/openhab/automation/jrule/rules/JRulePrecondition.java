@@ -29,7 +29,15 @@ import java.lang.annotation.Target;
 public @interface JRulePrecondition {
     String item() default "";
 
-    String state() default "";
+    double gt() default Double.MIN_VALUE;
 
-    PreconditionComparator comparator() default PreconditionComparator.EQUALS;
+    double lt() default Double.MIN_VALUE;
+
+    double gte() default Double.MIN_VALUE;
+
+    double lte() default Double.MIN_VALUE;
+
+    String eq() default "";
+
+    String neq() default "";
 }

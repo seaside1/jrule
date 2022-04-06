@@ -211,8 +211,7 @@ public class JRuleEngine implements PropertyChangeListener {
                             jRuleWhen.from(), jRuleWhen.to(), jRuleWhen.update(), jRuleWhen.item(), method,
                             jRuleEventPresent, getDoubleFromAnnotation(jRuleWhen.lt()),
                             getDoubleFromAnnotation(jRuleWhen.lte()), getDoubleFromAnnotation(jRuleWhen.gt()),
-                            getDoubleFromAnnotation(jRuleWhen.gte()), getDoubleFromAnnotation(jRuleWhen.eq()),
-                            preconditions);
+                            getDoubleFromAnnotation(jRuleWhen.gte()), jRuleWhen.eq(), jRuleWhen.neq(), preconditions);
                     itemNames.add(jRuleWhen.item());
                 } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1
                         || !jRuleWhen.cron().isEmpty()) {
@@ -309,11 +308,11 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void addExecutionContext(JRule jRule, String logName, String itemClass, String ruleName, String trigger,
             String from, String to, String update, String itemName, Method method, boolean eventParameterPresent,
-            Double lt, Double lte, Double gt, Double gte, Double eq, JRulePrecondition[] preconditions) {
+            Double lt, Double lte, Double gt, Double gte, String eq, String neq, JRulePrecondition[] preconditions) {
         List<JRuleExecutionContext> contextList = itemToExecutionContexts.computeIfAbsent(itemName,
                 k -> new ArrayList<>());
         final JRuleExecutionContext context = new JRuleExecutionContext(jRule, logName, trigger, from, to, update,
-                ruleName, itemClass, itemName, method, eventParameterPresent, lt, lte, gt, gte, eq, preconditions);
+                ruleName, itemClass, itemName, method, eventParameterPresent, lt, lte, gt, gte, eq, neq, preconditions);
         JRuleLog.debug(logger, logName, "ItemContextList add context: {}", context);
         contextList.add(context);
     }
@@ -323,7 +322,7 @@ public class JRuleEngine implements PropertyChangeListener {
         List<JRuleExecutionContext> contextList = channelToExecutionContexts.computeIfAbsent(channel,
                 k -> new ArrayList<>());
         final JRuleExecutionContext context = new JRuleExecutionContext(jRule, logName, null, null, null, null,
-                ruleName, null, null, method, eventParameterPresent, null, null, null, null, null, preconditions);
+                ruleName, null, null, method, eventParameterPresent, null, null, null, null, null, null, preconditions);
         JRuleLog.debug(logger, logName, "ChannelContextList add context: {}", context);
         contextList.add(context);
     }
@@ -408,35 +407,41 @@ public class JRuleEngine implements PropertyChangeListener {
         }
     }
 
+    private Boolean evaluateComparatorParameters(Double gt, Double gte, Double lt, Double lte, String eq, String neq,
+            String stateValue) {
+        if (eq != null) {
+            return stateValue.equals(eq);
+        } else if (neq != null) {
+            return !stateValue.equals(neq);
+        } else if (gt != null) {
+            return getValueAsDouble(stateValue) > gt;
+        } else if (gte != null) {
+            return getValueAsDouble(stateValue) >= gte;
+        } else if (lt != null) {
+            return getValueAsDouble(stateValue) < lt;
+        } else if (lte != null) {
+            return getValueAsDouble(stateValue) <= lte;
+        }
+        return null;
+    }
+
     private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
         JRuleLog.debug(logger, context.getLogName(), "invoke when context matches");
-        if (context.isNumericOperation()) {
-            Double value = getValueAsDouble(jRuleEvent.getValue());
-            if (context.getGt() != null) {
-                if (value > context.getGt()) {
-                    invokeRule(context, jRuleEvent);
-                }
-            } else if (context.getGte() != null) {
-                if (value >= context.getGte()) {
-                    invokeRule(context, jRuleEvent);
-                }
-            } else if (context.getLt() != null) {
-                if (value < context.getLt()) {
-                    invokeRule(context, jRuleEvent);
-                }
 
-            } else if (context.getLte() != null) {
-                if (value <= context.getLte()) {
-                    invokeRule(context, jRuleEvent);
-                }
-            } else if (context.getEq() != null) {
-                if (value.equals(context.getEq())) {
-                    invokeRule(context, jRuleEvent);
-                }
+        if (context.isComparatorOperation()) {
+            final Boolean evalCompare = evaluateComparatorParameters(context.getGt(), context.getGte(), context.getLt(),
+                    context.getLte(), context.getEq(), context.getNeq(), jRuleEvent.getValue());
+            if (evalCompare == null) {
+                logError("Failed to compare values for context: {} event: {}", context, jRuleEvent);
+                return;
             }
-        } else {
-            invokeRule(context, jRuleEvent);
+            if (!evalCompare) {
+                logDebug("Not invoking rule since comparator compare is false context: {} event: {}", context,
+                        jRuleEvent);
+                return;
+            }
         }
+        invokeRule(context, jRuleEvent);
     }
 
     private Double getValueAsDouble(String value) {
@@ -502,36 +507,31 @@ public class JRuleEngine implements PropertyChangeListener {
             }
         } else {
             JRuleLog.debug(logger, context.getLogName(), "Preconditions failed for context: {}", context);
-
         }
         return null;
     }
 
     private boolean evaluatePrecondition(JRuleExecutionContext context, JRulePrecondition precondition) {
         try {
-            Item item = itemRegistry.getItem(precondition.item());
-            String state = item.getState().toString();
-
-            switch (precondition.comparator()) {
-                case EQUALS:
-                    JRuleLog.debug(logger, context.getRuleName(), "Precondition comparison '{}' == '{}'", state,
-                            precondition.state());
-                    return state.equals(precondition.state());
-                case NOT_EQUALS:
-                    JRuleLog.debug(logger, context.getRuleName(), "Precondition comparison '{}' != '{}'", state,
-                            precondition.state());
-                    return !state.equals(precondition.state());
-                default:
-                    JRuleLog.warn(logger, context.getRuleName(), "Unsupported comparison operator {}",
-                            precondition.comparator());
-                    return false;
-
+            final Item item = itemRegistry.getItem(precondition.item());
+            final String state = item.getState().toString();
+            Boolean evalComparatorParams = evaluateComparatorParameters(precondition.gt(), precondition.gte(),
+                    precondition.lt(), precondition.lte(), precondition.eq(), precondition.neq(), state);
+            if (evalComparatorParams == null) {
+                logError("Failed to evaluate precondition context: {} precondition: {}", context,
+                        toString(precondition));
             }
-
+            return evalComparatorParams == null ? true : evalComparatorParams.booleanValue();
         } catch (ItemNotFoundException e) {
             JRuleLog.error(logger, context.getRuleName(), "Precondition item not found: {}", precondition.item());
         }
         return true; // For now
+    }
+
+    private String toString(JRulePrecondition precondition) {
+        return "item=" + precondition.item() + " eq=" + precondition.eq() + " neq=" + precondition.neq() + " gt="
+                + precondition.gt() + " gte=" + precondition.gte() + " lt=" + precondition.lt() + " lte="
+                + precondition.lte();
     }
 
     private synchronized static String getStackTraceAsString(Throwable throwable) {

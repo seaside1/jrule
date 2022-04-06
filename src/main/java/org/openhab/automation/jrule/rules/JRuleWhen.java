@@ -55,5 +55,7 @@ public @interface JRuleWhen {
 
     double lte() default Double.MIN_VALUE;
 
-    double eq() default Double.MIN_VALUE;
+    String eq() default "";
+
+    String neq() default "";
 }

@@ -37,7 +37,8 @@ public class JRuleExecutionContext {
     private final Double gte;
     private final Double lt;
     private final Double lte;
-    private final Double eq;
+    private final String eq;
+    private final String neq;
     private final String update;
     private final JRule jRule;
     private final Method method;
@@ -51,13 +52,14 @@ public class JRuleExecutionContext {
 
     public JRuleExecutionContext(JRule jRule, String logName, String trigger, String from, String to, String update,
             String ruleName, String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt,
-            Double lte, Double gt, Double gte, Double eq, JRulePrecondition[] preconditions) {
+            Double lte, Double gt, Double gte, String eq, String neq, JRulePrecondition[] preconditions) {
         this.logName = logName;
         this.gt = gt;
         this.gte = gte;
         this.lt = lt;
         this.lte = lte;
         this.eq = eq;
+        this.neq = neq;
         this.jRule = jRule;
         this.trigger = trigger;
         this.from = from;
@@ -74,7 +76,7 @@ public class JRuleExecutionContext {
     public JRuleExecutionContext(JRule jRule, String logName, Method method, String ruleName, boolean jRuleEventPresent,
             JRulePrecondition[] preconditions) {
         this(jRule, logName, null, null, null, null, ruleName, null, null, method, jRuleEventPresent, null, null, null,
-                null, null, preconditions);
+                null, null, null, preconditions);
     }
 
     @Override
@@ -183,12 +185,20 @@ public class JRuleExecutionContext {
         return lte;
     }
 
-    public Double getEq() {
+    public String getEq() {
         return eq;
+    }
+
+    public String getNeq() {
+        return neq;
     }
 
     public boolean isNumericOperation() {
         return lte != null || lt != null || gt != null || gte != null;
+    }
+
+    public boolean isComparatorOperation() {
+        return lte != null || lt != null || gt != null || gte != null || eq != null || neq != null;
     }
 
     public String getLogName() {
