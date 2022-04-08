@@ -12,7 +12,10 @@
  */
 package org.openhab.automation.jrule.internal.watch;
 
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -141,7 +144,7 @@ public class JRuleRulesWatcher implements Runnable {
             logDebug("Watcher Thread interrupted, closing down");
             return;
         } catch (Exception e) {
-            logError("Folder watcher terminated due to exception", e);
+            logError("Folder watcher terminated due to exception {}", e);
             return;
         }
     }
