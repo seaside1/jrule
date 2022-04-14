@@ -214,6 +214,10 @@ public class JRule {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
+    protected void sendCommand(String itemName, double value, String unit) {
+        JRuleEventHandler.get().sendCommand(itemName, value, unit);
+    }
+
     protected void sendCommand(String itemName, int value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }

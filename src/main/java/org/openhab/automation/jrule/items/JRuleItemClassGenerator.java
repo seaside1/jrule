@@ -50,11 +50,13 @@ public class JRuleItemClassGenerator {
     private final URL contactItemClassTemplateUrl;
     private final URL rollershutterItemClassTemplateUrl;
     private final URL groupItemClassTemplateUrl;
+    private final URL numberQuantityItemClassTemplateUrl;
 
     private final String itemClassTemplate;
     private final String switchItemClassTemplate;
     private final String playerItemClassTemplate;
     private final String dimmerItemClassTemplate;
+    private final String numberQuantityItemClassTemplate;
     private final String numberItemClassTemplate;
     private final String stringItemClassTemplate;
     private final String colorItemClassTemplate;
@@ -76,6 +78,9 @@ public class JRuleItemClassGenerator {
         dimmerItemClassTemplate = JRuleUtil.getResourceAsString(dimmerItemClassTemplateUrl);
         numberItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassNumber.template");
         numberItemClassTemplate = JRuleUtil.getResourceAsString(numberItemClassTemplateUrl);
+        numberQuantityItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassNumberQuantity.template");
+        numberQuantityItemClassTemplate = JRuleUtil.getResourceAsString(numberQuantityItemClassTemplateUrl);
+
         stringItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassString.template");
         stringItemClassTemplate = JRuleUtil.getResourceAsString(stringItemClassTemplateUrl);
         colorItemClassTemplateUrl = JRuleUtil.getResourceUrl("ItemClassColor.template");
@@ -102,11 +107,17 @@ public class JRuleItemClassGenerator {
         String template = null;
         String generatedClass = null;
         String type = item.getType();
+        String quantityType = null;
         if (type.contains(":")) {
-            String[] split = item.getType().split(":");
+            final String[] split = item.getType().split(":");
             type = split[0];
-        }
-        if (type.equals(CoreItemFactory.SWITCH)) {
+            if (split.length == 2) {
+                quantityType = split[1];
+                if (type.contains(CoreItemFactory.NUMBER)) {
+                    template = numberQuantityItemClassTemplate;
+                }
+            }
+        } else if (type.equals(CoreItemFactory.SWITCH)) {
             template = switchItemClassTemplate;
         } else if (type.equals(CoreItemFactory.DIMMER)) {
             template = dimmerItemClassTemplate;
@@ -145,6 +156,9 @@ public class JRuleItemClassGenerator {
         generatedClass = generatedClass.replaceAll("\\$\\{package\\}", itemPackage);
         generatedClass = generatedClass.replaceAll("\\$\\{ItemName\\}", itemName);
         generatedClass = generatedClass.replaceAll("\\$\\{ItemClass\\}", className);
+        if (quantityType != null) {
+            generatedClass = generatedClass.replaceAll("\\$\\{Type\\}", quantityType);
+        }
 
         if (f.exists()) {
             String existingClass = JRuleUtil.getFileAsString(f);

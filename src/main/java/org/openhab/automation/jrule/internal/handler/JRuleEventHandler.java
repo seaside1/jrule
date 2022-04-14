@@ -141,6 +141,11 @@ public class JRuleEventHandler {
         sendCommand(itemName, hsbType);
     }
 
+    public void sendCommand(String itemName, double value, String unit) {
+        final QuantityType<?> type = new QuantityType<>(value + " " + unit);
+        sendCommand(itemName, type);
+    }
+
     public void sendCommand(String itemName, JRuleRgbValue rgbValue) {
         sendCommand(itemName, HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue()));
     }
@@ -197,6 +202,11 @@ public class JRuleEventHandler {
 
     public void postUpdate(String itemName, String value) {
         postUpdate(itemName, new StringType(value));
+    }
+
+    public void postUpdate(String itemName, double value, String unit) {
+        QuantityType<?> type = new QuantityType<>(value + " " + unit);
+        postUpdate(itemName, type);
     }
 
     public void postUpdate(String itemName, double value) {

@@ -29,6 +29,14 @@ public abstract class JRuleNumberItem extends JRuleItem {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
+    public static void sendCommand(String itemName, double value, String unit) {
+        JRuleEventHandler.get().sendCommand(itemName, value, unit);
+    }
+
+    public static void postUpdate(String itemName, double value, String unit) {
+        JRuleEventHandler.get().postUpdate(itemName, value, unit);
+    }
+
     public static Double getState(String name) {
         return JRuleEventHandler.get().getStateFromItemAsDouble(name);
     }
