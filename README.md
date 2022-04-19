@@ -561,6 +561,21 @@ a motion detector is triggered we will turn on a fan.
 }
 ```
 
+# Example 26
+
+Use case: Send Quantity type Watt (W) from rule.
+
+```java
+   public class QuantityTypeRule extends JRule {
+  
+    @JRuleName("testQuantityPowerWatt")
+    @JRuleWhen(item=_MyTestMeterPower.ITEM, trigger=_MyTestMeterPower.TRIGGER_CHANGED)
+    public void testQuantityPower(JRuleEvent event) {
+        logInfo("TestQuantity power will send this value as Watt: {}", event.getValue());
+        _TestPowerQuantityType.sendCommand(event.getValueAsDouble(), "W");
+}
+```
+
 # Changelog
 ## BETA7
 - Fixed item for Number:Quantity, you can now send a quantity type in the command see example 26
