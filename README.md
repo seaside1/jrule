@@ -665,4 +665,4 @@ Use case: Send Quantity type Watt (W) from rule.
 
 ## Resources
 
-[https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA6/org.openhab.automation.jrule-3.x.x-BETA6.jar](https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA6/org.openhab.automation.jrule-3.x.x-BETA6.jar)
+[https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA7/org.openhab.automation.jrule-3.x.x-BETA7.jar](https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA7/org.openhab.automation.jrule-3.x.x-BETA7.jar)
