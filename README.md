@@ -141,6 +141,18 @@ org.openhab.automation.jrule.engine.executors.max=10
 
 ```
 
+# Operators for triggers and preconditions
+See example 12, 25 and 26
+| Operator                               | Description                                                                                   |
+| -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| eq                                     | Equals                        |
+| neq                                    | Not Equals                              |
+| gt                                     | Greater than                        |
+| gte                                    | Greater than equals                              |
+| lt                                     | Less than                        |
+| lte                                    | Less than equals                              |
+
+
 # Examples 
 
 ## Example 1
