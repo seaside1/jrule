@@ -1,0 +1,48 @@
+/**
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package ${package};
+
+import org.openhab.automation.jrule.items.JRuleNumberItem;
+
+/**
+ * Automatically Generated Class
+ * for Item ${ItemName}
+ *
+ * @author Joseph (Seaside) Hagberg - Initial contribution
+ */
+public class ${ItemClass} extends JRuleNumberItem {
+
+    public static final String ITEM = "${ItemName}";
+    
+    public static final String TYPE = "${Type}";
+    
+    public static Double getState() {
+        return JRuleNumberItem.getState(ITEM);
+    }
+    
+    public static void sendCommand(double value) {
+        JRuleNumberItem.sendCommand(ITEM, value);
+    }
+
+    public static void postUpdate(double value) {
+        JRuleNumberItem.postUpdate(ITEM, value);
+    }
+    
+     public static void sendCommand(double value, String unit) {
+        JRuleNumberItem.sendCommand(ITEM, value, unit);
+    }
+
+    public static void postUpdate(double value, String unit) {
+        JRuleNumberItem.postUpdate(ITEM, value, unit);
+    }
+}
