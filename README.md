@@ -62,6 +62,7 @@ The following jar files can be found under the jrule/jar-folder:
 1. Create JAVA source files for all items 
 2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/automation/jrule/jar
 3. Compile any java rules file under  /etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
+ It is possible to use package structure with subdirectories in this folder, or the can be place in a flat structure right under this folder
 4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar).
 The two jar files needed for Java rules development can be found under /etc/openhab/automation/jrule/jar
 
