@@ -562,6 +562,10 @@ a motion detector is triggered we will turn on a fan.
 ```
 
 # Changelog
+## BETA7
+- Fixed item for Number:Quantity, you can now send a quantity type in the command see example 26
+- Added precondition see example 24 and 25 by seime: https://github.com/seaside1/jrule/pull/30
+- Added possibility to use subdirs and packages for rules by seime: https://github.com/seaside1/jrule/pull/30
 ## BETA6
 - Added seprate thread executors supplied by seime: https://github.com/seaside1/jrule/pull/23
 - Added Windows Support by LumnitzF https://github.com/seaside1/jrule/pull/24
