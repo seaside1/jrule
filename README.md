@@ -512,6 +512,42 @@ Use case: Apply transformation using openHAB transformation service
 }
 ```
 
+## Example 24
+
+Use case: Use precondition annotation in order to create "AND" logic. Example we have a switch that will tell 
+if it is ok for disturbance. If it is ok the switch is set to ON and we can send a notification if the notification 
+message is updated.
+
+```java
+   public class PreConditionTestDisturbance extends JRule {
+
+    @JRulePrecondition(item=_MyTestDisturbanceSwitch.ITEM, eq = "ON")
+    @JRuleName("MyTestPreConditionRule1")
+    @JRuleWhen(item = _MyMessageNotification.ITEM, trigger = _MyMessageNotification.TRIGGER_RECEIVED_COMMAND)
+    public void testPrecondition(JRuleEvent event) {
+        String notificationMessage = event.getValue();
+        logInfo("It is ok to send notification: {}", notificationMessage);
+        _MySendNoticationItemMqtt.sendCommand(notificationMessage);
+    }
+}
+```
+## Example 25
+Use case: Use precondition annotation in order to create "AND" logic. Example when the temperature is above 30 degrees (celcius probably) and
+a motion detector is triggered we will turn on a fan.
+
+```java
+   public class PreConditionTestTemperature extends JRule {
+
+    @JRulePrecondition(item=_MyTestTemperatureSensor.ITEM, gt = 30)
+    @JRuleName("MyTestPreConditionRuleTemperature")
+    @JRuleWhen(item = _MyMotionDetector.ITEM, trigger = _MyMotionDectetor.TRIGGER_CHANGED_FROM_OFF_TO_ON)
+    public void testPrecondition(JRuleEvent event) {
+        logInfo("Temperature is above 30 and we should start the fan since the motiondetector is triggered");
+        _MyFan.sendCommand("ON");
+    }
+}
+```
+
 # Changelog
 ## BETA6
 - Added seprate thread executors supplied by seime: https://github.com/seaside1/jrule/pull/23
