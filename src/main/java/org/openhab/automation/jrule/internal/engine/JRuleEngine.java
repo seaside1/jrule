@@ -365,33 +365,35 @@ public class JRuleEngine implements PropertyChangeListener {
         final String type = ((ItemEvent) event).getType();
 
         final Set<String> triggerValues = new HashSet<>(5);
-        String stringValue;
+        final String stringNewValue;
+        final String stringOldValue;
         String memberName = null;
         if (event instanceof GroupItemStateChangedEvent) {
             memberName = ((GroupItemStateChangedEvent) event).getMemberName();
         }
 
         if (event instanceof ItemStateEvent) {
-            stringValue = ((ItemStateEvent) event).getItemState().toFullString();
+            stringNewValue = ((ItemStateEvent) event).getItemState().toFullString();
+            stringOldValue = null;
             triggerValues.add(RECEIVED_UPDATE);
-            triggerValues.add(RECEIVED_UPDATE_APPEND.concat(stringValue));
+            triggerValues.add(RECEIVED_UPDATE_APPEND.concat(stringNewValue));
         } else if (event instanceof ItemCommandEvent) {
-            stringValue = ((ItemCommandEvent) event).getItemCommand().toFullString();
+            stringNewValue = ((ItemCommandEvent) event).getItemCommand().toFullString();
+            stringOldValue = null;
             triggerValues.add(RECEIVED_COMMAND);
-            triggerValues.add(RECEIVED_COMMAND_APPEND.concat(stringValue));
+            triggerValues.add(RECEIVED_COMMAND_APPEND.concat(stringNewValue));
         } else if (event instanceof ItemStateChangedEvent) {
-            final String newValue = ((ItemStateChangedEvent) event).getItemState().toFullString();
-            final String oldValue = ((ItemStateChangedEvent) event).getOldItemState().toFullString();
-            stringValue = newValue;
+            stringNewValue = ((ItemStateChangedEvent) event).getItemState().toFullString();
+            stringOldValue = ((ItemStateChangedEvent) event).getOldItemState().toFullString();
 
-            if (JRuleUtil.isNotEmpty(oldValue) && JRuleUtil.isNotEmpty(newValue)) {
-                triggerValues.add(String.format(CHANGED_FROM_TO_PATTERN, oldValue, newValue));
-                triggerValues.add(CHANGED_FROM.concat(oldValue));
-                triggerValues.add(CHANGED_TO.concat(newValue));
+            if (JRuleUtil.isNotEmpty(stringOldValue) && JRuleUtil.isNotEmpty(stringNewValue)) {
+                triggerValues.add(String.format(CHANGED_FROM_TO_PATTERN, stringOldValue, stringNewValue));
+                triggerValues.add(CHANGED_FROM.concat(stringOldValue));
+                triggerValues.add(CHANGED_TO.concat(stringNewValue));
                 triggerValues.add(CHANGED);
             }
 
-            logDebug("newValue: {} oldValue: {} type: {}", newValue, oldValue, type);
+            logDebug("newValue: {} oldValue: {} type: {}", stringNewValue, stringOldValue, type);
             logDebug("Invoked execution contexts: {}", executionContexts.size());
             logDebug("Execution topic Topic: {}", event.getTopic());
             logDebug("Execution topic Payload: {}", event.getPayload());
@@ -406,7 +408,8 @@ public class JRuleEngine implements PropertyChangeListener {
         if (triggerValues.size() > 0) {
             String member = memberName == null ? "" : memberName;
             executionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
-                    .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(stringValue, member)));
+                    .forEach(context -> invokeWhenMatchParameters(context,
+                            new JRuleEvent(stringNewValue, stringOldValue, itemName, member)));
         } else {
             logDebug("Execution ignored, no trigger values for itemName: {} eventType: {}", itemName, type);
         }

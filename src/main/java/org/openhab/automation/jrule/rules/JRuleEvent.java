@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.rules;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
-import org.openhab.core.library.types.QuantityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,59 +27,73 @@ public class JRuleEvent {
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleEvent.class);
 
-    private final String value;
+    private final JRuleEventState state;
+    private final JRuleEventState oldState;
 
     private String memberName;
 
+    private String itemName;
+
     public JRuleEvent(String value) {
-        this.value = value;
+        this(value, null, null, null);
     }
 
-    public JRuleEvent(String value, String memberName) {
-        this.value = value;
+    public JRuleEvent(String value, String oldValue, String itemName, String memberName) {
+        this.itemName = itemName;
+        this.state = new JRuleEventState(value);
+        this.oldState = new JRuleEventState(oldValue);
         this.memberName = memberName;
     }
 
+    public JRuleEventState getState() {
+        return state;
+    }
+
+    public JRuleEventState getOldState() {
+        return oldState;
+    }
+
+    @Deprecated
     public String getValue() {
-        return value;
+        return state.getValue();
     }
 
+    @Deprecated
     public JRuleOnOffValue getValueAsOnOffValue() {
-        return JRuleOnOffValue.getValueFromString(value);
+        return state.getValueAsOnOffValue();
     }
 
+    @Deprecated
     public JRuleOpenClosedValue getValueAsOpenClosedValue() {
-        return JRuleOpenClosedValue.getValueFromString(value);
+        return state.getValueAsOpenClosedValue();
     }
 
+    @Deprecated
     public JRuleUpDownValue getValueAsUpDownValue() {
-        return JRuleUpDownValue.getValueFromString(value);
+        return state.getValueAsUpDownValue();
     }
 
+    @Deprecated
     public Double getValueAsDouble() {
-        try {
-            return QuantityType.valueOf(value).doubleValue();
-        } catch (Exception e) {
-            logger.warn("Error converting {} to double: {}", value, e.getMessage());
-            return null;
-        }
+        return state.getValueAsDouble();
     }
 
+    @Deprecated
     public Integer getValueAsInteger() {
-        try {
-            return QuantityType.valueOf(value).intValue();
-        } catch (Exception e) {
-            logger.warn("Error converting {} to int: {}", value, e.getMessage());
-            return null;
-        }
+        return state.getValueAsInteger();
     }
 
     public String getMemberName() {
         return memberName;
     }
 
+    public String getItemName() {
+        return itemName;
+    }
+
     @Override
     public String toString() {
-        return "JRuleEvent{" + "value='" + value + '\'' + ", memberName='" + memberName + '\'' + '}';
+        return String.format("JRuleEvent{itemName='%s', state=%s, oldState=%s, memberName='%s'", itemName, state,
+                oldState, memberName);
     }
 }
