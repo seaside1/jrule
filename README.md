@@ -617,6 +617,8 @@ triggered the rule.
 
 
 # Changelog
+## BETA9
+ - Fixed bug with item generation and forName overloading
 ## BETA8
  - Added forName for items see example 27 https://github.com/seaside1/jrule/commit/0952ae497d998c5728a85df407bfbf3f1909f8e9
  - Added itemName and OldState by gerrieg https://github.com/seaside1/jrule/pull/31
