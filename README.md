@@ -1,5 +1,7 @@
 # OpenHAB Rules using Java
 
+![java-logo-vert-blk|500x500](upload://hNnWJ8k2qES2xMl7c9Mxu0dNobS.png)
+
 This automation package aims to enable Java development of OpenHAB Rules. The addon will allow the user to create custom OpenHAB rules
 in one or several .java-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers
 are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execute rules based on items defined in OpenHAB either in .items-files or the GUI. The addon needs to know about these items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
