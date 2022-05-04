@@ -36,7 +36,7 @@ public class JRuleDimmerItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleDimmerItem(String itemName) {
+    protected JRuleDimmerItem(String itemName) {
         this.itemName = itemName;
     }
 

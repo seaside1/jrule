@@ -24,6 +24,10 @@ public class ${ItemClass} extends JRuleNumberItem {
 
     public static final String ITEM = "${ItemName}";
     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static Double getState() {
         return JRuleNumberItem.getState(ITEM);
     }

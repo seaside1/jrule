@@ -35,7 +35,7 @@ public class JRulePlayerItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRulePlayerItem(String itemName) {
+    protected JRulePlayerItem(String itemName) {
         this.itemName = itemName;
     }
 

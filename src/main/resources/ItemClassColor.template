@@ -27,6 +27,10 @@ public class ${ItemClass} extends JRuleColorItem {
  
     public static final String ITEM = "${ItemName}";
     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static JRuleColorValue getState() {
         return JRuleColorItem.getState(ITEM);
     }

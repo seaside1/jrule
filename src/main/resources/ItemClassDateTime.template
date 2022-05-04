@@ -24,6 +24,10 @@ import java.util.Date;
 public class ${ItemClass} extends JRuleDateTimeItem {
 
     public static final String ITEM = "${ItemName}";
+     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
     
     public static Date getState() {
         return JRuleDateTimeItem.getState(ITEM);

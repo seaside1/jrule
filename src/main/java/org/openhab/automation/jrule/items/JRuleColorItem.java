@@ -26,7 +26,7 @@ public class JRuleColorItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleColorItem(String itemName) {
+    protected JRuleColorItem(String itemName) {
         this.itemName = itemName;
     }
 

@@ -25,7 +25,7 @@ public class JRuleDateTimeItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleDateTimeItem(String itemName) {
+    protected JRuleDateTimeItem(String itemName) {
         this.itemName = itemName;
     }
 
@@ -45,15 +45,15 @@ public class JRuleDateTimeItem extends JRuleItem {
         return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
     }
 
-    public static void sendItemCommand(String itemName, Date date) {
+    public static void sendCommand(String itemName, Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
     }
 
-    public static void postItemUpdate(String itemName, Date date) {
+    public static void postUpdate(String itemName, Date date) {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
-    public static Date getItemState(String itemName) {
+    public static Date getState(String itemName) {
         return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
     }
 }

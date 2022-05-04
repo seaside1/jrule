@@ -24,7 +24,7 @@ public class JRuleContactItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleContactItem(String itemName) {
+    protected JRuleContactItem(String itemName) {
         this.itemName = itemName;
     }
 

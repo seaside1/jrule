@@ -25,6 +25,10 @@ public class ${ItemClass} extends JRuleContactItem {
  
     public static final String ITEM = "${ItemName}";
     
+     public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static JRuleOpenClosedValue getState() {
         return JRuleContactItem.getState(ITEM);
     }

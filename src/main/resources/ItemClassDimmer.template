@@ -26,6 +26,10 @@ public class ${ItemClass} extends JRuleDimmerItem {
 
     public static final String ITEM = "${ItemName}";
     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static int getState() {
         return JRuleDimmerItem.getState(ITEM);
     }

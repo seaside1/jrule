@@ -25,6 +25,10 @@ public class ${ItemClass} extends JRulePlayerItem {
  
     public static final String ITEM = "${ItemName}";
     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static JRulePlayPauseValue getState() {
         return JRulePlayerItem.getState(ITEM);
     }

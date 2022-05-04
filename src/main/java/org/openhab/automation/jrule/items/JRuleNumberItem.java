@@ -23,7 +23,7 @@ public class JRuleNumberItem extends JRuleItem {
 
     public final String itemName;
 
-    private JRuleNumberItem(String itemName) {
+    protected JRuleNumberItem(String itemName) {
         this.itemName = itemName;
     }
 

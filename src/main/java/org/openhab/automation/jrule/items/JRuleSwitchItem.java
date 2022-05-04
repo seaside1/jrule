@@ -35,7 +35,7 @@ public class JRuleSwitchItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleSwitchItem(String itemName) {
+    protected JRuleSwitchItem(String itemName) {
         this.itemName = itemName;
     }
 

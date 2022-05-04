@@ -25,7 +25,7 @@ public class JRuleRollershutterItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleRollershutterItem(String itemName) {
+    protected JRuleRollershutterItem(String itemName) {
         this.itemName = itemName;
     }
 

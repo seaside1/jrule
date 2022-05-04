@@ -29,6 +29,10 @@ public class ${ItemClass} extends JRuleGroupItem {
 
     public static final String ITEM = "${ItemName}";
     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static String getState() {
         return JRuleGroupItem.getState(ITEM);
     }

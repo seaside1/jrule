@@ -25,6 +25,10 @@ public class ${ItemClass} extends JRuleSwitchItem {
 
     public static final String ITEM = "${ItemName}";
     
+     public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static JRuleOnOffValue getState() {
         return JRuleSwitchItem.getState(ITEM);
     }

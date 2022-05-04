@@ -26,6 +26,10 @@ public class ${ItemClass} extends JRuleRollershutterItem {
  
     public static final String ITEM = "${ItemName}";
     
+    public ${ItemClass}() {
+        super(ITEM);
+    }
+    
     public static int getState() {
         return JRuleRollershutterItem.getState(ITEM);
     }

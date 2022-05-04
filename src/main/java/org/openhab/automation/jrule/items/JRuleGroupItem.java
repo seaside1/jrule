@@ -28,7 +28,7 @@ public class JRuleGroupItem extends JRuleItem {
 
     private final String itemName;
 
-    private JRuleGroupItem(String itemName) {
+    protected JRuleGroupItem(String itemName) {
         this.itemName = itemName;
     }
 
