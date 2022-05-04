@@ -708,4 +708,4 @@ triggered the rule.
 
 ## Resources
 
-[https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA8/org.openhab.automation.jrule-3.x.x-BETA8.jar](https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA7/org.openhab.automation.jrule-3.x.x-BETA8.jar)
+[https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA8/org.openhab.automation.jrule-3.x.x-BETA8.jar](https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA8/org.openhab.automation.jrule-3.x.x-BETA8.jar)
