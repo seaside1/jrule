@@ -573,6 +573,7 @@ Use case: Send Quantity type Watt (W) from rule.
     public void testQuantityPower(JRuleEvent event) {
         logInfo("TestQuantity power will send this value as Watt: {}", event.getValue());
         _TestPowerQuantityType.sendCommand(event.getValueAsDouble(), "W");
+    }
 }
 ```
 # Example 27
@@ -594,9 +595,31 @@ Use case: Use forName to create and item and send commands and get status
  }
 ```
 
+# Example 28
+
+Use case: Get the name of the item that triggered the rule as well as new and old state value. 
+This can be useful if you have multiple JRuleWhen with different items, and you want to know which item
+triggered the rule.
+
+```java
+ public class TriggerNameExample extends JRule {
+  
+    @JRuleName("triggerNameExample")
+    @JRuleWhen(item=_MyTestSwitch1.ITEM, trigger=_MyTestSwitch1.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhen(item=_MyTestSwitch2.ITEM, trigger=_MyTestSwitch2.TRIGGER_CHANGED_TO_ON)
+    public void triggerNameExample(JRuleEvent event) {
+     logInfo("The rule was triggered by the following item: {}", event.getItemName());
+     logInfo("The rule was Old Value was: {} and new value: {}", event.getOldState(), event.getState());  
+      
+    }
+ }
+```
 
 
 # Changelog
+## BETA8
+ - Added forName for items see example 27 https://github.com/seaside1/jrule/commit/0952ae497d998c5728a85df407bfbf3f1909f8e9
+ - Added itemName and OldState by gerrieg https://github.com/seaside1/jrule/pull/31
 ## BETA7
 - Fixed item for Number:Quantity, you can now send a quantity type in the command see example 26
 - Added precondition see example 24 and 25 by seime: https://github.com/seaside1/jrule/pull/30
