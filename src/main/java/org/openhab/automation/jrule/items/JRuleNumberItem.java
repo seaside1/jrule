@@ -31,23 +31,23 @@ public class JRuleNumberItem extends JRuleItem {
         return new JRuleNumberItem(itemName);
     }
 
-    public void sendCommand(double value) {
+    public void sendItemCommand(double value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void postUpdate(double value) {
+    public void postItemUpdate(double value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void sendCommand(double value, String unit) {
+    public void sendItemCommand(double value, String unit) {
         JRuleEventHandler.get().sendCommand(itemName, value, unit);
     }
 
-    public void postUpdate(double value, String unit) {
+    public void postItemUpdate(double value, String unit) {
         JRuleEventHandler.get().postUpdate(itemName, value, unit);
     }
 
-    public Double getState() {
+    public Double getItemState() {
         return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
     }
 

@@ -18,7 +18,6 @@ package org.openhab.automation.jrule.items;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public enum JRuleItemType {
-
     SWITCH,
     CONTACT,
     STRING,

@@ -33,27 +33,27 @@ public class JRuleDateTimeItem extends JRuleItem {
         return new JRuleDateTimeItem(itemName);
     }
 
-    public void sendCommand(Date date) {
+    public void sendItemCommand(Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
     }
 
-    public void postUpdate(Date date) {
+    public void postItemUpdate(Date date) {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
-    public Date getState() {
+    public Date getItemState() {
         return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
     }
 
-    public static void sendCommand(String itemName, Date date) {
+    public static void sendItemCommand(String itemName, Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
     }
 
-    public static void postUpdate(String itemName, Date date) {
+    public static void postItemUpdate(String itemName, Date date) {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
-    public static Date getState(String itemName) {
+    public static Date getItemState(String itemName) {
         return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
     }
 }

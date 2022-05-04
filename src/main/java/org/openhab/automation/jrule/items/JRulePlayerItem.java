@@ -43,15 +43,15 @@ public class JRulePlayerItem extends JRuleItem {
         return new JRulePlayerItem(itemName);
     }
 
-    public JRulePlayPauseValue getState() {
+    public JRulePlayPauseValue getItemState() {
         return JRuleEventHandler.get().getPauseValue(itemName);
     }
 
-    public void sendCommand(JRulePlayPauseValue command) {
+    public void sendItemCommand(JRulePlayPauseValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void postUpdate(JRulePlayPauseValue state) {
+    public void postItemUpdate(JRulePlayPauseValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 

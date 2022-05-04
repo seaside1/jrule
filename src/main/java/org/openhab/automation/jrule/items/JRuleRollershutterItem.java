@@ -33,27 +33,27 @@ public class JRuleRollershutterItem extends JRuleItem {
         return new JRuleRollershutterItem(itemName);
     }
 
-    public int getState() {
+    public int getItemState() {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
     }
 
-    public void sendCommand(JRuleUpDownValue command) {
+    public void sendItemCommand(JRuleUpDownValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendCommand(JRuleStopMoveValue command) {
+    public void sendItemCommand(JRuleStopMoveValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendCommand(int value) {
+    public void sendItemCommand(int value) {
         JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
     }
 
-    public void postUpdate(JRuleUpDownValue state) {
+    public void postItemUpdate(JRuleUpDownValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 
-    public void postUpdate(int value) {
+    public void postItemUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 

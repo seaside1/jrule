@@ -44,27 +44,27 @@ public class JRuleDimmerItem extends JRuleItem {
         return new JRuleDimmerItem(itemName);
     }
 
-    public int getState() {
+    public int getItemState() {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
     }
 
-    public void sendCommand(JRuleOnOffValue command) {
+    public void sendItemCommand(JRuleOnOffValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendCommand(JRuleIncreaseDecreaseValue command) {
+    public void sendItemCommand(JRuleIncreaseDecreaseValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendCommand(int value) {
+    public void sendItemCommand(int value) {
         JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
     }
 
-    public void postUpdate(JRuleOnOffValue state) {
+    public void postItemUpdate(JRuleOnOffValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 
-    public void postUpdate(int value) {
+    public void postItemUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 

@@ -36,60 +36,60 @@ public class JRuleGroupItem extends JRuleItem {
         return new JRuleGroupItem(itemName);
     }
 
-    public Set<String> members() {
+    public Set<String> itemMembers() {
         return JRuleEventHandler.get().getGroupMemberNames(itemName);
     }
 
-    public void sendCommandToAll(String value) {
+    public void sendItemCommandToAll(String value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
         groupMemberNames.forEach(m -> sendCommand(m, value));
     }
 
-    public String getState() {
+    public String getItemState() {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
-    public JRuleOnOffValue getStateAsOnOffValue() {
+    public JRuleOnOffValue getItemStateAsOnOffValue() {
         return JRuleEventHandler.get().getOnOffValue(itemName);
     }
 
-    public JRulePlayPauseValue getStateAsPlayPauseValue() {
+    public JRulePlayPauseValue getItemStateAsPlayPauseValue() {
         return JRuleEventHandler.get().getPauseValue(itemName);
     }
 
-    public JRuleUpDownValue getStateAsUpDownValue() {
+    public JRuleUpDownValue getItemStateAsUpDownValue() {
         return JRuleEventHandler.get().getUpDownValue(itemName);
     }
 
-    public void sendCommand(JRulePlayPauseValue value) {
+    public void sendItemCommand(JRulePlayPauseValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void sendCommand(JRuleOnOffValue value) {
+    public void sendItemCommand(JRuleOnOffValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void sendCommand(JRuleUpDownValue value) {
+    public void sendItemCommand(JRuleUpDownValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void sendCommand(String value) {
+    public void sendItemCommand(String value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void postUpdate(String value) {
+    public void postItemUpdate(String value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void postUpdate(JRulePlayPauseValue value) {
+    public void postItemUpdate(JRulePlayPauseValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void postUpdate(JRuleOnOffValue value) {
+    public void postItemUpdate(JRuleOnOffValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void postUpdate(JRuleUpDownValue value) {
+    public void postItemUpdate(JRuleUpDownValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 

@@ -39,15 +39,15 @@ public class JRuleSwitchItem extends JRuleItem {
         this.itemName = itemName;
     }
 
-    public JRuleOnOffValue getState() {
+    public JRuleOnOffValue getItemState() {
         return JRuleEventHandler.get().getOnOffValue(itemName);
     }
 
-    public void sendCommand(JRuleOnOffValue command) {
+    public void sendItemCommand(JRuleOnOffValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void postUpdate(JRuleOnOffValue state) {
+    public void postItemUpdate(JRuleOnOffValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 

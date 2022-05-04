@@ -31,15 +31,15 @@ public class JRuleStringItem extends JRuleItem {
         return new JRuleStringItem(itemName);
     }
 
-    public String getState() {
+    public String getItemState() {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
-    public void sendCommand(String value) {
+    public void sendItemCommand(String value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void postUpdate(String value) {
+    public void postItemUpdate(String value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 

@@ -32,7 +32,7 @@ public class JRuleContactItem extends JRuleItem {
         return new JRuleContactItem(itemName);
     }
 
-    public JRuleOpenClosedValue getState() {
+    public JRuleOpenClosedValue getItemState() {
         return JRuleEventHandler.get().getOpenClosedValue(itemName);
     }
 

@@ -34,43 +34,43 @@ public class JRuleColorItem extends JRuleItem {
         return new JRuleColorItem(itemName);
     }
 
-    public JRuleColorValue getState() {
+    public JRuleColorValue getItemState() {
         return JRuleEventHandler.get().getColorValue(itemName);
     }
 
-    public JRuleOnOffValue getOnOffState() {
+    public JRuleOnOffValue getItemOnOffState() {
         return JRuleEventHandler.get().getOnOffValue(itemName);
     }
 
-    public int getPercentState() {
+    public int getItemPercentState() {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
     }
 
-    public void sendCommand(JRuleColorValue colorValue) {
+    public void sendItemCommand(JRuleColorValue colorValue) {
         JRuleEventHandler.get().sendCommand(itemName, colorValue);
     }
 
-    public void sendCommand(JRuleOnOffValue command) {
+    public void sendItemCommand(JRuleOnOffValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendCommand(JRuleIncreaseDecreaseValue command) {
+    public void sendItemCommand(JRuleIncreaseDecreaseValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendCommand(int value) {
+    public void sendItemCommand(int value) {
         JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
     }
 
-    public void postUpdate(JRuleColorValue colorValue) {
+    public void postItemUpdate(JRuleColorValue colorValue) {
         JRuleEventHandler.get().postUpdate(itemName, colorValue);
     }
 
-    public void postUpdate(JRuleOnOffValue state) {
+    public void postItemUpdate(JRuleOnOffValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 
-    public void postUpdate(int value) {
+    public void postItemUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 
