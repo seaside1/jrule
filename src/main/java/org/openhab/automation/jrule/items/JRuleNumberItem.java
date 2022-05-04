@@ -19,7 +19,37 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleNumberItem extends JRuleItem {
+public class JRuleNumberItem extends JRuleItem {
+
+    public final String itemName;
+
+    private JRuleNumberItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleNumberItem forName(String itemName) {
+        return new JRuleNumberItem(itemName);
+    }
+
+    public void sendCommand(double value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    public void postUpdate(double value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
+    public void sendCommand(double value, String unit) {
+        JRuleEventHandler.get().sendCommand(itemName, value, unit);
+    }
+
+    public void postUpdate(double value, String unit) {
+        JRuleEventHandler.get().postUpdate(itemName, value, unit);
+    }
+
+    public Double getState() {
+        return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
+    }
 
     public static void sendCommand(String itemName, double value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
@@ -37,7 +67,7 @@ public abstract class JRuleNumberItem extends JRuleItem {
         JRuleEventHandler.get().postUpdate(itemName, value, unit);
     }
 
-    public static Double getState(String name) {
-        return JRuleEventHandler.get().getStateFromItemAsDouble(name);
+    public static Double getState(String itemName) {
+        return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
     }
 }

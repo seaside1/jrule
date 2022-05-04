@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleDimmerItem extends JRuleItem {
+public class JRuleDimmerItem extends JRuleItem {
 
     public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update ON";
     public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update OFF";
@@ -33,6 +33,40 @@ public abstract class JRuleDimmerItem extends JRuleItem {
     public static final String TRIGGER_CHANGED_TO_OFF = "Changed to OFF";
     public static final String TRIGGER_CHANGED_TO_ON = "Changed to ON";
     public static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from OFF to ON";
+
+    private final String itemName;
+
+    private JRuleDimmerItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleDimmerItem forName(String itemName) {
+        return new JRuleDimmerItem(itemName);
+    }
+
+    public int getState() {
+        return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
+    }
+
+    public void sendCommand(JRuleOnOffValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void sendCommand(JRuleIncreaseDecreaseValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void sendCommand(int value) {
+        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
+    }
+
+    public void postUpdate(JRuleOnOffValue state) {
+        JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    public void postUpdate(int value) {
+        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    }
 
     public static int getState(String itemName) {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);

@@ -19,7 +19,29 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleStringItem extends JRuleItem {
+public class JRuleStringItem extends JRuleItem {
+
+    private final String itemName;
+
+    private JRuleStringItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleStringItem forName(String itemName) {
+        return new JRuleStringItem(itemName);
+    }
+
+    public String getState() {
+        return JRuleEventHandler.get().getStringValue(itemName);
+    }
+
+    public void sendCommand(String value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    public void postUpdate(String value) {
+        JRuleEventHandler.get().postUpdate(itemName, value);
+    }
 
     public static String getState(String itemName) {
         return JRuleEventHandler.get().getStringValue(itemName);

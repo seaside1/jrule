@@ -20,7 +20,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleSwitchItem extends JRuleItem {
+public class JRuleSwitchItem extends JRuleItem {
 
     public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update ON";
     public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update OFF";
@@ -32,6 +32,28 @@ public abstract class JRuleSwitchItem extends JRuleItem {
     public static final String TRIGGER_CHANGED_TO_OFF = "Changed to OFF";
     public static final String TRIGGER_CHANGED_TO_ON = "Changed to ON";
     public static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from OFF to ON";
+
+    private final String itemName;
+
+    private JRuleSwitchItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public JRuleOnOffValue getState() {
+        return JRuleEventHandler.get().getOnOffValue(itemName);
+    }
+
+    public void sendCommand(JRuleOnOffValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void postUpdate(JRuleOnOffValue state) {
+        JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    public static JRuleSwitchItem forName(String itemName) {
+        return new JRuleSwitchItem(itemName);
+    }
 
     public static JRuleOnOffValue getState(String itemName) {
         return JRuleEventHandler.get().getOnOffValue(itemName);

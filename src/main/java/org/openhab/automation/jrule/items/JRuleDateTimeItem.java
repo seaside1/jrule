@@ -21,7 +21,29 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleDateTimeItem extends JRuleItem {
+public class JRuleDateTimeItem extends JRuleItem {
+
+    private final String itemName;
+
+    private JRuleDateTimeItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleDateTimeItem forName(String itemName) {
+        return new JRuleDateTimeItem(itemName);
+    }
+
+    public void sendCommand(Date date) {
+        JRuleEventHandler.get().sendCommand(itemName, date);
+    }
+
+    public void postUpdate(Date date) {
+        JRuleEventHandler.get().postUpdate(itemName, date);
+    }
+
+    public Date getState() {
+        return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
+    }
 
     public static void sendCommand(String itemName, Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
@@ -31,7 +53,7 @@ public abstract class JRuleDateTimeItem extends JRuleItem {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
-    public static Date getState(String name) {
-        return JRuleEventHandler.get().getStateFromItemAsDate(name);
+    public static Date getState(String itemName) {
+        return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
     }
 }

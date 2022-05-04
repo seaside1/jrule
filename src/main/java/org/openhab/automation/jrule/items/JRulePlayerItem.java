@@ -20,7 +20,7 @@ import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRulePlayerItem extends JRuleItem {
+public class JRulePlayerItem extends JRuleItem {
 
     public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update PLAY";
     public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update PAUSE";
@@ -32,6 +32,28 @@ public abstract class JRulePlayerItem extends JRuleItem {
     public static final String TRIGGER_CHANGED_FROM_OFF = "Changed from PAUSE";
     public static final String TRIGGER_CHANGED_TO_OFF = "Changed to PAUSE";
     public static final String TRIGGER_CHANGED_TO_ON = "Changed to PLAY";
+
+    private final String itemName;
+
+    private JRulePlayerItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRulePlayerItem forName(String itemName) {
+        return new JRulePlayerItem(itemName);
+    }
+
+    public JRulePlayPauseValue getState() {
+        return JRuleEventHandler.get().getPauseValue(itemName);
+    }
+
+    public void sendCommand(JRulePlayPauseValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void postUpdate(JRulePlayPauseValue state) {
+        JRuleEventHandler.get().postUpdate(itemName, state);
+    }
 
     public static JRulePlayPauseValue getState(String itemName) {
         return JRuleEventHandler.get().getPauseValue(itemName);

@@ -22,7 +22,57 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleColorItem extends JRuleItem {
+public class JRuleColorItem extends JRuleItem {
+
+    private final String itemName;
+
+    private JRuleColorItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleColorItem forName(String itemName) {
+        return new JRuleColorItem(itemName);
+    }
+
+    public JRuleColorValue getState() {
+        return JRuleEventHandler.get().getColorValue(itemName);
+    }
+
+    public JRuleOnOffValue getOnOffState() {
+        return JRuleEventHandler.get().getOnOffValue(itemName);
+    }
+
+    public int getPercentState() {
+        return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
+    }
+
+    public void sendCommand(JRuleColorValue colorValue) {
+        JRuleEventHandler.get().sendCommand(itemName, colorValue);
+    }
+
+    public void sendCommand(JRuleOnOffValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void sendCommand(JRuleIncreaseDecreaseValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void sendCommand(int value) {
+        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
+    }
+
+    public void postUpdate(JRuleColorValue colorValue) {
+        JRuleEventHandler.get().postUpdate(itemName, colorValue);
+    }
+
+    public void postUpdate(JRuleOnOffValue state) {
+        JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    public void postUpdate(int value) {
+        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    }
 
     public static JRuleColorValue getState(String itemName) {
         return JRuleEventHandler.get().getColorValue(itemName);

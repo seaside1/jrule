@@ -107,9 +107,11 @@ public class JRuleItemClassGenerator {
         String template = null;
         String generatedClass = null;
         String type = item.getType();
+        final String[] split = type.split(":");
+        final boolean isQuantityType = split.length > 0;
         String quantityType = null;
-        if (type.contains(":")) {
-            final String[] split = item.getType().split(":");
+
+        if (isQuantityType) {
             type = split[0];
             if (split.length == 2) {
                 quantityType = split[1];
@@ -117,33 +119,13 @@ public class JRuleItemClassGenerator {
                     template = numberQuantityItemClassTemplate;
                 }
             }
-        } else if (type.equals(CoreItemFactory.SWITCH)) {
-            template = switchItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.DIMMER)) {
-            template = dimmerItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.NUMBER)) {
-            template = numberItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.STRING)) {
-            template = stringItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.IMAGE)) {
-            template = itemClassTemplate;
-        } else if (type.equals(CoreItemFactory.CALL)) {
-            template = itemClassTemplate;
-        } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
-            template = rollershutterItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.LOCATION)) {
-            template = itemClassTemplate;
-        } else if (type.equals(CoreItemFactory.COLOR)) {
-            template = colorItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.CONTACT)) {
-            template = contactItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.PLAYER)) {
-            template = playerItemClassTemplate;
-        } else if (type.equals(CoreItemFactory.DATETIME)) {
-            template = dateTimeItemClassTemplate;
-        } else if (type.equals(GroupItem.TYPE)) {
-            template = groupItemClassTemplate;
-        } else {
+        }
+
+        if (template == null) {
+            template = getTemplateFromType(type);
+        }
+
+        if (template == null) {
             JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Unsupported item type for item: {} type: {}",
                     item.getName(), item.getType());
             return false;
@@ -176,5 +158,36 @@ public class JRuleItemClassGenerator {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR, "Failed to write generated class to " + f, e);
         }
         return false;
+    }
+
+    private String getTemplateFromType(String type) {
+        if (type.equals(CoreItemFactory.SWITCH)) {
+            return switchItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.DIMMER)) {
+            return dimmerItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.NUMBER)) {
+            return numberItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.STRING)) {
+            return stringItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.IMAGE)) {
+            return itemClassTemplate;
+        } else if (type.equals(CoreItemFactory.CALL)) {
+            return itemClassTemplate;
+        } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
+            return rollershutterItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.LOCATION)) {
+            return itemClassTemplate;
+        } else if (type.equals(CoreItemFactory.COLOR)) {
+            return colorItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.CONTACT)) {
+            return contactItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.PLAYER)) {
+            return playerItemClassTemplate;
+        } else if (type.equals(CoreItemFactory.DATETIME)) {
+            return dateTimeItemClassTemplate;
+        } else if (type.equals(GroupItem.TYPE)) {
+            return groupItemClassTemplate;
+        }
+        return null;
     }
 }

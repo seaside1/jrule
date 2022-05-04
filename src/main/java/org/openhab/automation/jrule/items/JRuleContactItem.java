@@ -20,7 +20,21 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Timo Litzius - Initial contribution
  */
-public abstract class JRuleContactItem extends JRuleItem {
+public class JRuleContactItem extends JRuleItem {
+
+    private final String itemName;
+
+    private JRuleContactItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleContactItem forName(String itemName) {
+        return new JRuleContactItem(itemName);
+    }
+
+    public JRuleOpenClosedValue getState() {
+        return JRuleEventHandler.get().getOpenClosedValue(itemName);
+    }
 
     public static JRuleOpenClosedValue getState(String itemName) {
         return JRuleEventHandler.get().getOpenClosedValue(itemName);

@@ -21,7 +21,41 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
  *
  * @author Timo Litzius - Initial contribution
  */
-public abstract class JRuleRollershutterItem extends JRuleItem {
+public class JRuleRollershutterItem extends JRuleItem {
+
+    private final String itemName;
+
+    private JRuleRollershutterItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public static JRuleRollershutterItem forName(String itemName) {
+        return new JRuleRollershutterItem(itemName);
+    }
+
+    public int getState() {
+        return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
+    }
+
+    public void sendCommand(JRuleUpDownValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void sendCommand(JRuleStopMoveValue command) {
+        JRuleEventHandler.get().sendCommand(itemName, command);
+    }
+
+    public void sendCommand(int value) {
+        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
+    }
+
+    public void postUpdate(JRuleUpDownValue state) {
+        JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    public void postUpdate(int value) {
+        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    }
 
     public static int getState(String itemName) {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
