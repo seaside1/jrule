@@ -31,7 +31,7 @@ Beta, still major changes.
 
 # Download
 
-Prebuilt jar file is available in the bin folder under https://github.com/seaside1/jrule/releases
+Prebuilt jar file is available under https://github.com/seaside1/jrule/releases
 
 # Java Rule Engine
 
@@ -55,9 +55,9 @@ The following jar files can be found under the jrule/jar-folder:
 
 # Get started with the JRule Automation Addon
 
-- Install the addon by copying the org.openhab.automation.jrule-3.x.x-ALPHAX.jar to openhab-addons folder
+- Install the addon by copying the org.openhab.automation.jrule-3.x.x-BETAX.jar to openhab-addons folder
   Download the latest release from https://github.com/seaside1/jrule/releases
-- In default location is /etc/openhab/automation/jrule
+- The default location is /etc/openhab/automation/jrule but can be configured
 - When the addon is started it will:
 1. Create JAVA source files for all items 
 2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/automation/jrule/jar
@@ -78,7 +78,7 @@ NOTE: The rules will be reloaded if they are modified. Any java file you place u
 will be compiled or recompiled, you don't have to restart OpenHAB.
 
 Designing your Java Rules File (Hello World)
-1. Start by adding an item in Openhab.
+1. Start by adding an item in OpenHAB.
 Group JRule
 Switch MyTestSwitch  "Test Switch" (JRule)
 Switch MyTestSwitch2  "Test Switch 2" (JRule)
@@ -120,7 +120,7 @@ Built in Core Actions that can be used
 
 # Logging from rules
 Logging from rule can be done in 3 different ways
-1. Not specifying anything will result in the usage of JRuleName as perfix when calling JRule.logInfo/Debug/Error etc see example 20
+1. Not specifying anything will result in the usage of JRuleName as prefix when calling JRule.logInfo/Debug/Error etc see example 20
 2. Overriding method JRule.getRuleLogName will result in the same log prefix for all rules defined in that file in see example 21
 3. Specifically add rependency on log4j and define your own logger to do logging
 
