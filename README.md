@@ -587,9 +587,9 @@ Use case: Use forName to create and item and send commands and get status
     @JRuleWhen(item=_MyTestSwitch.ITEM, trigger=_MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void testForName(JRuleEvent event) {
         JRuleSwitchItem switchItem = JRuleSwitchItem.forName("MyOtherTestSwitch");
-        switchItem.sendCommand(OFF);
-        if (switchItem.getStatus == ON) {
-            switchItem.sendCommand(OFF);
+        switchItem.sendItemCommand(OFF);
+        if (switchItem.getItemStatus == ON) {
+            switchItem.sendItemCommand(OFF);
         }
     }
  }
