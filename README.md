@@ -10,7 +10,7 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
 
 - Not supporting OH3 GUI rules, script actions and script conditions 
 
-# Why?
+# Why
 
  - You will be able to use a standard Java IDE to develop your rules. 
  - Full auto-completion (Shift space) for all items, less chance of errors and typos
@@ -21,7 +21,7 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
  - Use any 3rd party dependencies and libraries in your rules
  - You will be able to use JRule in parallel with any other Rules engine if you want to give it a try
 
-# Who?
+# Who
 
 This addon is not for beginners, you should have knowledge in writing java-programs or a desire to do so.
 
@@ -575,6 +575,26 @@ Use case: Send Quantity type Watt (W) from rule.
         _TestPowerQuantityType.sendCommand(event.getValueAsDouble(), "W");
 }
 ```
+# Example 27
+
+Use case: Use forName to create and item and send commands and get status
+
+```java
+ public class ForNameExampleRule extends JRule {
+  
+    @JRuleName("testForName")
+    @JRuleWhen(item=_MyTestSwitch.ITEM, trigger=_MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    public void testForName(JRuleEvent event) {
+        JRuleSwitchItem switchItem = JRuleSwitchItem.forName("MyOtherTestSwitch");
+        switchItem.sendCommand(OFF);
+        if (switchItem.getStatus == ON) {
+            switchItem.sendCommand(OFF);
+        }
+    }
+ }
+```
+
+
 
 # Changelog
 ## BETA7
