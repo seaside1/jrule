@@ -15,13 +15,14 @@ package org.openhab.automation.jrule.items;
 import java.util.Date;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleDateTimeItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDateTimeItem extends JRuleItem {
+public class JRuleDateTimeItem extends JRuleItem implements JRuleCommonTrigger {
 
     private final String itemName;
 
@@ -30,30 +31,18 @@ public class JRuleDateTimeItem extends JRuleItem {
     }
 
     public static JRuleDateTimeItem forName(String itemName) {
-        return new JRuleDateTimeItem(itemName);
+        return JRuleItemRegistry.get(itemName, JRuleDateTimeItem.class);
     }
 
-    public void sendItemCommand(Date date) {
+    public void sendCommand(Date date) {
         JRuleEventHandler.get().sendCommand(itemName, date);
     }
 
-    public void postItemUpdate(Date date) {
+    public void postUpdate(Date date) {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
-    public Date getItemState() {
-        return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
-    }
-
-    public static void sendCommand(String itemName, Date date) {
-        JRuleEventHandler.get().sendCommand(itemName, date);
-    }
-
-    public static void postUpdate(String itemName, Date date) {
-        JRuleEventHandler.get().postUpdate(itemName, date);
-    }
-
-    public static Date getState(String itemName) {
+    public Date getState() {
         return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
     }
 }

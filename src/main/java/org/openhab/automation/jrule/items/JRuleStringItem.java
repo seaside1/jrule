@@ -13,13 +13,14 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleStringItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleStringItem extends JRuleItem {
+public class JRuleStringItem extends JRuleItem implements JRuleCommonTrigger {
 
     private final String itemName;
 
@@ -28,30 +29,18 @@ public class JRuleStringItem extends JRuleItem {
     }
 
     public static JRuleStringItem forName(String itemName) {
-        return new JRuleStringItem(itemName);
+        return JRuleItemRegistry.get(itemName, JRuleStringItem.class);
     }
 
-    public String getItemState() {
+    public String getState() {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
-    public void sendItemCommand(String value) {
+    public void sendCommand(String value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void postItemUpdate(String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public static String getState(String itemName) {
-        return JRuleEventHandler.get().getStringValue(itemName);
-    }
-
-    public static void sendCommand(String itemName, String value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public static void postUpdate(String itemName, String value) {
+    public void postUpdate(String value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 }

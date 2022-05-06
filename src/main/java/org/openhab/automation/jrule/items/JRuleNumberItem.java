@@ -1,25 +1,26 @@
 /**
  * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
+ * <p>
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- *
+ * <p>
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- *
+ * <p>
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleNumberItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleNumberItem extends JRuleItem {
+public class JRuleNumberItem extends JRuleItem implements JRuleCommonTrigger {
 
     public final String itemName;
 
@@ -28,46 +29,26 @@ public class JRuleNumberItem extends JRuleItem {
     }
 
     public static JRuleNumberItem forName(String itemName) {
-        return new JRuleNumberItem(itemName);
+        return JRuleItemRegistry.get(itemName, JRuleNumberItem.class);
     }
 
-    public void sendItemCommand(double value) {
+    public void sendCommand(double value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void postItemUpdate(double value) {
+    public void postUpdate(double value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void sendItemCommand(double value, String unit) {
+    public void sendCommand(double value, String unit) {
         JRuleEventHandler.get().sendCommand(itemName, value, unit);
     }
 
-    public void postItemUpdate(double value, String unit) {
+    public void postUpdate(double value, String unit) {
         JRuleEventHandler.get().postUpdate(itemName, value, unit);
     }
 
-    public Double getItemState() {
-        return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
-    }
-
-    public static void sendCommand(String itemName, double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public static void postUpdate(String itemName, double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public static void sendCommand(String itemName, double value, String unit) {
-        JRuleEventHandler.get().sendCommand(itemName, value, unit);
-    }
-
-    public static void postUpdate(String itemName, double value, String unit) {
-        JRuleEventHandler.get().postUpdate(itemName, value, unit);
-    }
-
-    public static Double getState(String itemName) {
+    public Double getState() {
         return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
     }
 }
