@@ -17,9 +17,8 @@ package org.openhab.automation.jrule.trigger;
  *
  * @author Gerhard Riegler - Initial contribution
  */
-
 public interface JRuleCommonTrigger {
-    public static final String TRIGGER_CHANGED = "Changed";
-    public static final String TRIGGER_RECEIVED_COMMAND = "received command";
-    public static final String TRIGGER_RECEIVED_UPDATE = "received update";
+    static final String TRIGGER_CHANGED = "Changed";
+    static final String TRIGGER_RECEIVED_COMMAND = "received command";
+    static final String TRIGGER_RECEIVED_UPDATE = "received update";
 }

@@ -17,16 +17,15 @@ package org.openhab.automation.jrule.trigger;
  *
  * @author Gerhard Riegler - Initial contribution
  */
-
 public interface JRuleDimmerTrigger extends JRuleCommonTrigger {
-    public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update ON";
-    public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update OFF";
-    public static final String TRIGGER_RECEIVED_COMMAND_ON = "received command ON";
-    public static final String TRIGGER_RECEIVED_COMMAND_OFF = "received command OFF";
-    public static final String TRIGGER_CHANGED_FROM_ON_TO_OFF = "Changed from ON to OFF";
-    public static final String TRIGGER_CHANGED_FROM_ON = "Changed from ON";
-    public static final String TRIGGER_CHANGED_FROM_OFF = "Changed from OFF";
-    public static final String TRIGGER_CHANGED_TO_OFF = "Changed to OFF";
-    public static final String TRIGGER_CHANGED_TO_ON = "Changed to ON";
-    public static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from OFF to ON";
+    static final String TRIGGER_RECEIVED_UPDATE_ON = "received update ON";
+    static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update OFF";
+    static final String TRIGGER_RECEIVED_COMMAND_ON = "received command ON";
+    static final String TRIGGER_RECEIVED_COMMAND_OFF = "received command OFF";
+    static final String TRIGGER_CHANGED_FROM_ON_TO_OFF = "Changed from ON to OFF";
+    static final String TRIGGER_CHANGED_FROM_ON = "Changed from ON";
+    static final String TRIGGER_CHANGED_FROM_OFF = "Changed from OFF";
+    static final String TRIGGER_CHANGED_TO_OFF = "Changed to OFF";
+    static final String TRIGGER_CHANGED_TO_ON = "Changed to ON";
+    static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from OFF to ON";
 }

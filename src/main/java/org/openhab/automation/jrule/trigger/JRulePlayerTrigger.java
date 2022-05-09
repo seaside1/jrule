@@ -17,16 +17,15 @@ package org.openhab.automation.jrule.trigger;
  *
  * @author Gerhard Riegler - Initial contribution
  */
-
 public interface JRulePlayerTrigger extends JRuleCommonTrigger {
-    public static final String TRIGGER_RECEIVED_UPDATE_ON = "received update PLAY";
-    public static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update PAUSE";
-    public static final String TRIGGER_RECEIVED_COMMAND_ON = "received command PLAY";
-    public static final String TRIGGER_RECEIVED_COMMAND_OFF = "received command PAUSE";
-    public static final String TRIGGER_CHANGED_FROM_ON_TO_OFF = "Changed from PLAY to PAUSE";
-    public static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from PAUSE to PLAY";
-    public static final String TRIGGER_CHANGED_FROM_ON = "Changed from PLAY";
-    public static final String TRIGGER_CHANGED_FROM_OFF = "Changed from PAUSE";
-    public static final String TRIGGER_CHANGED_TO_OFF = "Changed to PAUSE";
-    public static final String TRIGGER_CHANGED_TO_ON = "Changed to PLAY";
+    static final String TRIGGER_RECEIVED_UPDATE_ON = "received update PLAY";
+    static final String TRIGGER_RECEIVED_UPDATE_OFF = "received update PAUSE";
+    static final String TRIGGER_RECEIVED_COMMAND_ON = "received command PLAY";
+    static final String TRIGGER_RECEIVED_COMMAND_OFF = "received command PAUSE";
+    static final String TRIGGER_CHANGED_FROM_ON_TO_OFF = "Changed from PLAY to PAUSE";
+    static final String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from PAUSE to PLAY";
+    static final String TRIGGER_CHANGED_FROM_ON = "Changed from PLAY";
+    static final String TRIGGER_CHANGED_FROM_OFF = "Changed from PAUSE";
+    static final String TRIGGER_CHANGED_TO_OFF = "Changed to PAUSE";
+    static final String TRIGGER_CHANGED_TO_ON = "Changed to PLAY";
 }
