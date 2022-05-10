@@ -194,7 +194,7 @@ When the rule is triggered, the triggered value is stored in the event.
    @JRuleName("MyEventValueTest")
    @JRuleWhen(item = __MyTestSwitch2.ITEM, trigger = __MyTestSwitch2.TRIGGER_RECEIVED_COMMAND)
    public void myEventValueTest(JRuleEvent event) {
-      logInfo("Got value from event: {}", event.getValue());
+      logInfo("Got value from event: {}", event.getState().getValue());
    }
 ```
 ## Example 4
@@ -207,7 +207,7 @@ To add an OR statement we simply add multiple @JRuleWhen statements
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "14", to = "10")
    @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "10", to = "12")
    public void myOrRuleNumber(JRuleEvent event) {
-      logInfo("Got change number: {}", event.getValue());
+      logInfo("Got change number: {}", event.getState().getValue());
    }
 ```
 
@@ -352,13 +352,13 @@ Use case trigger a rule at 22:30 in the evening to set initial brightness for a 
 
 ## Example 12
 
-Use case: If temperature is below or equals to 20 degrees send command on to a heating fan 
-It is possible to use:
-lte = less than or equals
-lt = less than
-gt = greater than
-gte = greater than or equals
-eq = equals
+Use case: If temperature is below or equals to 20 degrees send command on to a heating fan  
+It is possible to use:  
+lte = less than or equals  
+lt = less than  
+gt = greater than  
+gte = greater than or equals  
+eq = equals  
 ```java
   @JRuleName("turnOnFanIfTemperatureIsLow")
   @JRuleWhen(item = _MyTemperatureSensor.ITEM, trigger = _MyTemperatureSensor.TRIGGER_RECEIVED_UPDATE, lte = 20)
@@ -400,7 +400,7 @@ Use case: A group of switches, see if status is changed, and also which member i
     @JRuleName("groupMySwitchesChanged")
     @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED)
     public synchronized void groupMySwitchGroupChanged(JRuleEvent event) {
-        final boolean groupIsOnline = event.getValueAsOnOffValue() == ON;
+        final boolean groupIsOnline = event.getState().getValueAsOnOffValue() == ON;
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
     }
@@ -424,7 +424,7 @@ Use case: Listen for a Channel Trigger Event
     @JRuleName("channelTriggered")
     @JRuleWhen(channel = "binding:thing:buttonevent")
     public synchronized void channelTriggered(JRuleEvent event) {
-        logInfo("Channel triggered with value: {}", event.getValue());
+        logInfo("Channel triggered with value: {}", event.getState().getValue());
     }
 ```
 
@@ -435,29 +435,28 @@ Use case: Cron based expression to trigger rule
     @JRuleName("testCron")
     @JRuleWhen(cron = "4 * * * * *")
     public void testCron(JRuleEvent event) {
-        logInfo("CRON: Running cron from string every minute when seconds is at 4: {}", event.getValue());
+        logInfo("CRON: Running cron from string every minute when seconds is at 4: {}", event.getState().getValue());
     }
 ```
 
 
 ## Example 19
 
-Use case: getLastUpdated for an item
-Note that JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");
-can be called without serviceId argument:
-JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);
+Use case: getLastUpdated for an item  
+Note that JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");  
+can be called without serviceId argument:  
+JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);  
 ```java
   
     @JRuleName("testLastUpdate")
     @JRuleWhen(cron = "4 * * * * *")
     public void testLastUpdate(JRuleEvent event) {
-        logInfo("CRON: Running cron from string: {}", event.getValue());
+        logInfo("CRON: Running cron from string: {}", event.getState().getValue());
         ZonedDateTime lastUpdate = JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
         String lastUpdateFormatted = lastUpdate.format(formatter);
         logInfo("Last Update: {}", lastUpdateFormatted);    
 ```
-
 
 ## Example 20
 
@@ -518,8 +517,8 @@ Use case: Apply transformation using openHAB transformation service
     @JRuleName("MyTransformation")
     @JRuleWhen(item = _MyStringValue.ITEM, trigger = _MyStringValue.TRIGGER_RECEIVED_COMMAND)
     public void applyTransformation(JRuleEvent event) {
-        String transformedValue = transform("MAP(my.map):%s", event.getValue());
-        logInfo("Transformed {} to {}", event.getValue(), transformedValue);
+        String transformedValue = transform("MAP(my.map):%s", event.getState().getValue());
+        logInfo("Transformed {} to {}", event.getState().getValue(), transformedValue);
         _MyTransformationReceiver.sendCommand(transformedValue);
     }
 }
@@ -538,7 +537,7 @@ message is updated.
     @JRuleName("MyTestPreConditionRule1")
     @JRuleWhen(item = _MyMessageNotification.ITEM, trigger = _MyMessageNotification.TRIGGER_RECEIVED_COMMAND)
     public void testPrecondition(JRuleEvent event) {
-        String notificationMessage = event.getValue();
+        String notificationMessage = event.getState().getValue();
         logInfo("It is ok to send notification: {}", notificationMessage);
         _MySendNoticationItemMqtt.sendCommand(notificationMessage);
     }
@@ -571,8 +570,8 @@ Use case: Send Quantity type Watt (W) from rule.
     @JRuleName("testQuantityPowerWatt")
     @JRuleWhen(item=_MyTestMeterPower.ITEM, trigger=_MyTestMeterPower.TRIGGER_CHANGED)
     public void testQuantityPower(JRuleEvent event) {
-        logInfo("TestQuantity power will send this value as Watt: {}", event.getValue());
-        _TestPowerQuantityType.sendCommand(event.getValueAsDouble(), "W");
+        logInfo("TestQuantity power will send this value as Watt: {}", event.getState().getValue());
+        _TestPowerQuantityType.sendCommand(event.getState().getValueAsDouble(), "W");
     }
 }
 ```
@@ -609,7 +608,7 @@ triggered the rule.
     @JRuleWhen(item=_MyTestSwitch2.ITEM, trigger=_MyTestSwitch2.TRIGGER_CHANGED_TO_ON)
     public void triggerNameExample(JRuleEvent event) {
      logInfo("The rule was triggered by the following item: {}", event.getItemName());
-     logInfo("The rule was Old Value was: {} and new value: {}", event.getOldState(), event.getState());  
+     logInfo("The rule was Old Value was: {} and new value: {}", event.getOldState().getValue(), event.getState().getValue());  
       
     }
  }
@@ -617,6 +616,10 @@ triggered the rule.
 
 
 # Changelog
+## BETA10
+ - Optimized items by gerrieg https://github.com/seaside1/jrule/pull/33
+ - Syntax change: event.getValue(), event.getValuesAsDouble() etc replaced with event.getState().getValue() and event.getState().getValueAsDouble()
+ - Syntax change JRuleSwitchItem.sendCommand(myItem, ON) replaced with JRuleSwitchItem.forName(myItem).sendCommand(ON)
 ## BETA9
  - Fixed bug with item generation and forName overloading
 ## BETA8
