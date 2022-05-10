@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
@@ -38,11 +39,23 @@ public class JRuleDateTimeItem extends JRuleItem implements JRuleCommonTrigger {
         JRuleEventHandler.get().sendCommand(itemName, date);
     }
 
+    public void sendCommand(ZonedDateTime zonedDateTime) {
+        JRuleEventHandler.get().sendCommand(itemName, zonedDateTime);
+    }
+
     public void postUpdate(Date date) {
         JRuleEventHandler.get().postUpdate(itemName, date);
     }
 
+    public void postUpdate(ZonedDateTime zonedDateTime) {
+        JRuleEventHandler.get().postUpdate(itemName, zonedDateTime);
+    }
+
     public Date getState() {
         return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
+    }
+
+    public ZonedDateTime getZonedDateTimeState() {
+        return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
     }
 }

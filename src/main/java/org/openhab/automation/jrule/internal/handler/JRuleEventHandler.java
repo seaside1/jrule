@@ -132,6 +132,10 @@ public class JRuleEventHandler {
         sendCommand(itemName, new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())));
     }
 
+    public void sendCommand(String itemName, ZonedDateTime zonedDateTime) {
+        sendCommand(itemName, new DateTimeType(zonedDateTime));
+    }
+
     public void sendCommand(String itemName, JRuleColorValue colorValue) {
         final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
         if (hsbType == null) {
@@ -182,6 +186,10 @@ public class JRuleEventHandler {
 
     public void postUpdate(String itemName, Date date) {
         postUpdate(itemName, new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())));
+    }
+
+    public void postUpdate(String itemName, ZonedDateTime zonedDateTime) {
+        postUpdate(itemName, new DateTimeType(zonedDateTime));
     }
 
     public void postUpdate(String itemName, JRulePercentType value) {
@@ -459,12 +467,17 @@ public class JRuleEventHandler {
     }
 
     public Date getStateFromItemAsDate(String itemName) {
+        ZonedDateTime zonedDateTime = getStateFromItemAsZonedDateTime(itemName);
+        return zonedDateTime != null ? Date.from(zonedDateTime.toInstant()) : null;
+    }
+
+    public ZonedDateTime getStateFromItemAsZonedDateTime(String itemName) {
         State state = getStateFromItem(itemName);
         if (state == null) {
             return null;
         }
         DateTimeType dateTimeType = state.as(DateTimeType.class);
-        return dateTimeType != null ? Date.from(dateTimeType.getZonedDateTime().toInstant()) : null;
+        return dateTimeType != null ? dateTimeType.getZonedDateTime() : null;
     }
 
     public Set<String> getGroupMemberNames(String groupName) {
