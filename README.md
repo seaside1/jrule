@@ -710,6 +710,3 @@ triggered the rule.
 # Roadmap
 - Locks and timers by annotation
 - Built in expire functionality
-
-## Download
-https://github.com/seaside1/jrule/releases/latest/download/org.openhab.automation.jrule-3.x.x-latest.jar
