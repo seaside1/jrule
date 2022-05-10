@@ -10,8 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package ${package};
+package org.openhab.binding.jrule.items.generated;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleRollershutterItem;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
@@ -20,14 +21,14 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * Automatically Generated Class
- * for Item ${ItemName}
+ * The {@link _MyTestPlayer}
  *
  * @author Timo Litzius - Initial contribution
  */
-public class ${ItemClass} implements JRuleCommonTrigger {
- 
-    public static final String ITEM = "${ItemName}";
-    
+@NonNullByDefault
+public class _MyTestRollershutter implements JRuleCommonTrigger {
+    public static final String ITEM = "MyTestRollerShutter";
+
     public static int getState() {
         return JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).getState();
     }
@@ -51,5 +52,4 @@ public class ${ItemClass} implements JRuleCommonTrigger {
     public static void postUpdate(int value) {
         JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).sendCommand(value);
     }
-
 }

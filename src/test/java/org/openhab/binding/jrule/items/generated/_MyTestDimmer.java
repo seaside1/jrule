@@ -10,8 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package ${package};
+package org.openhab.binding.jrule.items.generated;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.items.JRuleDimmerItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -20,14 +21,14 @@ import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
 
 /**
  * Automatically Generated Class
- * for Item ${ItemName}
+ * The {@link _MyTestDimmer}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${ItemClass} implements JRuleDimmerTrigger {
+@NonNullByDefault
+public class _MyTestDimmer implements JRuleDimmerTrigger {
+    public static final String ITEM = "MyTestDateTime";
 
-    public static final String ITEM = "${ItemName}";
-    
     public static int getState() {
         return JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).getState();
     }

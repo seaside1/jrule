@@ -38,6 +38,7 @@ import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.watch.JRuleRulesWatcher;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.Item;
@@ -246,6 +247,7 @@ public class JRuleHandler implements PropertyChangeListener {
         } else {
             logError("Failed to create items due to config {}, compiler is null", config);
         }
+        JRuleItemRegistry.clear();
     }
 
     public synchronized void dispose() {
@@ -263,6 +265,7 @@ public class JRuleHandler implements PropertyChangeListener {
             }
         }
         eventSubscriber.removePropertyChangeListener(this);
+        JRuleItemRegistry.clear();
     }
 
     public synchronized void generateItemSources() {

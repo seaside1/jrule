@@ -12,8 +12,10 @@
  */
 package ${package};
 
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 
 /**
  * Automatically Generated Class
@@ -21,23 +23,19 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${ItemClass} extends JRuleSwitchItem {
+public class ${ItemClass} implements JRuleSwitchTrigger {
 
     public static final String ITEM = "${ItemName}";
     
-     public ${ItemClass}() {
-        super(ITEM);
-    }
-    
     public static JRuleOnOffValue getState() {
-        return JRuleSwitchItem.getState(ITEM);
+        return JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).getState();
     }
-    
+
     public static void sendCommand(JRuleOnOffValue command) {
-        JRuleSwitchItem.sendCommand(ITEM, command);
+        JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).sendCommand(command);
     }
 
     public static void postUpdate(JRuleOnOffValue value) {
-        JRuleSwitchItem.postUpdate(ITEM, value);
+        JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).postUpdate(value);
     }
 }

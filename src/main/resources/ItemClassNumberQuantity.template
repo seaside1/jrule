@@ -12,7 +12,9 @@
  */
 package ${package};
 
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * Automatically Generated Class
@@ -20,33 +22,29 @@ import org.openhab.automation.jrule.items.JRuleNumberItem;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${ItemClass} extends JRuleNumberItem {
+public class ${ItemClass} implements JRuleCommonTrigger {
 
     public static final String ITEM = "${ItemName}";
     
     public static final String TYPE = "${Type}";
     
-    public ${ItemClass}() {
-        super(ITEM);
-    }
-    
     public static Double getState() {
-        return JRuleNumberItem.getState(ITEM);
+        return JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).getState();
     }
-    
-    public static void sendCommand(double value) {
-        JRuleNumberItem.sendCommand(ITEM, value);
+
+    public static void sendCommand(double command) {
+        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).sendCommand(command);
     }
 
     public static void postUpdate(double value) {
-        JRuleNumberItem.postUpdate(ITEM, value);
+        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).postUpdate(value);
     }
-    
-     public static void sendCommand(double value, String unit) {
-        JRuleNumberItem.sendCommand(ITEM, value, unit);
+
+    public static void sendCommand(double command, String unit) {
+        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).sendCommand(command, unit);
     }
 
     public static void postUpdate(double value, String unit) {
-        JRuleNumberItem.postUpdate(ITEM, value, unit);
+        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).postUpdate(value, unit);
     }
 }

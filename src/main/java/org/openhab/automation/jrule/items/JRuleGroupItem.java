@@ -18,13 +18,14 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleGroupItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleGroupItem extends JRuleItem {
+public class JRuleGroupItem extends JRuleItem implements JRuleCommonTrigger {
 
     private final String itemName;
 
@@ -33,120 +34,63 @@ public class JRuleGroupItem extends JRuleItem {
     }
 
     public static JRuleGroupItem forName(String itemName) {
-        return new JRuleGroupItem(itemName);
+        return JRuleItemRegistry.get(itemName, JRuleGroupItem.class);
     }
 
-    public Set<String> itemMembers() {
+    public Set<String> members() {
         return JRuleEventHandler.get().getGroupMemberNames(itemName);
     }
 
-    public void sendItemCommandToAll(String value) {
+    public void sendCommandToAll(String value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
-        groupMemberNames.forEach(m -> sendCommand(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
-    public String getItemState() {
+    public String getState() {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
-    public JRuleOnOffValue getItemStateAsOnOffValue() {
+    public JRuleOnOffValue getStateAsOnOffValue() {
         return JRuleEventHandler.get().getOnOffValue(itemName);
     }
 
-    public JRulePlayPauseValue getItemStateAsPlayPauseValue() {
+    public JRulePlayPauseValue getStateAsPlayPauseValue() {
         return JRuleEventHandler.get().getPauseValue(itemName);
     }
 
-    public JRuleUpDownValue getItemStateAsUpDownValue() {
+    public JRuleUpDownValue getStateAsUpDownValue() {
         return JRuleEventHandler.get().getUpDownValue(itemName);
     }
 
-    public void sendItemCommand(JRulePlayPauseValue value) {
+    public void sendCommand(JRulePlayPauseValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void sendItemCommand(JRuleOnOffValue value) {
+    public void sendCommand(JRuleOnOffValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void sendItemCommand(JRuleUpDownValue value) {
+    public void sendCommand(JRuleUpDownValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void sendItemCommand(String value) {
+    public void sendCommand(String value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
-    public void postItemUpdate(String value) {
+    public void postUpdate(String value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void postItemUpdate(JRulePlayPauseValue value) {
+    public void postUpdate(JRulePlayPauseValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void postItemUpdate(JRuleOnOffValue value) {
+    public void postUpdate(JRuleOnOffValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 
-    public void postItemUpdate(JRuleUpDownValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public static Set<String> members(String groupName) {
-        return JRuleEventHandler.get().getGroupMemberNames(groupName);
-    }
-
-    public static void sendCommandToAll(String groupName, String value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(groupName);
-        groupMemberNames.forEach(m -> sendCommand(m, value));
-    }
-
-    public static String getState(String itemName) {
-        return JRuleEventHandler.get().getStringValue(itemName);
-    }
-
-    public static JRuleOnOffValue getStateAsOnOffValue(String itemName) {
-        return JRuleEventHandler.get().getOnOffValue(itemName);
-    }
-
-    public static JRulePlayPauseValue getStateAsPlayPauseValue(String itemName) {
-        return JRuleEventHandler.get().getPauseValue(itemName);
-    }
-
-    public static JRuleUpDownValue getStateAsUpDownValue(String itemName) {
-        return JRuleEventHandler.get().getUpDownValue(itemName);
-    }
-
-    public static void sendCommand(String itemName, JRulePlayPauseValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public static void sendCommand(String itemName, JRuleOnOffValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public static void sendCommand(String itemName, JRuleUpDownValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public static void sendCommand(String itemName, String value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public static void postUpdate(String itemName, String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public static void postUpdate(String itemName, JRulePlayPauseValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public static void postUpdate(String itemName, JRuleOnOffValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public static void postUpdate(String itemName, JRuleUpDownValue value) {
+    public void postUpdate(JRuleUpDownValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
     }
 }

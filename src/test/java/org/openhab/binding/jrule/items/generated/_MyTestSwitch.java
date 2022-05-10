@@ -13,8 +13,10 @@
 package org.openhab.binding.jrule.items.generated;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.automation.jrule.items.JRuleItemType;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 
 /**
  * Automatically Generated Class
@@ -23,8 +25,18 @@ import org.openhab.automation.jrule.items.JRuleSwitchItem;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 @NonNullByDefault
-public class _MyTestSwitch extends JRuleSwitchItem {
-
+public class _MyTestSwitch implements JRuleSwitchTrigger {
     public static final String ITEM = "MyTestSwitch";
-    public static final JRuleItemType TYPE = JRuleItemType.SWITCH;
+
+    public static JRuleOnOffValue getState() {
+        return JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).getState();
+    }
+
+    public static void sendCommand(JRuleOnOffValue command) {
+        JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).sendCommand(command);
+    }
+
+    public static void postUpdate(JRuleOnOffValue value) {
+        JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).postUpdate(value);
+    }
 }

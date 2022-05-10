@@ -10,8 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package ${package};
+package org.openhab.binding.jrule.items.generated;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.items.JRuleContactItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
@@ -19,14 +20,14 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * Automatically Generated Class
- * for Item ${ItemName}
+ * The {@link _MyTestContact}
  *
- * @author Timo Litzius - Initial contribution
+ * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${ItemClass} implements JRuleCommonTrigger {
- 
-    public static final String ITEM = "${ItemName}";
-    
+@NonNullByDefault
+public class _MyTestContact implements JRuleCommonTrigger {
+    public static final String ITEM = "MyTestContact";
+
     public static JRuleOpenClosedValue getState() {
         return JRuleItemRegistry.get(ITEM, JRuleContactItem.class).getState();
     }

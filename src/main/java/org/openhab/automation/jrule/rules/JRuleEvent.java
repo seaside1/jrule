@@ -15,8 +15,6 @@ package org.openhab.automation.jrule.rules;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleEvent}
@@ -24,8 +22,6 @@ import org.slf4j.LoggerFactory;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleEvent {
-
-    private static final Logger logger = LoggerFactory.getLogger(JRuleEvent.class);
 
     private final JRuleEventState state;
     private final JRuleEventState oldState;
@@ -93,7 +89,7 @@ public class JRuleEvent {
 
     @Override
     public String toString() {
-        return String.format("JRuleEvent{itemName='%s', state=%s, oldState=%s, memberName='%s'", itemName, state,
-                oldState, memberName);
+        return String.format("JRuleEvent [state=%s, oldState=%s, memberName=%s, itemName=%s]", state, oldState,
+                memberName, itemName);
     }
 }

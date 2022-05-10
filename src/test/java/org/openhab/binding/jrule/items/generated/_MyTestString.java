@@ -10,22 +10,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package ${package};
+package org.openhab.binding.jrule.items.generated;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * Automatically Generated Class
- * for Item ${ItemName}
+ * The {@link _MyTestString}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Timo Litzius - Initial contribution
  */
-public class ${ItemClass} implements JRuleCommonTrigger {
+@NonNullByDefault
+public class _MyTestString implements JRuleCommonTrigger {
+    public static final String ITEM = "MyTestString";
 
-    public static final String ITEM = "${ItemName}";
-    
     public static String getState() {
         return JRuleItemRegistry.get(ITEM, JRuleStringItem.class).getState();
     }

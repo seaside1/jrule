@@ -10,22 +10,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package ${package};
+package org.openhab.binding.jrule.items.generated;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * Automatically Generated Class
- * for Item ${ItemName}
+ * The {@link _MyTestNumber}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${ItemClass} implements JRuleCommonTrigger {
+@NonNullByDefault
+public class _MyTestNumber implements JRuleCommonTrigger {
+    public static final String ITEM = "MyTestNumber";
 
-    public static final String ITEM = "${ItemName}";
-    
     public static Double getState() {
         return JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).getState();
     }
@@ -36,5 +37,13 @@ public class ${ItemClass} implements JRuleCommonTrigger {
 
     public static void postUpdate(double value) {
         JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).postUpdate(value);
+    }
+
+    public static void sendCommand(double command, String unit) {
+        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).sendCommand(command, unit);
+    }
+
+    public static void postUpdate(double value, String unit) {
+        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).postUpdate(value, unit);
     }
 }

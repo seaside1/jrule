@@ -15,13 +15,14 @@ package org.openhab.automation.jrule.items;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleRollershutterItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleRollershutterItem extends JRuleItem {
+public class JRuleRollershutterItem extends JRuleItem implements JRuleCommonTrigger {
 
     private final String itemName;
 
@@ -30,54 +31,30 @@ public class JRuleRollershutterItem extends JRuleItem {
     }
 
     public static JRuleRollershutterItem forName(String itemName) {
-        return new JRuleRollershutterItem(itemName);
+        return JRuleItemRegistry.get(itemName, JRuleRollershutterItem.class);
     }
 
-    public int getItemState() {
+    public int getState() {
         return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
     }
 
-    public void sendItemCommand(JRuleUpDownValue command) {
+    public void sendCommand(JRuleUpDownValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendItemCommand(JRuleStopMoveValue command) {
+    public void sendCommand(JRuleStopMoveValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    public void sendItemCommand(int value) {
+    public void sendCommand(int value) {
         JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
     }
 
-    public void postItemUpdate(JRuleUpDownValue state) {
+    public void postUpdate(JRuleUpDownValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
     }
 
-    public void postItemUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
-    }
-
-    public static int getState(String itemName) {
-        return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
-    }
-
-    public static void sendCommand(String itemName, JRuleUpDownValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
-    }
-
-    public static void sendCommand(String itemName, JRuleStopMoveValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
-    }
-
-    public static void sendCommand(String itemName, int value) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
-    }
-
-    public static void postUpdate(String itemName, JRuleUpDownValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
-    }
-
-    public static void postUpdate(String itemName, int value) {
+    public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 }

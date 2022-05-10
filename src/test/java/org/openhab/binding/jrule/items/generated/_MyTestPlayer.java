@@ -10,8 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package ${package};
+package org.openhab.binding.jrule.items.generated;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRulePlayerItem;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
@@ -19,14 +20,14 @@ import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
 
 /**
  * Automatically Generated Class
- * for Item ${ItemName}
+ * The {@link _MyTestPlayer}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${ItemClass} implements JRulePlayerTrigger {
- 
-    public static final String ITEM = "${ItemName}";
-    
+@NonNullByDefault
+public class _MyTestPlayer implements JRulePlayerTrigger {
+    public static final String ITEM = "MyTestPlayer";
+
     public static JRulePlayPauseValue getState() {
         return JRuleItemRegistry.get(ITEM, JRulePlayerItem.class).getState();
     }

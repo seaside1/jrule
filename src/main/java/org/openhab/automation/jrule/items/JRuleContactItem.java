@@ -14,13 +14,14 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleContactItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleContactItem extends JRuleItem {
+public class JRuleContactItem extends JRuleItem implements JRuleCommonTrigger {
 
     private final String itemName;
 
@@ -29,14 +30,10 @@ public class JRuleContactItem extends JRuleItem {
     }
 
     public static JRuleContactItem forName(String itemName) {
-        return new JRuleContactItem(itemName);
+        return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
     }
 
-    public JRuleOpenClosedValue getItemState() {
-        return JRuleEventHandler.get().getOpenClosedValue(itemName);
-    }
-
-    public static JRuleOpenClosedValue getState(String itemName) {
+    public JRuleOpenClosedValue getState() {
         return JRuleEventHandler.get().getOpenClosedValue(itemName);
     }
 }
