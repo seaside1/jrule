@@ -711,6 +711,5 @@ triggered the rule.
 - Locks and timers by annotation
 - Built in expire functionality
 
-## Resources
-
-[https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA9/org.openhab.automation.jrule-3.x.x-BETA9.jar](https://github.com/seaside1/jrule/releases/download/jrule-3.x.x-BETA9/org.openhab.automation.jrule-3.x.x-BETA9.jar)
+## Download
+https://github.com/seaside1/jrule/releases/latest/download/org.openhab.automation.jrule-3.x.x-latest.jar
