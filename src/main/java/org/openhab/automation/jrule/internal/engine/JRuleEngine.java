@@ -227,7 +227,8 @@ public class JRuleEngine implements PropertyChangeListener {
                     JRuleLog.info(logger, logName, "Validating JRule channel: {} trigger: {} ", jRuleWhen.channel(),
                             jRuleWhen.trigger());
                     addChannelExecutionContext(jRule, logName, jRuleWhen.channel(), jRuleName.value(), method,
-                            jRuleEventPresent, preconditions);
+                            jRuleEventPresent, getStringFromAnnotation(jRuleWhen.eq()),
+                            getStringFromAnnotation(jRuleWhen.neq()), preconditions);
                 }
             }
         }
@@ -323,11 +324,11 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private void addChannelExecutionContext(JRule jRule, String logName, String channel, String ruleName, Method method,
-            boolean eventParameterPresent, JRulePrecondition[] preconditions) {
+            boolean eventParameterPresent, String eq, String neq, JRulePrecondition[] preconditions) {
         List<JRuleExecutionContext> contextList = channelToExecutionContexts.computeIfAbsent(channel,
                 k -> new ArrayList<>());
         final JRuleExecutionContext context = new JRuleExecutionContext(jRule, logName, null, null, null, null,
-                ruleName, null, null, method, eventParameterPresent, null, null, null, null, null, null, preconditions);
+                ruleName, null, null, method, eventParameterPresent, null, null, null, null, eq, neq, preconditions);
         JRuleLog.debug(logger, logName, "ChannelContextList add context: {}", context);
         contextList.add(context);
     }
