@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
+import org.openhab.automation.jrule.JRuleExecutionException;
 import org.openhab.core.transform.TransformationException;
 import org.openhab.core.transform.TransformationHelper;
 import org.osgi.framework.BundleContext;
@@ -49,7 +50,12 @@ public class JRuleTransformationHandler {
         this.bundleContext = bundleContext;
     }
 
-    public String transform(String stateDescPattern, String state) throws TransformationException {
-        return TransformationHelper.transform(bundleContext, stateDescPattern, state);
+    public String transform(String stateDescPattern, String state) throws JRuleExecutionException {
+        try {
+            return TransformationHelper.transform(bundleContext, stateDescPattern, state);
+        } catch (TransformationException e) {
+            throw new JRuleExecutionException(
+                    String.format("Transformation of %s using %s failed: %s", state, stateDescPattern, e.toString()));
+        }
     }
 }
