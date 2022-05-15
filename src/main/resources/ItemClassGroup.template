@@ -80,7 +80,7 @@ public class ${ItemClass} implements JRuleCommonTrigger {
     }
 
     public static void sendCommand(JRuleUpDownValue value) {
-        JRuleItemRegistry.get(ITEM, JRuleGroupItem.class).postUpdate(value);
+        JRuleItemRegistry.get(ITEM, JRuleGroupItem.class).sendCommand(value);
     }
 
     public static void postUpdate(JRuleUpDownValue value) {
