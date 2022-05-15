@@ -225,6 +225,7 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
+        logInfo("PostUpdate itemName: {} state: {}", itemName, state);
         final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state);
         eventPublisher.post(itemEvent);
     }
