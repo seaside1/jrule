@@ -277,7 +277,7 @@ public class JRuleEventHandler {
             case ON:
                 return JRuleOnOffValue.ON;
             default:
-                logError("Fail to transform contact value");
+                logError("Fail to transform onoff value");
                 return JRuleOnOffValue.UNDEF;
         }
     }
@@ -319,7 +319,7 @@ public class JRuleEventHandler {
             logError("Failed to find item: {}", itemName);
             return null;
         } catch (IllegalArgumentException i) {
-            logDebug("Failed to get state from item: {}, returning undef");
+            logDebug("Failed to get state from item: {}, returning undef", itemName);
             return UnDefType.UNDEF;
         }
     }
