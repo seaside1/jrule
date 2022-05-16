@@ -53,6 +53,7 @@ import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
+import org.openhab.core.types.UnDefType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,7 +264,7 @@ public class JRuleEventHandler {
             case PAUSE:
                 return JRulePlayPauseValue.PAUSE;
             default:
-                logError("Fail to transform switch value");
+                logError("Fail to transform playpause value");
                 return JRulePlayPauseValue.UNDEF;
         }
     }
@@ -276,7 +277,7 @@ public class JRuleEventHandler {
             case ON:
                 return JRuleOnOffValue.ON;
             default:
-                logError("Fail to transform switch value");
+                logError("Fail to transform contact value");
                 return JRuleOnOffValue.UNDEF;
         }
     }
@@ -289,7 +290,7 @@ public class JRuleEventHandler {
             case CLOSED:
                 return JRuleOpenClosedValue.CLOSED;
             default:
-                logError("Fail to transform switch value");
+                logError("Fail to transform openclosed value");
                 return JRuleOpenClosedValue.UNDEF;
         }
     }
@@ -317,6 +318,9 @@ public class JRuleEventHandler {
         } catch (ItemNotFoundException e) {
             logError("Failed to find item: {}", itemName);
             return null;
+        } catch (IllegalArgumentException i) {
+            logDebug("Failed to get state from item: {}, returning undef");
+            return UnDefType.UNDEF;
         }
     }
 
@@ -428,6 +432,7 @@ public class JRuleEventHandler {
         this.itemRegistry = itemRegistry;
     }
 
+    @SuppressWarnings("rawtypes")
     public Double getStateFromItemAsDouble(String name) {
         State state = getStateFromItem(name);
         if (state == null) {
@@ -510,6 +515,7 @@ public class JRuleEventHandler {
         JRuleLog.info(logger, LOG_NAME_EVENT, message, parameters);
     }
 
+    @SuppressWarnings("unused")
     private void logWarn(String message, Object... parameters) {
         JRuleLog.warn(logger, LOG_NAME_EVENT, message, parameters);
     }
