@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.openhab.automation.jrule.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
@@ -33,7 +34,6 @@ import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.core.transform.TransformationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,7 +182,7 @@ public class JRule {
         JRuleVoiceHandler.get().say(text);
     }
 
-    protected String transform(String stateDescPattern, String state) throws TransformationException {
+    protected String transform(String stateDescPattern, String state) throws JRuleExecutionException {
         return JRuleTransformationHandler.get().transform(stateDescPattern, state);
     }
 
