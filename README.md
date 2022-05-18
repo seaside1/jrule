@@ -105,7 +105,7 @@ public class MySwitchRule extends JRule {
 
 Make sure you add the Jar-files from /etc/openhab/jrule/jar as dependencies.
 
-# Build and deploy your rules using Maven
+# Build and Deploy Rules using Maven
 See https://github.com/seaside1/jrule-user for an example template project.
 
 # Third Party External Dependencies
