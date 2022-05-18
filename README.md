@@ -105,6 +105,9 @@ public class MySwitchRule extends JRule {
 
 Make sure you add the Jar-files from /etc/openhab/jrule/jar as dependencies.
 
+# Build and deploy your rules using Maven
+See https://github.com/seaside1/jrule-user for an example template project.
+
 # Third Party External Dependencies
 
 You can add any 3rd party library as dependency. Copy the jar files needed to /etc/openhab/automation/jrule/ext-lib
@@ -616,6 +619,14 @@ triggered the rule.
 
 
 # Changelog
+## BETA11
+ - Wrap TransformationException in JRuleExecutionException by seime https://github.com/seaside1/jrule/pull/39
+ - Add equivalent postUpdate logging as sendCommand by seime https://github.com/seaside1/jrule/pull/38
+ - Fix group sendCommand for UpDown by seime https://github.com/seaside1/jrule/pull/36
+ - Added eq and neq to channel event by gerrieg https://github.com/seaside1/jrule/pull/35
+ - Added support for ZonedDateTime in DateTimeItem by gerrieg https://github.com/seaside1/jrule/pull/34
+ - Fixed issued with undef item for state 
+ - Added mocked eventbus for testing rules with junit 
 ## BETA10
  - Optimized items by gerrieg https://github.com/seaside1/jrule/pull/33
  - Syntax change: event.getValue(), event.getValuesAsDouble() etc replaced with event.getState().getValue() and event.getState().getValueAsDouble()
