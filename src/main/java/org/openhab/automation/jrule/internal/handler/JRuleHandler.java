@@ -99,7 +99,7 @@ public class JRuleHandler implements PropertyChangeListener {
     @Nullable
     private Thread rulesDirWatcherThread;
 
-    private DelayedDebouncingExecutor delayedRulesReloader;
+    private final DelayedDebouncingExecutor delayedRulesReloader;
 
     private volatile boolean recompileJar = true;
 
@@ -110,7 +110,7 @@ public class JRuleHandler implements PropertyChangeListener {
         this.voiceManager = voiceManager;
         this.config = config;
         this.bundleContext = bundleContext;
-        this.delayedRulesReloader = new DelayedDebouncingExecutor(2000);
+        this.delayedRulesReloader = new DelayedDebouncingExecutor(config.getRulesInitDelaySeconds());
 
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
@@ -389,13 +389,14 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     private class DelayedDebouncingExecutor {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        private int delayMillis;
+        private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        private static final int TERMINATION_AWAIT_TIME = 20;
+        private final int delaySeconds;
         @Nullable
-        ScheduledFuture existingInvocationFuture = null;
+        private ScheduledFuture existingInvocationFuture = null;
 
-        public DelayedDebouncingExecutor(int delayMillis) {
-            this.delayMillis = delayMillis;
+        public DelayedDebouncingExecutor(int delaySeconds) {
+            this.delaySeconds = delaySeconds;
         }
 
         public synchronized void callWithDelay(Callable callable) {
@@ -404,14 +405,14 @@ public class JRuleHandler implements PropertyChangeListener {
                 existingInvocationFuture.cancel(false);
             }
 
-            existingInvocationFuture = executorService.schedule(callable, delayMillis, TimeUnit.MILLISECONDS);
+            existingInvocationFuture = executorService.schedule(callable, delaySeconds, TimeUnit.SECONDS);
         }
 
         public void shutdown() {
             logDebug("Shutting down delayed debouncing executor");
             executorService.shutdownNow();
             try {
-                executorService.awaitTermination(20, TimeUnit.SECONDS);
+                executorService.awaitTermination(TERMINATION_AWAIT_TIME, TimeUnit.SECONDS);
                 logDebug("Delayed debouncing executor shutdown complete");
             } catch (InterruptedException e) {
                 logWarn("Got interrupted while shutting down delayed debouncing executor: {}", e);

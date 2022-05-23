@@ -71,8 +71,10 @@ public class JRuleConfig {
     private static final String LOG_NAME_CONF = "JRuleConf";
     private static final String JRULE_CONFIG_NAME = "jrule.conf";
 
-    private static final Object INIT_DELAY_PROPERTY = "init.delay";
+    private static final String INIT_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.initdelay";
     private static final int DEFAULT_INIT_DELAY = 5;
+    private static final String INIT_RULES_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.rulesdelay";
+    private static final int DEFAULT_RULES_INIT_DELAY = 2;
     private final Map<String, Object> properties;
 
     private final Properties jRuleProperties;
@@ -94,11 +96,11 @@ public class JRuleConfig {
     }
 
     public int getInitDelaySeconds() {
-        Object initDelay = properties.get(INIT_DELAY_PROPERTY);
+        final String initDelay = (String) properties.get(INIT_DELAY_PROPERTY);
         int delay = DEFAULT_INIT_DELAY;
         if (initDelay != null) {
             try {
-                delay = Integer.parseInt((String) initDelay);
+                delay = Integer.parseInt(initDelay);
             } catch (Exception x) {
                 // Best effort
             }
@@ -214,5 +216,18 @@ public class JRuleConfig {
 
     public String getGeneratedItemPackage() {
         return getConfigPropertyOrDefaultValue(GENERATED_ITEM_PACKAGE_PROPERTY, DEFAULT_GENERATED_ITEM_PACKAGE);
+    }
+
+    public int getRulesInitDelaySeconds() {
+        final String initRulesDelay = (String) properties.get(INIT_RULES_DELAY_PROPERTY);
+        int delay = DEFAULT_RULES_INIT_DELAY;
+        if (initRulesDelay != null) {
+            try {
+                delay = Integer.parseInt(initRulesDelay);
+            } catch (Exception x) {
+                // Best effort
+            }
+        }
+        return delay;
     }
 }
