@@ -270,7 +270,6 @@ public class JRuleUser extends JRule {
 }
 ```
 
-``
 We then extend the rule from the Java Rules file:
 
 ```java
