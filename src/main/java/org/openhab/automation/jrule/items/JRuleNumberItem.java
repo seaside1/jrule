@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
@@ -21,8 +23,6 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleNumberItem extends JRuleItem implements JRuleCommonTrigger {
-
-    public final String itemName;
 
     protected JRuleNumberItem(String itemName) {
         this.itemName = itemName;
@@ -50,5 +50,9 @@ public class JRuleNumberItem extends JRuleItem implements JRuleCommonTrigger {
 
     public Double getState() {
         return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
+    }
+
+    public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return Double.parseDouble(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
     }
 }

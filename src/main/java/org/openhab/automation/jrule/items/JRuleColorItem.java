@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -24,8 +26,6 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleColorItem extends JRuleItem implements JRuleCommonTrigger {
-
-    private final String itemName;
 
     protected JRuleColorItem(String itemName) {
         this.itemName = itemName;
@@ -73,5 +73,9 @@ public class JRuleColorItem extends JRuleItem implements JRuleCommonTrigger {
 
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    }
+
+    public String getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
     }
 }

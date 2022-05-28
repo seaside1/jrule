@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
@@ -26,8 +27,6 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleGroupItem extends JRuleItem implements JRuleCommonTrigger {
-
-    private final String itemName;
 
     protected JRuleGroupItem(String itemName) {
         this.itemName = itemName;
@@ -92,5 +91,11 @@ public class JRuleGroupItem extends JRuleItem implements JRuleCommonTrigger {
 
     public void postUpdate(JRuleUpDownValue value) {
         JRuleEventHandler.get().postUpdate(itemName, value);
+    }
+
+    // Persistence method
+    public String getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        // TODO Groups should have a type registered
+        return JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
     }
 }

@@ -441,23 +441,21 @@ Use case: Cron based expression to trigger rule
     }
 ```
 
-
 ## Example 19
 
 Use case: getLastUpdated for an item  
-Note that JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");  
-can be called without serviceId argument:  
-JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM);  
+Note that `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated("mapdb");`
+can be called without serviceId argument: `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated();`
 ```java
-  
-    @JRuleName("testLastUpdate")
-    @JRuleWhen(cron = "4 * * * * *")
-    public void testLastUpdate(JRuleEvent event) {
-        logInfo("CRON: Running cron from string: {}", event.getState().getValue());
-        ZonedDateTime lastUpdate = JRulePersistenceExtentions.getLastUpdate(_MyCoolItem.ITEM, "mapdb");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
-        String lastUpdateFormatted = lastUpdate.format(formatter);
-        logInfo("Last Update: {}", lastUpdateFormatted);    
+@JRuleName("testLastUpdate")
+@JRuleWhen(cron = "4 * * * * *")
+public void testLastUpdate(JRuleEvent event){
+    logInfo("CRON: Running cron from string: {}",event.getState().getValue());
+    ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated("mapdb");
+    DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
+    String lastUpdateFormatted=lastUpdate.format(formatter);
+    logInfo("Last Update: {}",lastUpdateFormatted);
+}
 ```
 
 ## Example 20
@@ -616,6 +614,17 @@ triggered the rule.
  }
 ```
 
+## Example 29
+
+Use case: get average value for a Number item last hour 
+```java
+@JRuleName("testAverageLastHour")
+@JRuleWhen(cron = "4 * * * * *")
+public void testAverage(JRuleEvent event){
+    Double average = JRuleNumberItem.forName(_MyNumberItem.ITEM).averageSince(ZonedDateTime.now().minus(1,ChronoUnit.HOURS));
+    logInfo("Average value last hour: {}",average);
+}
+```
 
 # Changelog
 ## BETA11
