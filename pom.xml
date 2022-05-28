@@ -10,6 +10,22 @@
   </parent>
   <artifactId>org.openhab.automation.jrule</artifactId>
   <name>openHAB Add-ons :: Bundles :: Standalone Java Rules Automation</name>
+
+  <properties>
+    <bnd.importpackage>com.sun.org.apache.xml.internal.utils.*;resolution:=optional,\
+      com.sun.org.apache.xpath.internal.*;resolution:=optional,\
+      org.apache.log.*;resolution:=optional,\
+      org.apache.xml.utils.*;resolution:=optional,\
+      org.apache.xpath.*;resolution:=optional,\
+      org.dom4j.*;resolution:=optional,\
+      org.jdom.*;resolution:=optional,\
+      org.jaxen.*;resolution:=optional,\
+      org.mozilla.javascript.*;resolution:=optional,\
+      org.python.*;resolution:=optional,\
+      org.zeroturnaround.javarebel.*;resolution:=optional,\
+      org.apache.tools.ant.*;resolution:=optional
+    </bnd.importpackage>
+  </properties>
   <dependencies>
     <dependency>
       <version>1.2.9</version>
@@ -24,6 +40,12 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>2.3.31</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
