@@ -16,7 +16,7 @@ import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
  */
 public class ${item.itemClassName} implements JRuleDimmerTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
     
     public static int getState() {
         return JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).getState();

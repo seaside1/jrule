@@ -14,7 +14,7 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  */
 public class ${item.itemClassName} implements JRuleCommonTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
     
     public static final String TYPE = "${item.quantityType}";
     

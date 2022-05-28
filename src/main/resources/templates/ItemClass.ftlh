@@ -12,5 +12,5 @@ import org.openhab.automation.jrule.items.JRuleItem;
  */
 public class ${item.itemClassName} extends JRuleItem {
 
-    <#include "StaticVariables.ftlh">
+    <#include "Common.ftlh">
 }

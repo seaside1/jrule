@@ -14,7 +14,7 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
  */
 public class ${item.itemClassName} implements JRuleSwitchTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
 
     public static JRuleOnOffValue getState() {
         return JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).getState();

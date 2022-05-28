@@ -14,7 +14,7 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  */
 public class ${item.itemClassName} implements JRuleCommonTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
     
     public static Double getState() {
         return JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).getState();

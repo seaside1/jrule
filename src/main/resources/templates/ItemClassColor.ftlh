@@ -18,7 +18,7 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  */
 public class ${item.itemClassName} implements JRuleCommonTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
 
     public static JRuleColorValue getState() {
         return JRuleItemRegistry.get(ITEM, JRuleColorItem.class).getState();
