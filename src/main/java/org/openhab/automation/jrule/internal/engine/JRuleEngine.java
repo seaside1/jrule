@@ -584,12 +584,11 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public void dispose() {
         if (config.isExecutorsEnabled()) {
-            ruleExecutorService.shutdown();
+            ruleExecutorService.shutdownNow();
             try {
                 ruleExecutorService.awaitTermination(AWAIT_TERMINATION_THREAD_SECONDS, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                logWarn("Not all rules ran to completion before rule engine shutdown");
-                logDebug("Not all rules ran to completion before rule engine shutdown", e);
+                logWarn("Not all rules ran to completion before rule engine shutdown", e);
             }
         }
     }

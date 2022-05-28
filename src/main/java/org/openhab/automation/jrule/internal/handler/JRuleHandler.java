@@ -25,9 +25,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.DelayedDebouncingExecutor;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -94,6 +96,8 @@ public class JRuleHandler implements PropertyChangeListener {
     @Nullable
     private Thread rulesDirWatcherThread;
 
+    private final DelayedDebouncingExecutor delayedRulesReloader;
+
     private volatile boolean recompileJar = true;
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, EventPublisher eventPublisher,
@@ -103,6 +107,7 @@ public class JRuleHandler implements PropertyChangeListener {
         this.voiceManager = voiceManager;
         this.config = config;
         this.bundleContext = bundleContext;
+        this.delayedRulesReloader = new DelayedDebouncingExecutor(config.getRulesInitDelaySeconds(), TimeUnit.SECONDS);
 
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
@@ -252,6 +257,8 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public synchronized void dispose() {
         logDebug("Dispose called!");
+        delayedRulesReloader.cancel();
+        delayedRulesReloader.shutdown();
         JRuleEngine.get().reset();
         if (directoryWatcher != null) {
             directoryWatcher.removePropertyChangeListener(this);
@@ -266,6 +273,7 @@ public class JRuleHandler implements PropertyChangeListener {
         }
         eventSubscriber.removePropertyChangeListener(this);
         JRuleItemRegistry.clear();
+        logDebug("Dispose complete");
     }
 
     public synchronized void generateItemSources() {
@@ -363,18 +371,18 @@ public class JRuleHandler implements PropertyChangeListener {
                 || JRuleRulesWatcher.PROPERTY_ENTRY_DELETE.equals(property)) {
             Path newValue = (Path) evt.getNewValue();
             logDebug("Directory watcher new value: {}", newValue);
-            reloadRules();
-            logDebug("All Rules reloaded");
-
+            delayedRulesReloader.call(() -> reloadRules());
         }
     }
 
-    private void reloadRules() {
+    @Nullable
+    private Void reloadRules() {
         compileUserRules();
         JRuleEngine.get().reset();
         createRuleInstances();
         eventSubscriber.stopSubscriber();
         eventSubscriber.startSubscriber();
         logInfo("JRule Engine Rules Reloaded!");
+        return null;
     }
 }
