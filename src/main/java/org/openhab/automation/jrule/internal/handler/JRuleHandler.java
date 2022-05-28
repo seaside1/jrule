@@ -280,6 +280,8 @@ public class JRuleHandler implements PropertyChangeListener {
                 .forEach(this::deleteFile);
 
         items.forEach(this::generateItemSource);
+
+        itemGenerator.generateItemsSource(items);
     }
 
     private synchronized boolean deleteFile(File f) {

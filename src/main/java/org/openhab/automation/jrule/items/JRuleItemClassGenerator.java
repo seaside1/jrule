@@ -15,8 +15,12 @@ package org.openhab.automation.jrule.items;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
@@ -65,7 +69,7 @@ public class JRuleItemClassGenerator {
 
         // Set the preferred charset template files are stored in. UTF-8 is
         // a good choice in most applications:
-        freemarkerConfiguration.setDefaultEncoding("UTF-8");
+        freemarkerConfiguration.setDefaultEncoding(StandardCharsets.UTF_8.name());
 
         // Sets how errors will appear.
         // During web page *development* TemplateExceptionHandler.HTML_DEBUG_HANDLER is better.
@@ -81,12 +85,6 @@ public class JRuleItemClassGenerator {
         freemarkerConfiguration.setFallbackOnNullLoopVariable(false);
     }
 
-    private File createJavaSourceFileForItem(Item item) {
-        return new File(new StringBuilder().append(jRuleConfig.getItemsDirectory()).append(File.separator)
-                .append(jRuleConfig.getGeneratedItemPrefix()).append(item.getName())
-                .append(JRuleConstants.JAVA_FILE_TYPE).toString());
-    }
-
     public boolean generateItemSource(Item item) {
         try {
             String type = item.getType();
@@ -97,19 +95,13 @@ public class JRuleItemClassGenerator {
                         item.getName(), item.getType());
             } else {
 
-                String itemName = item.getName();
-                String className = jRuleConfig.getGeneratedItemPrefix() + itemName;
-                String itemPackage = jRuleConfig.getGeneratedItemPackage();
-
                 Map<String, Object> processingModel = new HashMap<>();
-                processingModel.put("package", itemPackage);
-                processingModel.put("ItemName", itemName);
-                processingModel.put("ItemClass", className);
-                if (isQuantityType(type)) {
-                    processingModel.put("Type", getQuantityType(type));
-                }
+                processingModel.put("item", createItemModel(item));
 
-                File targetSourceFile = createJavaSourceFileForItem(item);
+                File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
+                        .append(File.separator).append(jRuleConfig.getGeneratedItemPrefix()).append(item.getName())
+                        .append(JRuleConstants.JAVA_FILE_TYPE).toString());
+
                 try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
                     Template template = freemarkerConfiguration.getTemplate(templateName);
                     template.process(processingModel, fileWriter);
@@ -126,6 +118,50 @@ public class JRuleItemClassGenerator {
         }
 
         return false;
+    }
+
+    public boolean generateItemsSource(Collection<Item> items) {
+        List<Map<String, Object>> model = items.stream().map(e -> createItemModel(e)).collect(Collectors.toList());
+        Map<String, Object> processingModel = new HashMap<>();
+        processingModel.put("items", model);
+        processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
+
+        File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
+                .append(File.separator).append("Items.java").toString());
+
+        try {
+            try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
+                Template template = freemarkerConfiguration.getTemplate("Items" + TEMPLATE_SUFFIX);
+                template.process(processingModel, fileWriter);
+            }
+
+            JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}",
+                    targetSourceFile.getAbsolutePath());
+            return true;
+        } catch (TemplateException | IOException e) {
+            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
+                    "Internal error when generating java source for Items.java: {}", e.toString());
+
+        }
+        return false;
+    }
+
+    private Map<String, Object> createItemModel(Item item) {
+        Map<String, Object> itemModel = new HashMap<>();
+        itemModel.put("itemName", item.getName());
+        itemModel.put("itemPackage", jRuleConfig.getGeneratedItemPackage());
+        itemModel.put("itemClassName", jRuleConfig.getGeneratedItemPrefix() + item.getName());
+        if (isQuantityType(item.getType())) {
+            itemModel.put("itemClassType", "JRuleNumberItem");
+        } else {
+            itemModel.put("itemClassType", "JRule" + item.getType() + "Item"); // Convention applied
+        }
+        itemModel.put("itemLabel", item.getLabel());
+        if (isQuantityType(item.getType())) {
+            itemModel.put("quantityType", getQuantityType(item.getType()));
+        }
+
+        return itemModel;
     }
 
     private String getQuantityType(String type) {
@@ -152,7 +188,7 @@ public class JRuleItemClassGenerator {
         } else if (isQuantityType(type)) {
             return "ItemClassNumberQuantity" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.STRING)) {
-            return "ItemClassSwitch" + TEMPLATE_SUFFIX;
+            return "ItemClassString" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.IMAGE)) {
             return "ItemClass" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.CALL)) {
@@ -171,6 +207,8 @@ public class JRuleItemClassGenerator {
             return "ItemClassDateTime" + TEMPLATE_SUFFIX;
         } else if (type.equals(GroupItem.TYPE)) {
             return "ItemClassGroup" + TEMPLATE_SUFFIX;
+        } else if (type.equals("Location")) { // TODO appears to be missing in Core
+            return "ItemClassLocation" + TEMPLATE_SUFFIX;
         }
         return null;
     }
