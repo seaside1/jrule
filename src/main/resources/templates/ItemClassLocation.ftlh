@@ -14,7 +14,7 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
  */
 public class ${item.itemClassName} implements JRuleSwitchTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
 
   // Empty for now, waiting for PR #40
 }

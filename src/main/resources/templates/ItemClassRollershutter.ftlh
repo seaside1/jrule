@@ -16,7 +16,7 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  */
 public class ${item.itemClassName} implements JRuleCommonTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
 
 public static int getState() {
         return JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).getState();

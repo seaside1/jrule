@@ -15,7 +15,7 @@ import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
  */
 public class ${item.itemClassName} implements JRulePlayerTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
     
     public static JRulePlayPauseValue getState() {
         return JRuleItemRegistry.get(ITEM, JRulePlayerItem.class).getState();

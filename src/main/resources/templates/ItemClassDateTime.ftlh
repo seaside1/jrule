@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
  */
 public class ${item.itemClassName} implements JRuleCommonTrigger {
 
-<#include "StaticVariables.ftlh">
+<#include "Common.ftlh">
      
     public static Date getState() {
         return JRuleItemRegistry.get(ITEM, JRuleDateTimeItem.class).getState();
