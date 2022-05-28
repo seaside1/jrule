@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
@@ -22,8 +24,6 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleSwitchItem extends JRuleItem implements JRuleSwitchTrigger {
-
-    private final String itemName;
 
     protected JRuleSwitchItem(String itemName) {
         this.itemName = itemName;
@@ -43,5 +43,11 @@ public class JRuleSwitchItem extends JRuleItem implements JRuleSwitchTrigger {
 
     public void postUpdate(JRuleOnOffValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    // Persistence method
+    public JRuleOnOffValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRuleOnOffValue.getValueFromString(
+                JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
     }
 }
