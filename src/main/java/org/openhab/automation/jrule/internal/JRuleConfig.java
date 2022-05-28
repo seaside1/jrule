@@ -71,8 +71,6 @@ public class JRuleConfig {
     private static final String LOG_NAME_CONF = "JRuleConf";
     private static final String JRULE_CONFIG_NAME = "jrule.conf";
 
-    private static final Object INIT_DELAY_PROPERTY = "init.delay";
-    private static final int DEFAULT_INIT_DELAY = 5;
     private final Map<String, Object> properties;
 
     private final Properties jRuleProperties;
@@ -91,19 +89,6 @@ public class JRuleConfig {
             logger.debug("Failed to load properties {}", configFileName);
         }
         properties.forEach((k, v) -> jRuleProperties.put(k, v));
-    }
-
-    public int getInitDelaySeconds() {
-        Object initDelay = properties.get(INIT_DELAY_PROPERTY);
-        int delay = DEFAULT_INIT_DELAY;
-        if (initDelay != null) {
-            try {
-                delay = Integer.parseInt((String) initDelay);
-            } catch (Exception x) {
-                // Best effort
-            }
-        }
-        return delay;
     }
 
     public String getWorkingDirectory() {

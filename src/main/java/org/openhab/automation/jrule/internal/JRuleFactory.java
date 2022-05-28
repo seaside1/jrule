@@ -52,7 +52,8 @@ public class JRuleFactory {
     private final JRuleConfig config;
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleFactory.class);
-
+    private static final Object INIT_DELAY_PROPERTY = "init.delay";
+    private static final int DEFAULT_INIT_DELAY = 5;
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
 
     @Activate
@@ -66,7 +67,20 @@ public class JRuleFactory {
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
                 componentContext.getBundleContext());
-        createDelayedInitialization(config.getInitDelaySeconds());
+        createDelayedInitialization(getInitDelaySeconds(properties));
+    }
+
+    private int getInitDelaySeconds(Map<String, Object> properties) {
+        Object initDelay = properties.get(INIT_DELAY_PROPERTY);
+        int delay = DEFAULT_INIT_DELAY;
+        if (initDelay != null) {
+            try {
+                delay = Integer.parseInt((String) initDelay);
+            } catch (Exception x) {
+                // Best effort
+            }
+        }
+        return delay;
     }
 
     private synchronized CompletableFuture<Void> createDelayedInitialization(int delayInSeconds) {

@@ -20,6 +20,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,7 +63,7 @@ public class JRuleRulesWatcher implements Runnable {
         try {
             watchService = FileSystems.getDefault().newWatchService();
         } catch (IOException e) {
-            logError("Could not start file watcher service. No rules will be loaded: {}", e);
+            logger.error("Failed to watch directory", e);
         }
     }
 
@@ -76,7 +77,7 @@ public class JRuleRulesWatcher implements Runnable {
         propertyChangeSupport.removePropertyChangeListener(pcl);
     }
 
-    private void registerListenerForFolder(Path watchFolder) throws IOException {
+    private void registerListnerForFolder(Path watchFolder) throws IOException {
         try {
             Boolean isFolder = (Boolean) Files.getAttribute(watchFolder, BASIC_IS_DIRECTORY);
             if (!isFolder) {
@@ -89,7 +90,10 @@ public class JRuleRulesWatcher implements Runnable {
             return;
         }
         logDebug("Watching for rule changes: {}", watchFolder);
-
+        if (watchService == null) {
+            final FileSystem fs = watchFolder.getFileSystem();
+            watchService = fs.newWatchService();
+        }
         watchFolder.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
                 StandardWatchEventKinds.ENTRY_MODIFY);
     }
@@ -99,15 +103,15 @@ public class JRuleRulesWatcher implements Runnable {
         try {
             watchFolders.stream().forEach(folder -> {
                 try {
-                    registerListenerForFolder(folder);
+                    registerListnerForFolder(folder);
                 } catch (IOException e) {
                     logger.error("Failed to setup listener for folder: {}", folder);
                 }
             });
-            WatchKey key;
+            WatchKey key = null;
             while (true) {
                 key = watchService.take();
-                Kind<?> kind;
+                Kind<?> kind = null;
                 for (WatchEvent<?> watchEvent : key.pollEvents()) {
                     kind = watchEvent.kind();
                     if (OVERFLOW == kind) {
@@ -120,7 +124,7 @@ public class JRuleRulesWatcher implements Runnable {
                         continue;
                     }
                     if (ENTRY_CREATE == kind) {
-                        logDebug("New Path {} created in watchFolder", newPath);
+                        logDebug("New Path created in watchFolder");
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_CREATE, null, newPath);
                     } else if (ENTRY_MODIFY == kind) {
                         logDebug("New path modified: {} fn: {}", newPath, newPath.getFileName());
@@ -129,29 +133,28 @@ public class JRuleRulesWatcher implements Runnable {
                         logDebug("New path deleted: {}", newPath);
                         propertyChangeSupport.firePropertyChange(PROPERTY_ENTRY_DELETE, null, newPath);
                     } else {
-                        logWarn("Unhandled case: {}", kind.name());
+                        logDebug("Unhandled case: {}", kind.name());
                     }
                 }
                 if (!key.reset()) {
                     break;
                 }
             }
-
         } catch (InterruptedException e) {
-            // Ignore
+            logDebug("Watcher Thread interrupted, closing down");
+            return;
         } catch (Exception e) {
             logError("Folder watcher terminated due to exception {}", e);
-        } finally {
-            try {
-                watchService.close();
-            } catch (IOException e) {
-                logError("Error closing watch service: {}", e);
-            }
+            return;
         }
     }
 
     private void logDebug(String message, Object... parameters) {
         JRuleLog.debug(logger, LOG_NAME_RULESWATCHER, message, parameters);
+    }
+
+    private void logInfo(String message, Object... parameters) {
+        JRuleLog.info(logger, LOG_NAME_RULESWATCHER, message, parameters);
     }
 
     private void logWarn(String message, Object... parameters) {
