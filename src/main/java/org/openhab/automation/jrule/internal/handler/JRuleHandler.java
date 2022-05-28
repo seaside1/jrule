@@ -257,6 +257,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public synchronized void dispose() {
         logDebug("Dispose called!");
+        delayedRulesReloader.cancel();
         delayedRulesReloader.shutdown();
         JRuleEngine.get().reset();
         if (directoryWatcher != null) {

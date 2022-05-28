@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class DelayedDebouncingExecutor {
     private static final Logger logger = LoggerFactory.getLogger(DelayedDebouncingExecutor.class);
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executorService;
     private static final int TERMINATION_AWAIT_TIME_SECONDS = 20;
     private final int delay;
     private TimeUnit timeUnit;
@@ -42,15 +42,34 @@ public class DelayedDebouncingExecutor {
     public DelayedDebouncingExecutor(int delay, TimeUnit timeUnit) {
         this.delay = delay;
         this.timeUnit = timeUnit;
+        this.executorService = Executors.newSingleThreadScheduledExecutor();
     }
 
+    /**
+     * Cancel any pending future execution
+     */
+    public void cancel() {
+        if (existingInvocationFuture != null && !existingInvocationFuture.isDone()) {
+            existingInvocationFuture.cancel(true);
+        }
+    }
+
+    /**
+     * Schedule a new execution of a Callable. Any pending executions will be cancelled and replace by this new one.
+     * Actual execution of the callable happens after the given delay - if not replaced by a subsequent call to this
+     * method.
+     * 
+     * @param callable the callable to schedule
+     */
     public synchronized void call(Callable<Void> callable) {
+        boolean shouldSchedule = true;
         if (existingInvocationFuture != null && !existingInvocationFuture.isDone()) {
             logger.debug("Cancelling existing delayed execution");
-            existingInvocationFuture.cancel(false);
+            shouldSchedule = existingInvocationFuture.cancel(false);
         }
-
-        existingInvocationFuture = executorService.schedule(callable, delay, timeUnit);
+        if (shouldSchedule) {
+            existingInvocationFuture = executorService.schedule(callable, delay, timeUnit);
+        }
     }
 
     public void shutdown() {

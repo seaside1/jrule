@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.internal;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -45,9 +44,6 @@ public class JRuleFactory {
 
     private final JRuleHandler jRuleHandler;
     private final JRuleEngine jRuleEngine;
-
-    @Nullable
-    private static CompletableFuture<Void> initFuture = null;
 
     private final JRuleConfig config;
 
@@ -85,10 +81,7 @@ public class JRuleFactory {
 
     @Deactivate
     public synchronized void dispose() {
-        if (initFuture != null) {
-            initFuture.cancel(true);
-            initFuture = null;
-        }
+        delayedInit.cancel();
         jRuleHandler.dispose();
         jRuleEngine.dispose();
     }
