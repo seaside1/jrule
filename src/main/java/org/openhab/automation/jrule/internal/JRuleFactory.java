@@ -55,6 +55,8 @@ public class JRuleFactory {
 
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
 
+    private final DelayedDebouncingExecutor delayedInit = new DelayedDebouncingExecutor(2, TimeUnit.SECONDS);
+
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
@@ -66,17 +68,15 @@ public class JRuleFactory {
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
                 componentContext.getBundleContext());
-        createDelayedInitialization(config.getInitDelaySeconds());
+        delayedInit.call(this::init);
     }
 
-    private synchronized CompletableFuture<Void> createDelayedInitialization(int delayInSeconds) {
-        initFuture = JRuleUtil.delayedExecution(delayInSeconds, TimeUnit.SECONDS);
-        return initFuture.thenAccept(s -> {
-            JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
-            jRuleEngine.initialize();
-            jRuleHandler.initialize();
-            initFuture = null;
-        });
+    @Nullable
+    private Void init() {
+        JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
+        jRuleEngine.initialize();
+        jRuleHandler.initialize();
+        return null;
     }
 
     private String getBundleVersion() {

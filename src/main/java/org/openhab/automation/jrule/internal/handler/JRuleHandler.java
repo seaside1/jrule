@@ -25,14 +25,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.DelayedDebouncingExecutor;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -110,7 +107,7 @@ public class JRuleHandler implements PropertyChangeListener {
         this.voiceManager = voiceManager;
         this.config = config;
         this.bundleContext = bundleContext;
-        this.delayedRulesReloader = new DelayedDebouncingExecutor(config.getRulesInitDelaySeconds());
+        this.delayedRulesReloader = new DelayedDebouncingExecutor(config.getRulesInitDelaySeconds(), TimeUnit.SECONDS);
 
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
@@ -373,12 +370,12 @@ public class JRuleHandler implements PropertyChangeListener {
                 || JRuleRulesWatcher.PROPERTY_ENTRY_DELETE.equals(property)) {
             Path newValue = (Path) evt.getNewValue();
             logDebug("Directory watcher new value: {}", newValue);
-            delayedRulesReloader.callWithDelay(() -> reloadRulesNow());
+            delayedRulesReloader.call(() -> reloadRules());
         }
     }
 
     @Nullable
-    private Object reloadRulesNow() {
+    private Void reloadRules() {
         compileUserRules();
         JRuleEngine.get().reset();
         createRuleInstances();
@@ -386,37 +383,5 @@ public class JRuleHandler implements PropertyChangeListener {
         eventSubscriber.startSubscriber();
         logInfo("JRule Engine Rules Reloaded!");
         return null;
-    }
-
-    private class DelayedDebouncingExecutor {
-        private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        private static final int TERMINATION_AWAIT_TIME = 20;
-        private final int delaySeconds;
-        @Nullable
-        private ScheduledFuture existingInvocationFuture = null;
-
-        public DelayedDebouncingExecutor(int delaySeconds) {
-            this.delaySeconds = delaySeconds;
-        }
-
-        public synchronized void callWithDelay(Callable callable) {
-            if (existingInvocationFuture != null && !existingInvocationFuture.isDone()) {
-                logDebug("Cancelling existing delayed execution");
-                existingInvocationFuture.cancel(false);
-            }
-
-            existingInvocationFuture = executorService.schedule(callable, delaySeconds, TimeUnit.SECONDS);
-        }
-
-        public void shutdown() {
-            logDebug("Shutting down delayed debouncing executor");
-            executorService.shutdownNow();
-            try {
-                executorService.awaitTermination(TERMINATION_AWAIT_TIME, TimeUnit.SECONDS);
-                logDebug("Delayed debouncing executor shutdown complete");
-            } catch (InterruptedException e) {
-                logWarn("Got interrupted while shutting down delayed debouncing executor: {}", e);
-            }
-        }
     }
 }
