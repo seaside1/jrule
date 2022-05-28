@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 public class ${ItemClass} implements JRuleCommonTrigger {
 
     public static final String ITEM = "${ItemName}";
-    
+
     public static String getState() {
         return JRuleItemRegistry.get(ITEM, JRuleStringItem.class).getState();
     }

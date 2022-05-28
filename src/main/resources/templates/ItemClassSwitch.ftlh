@@ -26,7 +26,7 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 public class ${ItemClass} implements JRuleSwitchTrigger {
 
     public static final String ITEM = "${ItemName}";
-    
+
     public static JRuleOnOffValue getState() {
         return JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).getState();
     }
