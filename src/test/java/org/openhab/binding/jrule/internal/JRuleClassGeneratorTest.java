@@ -125,11 +125,15 @@ public class JRuleClassGeneratorTest {
         numberItem.setLabel("NumberLabel");
         generateAndCompile(numberItem);
 
-        NumberItem quantityItem = new NumberItem("Number:Temperature", "NumberItem");
+        NumberItem quantityItem = new NumberItem("Number:Temperature", "QuanitityItem");
         quantityItem.setLabel("QuantityLabel");
         generateAndCompile(quantityItem);
 
-        List<Item> items = Lists.create(switchItem, stringItem);
+        GroupItem groupItem = new GroupItem("RollershutterGroup", new RollershutterItem("RollershutterItem"));
+        groupItem.setLabel("RollerShutterGroupLabel");
+        generateAndCompile(groupItem);
+
+        List<Item> items = Lists.create(switchItem, stringItem, numberItem, quantityItem, groupItem);
 
         boolean success = sourceFileGenerator.generateItemsSource(items);
         assertTrue(success, "Failed to generate source file for items");

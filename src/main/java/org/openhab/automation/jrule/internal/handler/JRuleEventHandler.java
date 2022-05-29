@@ -230,6 +230,10 @@ public class JRuleEventHandler {
         postUpdate(itemName, new DecimalType(value));
     }
 
+    public void postUpdate(String itemName, int value) {
+        postUpdate(itemName, new DecimalType(value));
+    }
+
     public void postUpdate(String itemName, State state) {
         if (eventPublisher == null) {
             return;
