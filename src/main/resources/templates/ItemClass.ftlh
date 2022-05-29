@@ -1,16 +1,9 @@
-<#include "Header.ftlh">
-
+<#include "License.ftlh">
 package ${item.itemPackage};
 
 import org.openhab.automation.jrule.items.JRuleItem;
 
-/**
- * Automatically Generated Class
- * for Item ${item.itemName}
- *
- * @author Joseph (Seaside) Hagberg - Initial contribution
- */
+<#include "ClassJavadoc.ftlh">
 public class ${item.itemClassName} extends JRuleItem {
-
-    <#include "Common.ftlh">
+<#include "Common.ftlh">
 }

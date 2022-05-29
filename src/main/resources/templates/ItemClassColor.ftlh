@@ -1,15 +1,10 @@
-<#include "Header.ftlh">
+<#include "License.ftlh">
 
 package ${item.itemPackage};
 
 import org.openhab.automation.jrule.items.JRuleColorItem;
 
-/**
- * Automatically Generated Class
- * for Item ${item.itemName}
- *
- * @author Joseph (Seaside) Hagberg - Initial contribution
- */
+<#include "ClassJavadoc.ftlh">
 public class ${item.itemClassName} extends JRuleColorItem {
 
 <#include "Common.ftlh">
