@@ -12,29 +12,13 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleCommonTrigger {
+public class ${item.itemClassName} extends JRuleNumberItem {
 
 <#include "Common.ftlh">
     
-    public static final String TYPE = "${item.quantityType}";
+    public static final String QUANTITY_TYPE = "${item.quantityType}";
     
-    public static Double getState() {
-        return JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).getState();
-    }
-
-    public static void sendCommand(double command) {
-        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).sendCommand(command);
-    }
-
-    public static void postUpdate(double value) {
-        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).postUpdate(value);
-    }
-
-    public static void sendCommand(double command, String unit) {
-        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).sendCommand(command, unit);
-    }
-
-    public static void postUpdate(double value, String unit) {
-        JRuleItemRegistry.get(ITEM, JRuleNumberItem.class).postUpdate(value, unit);
+    public String getQuantityType() {
+        return QUANTITY_TYPE;
     }
 }

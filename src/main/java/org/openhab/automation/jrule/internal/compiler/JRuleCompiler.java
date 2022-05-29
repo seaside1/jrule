@@ -178,7 +178,7 @@ public class JRuleCompiler {
     }
 
     public void compile(List<File> javaSourceFiles, String classPath) {
-        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
             logError(
@@ -202,13 +202,14 @@ public class JRuleCompiler {
                 logDebug("Compilation of classes successfully!");
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri(),
+                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(),
+                            diagnostic.getSource() == null ? "" : diagnostic.getSource().toUri(),
                             diagnostic.getMessage(Locale.getDefault()));
                 }
             }
             fileManager.close();
         } catch (Exception x) {
-            logError("error", x);
+            logError("Compiler threw error {}", x.toString());
         }
     }
 

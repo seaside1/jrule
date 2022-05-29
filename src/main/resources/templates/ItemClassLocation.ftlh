@@ -2,17 +2,14 @@
 
 package ${item.itemPackage};
 
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
+import org.openhab.automation.jrule.items.JRuleLocationItem;
 
 /**
  * Automatically Generated Class for Item ${item.itemName}
  *
  * @author Arne Seime - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleSwitchTrigger {
+public class ${item.itemClassName} extends JRuleLocationItem {
 
 <#include "Common.ftlh">
 

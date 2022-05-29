@@ -12,13 +12,27 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
+
 /**
  * The {@link JRuleItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleItem {
+public abstract class JRuleItem implements JRuleCommonTrigger {
     public static final String TRIGGER_CHANGED = "Changed";
     public static final String TRIGGER_RECEIVED_COMMAND = "received command";
     public static final String TRIGGER_RECEIVED_UPDATE = "received update";
+
+    public String getName() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getLabel() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getType() {
+        return null; // Method overridden by generated item
+    }
 }

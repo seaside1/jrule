@@ -13,14 +13,13 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleStringItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleStringItem extends JRuleItem implements JRuleCommonTrigger {
+public class JRuleStringItem extends JRuleItem {
 
     private final String itemName;
 

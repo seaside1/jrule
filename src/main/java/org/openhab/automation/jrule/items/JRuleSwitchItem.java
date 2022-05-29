@@ -14,14 +14,13 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 
 /**
  * The {@link JRuleSwitchItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleSwitchItem extends JRuleItem implements JRuleSwitchTrigger {
+public class JRuleSwitchItem extends JRuleItem {
 
     private final String itemName;
 

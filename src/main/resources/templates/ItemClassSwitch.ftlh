@@ -12,19 +12,6 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleSwitchTrigger {
-
+public class ${item.itemClassName} extends JRuleSwitchItem {
 <#include "Common.ftlh">
-
-    public static JRuleOnOffValue getState() {
-        return JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).getState();
-    }
-
-    public static void sendCommand(JRuleOnOffValue command) {
-        JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).sendCommand(command);
-    }
-
-    public static void postUpdate(JRuleOnOffValue value) {
-        JRuleItemRegistry.get(ITEM, JRuleSwitchItem.class).postUpdate(value);
-    }
 }

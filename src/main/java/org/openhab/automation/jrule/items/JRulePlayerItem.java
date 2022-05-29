@@ -14,14 +14,13 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
 
 /**
  * The {@link JRulePlayerItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
+public class JRulePlayerItem extends JRuleItem {
 
     private final String itemName;
 

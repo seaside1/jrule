@@ -118,7 +118,7 @@ public class JRuleClassGeneratorTest {
         boolean success = sourceFileGenerator.generateItemsSource(items);
         assertTrue(success, "Failed to generate source file for items");
 
-        compiler.compile(new File(targetFolder, "Items.java"), "target/classes");
+        compiler.compile(new File(targetFolder, "Items.java"), "target/classes:target/items");
 
         File compiledClass = new File(targetFolder, "Items.class");
         assertTrue(compiledClass.exists());

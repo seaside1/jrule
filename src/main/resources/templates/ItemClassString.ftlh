@@ -12,19 +12,7 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleCommonTrigger {
+public class ${item.itemClassName} extends JRuleStringItem {
 
 <#include "Common.ftlh">
-
-    public static String getState() {
-        return JRuleItemRegistry.get(ITEM, JRuleStringItem.class).getState();
-    }
-
-    public static void sendCommand(String command) {
-        JRuleItemRegistry.get(ITEM, JRuleStringItem.class).sendCommand(command);
-    }
-
-    public static void postUpdate(String value) {
-        JRuleItemRegistry.get(ITEM, JRuleStringItem.class).postUpdate(value);
-    }
 }

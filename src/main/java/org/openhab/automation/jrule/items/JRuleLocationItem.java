@@ -12,14 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
-
 /**
  * The {@link JRuleLocationItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleLocationItem extends JRuleItem implements JRuleCommonTrigger {
+public class JRuleLocationItem extends JRuleItem {
 
     public final String itemName;
 
