@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.items;
 import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
@@ -53,6 +54,10 @@ public class JRuleGroupRollershutterItem extends JRuleGroupItem {
     }
 
     public void sendCommand(JRuleUpDownValue value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    public void sendCommand(JRuleStopMoveValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
