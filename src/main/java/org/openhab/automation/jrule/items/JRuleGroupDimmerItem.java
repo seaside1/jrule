@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * The {@link JRuleGroupColorItem} Items
@@ -53,6 +54,10 @@ public class JRuleGroupDimmerItem extends JRuleGroupItem {
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue value) {
+        JRuleEventHandler.get().sendCommand(itemName, value);
+    }
+
+    public void sendCommand(JRuleOnOffValue value) {
         JRuleEventHandler.get().sendCommand(itemName, value);
     }
 
