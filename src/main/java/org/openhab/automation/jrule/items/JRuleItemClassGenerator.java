@@ -157,6 +157,7 @@ public class JRuleItemClassGenerator {
             itemModel.put("itemClassType", "JRule" + item.getType() + "Item"); // Convention applied
         }
         itemModel.put("itemLabel", item.getLabel());
+        itemModel.put("itemType", item.getType());
         if (isQuantityType(item.getType())) {
             itemModel.put("quantityType", getQuantityType(item.getType()));
         }
@@ -196,7 +197,7 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
             return "ItemClassRollershutter" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.LOCATION)) {
-            return "ItemClass" + TEMPLATE_SUFFIX;
+            return "ItemClassLocation" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.COLOR)) {
             return "ItemClassColor" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.CONTACT)) {
@@ -207,8 +208,6 @@ public class JRuleItemClassGenerator {
             return "ItemClassDateTime" + TEMPLATE_SUFFIX;
         } else if (type.equals(GroupItem.TYPE)) {
             return "ItemClassGroup" + TEMPLATE_SUFFIX;
-        } else if (type.equals("Location")) { // TODO appears to be missing in Core
-            return "ItemClassLocation" + TEMPLATE_SUFFIX;
         }
         return null;
     }

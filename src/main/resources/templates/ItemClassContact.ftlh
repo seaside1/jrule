@@ -13,11 +13,8 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  *
  * @author Timo Litzius - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleCommonTrigger {
+public class ${item.itemClassName} extends JRuleContactItem  {
 
 <#include "Common.ftlh">
-    
-    public static JRuleOpenClosedValue getState() {
-        return JRuleItemRegistry.get(ITEM, JRuleContactItem.class).getState();
-    }
+
 }

@@ -2,8 +2,11 @@
 
 package ${packageName};
 
-import org.openhab.automation.jrule.items.*;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+
+<#list items as item>
+import org.openhab.automation.jrule.items.generated.${item.itemClassName};
+</#list>
 
 /**
  * Automatically Generated Class for all items
@@ -13,7 +16,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
 public class Items {
 
 <#list items as item>
- public static ${item.itemClassType} ${item.itemName} = JRuleItemRegistry.get("${item.itemName}", ${item.itemClassType}.class);
+ public static ${item.itemClassName} ${item.itemName} = JRuleItemRegistry.get("${item.itemName}", ${item.itemClassName}.class);
 </#list>
 
 }

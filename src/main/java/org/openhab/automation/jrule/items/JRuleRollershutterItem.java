@@ -17,14 +17,13 @@ import java.time.ZonedDateTime;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleRollershutterItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleRollershutterItem extends JRuleItem implements JRuleCommonTrigger {
+public class JRuleRollershutterItem extends JRuleItem {
 
     protected JRuleRollershutterItem(String itemName) {
         this.itemName = itemName;

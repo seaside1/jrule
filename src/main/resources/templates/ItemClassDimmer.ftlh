@@ -14,31 +14,9 @@ import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleDimmerTrigger {
+public class ${item.itemClassName} extends JRuleDimmerItem  {
 
 <#include "Common.ftlh">
     
-    public static int getState() {
-        return JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).getState();
-    }
 
-    public static void sendCommand(JRuleOnOffValue command) {
-        JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).sendCommand(command);
-    }
-
-    public static void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).sendCommand(command);
-    }
-
-    public static void sendCommand(int command) {
-        JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).sendCommand(command);
-    }
-
-    public static void postUpdate(JRuleOnOffValue value) {
-        JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).postUpdate(value);
-    }
-
-    public static void postUpdate(int value) {
-        JRuleItemRegistry.get(ITEM, JRuleDimmerItem.class).postUpdate(value);
-    }
 }

@@ -14,32 +14,8 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  *
  * @author Timo Litzius - Initial contribution
  */
-public class ${item.itemClassName} implements JRuleCommonTrigger {
+public class ${item.itemClassName} extends JRuleRollershutterItem {
 
 <#include "Common.ftlh">
-
-public static int getState() {
-        return JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).getState();
-    }
-
-    public static void sendCommand(JRuleUpDownValue command) {
-        JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).sendCommand(command);
-    }
-
-    public static void sendCommand(JRuleStopMoveValue command) {
-        JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).sendCommand(command);
-    }
-
-    public static void sendCommand(int value) {
-        JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).sendCommand(value);
-    }
-
-    public static void postUpdate(JRuleUpDownValue command) {
-        JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).postUpdate(command);
-    }
-
-    public static void postUpdate(int value) {
-        JRuleItemRegistry.get(ITEM, JRuleRollershutterItem.class).sendCommand(value);
-    }
 
 }

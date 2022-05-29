@@ -15,14 +15,13 @@ package org.openhab.automation.jrule.items;
 import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleNumberItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleNumberItem extends JRuleItem implements JRuleCommonTrigger {
+public class JRuleNumberItem extends JRuleItem {
 
     protected JRuleNumberItem(String itemName) {
         this.itemName = itemName;

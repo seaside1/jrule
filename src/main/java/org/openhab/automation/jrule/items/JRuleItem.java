@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
 
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 import org.openhab.core.library.types.DecimalType;
 
 /**
@@ -21,7 +22,7 @@ import org.openhab.core.library.types.DecimalType;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleItem {
+public abstract class JRuleItem implements JRuleCommonTrigger {
     public static final String TRIGGER_CHANGED = "Changed";
     public static final String TRIGGER_RECEIVED_COMMAND = "received command";
     public static final String TRIGGER_RECEIVED_UPDATE = "received update";
@@ -128,5 +129,17 @@ public abstract class JRuleItem {
         } else {
             return null;
         }
+    }
+
+    public String getName() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getLabel() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getType() {
+        return null; // Method overridden by generated item
     }
 }
