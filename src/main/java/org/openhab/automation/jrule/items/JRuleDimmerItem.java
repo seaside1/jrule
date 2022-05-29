@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -22,8 +24,6 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleDimmerItem extends JRuleItem {
-
-    private final String itemName;
 
     protected JRuleDimmerItem(String itemName) {
         this.itemName = itemName;
@@ -55,5 +55,14 @@ public class JRuleDimmerItem extends JRuleItem {
 
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    }
+
+    public Integer getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        String state = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return Integer.parseInt(state);
+        } else {
+            return null;
+        }
     }
 }

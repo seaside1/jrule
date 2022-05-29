@@ -24,8 +24,6 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  */
 public class JRuleDateTimeItem extends JRuleItem {
 
-    private final String itemName;
-
     protected JRuleDateTimeItem(String itemName) {
         this.itemName = itemName;
     }
@@ -56,5 +54,14 @@ public class JRuleDateTimeItem extends JRuleItem {
 
     public ZonedDateTime getZonedDateTimeState() {
         return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
+    }
+
+    public Date getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        String state = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return new Date(ZonedDateTime.parse(state).toInstant().toEpochMilli());
+        } else {
+            return null;
+        }
     }
 }
