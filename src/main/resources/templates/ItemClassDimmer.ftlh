@@ -1,19 +1,10 @@
-<#include "Header.ftlh">
+<#include "License.ftlh">
 
 package ${item.itemPackage};
 
 import org.openhab.automation.jrule.items.JRuleDimmerItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
 
-/**
- * Automatically Generated Class
- * for Item ${item.itemName}
- *
- * @author Joseph (Seaside) Hagberg - Initial contribution
- */
+<#include "ClassJavadoc.ftlh">
 public class ${item.itemClassName} extends JRuleDimmerItem  {
 
 <#include "Common.ftlh">

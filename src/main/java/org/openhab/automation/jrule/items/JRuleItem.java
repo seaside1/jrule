@@ -23,11 +23,20 @@ import org.openhab.core.library.types.DecimalType;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public abstract class JRuleItem implements JRuleCommonTrigger {
-    public static final String TRIGGER_CHANGED = "Changed";
-    public static final String TRIGGER_RECEIVED_COMMAND = "received command";
-    public static final String TRIGGER_RECEIVED_UPDATE = "received update";
 
     protected String itemName;
+
+    public String getName() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getLabel() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getType() {
+        return null; // Method overridden by generated item
+    }
 
     public ZonedDateTime lastUpdated() {
         return lastUpdated(null);
@@ -129,17 +138,5 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
         } else {
             return null;
         }
-    }
-
-    public String getName() {
-        return null; // Method overridden by generated item
-    }
-
-    public String getLabel() {
-        return null; // Method overridden by generated item
-    }
-
-    public String getType() {
-        return null; // Method overridden by generated item
     }
 }
