@@ -20,9 +20,6 @@ import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public abstract class JRuleItem implements JRuleCommonTrigger {
-    public static final String TRIGGER_CHANGED = "Changed";
-    public static final String TRIGGER_RECEIVED_COMMAND = "received command";
-    public static final String TRIGGER_RECEIVED_UPDATE = "received update";
 
     public String getName() {
         return null; // Method overridden by generated item
