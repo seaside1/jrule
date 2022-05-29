@@ -53,6 +53,10 @@ public class JRuleGroupItem extends JRuleItem {
         return JRuleEventHandler.get().getOnOffValue(itemName);
     }
 
+    public double getStateAsDouble() {
+        return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
+    }
+
     public JRulePlayPauseValue getStateAsPlayPauseValue() {
         return JRuleEventHandler.get().getPauseValue(itemName);
     }
