@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.items;
 import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.core.library.types.DecimalType;
 
 /**
  * The {@link JRuleNumberItem} Items
@@ -53,5 +54,83 @@ public class JRuleNumberItem extends JRuleItem {
 
     public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
         return Double.parseDouble(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
+    }
+
+    public Double maximumSince(ZonedDateTime timestamp) {
+        return maximumSince(timestamp, null);
+    }
+
+    public Double maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        DecimalType state = JRulePersistenceExtentions.maximumSince(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return state.doubleValue();
+        } else {
+            return null;
+        }
+    }
+
+    public Double minimumSince(ZonedDateTime timestamp) {
+        return minimumSince(timestamp, null);
+    }
+
+    public Double minimumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        DecimalType state = JRulePersistenceExtentions.minimumSince(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return state.doubleValue();
+        } else {
+            return null;
+        }
+    }
+
+    public Double varianceSince(ZonedDateTime timestamp) {
+        return varianceSince(timestamp, null);
+    }
+
+    public Double varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        DecimalType state = JRulePersistenceExtentions.varianceSince(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return state.doubleValue();
+        } else {
+            return null;
+        }
+    }
+
+    public Double deviationSince(ZonedDateTime timestamp) {
+        return deviationSince(timestamp, null);
+    }
+
+    public Double deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        DecimalType state = JRulePersistenceExtentions.deviationSince(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return state.doubleValue();
+        } else {
+            return null;
+        }
+    }
+
+    public Double averageSince(ZonedDateTime timestamp) {
+        return averageSince(timestamp, null);
+    }
+
+    public Double averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        DecimalType state = JRulePersistenceExtentions.averageSince(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return state.doubleValue();
+        } else {
+            return null;
+        }
+    }
+
+    public Double sumSince(ZonedDateTime timestamp) {
+        return sumSince(timestamp, null);
+    }
+
+    public Double sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        DecimalType state = JRulePersistenceExtentions.sumSince(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return state.doubleValue();
+        } else {
+            return null;
+        }
     }
 }

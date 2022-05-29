@@ -153,13 +153,28 @@ public class JRuleItemClassGenerator {
         itemModel.put("itemClassName", jRuleConfig.getGeneratedItemPrefix() + item.getName());
         if (isQuantityType(item.getType())) {
             itemModel.put("itemClassType", "JRuleNumberItem");
+            itemModel.put("quantityType", getQuantityType(item.getType()));
         } else {
             itemModel.put("itemClassType", "JRule" + item.getType() + "Item"); // Convention applied
         }
         itemModel.put("itemLabel", item.getLabel());
         itemModel.put("itemType", item.getType());
-        if (isQuantityType(item.getType())) {
-            itemModel.put("quantityType", getQuantityType(item.getType()));
+
+        // Group handling
+        if (item.getType().equals(GroupItem.TYPE)) {
+            Item baseItem = ((GroupItem) item).getBaseItem();
+
+            String baseItemType = "String"; // Defaulting to a simple string value, can hold any state
+            if (baseItem != null && baseItem.getType() != null) {
+                baseItemType = baseItem.getType();
+            }
+
+            if (isQuantityType(baseItemType)) {
+                itemModel.put("itemGroupClassName", "JRuleGroupNumberItem");
+                itemModel.put("quantityType", getQuantityType(baseItemType));
+            } else {
+                itemModel.put("itemGroupClassName", "JRuleGroup" + baseItemType + "Item");
+            }
         }
 
         return itemModel;
