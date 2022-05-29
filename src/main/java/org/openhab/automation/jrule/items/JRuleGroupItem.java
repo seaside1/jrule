@@ -12,20 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
 import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
  * The {@link JRuleGroupItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleGroupItem extends JRuleItem {
+public abstract class JRuleGroupItem extends JRuleItem {
 
     protected JRuleGroupItem(String itemName) {
         this.itemName = itemName;
@@ -42,63 +38,5 @@ public class JRuleGroupItem extends JRuleItem {
     public void sendCommandToAll(String value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
-    }
-
-    public String getState() {
-        return JRuleEventHandler.get().getStringValue(itemName);
-    }
-
-    public JRuleOnOffValue getStateAsOnOffValue() {
-        return JRuleEventHandler.get().getOnOffValue(itemName);
-    }
-
-    public double getStateAsDouble() {
-        return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
-    }
-
-    public JRulePlayPauseValue getStateAsPlayPauseValue() {
-        return JRuleEventHandler.get().getPauseValue(itemName);
-    }
-
-    public JRuleUpDownValue getStateAsUpDownValue() {
-        return JRuleEventHandler.get().getUpDownValue(itemName);
-    }
-
-    public void sendCommand(JRulePlayPauseValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void sendCommand(JRuleOnOffValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void sendCommand(JRuleUpDownValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void sendCommand(String value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void postUpdate(String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public void postUpdate(JRulePlayPauseValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public void postUpdate(JRuleOnOffValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    public void postUpdate(JRuleUpDownValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    // Persistence method
-    public String getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        // TODO Groups should have a type registered
-        return JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
     }
 }

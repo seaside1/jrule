@@ -74,7 +74,7 @@ public class JRuleClassGeneratorTest {
     }
 
     @Test
-    public void testGenerateAndCompile() {
+    public void testGenerateAndCompileStandardItem() {
         generateAndCompile(decorate(new ColorItem("ColorItem")));
         generateAndCompile(decorate(new ContactItem("ContactItem")));
         generateAndCompile(decorate(new DateTimeItem("DateTimeItem")));
@@ -87,6 +87,22 @@ public class JRuleClassGeneratorTest {
         generateAndCompile(decorate(new StringItem("StringItem")));
         generateAndCompile(decorate(new SwitchItem("SwitchItem")));
         generateAndCompile(decorate(new LocationItem("LocationItem")));
+    }
+
+    @Test
+    public void testGenerateAndCompileGroupItem() {
+        generateAndCompile(decorate(new GroupItem("ColorGroup", new ColorItem("ColorItem"))));
+        generateAndCompile(decorate(new GroupItem("ContactGroup", new ContactItem("ContactItem"))));
+        generateAndCompile(decorate(new GroupItem("DateTimeGroup", new DateTimeItem("DateTimeItem"))));
+        generateAndCompile(decorate(new GroupItem("DimmerGroup", new DimmerItem("DimmerItem"))));
+        generateAndCompile(decorate(new GroupItem("NumberGroup", new NumberItem("NumberItem"))));
+        generateAndCompile(
+                decorate(new GroupItem("QuantityGroup", new NumberItem("Number:Temperature", "QuantityItem"))));
+        generateAndCompile(decorate(new GroupItem("PlayerGroup", new PlayerItem("PlayerItem"))));
+        generateAndCompile(decorate(new GroupItem("RollershutterGroup", new RollershutterItem("RollershutterItem"))));
+        generateAndCompile(decorate(new GroupItem("StringGroup", new StringItem("StringItem"))));
+        generateAndCompile(decorate(new GroupItem("SwitchGroup", new SwitchItem("SwitchItem"))));
+        generateAndCompile(decorate(new GroupItem("LocationGroup", new LocationItem("LocationItem"))));
     }
 
     private Item decorate(GenericItem item) {

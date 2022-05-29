@@ -97,6 +97,10 @@ public class JRuleEventHandler {
         sendCommand(itemName, getCommand(command));
     }
 
+    public void sendCommand(String itemName, JRuleOpenClosedValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
     public void sendCommand(String itemName, JRuleOnOffValue command) {
         sendCommand(itemName, getCommand(command));
     }
@@ -205,6 +209,10 @@ public class JRuleEventHandler {
         postUpdate(itemName, getStateFromValue(state));
     }
 
+    public void postUpdate(String itemName, JRuleOpenClosedValue state) {
+        postUpdate(itemName, getStateFromValue(state));
+    }
+
     public void postUpdate(String itemName, JRuleUpDownValue state) {
         postUpdate(itemName, getStateFromValue(state));
     }
@@ -256,7 +264,7 @@ public class JRuleEventHandler {
         return getUpDownValueFromState(state);
     }
 
-    private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
+    public JRulePlayPauseValue getPlayPauseValueFromState(State state) {
         final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
         switch (playPauseType) {
             case PLAY:
@@ -369,6 +377,32 @@ public class JRuleEventHandler {
                 return PlayPauseType.PLAY;
             case PAUSE:
                 return PlayPauseType.PAUSE;
+            case UNDEF:
+            default:
+                logError("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private Command getCommand(JRuleOpenClosedValue command) {
+        switch (command) {
+            case OPEN:
+                return OpenClosedType.OPEN;
+            case CLOSED:
+                return OpenClosedType.CLOSED;
+            case UNDEF:
+            default:
+                logError("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private State getStateFromValue(JRuleOpenClosedValue command) {
+        switch (command) {
+            case OPEN:
+                return OpenClosedType.OPEN;
+            case CLOSED:
+                return OpenClosedType.CLOSED;
             case UNDEF:
             default:
                 logError("Unhandled getCommand: {}", command);
