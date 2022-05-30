@@ -12,3 +12,9 @@
 
 ## Maximum number of threads
 #org.openhab.automation.jrule.engine.executors.max=10
+
+## Number of seconds before jrule engine is initialized
+# org.openhab.automation.jrule.engine.initdelay=5
+
+## Number of seconds before rules from jar and source files are loaded 
+#org.openhab.automation.jrule.engine.rulesdelay=2

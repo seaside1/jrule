@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.internal;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -46,15 +45,13 @@ public class JRuleFactory {
     private final JRuleHandler jRuleHandler;
     private final JRuleEngine jRuleEngine;
 
-    @Nullable
-    private static CompletableFuture<Void> initFuture = null;
-
     private final JRuleConfig config;
 
     private static final Logger logger = LoggerFactory.getLogger(JRuleFactory.class);
-    private static final Object INIT_DELAY_PROPERTY = "init.delay";
-    private static final int DEFAULT_INIT_DELAY = 5;
+
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
+
+    private final DelayedDebouncingExecutor delayedInit = new DelayedDebouncingExecutor(5, TimeUnit.SECONDS);
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
@@ -67,30 +64,15 @@ public class JRuleFactory {
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
                 componentContext.getBundleContext());
-        createDelayedInitialization(getInitDelaySeconds(properties));
+        delayedInit.call(this::init);
     }
 
-    private int getInitDelaySeconds(Map<String, Object> properties) {
-        Object initDelay = properties.get(INIT_DELAY_PROPERTY);
-        int delay = DEFAULT_INIT_DELAY;
-        if (initDelay != null) {
-            try {
-                delay = Integer.parseInt((String) initDelay);
-            } catch (Exception x) {
-                // Best effort
-            }
-        }
-        return delay;
-    }
-
-    private synchronized CompletableFuture<Void> createDelayedInitialization(int delayInSeconds) {
-        initFuture = JRuleUtil.delayedExecution(delayInSeconds, TimeUnit.SECONDS);
-        return initFuture.thenAccept(s -> {
-            JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
-            jRuleEngine.initialize();
-            jRuleHandler.initialize();
-            initFuture = null;
-        });
+    @Nullable
+    private Void init() {
+        JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
+        jRuleEngine.initialize();
+        jRuleHandler.initialize();
+        return null;
     }
 
     private String getBundleVersion() {
@@ -99,10 +81,7 @@ public class JRuleFactory {
 
     @Deactivate
     public synchronized void dispose() {
-        if (initFuture != null) {
-            initFuture.cancel(true);
-            initFuture = null;
-        }
+        delayedInit.cancel();
         jRuleHandler.dispose();
         jRuleEngine.dispose();
     }
