@@ -1,8 +1,8 @@
-    public static final String ITEM = "${item.itemName}";
+    public static final String ITEM = "${item.name}";
 
-    public static final String LABEL = "<#if item.itemLabel??>${item.itemLabel}</#if>";
+    public static final String LABEL = "<#if item.label??>${item.label}</#if>";
 
-    public static final String TYPE = "${item.itemType}";
+    public static final String TYPE = "${item.type}";
 
     @Override
     public String getName() {
@@ -24,6 +24,6 @@
         return "'"+LABEL+"'/"+ITEM+"/"+TYPE;
     }
 
-    public ${item.itemClassName}(String itemName) {
-        super(itemName);
+    public ${item.class}(String name) {
+        super(name);
     }

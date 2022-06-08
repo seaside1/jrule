@@ -1,11 +1,11 @@
 <#include "License.ftlh">
 
-package ${item.itemPackage};
+package ${item.package};
 
 import org.openhab.automation.jrule.items.JRuleDimmerItem;
 
 <#include "ClassJavadoc.ftlh">
-public class ${item.itemClassName} extends JRuleDimmerItem  {
+public class ${item.class} extends JRuleDimmerItem  {
 
 <#include "Common.ftlh">
     

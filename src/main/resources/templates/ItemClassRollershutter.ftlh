@@ -1,11 +1,11 @@
 <#include "License.ftlh">
 
-package ${item.itemPackage};
+package ${item.package};
 
 import org.openhab.automation.jrule.items.JRuleRollershutterItem;
 
 <#include "ClassJavadoc.ftlh">
-public class ${item.itemClassName} extends JRuleRollershutterItem {
+public class ${item.class} extends JRuleRollershutterItem {
 
 <#include "Common.ftlh">
 

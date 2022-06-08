@@ -5,7 +5,7 @@ package ${packageName};
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 <#list items as item>
-import org.openhab.automation.jrule.items.generated.${item.itemClassName};
+import org.openhab.automation.jrule.items.generated.${item.class};
 </#list>
 
 /**
@@ -18,14 +18,14 @@ public class Items {
 
 
 <#list items as item>
- public static ${item.itemClassName} ${item.itemName};
+ public static ${item.class} ${item.name};
 
 </#list>
 
  public Items() {
 
    <#list items as item>
-    ${item.itemName} = JRuleItemRegistry.get("${item.itemName}", ${item.itemClassName}.class);
+    ${item.name} = JRuleItemRegistry.get("${item.name}", ${item.class}.class);
 
    </#list>
 

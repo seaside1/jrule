@@ -150,17 +150,14 @@ public class JRuleItemClassGenerator {
 
     private Map<String, Object> createItemModel(Item item) {
         Map<String, Object> itemModel = new HashMap<>();
-        itemModel.put("itemName", item.getName());
-        itemModel.put("itemPackage", jRuleConfig.getGeneratedItemPackage());
-        itemModel.put("itemClassName", jRuleConfig.getGeneratedItemPrefix() + item.getName());
+        itemModel.put("name", item.getName());
+        itemModel.put("package", jRuleConfig.getGeneratedItemPackage());
+        itemModel.put("class", jRuleConfig.getGeneratedItemPrefix() + item.getName());
         if (isQuantityType(item.getType())) {
-            itemModel.put("itemClassType", "JRuleNumberItem");
             itemModel.put("quantityType", getQuantityType(item.getType()));
-        } else {
-            itemModel.put("itemClassType", "JRule" + item.getType() + "Item"); // Convention applied
         }
-        itemModel.put("itemLabel", item.getLabel());
-        itemModel.put("itemType", item.getType());
+        itemModel.put("label", item.getLabel());
+        itemModel.put("type", item.getType());
 
         // Group handling
         if (item.getType().equals(GroupItem.TYPE)) {
@@ -172,10 +169,10 @@ public class JRuleItemClassGenerator {
             }
 
             if (isQuantityType(baseItemType)) {
-                itemModel.put("itemGroupClassName", "JRuleGroupNumberItem");
+                itemModel.put("parentClass", "JRuleGroupNumberItem");
                 itemModel.put("quantityType", getQuantityType(baseItemType));
             } else {
-                itemModel.put("itemGroupClassName", "JRuleGroup" + baseItemType + "Item");
+                itemModel.put("parentClass", "JRuleGroup" + baseItemType + "Item");
             }
         }
 
@@ -201,10 +198,8 @@ public class JRuleItemClassGenerator {
             return "ItemClassSwitch" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.DIMMER)) {
             return "ItemClassDimmer" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.NUMBER)) {
+        } else if (type.equals(CoreItemFactory.NUMBER) || isQuantityType(type)) {
             return "ItemClassNumber" + TEMPLATE_SUFFIX;
-        } else if (isQuantityType(type)) {
-            return "ItemClassNumberQuantity" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.STRING)) {
             return "ItemClassString" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.IMAGE)) {

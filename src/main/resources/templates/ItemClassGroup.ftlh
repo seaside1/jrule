@@ -1,11 +1,11 @@
 <#include "License.ftlh">
 
-package ${item.itemPackage};
+package ${item.package};
 
-import org.openhab.automation.jrule.items.${item.itemGroupClassName};
+import org.openhab.automation.jrule.items.${item.parentClass};
 
 <#include "ClassJavadoc.ftlh">
-public class ${item.itemClassName} extends ${item.itemGroupClassName}  {
+public class ${item.class} extends ${item.parentClass}  {
 
 <#include "Common.ftlh">
 
