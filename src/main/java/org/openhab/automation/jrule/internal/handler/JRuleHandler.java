@@ -210,7 +210,8 @@ public class JRuleHandler implements PropertyChangeListener {
                 JRuleUtil.class.getClassLoader());
 
         // Load item classes first
-        compiler.loadPlainClasses(loader, new File(config.getItemsDirectory()), JRuleConfig.ITEMS_PACKAGE, false);
+        compiler.loadClassesFromFolder(loader, new File(config.getItemsRootDirectory()), JRuleConfig.ITEMS_PACKAGE,
+                false);
         // Clear registry from old items
         JRuleItemRegistry.clear();
         // Reload Items class - this will also instantiate all items and load them to the registry
@@ -224,8 +225,9 @@ public class JRuleHandler implements PropertyChangeListener {
         }
 
         // Load rules that refer to the items
-        compiler.loadPlainClasses(loader, new File(config.getRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
-        compiler.loadJarClasses(loader, new File(config.getJarRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
+        compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), JRuleConfig.RULES_PACKAGE,
+                true);
+        compiler.loadClassesFromJar(loader, new File(config.getJarRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
     }
 
     private boolean initializeFolder(String folder) {
