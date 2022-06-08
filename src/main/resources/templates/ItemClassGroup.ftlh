@@ -1,13 +1,13 @@
-<#include "License.ftlh">
+<#include "CommonLicense.ftlh">
 
 package ${item.package};
 
 import org.openhab.automation.jrule.items.${item.parentClass};
 
-<#include "ClassJavadoc.ftlh">
+<#include "CommonJavadoc.ftlh">
 public class ${item.class} extends ${item.parentClass}  {
 
-<#include "Common.ftlh">
+<#include "CommonMethods.ftlh">
 
 <#if item.quantityType??>
     public static final String QUANTITY_TYPE = "${item.quantityType}";

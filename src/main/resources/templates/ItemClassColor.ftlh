@@ -1,11 +1,11 @@
-<#include "License.ftlh">
+<#include "CommonLicense.ftlh">
 
 package ${item.package};
 
 import org.openhab.automation.jrule.items.JRuleColorItem;
 
-<#include "ClassJavadoc.ftlh">
+<#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleColorItem {
 
-<#include "Common.ftlh">
+<#include "CommonMethods.ftlh">
 }

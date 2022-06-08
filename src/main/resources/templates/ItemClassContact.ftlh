@@ -1,12 +1,12 @@
-<#include "License.ftlh">
+<#include "CommonLicense.ftlh">
 
 package ${item.package};
 
 import org.openhab.automation.jrule.items.JRuleContactItem;
 
-<#include "ClassJavadoc.ftlh">
+<#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleContactItem  {
 
-<#include "Common.ftlh">
+<#include "CommonMethods.ftlh">
 
 }
