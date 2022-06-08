@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,8 @@ public class JRuleItemClassGenerator {
     }
 
     public boolean generateItemsSource(Collection<Item> items) {
-        List<Map<String, Object>> model = items.stream().map(e -> createItemModel(e)).collect(Collectors.toList());
+        List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
+                .map(e -> createItemModel(e)).collect(Collectors.toList());
         Map<String, Object> processingModel = new HashMap<>();
         processingModel.put("items", model);
         processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());

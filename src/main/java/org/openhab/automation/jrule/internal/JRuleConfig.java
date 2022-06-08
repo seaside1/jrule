@@ -75,6 +75,8 @@ public class JRuleConfig {
     private static final int DEFAULT_INIT_DELAY = 5;
     private static final String INIT_RULES_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.rulesdelay";
     private static final int DEFAULT_RULES_INIT_DELAY = 2;
+    private static final String DEFAULT_ITEMS_RECOMPILATION_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.itemsrecompilationdelay";
+    private static final int DEFAULT_ITEMS_RECOMPILATION_DELAY = 5;
     private final Map<String, Object> properties;
 
     private final Properties jRuleProperties;
@@ -219,15 +221,22 @@ public class JRuleConfig {
     }
 
     public int getRulesInitDelaySeconds() {
-        final String initRulesDelay = (String) properties.get(INIT_RULES_DELAY_PROPERTY);
-        int delay = DEFAULT_RULES_INIT_DELAY;
-        if (initRulesDelay != null) {
+        return getIntConfigProperty(INIT_RULES_DELAY_PROPERTY, DEFAULT_RULES_INIT_DELAY);
+    }
+
+    public int getItemsRecompilationDelaySeconds() {
+        return getIntConfigProperty(DEFAULT_ITEMS_RECOMPILATION_DELAY_PROPERTY, DEFAULT_ITEMS_RECOMPILATION_DELAY);
+    }
+
+    private int getIntConfigProperty(String propertyName, int defaultValue) {
+        final String configuredValue = (String) properties.get(propertyName);
+        if (configuredValue != null) {
             try {
-                delay = Integer.parseInt(initRulesDelay);
+                return Integer.parseInt(configuredValue);
             } catch (Exception x) {
                 // Best effort
             }
         }
-        return delay;
+        return defaultValue;
     }
 }

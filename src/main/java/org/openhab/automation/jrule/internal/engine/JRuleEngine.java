@@ -406,7 +406,7 @@ public class JRuleEngine implements PropertyChangeListener {
             return;
         }
 
-        if (triggerValues.size() > 0) {
+        if (!triggerValues.isEmpty()) {
             String member = memberName == null ? "" : memberName;
             executionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
                     .forEach(context -> invokeWhenMatchParameters(context,

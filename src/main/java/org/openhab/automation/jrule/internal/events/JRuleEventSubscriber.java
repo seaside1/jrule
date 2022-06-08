@@ -15,7 +15,9 @@ package org.openhab.automation.jrule.internal.events;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -65,6 +67,10 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     private final PropertyChangeSupport propertyChangeSupport;
 
+    private Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
+
+    private volatile boolean queueEvents = false;
+
     public JRuleEventSubscriber() {
         propertyChangeSupport = new PropertyChangeSupport(this);
         subscribedEventTypes.add(GroupItemStateChangedEvent.TYPE);
@@ -105,9 +111,38 @@ public class JRuleEventSubscriber implements EventSubscriber {
         propertyChangeSupport.removePropertyChangeListener(JRuleEngine.get());
     }
 
+    public void pauseEventSubscriber() {
+        queueEvents = true;
+    }
+
+    public void resumeEvents() {
+        while (true) {
+            Event event = eventQueue.poll();
+            if (event == null) {
+                JRuleLog.info(logger, LOG_NAME_SUBSCRIBER, "Event queue empty");
+                queueEvents = false;
+                break;
+            }
+            try {
+                JRuleLog.info(logger, LOG_NAME_SUBSCRIBER, "Delivering previously queued event {}", event);
+                processEvent(event);
+            } catch (Exception e) {
+                JRuleLog.warn(logger, LOG_NAME_SUBSCRIBER, "Error processing queued event, discarding: {}", event);
+            }
+        }
+    }
+
     @Override
     public void receive(Event event) {
+        if (queueEvents) {
+            JRuleLog.info(logger, LOG_NAME_SUBSCRIBER, "Event processing paused, queueing event {}", event);
+            eventQueue.add(event);
+        } else {
+            processEvent(event);
+        }
+    }
 
+    private void processEvent(Event event) {
         final String itemFromTopic = JRuleUtil.getItemNameFromTopic(event.getTopic());
         if (event.getType().equals(ItemAddedEvent.TYPE) //
                 || event.getType().equals(ItemRemovedEvent.TYPE) //

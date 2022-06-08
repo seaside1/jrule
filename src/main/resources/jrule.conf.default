@@ -18,3 +18,7 @@
 
 ## Number of seconds before rules from jar and source files are loaded 
 #org.openhab.automation.jrule.engine.rulesdelay=2
+
+# Number of seconds to wait after an item change or Java rule change before
+# recompilation and reloading starts
+# org.openhab.automation.jrule.engine.itemsrecompilationdelay=5

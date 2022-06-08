@@ -47,7 +47,7 @@ public class JRuleJarExtractor {
         }
         Class<?> clazz = loadedClasses.get(0);
         final URL jarUrl = getClassLocation(clazz);
-        writeJarToFolder(jarUrl, jarFilePath);
+        copyJRulesJarToFolder(jarUrl, jarFilePath);
     }
 
     private Vector<Class<?>> getLoadedClasses(ClassLoader classLoader) {
@@ -67,7 +67,7 @@ public class JRuleJarExtractor {
         return null;
     }
 
-    private void writeJarToFolder(URL jarUrl, String jarFilePath) {
+    private void copyJRulesJarToFolder(URL jarUrl, String jarFilePath) {
         if (jarUrl == null) {
             JRuleLog.debug(logger, LOG_NAME_JAR, "ignoring jar: {}", jarUrl);
             return;

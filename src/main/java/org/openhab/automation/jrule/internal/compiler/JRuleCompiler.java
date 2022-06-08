@@ -154,6 +154,7 @@ public class JRuleCompiler {
     public void loadPlainClasses(ClassLoader classLoader, File sourceFolder, String classPackage,
             boolean createInstance) {
         try {
+
             final File[] classItems = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
             if (classItems == null || classItems.length == 0) {
                 logInfo("Found no user defined java rules to load into memory in folder: {}",
@@ -173,17 +174,44 @@ public class JRuleCompiler {
         }
     }
 
-    public void compile(File javaSourceFile, String classPath) {
-        compile(List.of(javaSourceFile), classPath);
+    public boolean compileItems() {
+        return compileItems(new File(jRuleConfig.getItemsDirectory()));
     }
 
-    public void compile(List<File> javaSourceFiles, String classPath) {
+    private boolean compileItems(File sourceFolder) {
+        final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
+                + getJarPath(JAR_JRULE_NAME) + ":" + jRuleConfig.getItemsRootDirectory();
+        logDebug("Compiling items in folder: {}", sourceFolder.getAbsolutePath());
+
+        final File[] javaSourceFiles = sourceFolder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
+        final File[] javaClassFiles = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
+
+        Map<String, File> classFiles = new HashMap<>();
+        Arrays.stream(javaClassFiles).forEach(classFile -> classFiles
+                .put(JRuleUtil.removeExtension(classFile.getName(), JRuleConstants.CLASS_FILE_TYPE), classFile));
+
+        Map<String, File> sourceFiles = new HashMap<>();
+        Arrays.stream(javaSourceFiles).forEach(sourceFile -> sourceFiles
+                .put(JRuleUtil.removeExtension(sourceFile.getName(), JRuleConstants.JAVA_FILE_TYPE), sourceFile));
+
+        // First delete any class files with no corresponding source file
+        classFiles.keySet().stream().filter(className -> !sourceFiles.containsKey(className))
+                .forEach(file -> classFiles.get(file).delete());
+        // Will trigger compilation of any missing or old item java files
+        return compile(new File(sourceFolder, "Items.java"), itemsClassPath);
+    }
+
+    public boolean compile(File javaSourceFile, String classPath) {
+        return compile(List.of(javaSourceFile), classPath);
+    }
+
+    public boolean compile(List<File> javaSourceFiles, String classPath) {
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
             logError(
                     "Failed to get compiler, are you sure you are using a JDK? ToolProvider.getSystemJavaCompiler() returned null");
-            return;
+            return false;
         }
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
@@ -200,6 +228,7 @@ public class JRuleCompiler {
         try {
             if (task.call()) {
                 logDebug("Compilation of classes successfully!");
+                return true;
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
                     logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(),
@@ -211,33 +240,8 @@ public class JRuleCompiler {
         } catch (Exception x) {
             logError("Compiler threw error {}", x.toString());
         }
-    }
 
-    public File[] getJavaSourceItemsFromFolder(File folder) {
-        return folder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
-    }
-
-    public void compileItemsInFolder(File sourceFolder) {
-        final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
-                + getJarPath(JAR_JRULE_NAME) + ":" + jRuleConfig.getItemsRootDirectory();
-        logDebug("Compiling items in folder: {}", sourceFolder.getAbsolutePath());
-
-        final File[] javaSourceFiles = getJavaSourceItemsFromFolder(sourceFolder);
-        final File[] javaClassFiles = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
-
-        Map<String, File> classFiles = new HashMap<>();
-        Arrays.stream(javaClassFiles).forEach(classFile -> classFiles
-                .put(JRuleUtil.removeExtension(classFile.getName(), JRuleConstants.CLASS_FILE_TYPE), classFile));
-
-        Map<String, File> sourceFiles = new HashMap<>();
-        Arrays.stream(javaSourceFiles).forEach(sourceFile -> sourceFiles
-                .put(JRuleUtil.removeExtension(sourceFile.getName(), JRuleConstants.JAVA_FILE_TYPE), sourceFile));
-
-        // First delete any class files with no corresponding source file
-        classFiles.keySet().stream().filter(className -> !sourceFiles.containsKey(className))
-                .forEach(file -> classFiles.get(file).delete());
-        // Will trigger compilation of any missing or old item java files
-        compile(new File(sourceFolder, "Items.java"), itemsClassPath);
+        return false;
     }
 
     public String getJarPath(String jarName) {
@@ -245,11 +249,7 @@ public class JRuleCompiler {
                 .toString();
     }
 
-    public void compileItems() {
-        compileItemsInFolder(new File(jRuleConfig.getItemsDirectory()));
-    }
-
-    public void compileRules() {
+    public boolean compileRules() {
         String rulesClassPath = //
                 System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator //
                         + getJarPath(JAR_JRULE_ITEMS_NAME) + File.pathSeparator //
@@ -266,7 +266,7 @@ public class JRuleCompiler {
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)).map(Path::toFile)
                     .collect(Collectors.toList());
             if (!ruleJavaFiles.isEmpty()) {
-                compile(ruleJavaFiles, rulesClassPath);
+                return compile(ruleJavaFiles, rulesClassPath);
             } else {
                 logWarn("Found no java rules to compile and use in folder {}", jRuleConfig.getRulesDirectory());
             }
@@ -274,6 +274,7 @@ public class JRuleCompiler {
             logError("Error listing java files in folder: {}", jRuleConfig.getRulesDirectory(), e);
 
         }
+        return false;
     }
 
     public List<URL> getExtLibsAsUrls() {

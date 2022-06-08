@@ -15,8 +15,21 @@ import org.openhab.automation.jrule.items.generated.${item.itemClassName};
 */
 public class Items {
 
+
+
 <#list items as item>
- public static ${item.itemClassName} ${item.itemName} = JRuleItemRegistry.get("${item.itemName}", ${item.itemClassName}.class);
+ public static ${item.itemClassName} ${item.itemName};
 
 </#list>
+
+ public Items() {
+
+   <#list items as item>
+    ${item.itemName} = JRuleItemRegistry.get("${item.itemName}", ${item.itemClassName}.class);
+
+   </#list>
+
+ }
+
 }
+
