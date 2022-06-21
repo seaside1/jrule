@@ -5,11 +5,6 @@
     public static final String TYPE = "${item.type}";
 
     @Override
-    public String getName() {
-        return ITEM;
-    }
-
-    @Override
     public String getLabel() {
         return LABEL;
     }

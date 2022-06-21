@@ -30,7 +30,7 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
     }
 
     public String getName() {
-        return null; // Method overridden by generated item
+        return itemName;
     }
 
     public String getLabel() {
