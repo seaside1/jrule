@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -167,6 +168,12 @@ public class JRuleEngine implements PropertyChangeListener {
             logDebug("Adding rule method: {}", method.getName());
             if (!method.isAnnotationPresent(JRuleName.class)) {
                 logDebug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
+                continue;
+            }
+            // Check if method is public, else execution will fail at runtime
+            boolean isPublic = (method.getModifiers() & Modifier.PUBLIC) != 0;
+            if (!isPublic) {
+                logWarn("Rule method ignored since method isn't public: {}", method.getName());
                 continue;
             }
 
