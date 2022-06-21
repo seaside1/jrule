@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 public class JRuleImageItem extends JRuleItem {
 
     protected JRuleImageItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleImageItem forName(String itemName) {
