@@ -203,9 +203,9 @@ public class JRuleItemClassGenerator {
         } else if (type.equals(CoreItemFactory.STRING)) {
             return "ItemClassString" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.IMAGE)) {
-            return "ItemClass" + TEMPLATE_SUFFIX;
+            return "ItemClassImage" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.CALL)) {
-            return "ItemClass" + TEMPLATE_SUFFIX;
+            return "ItemClassCall" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
             return "ItemClassRollershutter" + TEMPLATE_SUFFIX;
         } else if (type.equals(CoreItemFactory.LOCATION)) {

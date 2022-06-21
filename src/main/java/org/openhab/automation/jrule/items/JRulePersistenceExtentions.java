@@ -16,12 +16,15 @@ import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.RawType;
 import org.openhab.core.persistence.HistoricItem;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
+import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +43,33 @@ class JRulePersistenceExtentions {
     }
 
     public static String historicState(String itemName, ZonedDateTime timestamp, String serviceId) {
+        State state = historicStateInternal(itemName, timestamp, serviceId);
+        if (state != null) {
+            return state.toString();
+        }
+        return null;
+    }
+
+    public static JRuleRawValue historicStateAsRawValue(String itemName, ZonedDateTime timestamp) {
+        return historicStateAsRawValue(itemName, timestamp, null);
+    }
+
+    public static JRuleRawValue historicStateAsRawValue(String itemName, ZonedDateTime timestamp, String serviceId) {
+        State state = historicStateInternal(itemName, timestamp, serviceId);
+        if (state != null) {
+            RawType raw = (RawType) state;
+            return new JRuleRawValue(raw.getMimeType(), raw.getBytes());
+        }
+        return null;
+    }
+
+    private static State historicStateInternal(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
         if (item != null) {
             HistoricItem historicState = serviceId == null ? PersistenceExtensions.historicState(item, timestamp)
                     : PersistenceExtensions.historicState(item, timestamp, serviceId);
             if (historicState != null) {
-                return historicState.getState().toString();
+                return historicState.getState();
             }
         }
         return null;

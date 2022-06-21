@@ -30,10 +30,12 @@ import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
+import org.openhab.core.library.items.CallItem;
 import org.openhab.core.library.items.ColorItem;
 import org.openhab.core.library.items.ContactItem;
 import org.openhab.core.library.items.DateTimeItem;
 import org.openhab.core.library.items.DimmerItem;
+import org.openhab.core.library.items.ImageItem;
 import org.openhab.core.library.items.LocationItem;
 import org.openhab.core.library.items.NumberItem;
 import org.openhab.core.library.items.PlayerItem;
@@ -87,6 +89,8 @@ public class JRuleClassGeneratorTest {
         generateAndCompile(decorate(new StringItem("StringItem")));
         generateAndCompile(decorate(new SwitchItem("SwitchItem")));
         generateAndCompile(decorate(new LocationItem("LocationItem")));
+        generateAndCompile(decorate(new CallItem("CallItem")));
+        generateAndCompile(decorate(new ImageItem("ImageItem")));
     }
 
     @Test
@@ -103,6 +107,8 @@ public class JRuleClassGeneratorTest {
         generateAndCompile(decorate(new GroupItem("StringGroup", new StringItem("StringItem"))));
         generateAndCompile(decorate(new GroupItem("SwitchGroup", new SwitchItem("SwitchItem"))));
         generateAndCompile(decorate(new GroupItem("LocationGroup", new LocationItem("LocationItem"))));
+        generateAndCompile(decorate(new GroupItem("CallGroup", new CallItem("CallItem"))));
+        generateAndCompile(decorate(new GroupItem("ImageGroup", new ImageItem("ImageItem"))));
     }
 
     private Item decorate(GenericItem item) {
