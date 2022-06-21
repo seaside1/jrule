@@ -67,20 +67,17 @@ class JRulePersistenceExtentions {
         return null;
     }
 
-    public static Boolean updatedSince(String itemName, ZonedDateTime timestamp) {
+    public static boolean updatedSince(String itemName, ZonedDateTime timestamp) {
         return updatedSince(itemName, timestamp, null);
     }
 
-    public static Boolean updatedSince(String itemName, ZonedDateTime timestamp, String serviceId) {
+    public static boolean updatedSince(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
         if (item != null) {
-            Boolean updatedSince = serviceId == null ? PersistenceExtensions.updatedSince(item, timestamp)
+            return serviceId == null ? PersistenceExtensions.updatedSince(item, timestamp)
                     : PersistenceExtensions.updatedSince(item, timestamp, serviceId);
-            if (updatedSince != null) {
-                return updatedSince;
-            }
         }
-        return null;
+        return false;
     }
 
     public static DecimalType maximumSince(String itemName, ZonedDateTime timestamp) {
