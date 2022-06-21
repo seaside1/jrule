@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 public class JRuleStringItem extends JRuleItem {
 
     protected JRuleStringItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleStringItem forName(String itemName) {

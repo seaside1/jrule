@@ -26,7 +26,7 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 public class JRuleRollershutterItem extends JRuleItem {
 
     protected JRuleRollershutterItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleRollershutterItem forName(String itemName) {

@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 public class JRuleContactItem extends JRuleItem {
 
     protected JRuleContactItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleContactItem forName(String itemName) {

@@ -25,7 +25,7 @@ import org.openhab.core.library.types.DecimalType;
 public class JRuleNumberItem extends JRuleItem {
 
     protected JRuleNumberItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleNumberItem forName(String itemName) {

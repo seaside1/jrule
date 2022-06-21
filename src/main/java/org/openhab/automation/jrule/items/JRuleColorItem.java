@@ -27,7 +27,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 public class JRuleColorItem extends JRuleItem {
 
     protected JRuleColorItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleColorItem forName(String itemName) {

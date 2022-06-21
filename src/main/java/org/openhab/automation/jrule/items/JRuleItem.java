@@ -25,6 +25,10 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
 
     protected String itemName;
 
+    public JRuleItem(String itemName) {
+        this.itemName = itemName;
+    }
+
     public String getName() {
         return null; // Method overridden by generated item
     }

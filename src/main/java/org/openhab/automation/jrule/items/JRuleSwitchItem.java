@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 public class JRuleSwitchItem extends JRuleItem {
 
     protected JRuleSwitchItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleSwitchItem forName(String itemName) {

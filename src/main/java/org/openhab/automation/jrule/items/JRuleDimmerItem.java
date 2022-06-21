@@ -26,7 +26,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 public class JRuleDimmerItem extends JRuleItem {
 
     protected JRuleDimmerItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleDimmerItem forName(String itemName) {

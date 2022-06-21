@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 public class JRuleDateTimeItem extends JRuleItem {
 
     protected JRuleDateTimeItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleDateTimeItem forName(String itemName) {

@@ -19,10 +19,8 @@ package org.openhab.automation.jrule.items;
  */
 public class JRuleLocationItem extends JRuleItem {
 
-    public final String itemName;
-
     protected JRuleLocationItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleLocationItem forName(String itemName) {
