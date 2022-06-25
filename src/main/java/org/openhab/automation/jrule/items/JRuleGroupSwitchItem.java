@@ -16,13 +16,14 @@ import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 
 /**
  * The {@link JRuleGroupSwitchItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupSwitchItem extends JRuleGroupItem {
+public class JRuleGroupSwitchItem extends JRuleGroupItem implements JRuleSwitchTrigger {
 
     protected JRuleGroupSwitchItem(String itemName) {
         super(itemName);

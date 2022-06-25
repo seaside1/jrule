@@ -17,13 +17,14 @@ import java.time.ZonedDateTime;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
 
 /**
  * The {@link JRuleGroupColorItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupDimmerItem extends JRuleGroupItem {
+public class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleDimmerTrigger {
 
     protected JRuleGroupDimmerItem(String itemName) {
         super(itemName);

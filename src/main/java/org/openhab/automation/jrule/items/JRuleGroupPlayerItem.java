@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
 import org.openhab.core.library.types.PlayPauseType;
 
 /**
@@ -23,7 +24,7 @@ import org.openhab.core.library.types.PlayPauseType;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupPlayerItem extends JRuleGroupItem {
+public class JRuleGroupPlayerItem extends JRuleGroupItem implements JRulePlayerTrigger {
 
     protected JRuleGroupPlayerItem(String itemName) {
         super(itemName);
