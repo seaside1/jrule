@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The {@link JRulePersistenceExtentions}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Arne Seime - Initial contribution
  */
 class JRulePersistenceExtentions {
 
@@ -75,11 +75,11 @@ class JRulePersistenceExtentions {
         return null;
     }
 
-    public static Boolean changedSince(String itemName, ZonedDateTime timestamp) {
+    public static boolean changedSince(String itemName, ZonedDateTime timestamp) {
         return changedSince(itemName, timestamp, null);
     }
 
-    public static Boolean changedSince(String itemName, ZonedDateTime timestamp, String serviceId) {
+    public static boolean changedSince(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
         if (item != null) {
             Boolean changedSince = serviceId == null ? PersistenceExtensions.changedSince(item, timestamp)
@@ -88,7 +88,7 @@ class JRulePersistenceExtentions {
                 return changedSince;
             }
         }
-        return null;
+        return false;
     }
 
     public static boolean updatedSince(String itemName, ZonedDateTime timestamp) {

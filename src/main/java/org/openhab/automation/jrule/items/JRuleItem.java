@@ -49,19 +49,19 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
         return JRulePersistenceExtentions.lastUpdate(itemName, persistenceServiceId);
     }
 
-    public Boolean changedSince(ZonedDateTime timestamp) {
+    public boolean changedSince(ZonedDateTime timestamp) {
         return changedSince(timestamp, null);
     }
 
-    public Boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId) {
+    public boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtentions.changedSince(itemName, timestamp, persistenceServiceId);
     }
 
-    public Boolean updatedSince(ZonedDateTime timestamp) {
+    public boolean updatedSince(ZonedDateTime timestamp) {
         return updatedSince(timestamp, null);
     }
 
-    public Boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
+    public boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtentions.updatedSince(itemName, timestamp, persistenceServiceId);
     }
 }
