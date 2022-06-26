@@ -359,8 +359,8 @@ public class JRuleEngine implements PropertyChangeListener {
             logDebug("No execution context for channelEvent: {}", channelEvent);
             return;
         }
-        executionContexts
-                .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(channelEvent.getEvent())));
+        executionContexts.forEach(context -> invokeWhenMatchParameters(context,
+                new JRuleEvent(channelEvent.getEvent(), channelEvent.getChannel().toString())));
     }
 
     private void handleEventUpdate(Event event) {
