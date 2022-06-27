@@ -166,7 +166,8 @@ public class JRuleHandler implements PropertyChangeListener {
         // Start directory watcher for source file changes
         startDirectoryWatcher();
         eventSubscriber.startSubscriber();
-        logInfo("JRule Engine Initializing done!");
+
+        logInfo("JRule Engine Initializing done! {}", JRuleEngine.get().getRuleLoadingStatistics());
     }
 
     public synchronized void dispose() {
@@ -267,7 +268,7 @@ public class JRuleHandler implements PropertyChangeListener {
         compiler.compileRules();
         JRuleEngine.get().reset();
         createRuleInstances();
-        logInfo("JRule Engine Rules Reloaded!");
+        logInfo("JRule Engine Rules Reloaded! {}", JRuleEngine.get().getRuleLoadingStatistics());
         result = true;
         eventSubscriber.resumeEvents();
         return result;
