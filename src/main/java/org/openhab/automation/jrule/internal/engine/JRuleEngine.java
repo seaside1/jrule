@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -109,7 +110,10 @@ public class JRuleEngine implements PropertyChangeListener {
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
     private ItemRegistry itemRegistry;
 
+    private RuleLoadingStatistics ruleLoadingStatistics;
+
     private JRuleEngine() {
+        ruleLoadingStatistics = new RuleLoadingStatistics(null);
     }
 
     public static JRuleEngine get() {
@@ -137,6 +141,8 @@ public class JRuleEngine implements PropertyChangeListener {
         channelToExecutionContexts.clear();
         itemToRules.clear();
         clearTimers();
+
+        ruleLoadingStatistics = new RuleLoadingStatistics(ruleLoadingStatistics);
     }
 
     private synchronized void clearTimers() {
@@ -167,6 +173,12 @@ public class JRuleEngine implements PropertyChangeListener {
             logDebug("Adding rule method: {}", method.getName());
             if (!method.isAnnotationPresent(JRuleName.class)) {
                 logDebug("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
+                continue;
+            }
+            // Check if method is public, else execution will fail at runtime
+            boolean isPublic = (method.getModifiers() & Modifier.PUBLIC) != 0;
+            if (!isPublic) {
+                logWarn("Rule method ignored since method isn't public: {}", method.getName());
                 continue;
             }
 
@@ -214,6 +226,8 @@ public class JRuleEngine implements PropertyChangeListener {
                             getDoubleFromAnnotation(jRuleWhen.gte()), getStringFromAnnotation(jRuleWhen.eq()),
                             getStringFromAnnotation(jRuleWhen.neq()), preconditions);
                     itemNames.add(jRuleWhen.item());
+
+                    ruleLoadingStatistics.addItemStateTrigger();
                 } else if (jRuleWhen.hours() != -1 || jRuleWhen.minutes() != -1 || jRuleWhen.seconds() != -1
                         || !jRuleWhen.cron().isEmpty()) {
                     // JRuleWhen for a time trigger
@@ -222,6 +236,7 @@ public class JRuleEngine implements PropertyChangeListener {
                             jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
                     addTimedExecution(jRule, logName, jRuleName.value(), jRuleWhen, method, jRuleEventPresent,
                             preconditions);
+                    ruleLoadingStatistics.addTimedTrigger();
                 } else if (!jRuleWhen.channel().isEmpty()) {
                     // JRuleWhen for a channel
                     JRuleLog.info(logger, logName, "Validating JRule channel: {} trigger: {} ", jRuleWhen.channel(),
@@ -229,9 +244,15 @@ public class JRuleEngine implements PropertyChangeListener {
                     addChannelExecutionContext(jRule, logName, jRuleWhen.channel(), jRuleName.value(), method,
                             jRuleEventPresent, getStringFromAnnotation(jRuleWhen.eq()),
                             getStringFromAnnotation(jRuleWhen.neq()), preconditions);
+                    ruleLoadingStatistics.addChannelTrigger();
                 }
             }
+            if (jRuleWhens.length > 0) {
+                ruleLoadingStatistics.addRuleMethod();
+            }
+
         }
+        ruleLoadingStatistics.addRuleClass();
     }
 
     private Double getDoubleFromAnnotation(double d) {
@@ -352,8 +373,8 @@ public class JRuleEngine implements PropertyChangeListener {
             logDebug("No execution context for channelEvent: {}", channelEvent);
             return;
         }
-        executionContexts
-                .forEach(context -> invokeWhenMatchParameters(context, new JRuleEvent(channelEvent.getEvent())));
+        executionContexts.forEach(context -> invokeWhenMatchParameters(context,
+                new JRuleEvent(channelEvent.getEvent(), channelEvent.getChannel().toString())));
     }
 
     private void handleEventUpdate(Event event) {
@@ -406,7 +427,7 @@ public class JRuleEngine implements PropertyChangeListener {
             return;
         }
 
-        if (triggerValues.size() > 0) {
+        if (!triggerValues.isEmpty()) {
             String member = memberName == null ? "" : memberName;
             executionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
                     .forEach(context -> invokeWhenMatchParameters(context,
@@ -595,5 +616,9 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public void setItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = itemRegistry;
+    }
+
+    public RuleLoadingStatistics getRuleLoadingStatistics() {
+        return ruleLoadingStatistics;
     }
 }

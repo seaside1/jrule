@@ -16,19 +16,16 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleDateTimeItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDateTimeItem extends JRuleItem implements JRuleCommonTrigger {
-
-    private final String itemName;
+public class JRuleDateTimeItem extends JRuleItem {
 
     protected JRuleDateTimeItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleDateTimeItem forName(String itemName) {
@@ -57,5 +54,14 @@ public class JRuleDateTimeItem extends JRuleItem implements JRuleCommonTrigger {
 
     public ZonedDateTime getZonedDateTimeState() {
         return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
+    }
+
+    public Date getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        String state = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
+        if (state != null) {
+            return new Date(ZonedDateTime.parse(state).toInstant().toEpochMilli());
+        } else {
+            return null;
+        }
     }
 }

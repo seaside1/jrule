@@ -61,7 +61,7 @@ public class DelayedDebouncingExecutor {
      * 
      * @param callable the callable to schedule
      */
-    public synchronized void call(Callable<Void> callable) {
+    public synchronized void call(Callable<Boolean> callable) {
         boolean shouldSchedule = true;
         if (existingInvocationFuture != null && !existingInvocationFuture.isDone()) {
             logger.debug("Cancelling existing delayed execution");

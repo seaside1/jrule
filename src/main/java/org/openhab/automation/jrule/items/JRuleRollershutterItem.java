@@ -12,22 +12,21 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleRollershutterItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleRollershutterItem extends JRuleItem implements JRuleCommonTrigger {
-
-    private final String itemName;
+public class JRuleRollershutterItem extends JRuleItem {
 
     protected JRuleRollershutterItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleRollershutterItem forName(String itemName) {
@@ -56,5 +55,10 @@ public class JRuleRollershutterItem extends JRuleItem implements JRuleCommonTrig
 
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    }
+
+    // Persistence methods
+    public int getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return Integer.parseInt(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
     }
 }

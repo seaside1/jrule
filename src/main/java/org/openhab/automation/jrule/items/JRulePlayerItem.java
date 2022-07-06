@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
@@ -23,10 +25,8 @@ import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
  */
 public class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
 
-    private final String itemName;
-
     protected JRulePlayerItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRulePlayerItem forName(String itemName) {
@@ -43,5 +43,11 @@ public class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
 
     public void postUpdate(JRulePlayPauseValue state) {
         JRuleEventHandler.get().postUpdate(itemName, state);
+    }
+
+    // Persistence method
+    public JRulePlayPauseValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePlayPauseValue
+                .valueOf(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
     }
 }

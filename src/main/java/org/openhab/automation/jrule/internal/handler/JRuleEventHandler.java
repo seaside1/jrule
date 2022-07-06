@@ -27,6 +27,7 @@ import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
@@ -48,6 +49,7 @@ import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
 import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.library.types.RawType;
 import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
@@ -97,6 +99,10 @@ public class JRuleEventHandler {
         sendCommand(itemName, getCommand(command));
     }
 
+    public void sendCommand(String itemName, JRuleOpenClosedValue command) {
+        sendCommand(itemName, getCommand(command));
+    }
+
     public void sendCommand(String itemName, JRuleOnOffValue command) {
         sendCommand(itemName, getCommand(command));
     }
@@ -115,6 +121,10 @@ public class JRuleEventHandler {
 
     public void sendCommand(String itemName, String command) {
         sendCommand(itemName, new StringType(command));
+    }
+
+    public void postUpdate(String itemName, JRuleRawValue command) {
+        postUpdate(itemName, new RawType(command.getData(), command.getMimeType()));
     }
 
     public void sendCommand(String itemName, JRulePercentType value) {
@@ -205,6 +215,10 @@ public class JRuleEventHandler {
         postUpdate(itemName, getStateFromValue(state));
     }
 
+    public void postUpdate(String itemName, JRuleOpenClosedValue state) {
+        postUpdate(itemName, getStateFromValue(state));
+    }
+
     public void postUpdate(String itemName, JRuleUpDownValue state) {
         postUpdate(itemName, getStateFromValue(state));
     }
@@ -219,6 +233,10 @@ public class JRuleEventHandler {
     }
 
     public void postUpdate(String itemName, double value) {
+        postUpdate(itemName, new DecimalType(value));
+    }
+
+    public void postUpdate(String itemName, int value) {
         postUpdate(itemName, new DecimalType(value));
     }
 
@@ -256,7 +274,7 @@ public class JRuleEventHandler {
         return getUpDownValueFromState(state);
     }
 
-    private JRulePlayPauseValue getPlayPauseValueFromState(State state) {
+    public JRulePlayPauseValue getPlayPauseValueFromState(State state) {
         final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
         switch (playPauseType) {
             case PLAY:
@@ -376,6 +394,32 @@ public class JRuleEventHandler {
         }
     }
 
+    private Command getCommand(JRuleOpenClosedValue command) {
+        switch (command) {
+            case OPEN:
+                return OpenClosedType.OPEN;
+            case CLOSED:
+                return OpenClosedType.CLOSED;
+            case UNDEF:
+            default:
+                logError("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
+    private State getStateFromValue(JRuleOpenClosedValue command) {
+        switch (command) {
+            case OPEN:
+                return OpenClosedType.OPEN;
+            case CLOSED:
+                return OpenClosedType.CLOSED;
+            case UNDEF:
+            default:
+                logError("Unhandled getCommand: {}", command);
+                return null;
+        }
+    }
+
     private Command getCommand(JRuleOnOffValue command) {
         switch (command) {
             case OFF:
@@ -484,6 +528,15 @@ public class JRuleEventHandler {
         }
         DateTimeType dateTimeType = state.as(DateTimeType.class);
         return dateTimeType != null ? dateTimeType.getZonedDateTime() : null;
+    }
+
+    public JRuleRawValue getRawValue(String itemName) {
+        State state = getStateFromItem(itemName);
+        if (state != null) {
+            RawType raw = (RawType) state;
+            return new JRuleRawValue(raw.getMimeType(), raw.getBytes());
+        }
+        return null;
     }
 
     public Set<String> getGroupMemberNames(String groupName) {

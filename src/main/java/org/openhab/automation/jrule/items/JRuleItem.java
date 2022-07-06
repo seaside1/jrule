@@ -12,13 +12,56 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
+import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
+
 /**
  * The {@link JRuleItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleItem {
-    public static final String TRIGGER_CHANGED = "Changed";
-    public static final String TRIGGER_RECEIVED_COMMAND = "received command";
-    public static final String TRIGGER_RECEIVED_UPDATE = "received update";
+public abstract class JRuleItem implements JRuleCommonTrigger {
+
+    protected String itemName;
+
+    public JRuleItem(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getName() {
+        return itemName;
+    }
+
+    public String getLabel() {
+        return null; // Method overridden by generated item
+    }
+
+    public String getType() {
+        return null; // Method overridden by generated item
+    }
+
+    public ZonedDateTime lastUpdated() {
+        return lastUpdated(null);
+    }
+
+    public ZonedDateTime lastUpdated(String persistenceServiceId) {
+        return JRulePersistenceExtentions.lastUpdate(itemName, persistenceServiceId);
+    }
+
+    public boolean changedSince(ZonedDateTime timestamp) {
+        return changedSince(timestamp, null);
+    }
+
+    public boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtentions.changedSince(itemName, timestamp, persistenceServiceId);
+    }
+
+    public boolean updatedSince(ZonedDateTime timestamp) {
+        return updatedSince(timestamp, null);
+    }
+
+    public boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtentions.updatedSince(itemName, timestamp, persistenceServiceId);
+    }
 }

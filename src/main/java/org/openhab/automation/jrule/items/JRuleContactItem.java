@@ -12,21 +12,20 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.time.ZonedDateTime;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
-import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
 /**
  * The {@link JRuleContactItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleContactItem extends JRuleItem implements JRuleCommonTrigger {
-
-    private final String itemName;
+public class JRuleContactItem extends JRuleItem {
 
     protected JRuleContactItem(String itemName) {
-        this.itemName = itemName;
+        super(itemName);
     }
 
     public static JRuleContactItem forName(String itemName) {
@@ -35,5 +34,11 @@ public class JRuleContactItem extends JRuleItem implements JRuleCommonTrigger {
 
     public JRuleOpenClosedValue getState() {
         return JRuleEventHandler.get().getOpenClosedValue(itemName);
+    }
+
+    // Persistence method
+    public JRuleOpenClosedValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRuleOpenClosedValue.getValueFromString(
+                JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
     }
 }

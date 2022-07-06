@@ -25,10 +25,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -71,11 +71,11 @@ public class JRuleCompiler {
         this.jRuleConfig = jRuleConfig;
     }
 
-    public void loadJarClasses(ClassLoader classLoader, File sourceFolder, String classPackage,
+    public void loadClassesFromJar(ClassLoader classLoader, File sourceFolder, String onlyInPackage,
             boolean createInstance) {
         try {
-            final File[] jarItems = sourceFolder.listFiles(JRuleFileNameFilter.JAR_FILTER);
-            if (jarItems == null || jarItems.length == 0) {
+            final File[] jarFiles = sourceFolder.listFiles(JRuleFileNameFilter.JAR_FILTER);
+            if (jarFiles == null || jarFiles.length == 0) {
                 logInfo("Found no user defined java rules to load into memory in folder: {}",
                         sourceFolder.getAbsolutePath());
                 return;
@@ -83,29 +83,29 @@ public class JRuleCompiler {
                 logInfo("Found java rules to load into memory in folder: {}", sourceFolder.getAbsolutePath());
             }
 
-            Arrays.stream(jarItems).forEach(jarItem -> logDebug("Attempting to load jar: {}", jarItem));
-            Arrays.stream(jarItems).forEach(jarItem -> {
+            Arrays.stream(jarFiles).forEach(jarItem -> logDebug("Attempting to load jar: {}", jarItem));
+            Arrays.stream(jarFiles).forEach(jarItem -> {
                 logDebug("Loading instance for jar: {}", jarItem.getName());
                 JarFile jarFile = null;
                 try {
                     jarFile = new JarFile(jarItem);
                     final Enumeration<JarEntry> jarEntries = jarFile.entries();
                     while (jarEntries.hasMoreElements()) {
-                        JarEntry je = jarEntries.nextElement();
-                        final @NonNull String jarEntryName = je.getName() == null ? "" : je.getName();
-                        final int lastIndexOfFronSlash = jarEntryName.lastIndexOf(FRONT_SLASH) + 1;
-                        if (jarEntryName.length() < 1 || je.isDirectory()
-                                || !jarEntryName.endsWith(JRuleConstants.CLASS_FILE_TYPE)
-                                || lastIndexOfFronSlash == -1) {
+                        JarEntry jarEntry = jarEntries.nextElement();
+                        final @NonNull String jarEntryName = jarEntry.getName() == null ? "" : jarEntry.getName();
+                        final int lastIndexOfSlash = jarEntryName.lastIndexOf(FRONT_SLASH) + 1;
+                        if (jarEntryName.length() < 1 || jarEntry.isDirectory()
+                                || !jarEntryName.endsWith(JRuleConstants.CLASS_FILE_TYPE) || lastIndexOfSlash == -1
+                                || !relativePathToFullClassname(jarEntryName).startsWith(onlyInPackage)) {
                             continue;
                         }
 
-                        logger.debug("Attempting to load: {}", je.getName());
-                        loadClass(je.getName().substring(je.getName().lastIndexOf(FRONT_SLASH) + 1), classLoader,
-                                classPackage, createInstance);
+                        logger.debug("Attempting to load class from jar file {}: {}", jarItem.getAbsolutePath(),
+                                jarEntryName);
+                        loadClass(classLoader, relativePathToFullClassname(jarEntryName), createInstance);
                     }
                 } catch (IllegalArgumentException | SecurityException | IOException e) {
-                    logError("Could not load class", e);
+                    logError("Error loading classes from jarfile {} due to {}", jarItem.getAbsolutePath(), e);
                 } finally {
                     if (jarFile != null) {
                         try {
@@ -117,25 +117,33 @@ public class JRuleCompiler {
                 }
             });
         } catch (Exception e) {
-            logError("error instance", e);
+            logError("Error loading classes from jarfile: {}", e);
         }
     }
 
-    public void loadClass(String className, ClassLoader classLoader, String classPackage, boolean createInstance) {
+    private String relativePathToFullClassname(String path) {
+        if (path.endsWith(".class")) {
+            path = path.substring(0, path.lastIndexOf(".class"));
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        return path.replaceAll("/", ".");
+    }
+
+    public void loadClass(ClassLoader classLoader, String className, boolean createInstance) {
         Class<?> loadedClass = null;
         try {
-            loadedClass = classLoader
-                    .loadClass(classPackage + JRuleUtil.removeExtension(className, JRuleConstants.CLASS_FILE_TYPE));
+            loadedClass = classLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
-            logDebug("Failed to load class: {} loadingClass: {}", className, e,
-                    classPackage + JRuleUtil.removeExtension(className, JRuleConstants.CLASS_FILE_TYPE));
+            logDebug("Failed to load class {}: {}", className, e);
             return;
         }
 
         Method[] declaredMethods = loadedClass.getDeclaredMethods();
-
-        logDebug("Loaded class with classLoader: {}", loadedClass.getName());
-        logDebug("Loaded class with methods: {}", Arrays.asList(declaredMethods));
+        logDebug("Loaded class {} with classLoader: {} and methods {}", loadedClass.getName(), classLoader.getName(),
+                Arrays.asList(declaredMethods));
 
         if (createInstance) {
             if (Modifier.isAbstract(loadedClass.getModifiers())) {
@@ -151,39 +159,74 @@ public class JRuleCompiler {
         }
     }
 
-    public void loadPlainClasses(ClassLoader classLoader, File sourceFolder, String classPackage,
+    public void loadClassesFromFolder(ClassLoader classLoader, File rootFolder, String onlyInRootPackage,
             boolean createInstance) {
-        try {
-            final File[] classItems = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
-            if (classItems == null || classItems.length == 0) {
-                logInfo("Found no user defined java rules to load into memory in folder: {}",
-                        sourceFolder.getAbsolutePath());
-                return;
-            }
-            logInfo("Number of Java Rules classes to load in to memory: {} folder: {}", classItems.length,
-                    sourceFolder.getAbsolutePath());
 
-            Arrays.stream(classItems).forEach(classItem -> logDebug("Attempting to load class: {}", classItem));
-            Arrays.stream(classItems).forEach(classItem -> {
-                logDebug("Loading instance for class: {}", classItem.getName());
-                loadClass(classItem.getName(), classLoader, classPackage, createInstance);
+        String rootFolderPath = rootFolder.getAbsolutePath();
+
+        List<String> classFiles = new ArrayList<>();
+
+        try (Stream<Path> walk = Files.walk(rootFolder.toPath())) {
+            classFiles = walk.filter(p -> !Files.isDirectory(p))
+                    .filter(f -> f.getFileName().toString().endsWith(".class"))
+                    .map(e -> e.toAbsolutePath().toString().replace(rootFolderPath, ""))
+                    .map(e -> relativePathToFullClassname(e)).filter(e -> e.startsWith(onlyInRootPackage))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            logError("Error loading classes in {} due to {}", rootFolder.getAbsolutePath(), e);
+        }
+
+        // classFiles is now in the form "packageRoot.subPackage.classname", filtered by prefix in onlyInRootPackage
+        if (classFiles.isEmpty()) {
+            logInfo("Found no classes to load into memory in folder: {}", rootFolder.getAbsolutePath());
+        } else {
+            logInfo("Number of classes to load in to memory: {} folder: {}", classFiles.size(),
+                    rootFolder.getAbsolutePath());
+            classFiles.forEach(classItem -> {
+                logDebug("Attempting to load class: {}", classItem);
+                loadClass(classLoader, classItem, createInstance);
             });
-        } catch (Exception e) {
-            logError("error instance", e);
         }
     }
 
-    public void compile(File javaSourceFile, String classPath) {
-        compile(List.of(javaSourceFile), classPath);
+    public boolean compileItems() {
+        return compileItems(new File(jRuleConfig.getItemsDirectory()));
     }
 
-    public void compile(List<File> javaSourceFiles, String classPath) {
-        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+    private boolean compileItems(File sourceFolder) {
+        final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
+                + getJarPath(JAR_JRULE_NAME) + ":" + jRuleConfig.getItemsRootDirectory();
+        logDebug("Compiling items in folder: {}", sourceFolder.getAbsolutePath());
+
+        final File[] javaSourceFiles = sourceFolder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
+        final File[] javaClassFiles = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
+
+        Map<String, File> classFiles = new HashMap<>();
+        Arrays.stream(javaClassFiles).forEach(classFile -> classFiles
+                .put(JRuleUtil.removeExtension(classFile.getName(), JRuleConstants.CLASS_FILE_TYPE), classFile));
+
+        Map<String, File> sourceFiles = new HashMap<>();
+        Arrays.stream(javaSourceFiles).forEach(sourceFile -> sourceFiles
+                .put(JRuleUtil.removeExtension(sourceFile.getName(), JRuleConstants.JAVA_FILE_TYPE), sourceFile));
+
+        // First delete any class files with no corresponding source file
+        classFiles.keySet().stream().filter(className -> !sourceFiles.containsKey(className))
+                .forEach(className -> classFiles.get(className).delete());
+        // Will trigger compilation of any missing or old item java files
+        return compile(new File(sourceFolder, "Items.java"), itemsClassPath);
+    }
+
+    public boolean compile(File javaSourceFile, String classPath) {
+        return compile(List.of(javaSourceFile), classPath);
+    }
+
+    public boolean compile(List<File> javaSourceFiles, String classPath) {
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
             logError(
                     "Failed to get compiler, are you sure you are using a JDK? ToolProvider.getSystemJavaCompiler() returned null");
-            return;
+            return false;
         }
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
@@ -200,38 +243,20 @@ public class JRuleCompiler {
         try {
             if (task.call()) {
                 logDebug("Compilation of classes successfully!");
+                return true;
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(), diagnostic.getSource().toUri(),
+                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(),
+                            diagnostic.getSource() == null ? "" : diagnostic.getSource().toUri(),
                             diagnostic.getMessage(Locale.getDefault()));
                 }
             }
             fileManager.close();
         } catch (Exception x) {
-            logError("error", x);
+            logError("Compiler threw error {}", x.toString());
         }
-    }
 
-    public File[] getJavaSourceItemsFromFolder(File folder) {
-        return folder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
-    }
-
-    public void compileItemsInFolder(File itemsFolder) {
-        final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
-                + getJarPath(JAR_JRULE_NAME);
-        logDebug("Compiling items in folder: {}", itemsFolder.getAbsolutePath());
-        final File[] javaItems = getJavaSourceItemsFromFolder(itemsFolder);
-        final File[] classItems = itemsFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
-        final Set<String> classNames = new HashSet<>();
-        Arrays.stream(classItems).forEach(classItem -> classNames
-                .add(JRuleUtil.removeExtension(classItem.getName(), JRuleConstants.CLASS_FILE_TYPE)));
-
-        logDebug("ClassNameSetSize: {}", classNames.size());
-        Arrays.stream(javaItems)
-                .filter(javaItem -> !classNames
-                        .contains(JRuleUtil.removeExtension(javaItem.getName(), JRuleConstants.JAVA_FILE_TYPE)))
-                .forEach(javaItem -> compile(javaItem, itemsClassPath));
-        classNames.clear();
+        return false;
     }
 
     public String getJarPath(String jarName) {
@@ -239,11 +264,7 @@ public class JRuleCompiler {
                 .toString();
     }
 
-    public void compileItems() {
-        compileItemsInFolder(new File(jRuleConfig.getItemsDirectory()));
-    }
-
-    public void compileRules() {
+    public boolean compileRules() {
         String rulesClassPath = //
                 System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator //
                         + getJarPath(JAR_JRULE_ITEMS_NAME) + File.pathSeparator //
@@ -260,7 +281,7 @@ public class JRuleCompiler {
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)).map(Path::toFile)
                     .collect(Collectors.toList());
             if (!ruleJavaFiles.isEmpty()) {
-                compile(ruleJavaFiles, rulesClassPath);
+                return compile(ruleJavaFiles, rulesClassPath);
             } else {
                 logWarn("Found no java rules to compile and use in folder {}", jRuleConfig.getRulesDirectory());
             }
@@ -268,6 +289,7 @@ public class JRuleCompiler {
             logError("Error listing java files in folder: {}", jRuleConfig.getRulesDirectory(), e);
 
         }
+        return false;
     }
 
     public List<URL> getExtLibsAsUrls() {
