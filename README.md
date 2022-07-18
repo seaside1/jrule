@@ -167,7 +167,7 @@ Use Case: Invoke another item Switch from rule
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
-        _MySwitch2.sendCommand(ON);
+        sendCommand(_MySwitch2.ITEM, ON);
     }
 ```
 
@@ -181,7 +181,7 @@ This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
     @JRuleWhen(item = _MyTestSwitch2.ITEM, trigger = _MyTestSwitch2.TRIGGER_CHANGED_FROM_OFF_TO_ON)
     public void execLockTestRule() {
         if (getTimedLock("MyLockTestRule1", 20)) {
-            _MyDoorBellItem.sendCommand(ON);
+            sendCommand(_MyDoorBellItem.ITEM, ON);
             logInfo("||||| --> Got Lock! Ding-dong !");
         } else {
             logInfo("||||| --> Ignoring call to rule it is locked!");
@@ -301,7 +301,7 @@ Use case create a timer for automatically turning of a light when it is turned o
         logInfo("Turning on light it will be turned off in 2 mins");
         createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
             logInfo("Time is up! Turning off lights");
-            _MyLightSwitch.sendCommand(OFF);
+            sendCommand(_MyLightSwitch.ITEM, OFF);
         });
     }
 ```
@@ -319,7 +319,7 @@ to send multiple ON statements to be sure it actually turns on.
         createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 10, (Void) -> { // Lambda Expression
             final String messageOn = "repeatRuleExample Repeating.....";
             logInfo(messageOn);
-            _MyBad433Switch.sendCommand(ON);
+            sendCommand(_MyBad433Switch.ITEM, ON);
         });
     }
 ```
@@ -335,7 +335,7 @@ it will not reschedule the timer, if the timer is already running it won't resch
         createTimer("myTimer", 10, (Void) -> { // Lambda Expression
             final String messageOn = "timer example.";
             logInfo(messageOn);
-            _MyTestWitch2.sendCommand(ON);
+            sendCommand(ON, _MyTestWitch2.ITEM);
         });
     }
 ```
@@ -348,7 +348,7 @@ Use case trigger a rule at 22:30 in the evening to set initial brightness for a 
   public synchronized void setDayBrightness(JRuleEvent event) {
       logInfo("Setting night brightness to 30%");
       int dimLevel = 30;
-      _ZwaveDimmerBrightness.sendCommand(dimLevel);
+      sendCommand(_ZwaveDimmerBrightness.ITEM, new JRulePercentType(dimLevel));
   }
 ```
 
@@ -366,7 +366,7 @@ eq = equals
   @JRuleWhen(item = _MyTemperatureSensor.ITEM, trigger = _MyTemperatureSensor.TRIGGER_RECEIVED_UPDATE, lte = 20)
   public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
       logInfo("Starting fan since temeprature dropped below 20");
-      _MyHeatinFanSwitch.sendCommand(ON);
+      sendCommand(ON, _MyHeatinFanSwitch.ITEM);
   }
 ```
 
@@ -472,7 +472,7 @@ Use case: Get the brigtness from a color item, set a color item to white (HSB 0,
    
     @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED) 
     public void testSetWhiteOnColorItem(JRuleEvent event) {
-        _MyTestColorItem.sendCommand(JRuleColorValue.fromHsb(0,  0,  100));
+        sendCommand(_MyTestColorItem.ITEM, JRuleColorValue.fromHsb(0,  0,  100));
     }
 ```
 
@@ -484,7 +484,7 @@ Use case: Set logging name for a specific rule
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
-        _MySwitch2.sendCommand(ON);
+        sendCommand(_MySwitch2.ITEM, ON);
     }
 ```
 
@@ -497,7 +497,7 @@ Use case: Override logging for all rules defined in one file
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
-        _MySwitch2.sendCommand(ON);
+        sendCommand(_MySwitch2.ITEM, ON);
     }
     
     @Override
@@ -519,7 +519,7 @@ Use case: Apply transformation using openHAB transformation service
     public void applyTransformation(JRuleEvent event) {
         String transformedValue = transform("MAP(my.map):%s", event.getState().getValue());
         logInfo("Transformed {} to {}", event.getState().getValue(), transformedValue);
-        _MyTransformationReceiver.sendCommand(transformedValue);
+        sendCommand(_MyTransformationReceiver.ITEM, transformedValue);
     }
 }
 ```
@@ -539,7 +539,7 @@ message is updated.
     public void testPrecondition(JRuleEvent event) {
         String notificationMessage = event.getState().getValue();
         logInfo("It is ok to send notification: {}", notificationMessage);
-        _MySendNoticationItemMqtt.sendCommand(notificationMessage);
+        sendCommand(_MySendNoticationItemMqtt.ITEM, notificationMessage);
     }
 }
 ```
@@ -555,7 +555,7 @@ a motion detector is triggered we will turn on a fan.
     @JRuleWhen(item = _MyMotionDetector.ITEM, trigger = _MyMotionDectetor.TRIGGER_CHANGED_FROM_OFF_TO_ON)
     public void testPrecondition(JRuleEvent event) {
         logInfo("Temperature is above 30 and we should start the fan since the motiondetector is triggered");
-        _MyFan.sendCommand("ON");
+        sendCommand(_MyFan.ITEM, ON);
     }
 }
 ```
@@ -571,7 +571,7 @@ Use case: Send Quantity type Watt (W) from rule.
     @JRuleWhen(item=_MyTestMeterPower.ITEM, trigger=_MyTestMeterPower.TRIGGER_CHANGED)
     public void testQuantityPower(JRuleEvent event) {
         logInfo("TestQuantity power will send this value as Watt: {}", event.getState().getValue());
-        _TestPowerQuantityType.sendCommand(event.getState().getValueAsDouble(), "W");
+        sendCommand(_TestPowerQuantityType.ITEM, event.getState().getValueAsDouble(), "W");
     }
 }
 ```
@@ -626,7 +626,37 @@ public void testAverage(JRuleEvent event){
 }
 ```
 
+
+## Example 30
+
+Use case: Use generated Items.java to get hold of items. For instance get state of an item. 
+```java
+ public class ItemsExampleRule extends JRule {
+  
+    @JRuleName("testItems")
+    @JRuleWhen(item=_MyTestSwitch.ITEM, trigger=_MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    public void testItems(JRuleEvent event) {
+        Items.MyOtherTestSwitch.getState();
+    }
+ }
+
+```
+
 # Changelog
+## BETA12
+ - Major refactoring by seime https://github.com/seaside1/jrule/pull/42
+   - Replaces the templating mechanism with Freemarker, mainly to allow more advanced constructs such as loops - 
+     and to avoid all the repetitive code in the template files
+   - Generates a new file Items.java which looks a bit like
+     public class Items {
+          public static MySwitchItem SwitchItem = JRuleItemRegistry.get("MySwitchItem", MySwitchItem.class);
+          public static MyStringItem StringItem = JRuleItemRegistry.get("MyStringItem", MyStringItem.class);
+      } 
+    - Adds a skeleton support for LocationItem (which was missing)
+    - Adds a new field LABEL (item label)
+    - Adds a few convenience methods such as getLabel() and getName()
+    - Adds more typing of Group items
+
 ## BETA11
  - Wrap TransformationException in JRuleExecutionException by seime https://github.com/seaside1/jrule/pull/39
  - Add equivalent postUpdate logging as sendCommand by seime https://github.com/seaside1/jrule/pull/38
