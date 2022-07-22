@@ -66,16 +66,10 @@ public class JRuleHandler implements PropertyChangeListener {
     private static final String LOG_NAME_HANDLER = "JRuleHandler";
 
     @NonNullByDefault({})
-    private ItemRegistry itemRegistry;
+    private final ItemRegistry itemRegistry;
 
     @NonNullByDefault({})
-    private JRuleEventSubscriber eventSubscriber;
-
-    @NonNullByDefault({})
-    private VoiceManager voiceManager;
-
-    @NonNullByDefault({})
-    private BundleContext bundleContext;
+    private final JRuleEventSubscriber eventSubscriber;
 
     private final Logger logger = LoggerFactory.getLogger(JRuleHandler.class);
 
@@ -83,7 +77,7 @@ public class JRuleHandler implements PropertyChangeListener {
     private JRuleRulesWatcher directoryWatcher;
 
     @Nullable
-    private JRuleItemClassGenerator itemGenerator;
+    private final JRuleItemClassGenerator itemGenerator;
 
     private final JRuleCompiler compiler;
 
@@ -100,9 +94,7 @@ public class JRuleHandler implements PropertyChangeListener {
             JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
-        this.voiceManager = voiceManager;
         this.config = config;
-        this.bundleContext = bundleContext;
         this.delayedRulesReloader = new DelayedDebouncingExecutor(config.getRulesInitDelaySeconds(), TimeUnit.SECONDS);
         this.delayedItemsCompiler = new DelayedDebouncingExecutor(config.getItemsRecompilationDelaySeconds(),
                 TimeUnit.SECONDS);
@@ -217,7 +209,7 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleItemRegistry.clear();
         // Reload Items class - this will also instantiate all items and load them to the registry
         try {
-            Class cls = Class.forName(config.getGeneratedItemPackage() + ".Items", true, loader);
+            Class<?> cls = Class.forName(config.getGeneratedItemPackage() + ".Items", true, loader);
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated Items class");
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
@@ -246,6 +238,7 @@ public class JRuleHandler implements PropertyChangeListener {
     @Nullable
     private synchronized Boolean compileItemsInternal() {
         logInfo("Compiling items");
+        itemGenerator.generateItemsSource(itemRegistry.getItems());
         Boolean result = false;
         if (compiler.compileItems()) {
 
@@ -262,16 +255,12 @@ public class JRuleHandler implements PropertyChangeListener {
 
     @Nullable
     private synchronized Boolean compileAndReloadRules() {
-        Boolean result = false;
-
-        eventSubscriber.pauseEventSubscriber();
         compiler.compileRules();
         JRuleEngine.get().reset();
         createRuleInstances();
         logInfo("JRule Engine Rules Reloaded! {}", JRuleEngine.get().getRuleLoadingStatistics());
-        result = true;
         eventSubscriber.resumeEvents();
-        return result;
+        return true;
     }
 
     @Nullable
@@ -302,14 +291,13 @@ public class JRuleHandler implements PropertyChangeListener {
             if (eventType.equals(ItemRemovedEvent.TYPE)) {
                 logDebug("RemovedType: {}", evt);
                 deleteSourceFileForItem(itemName);
-                delayedItemsCompiler.call(() -> compileItemsInternal());
+                delayedItemsCompiler.call(this::compileItemsInternal);
             } else if (eventType.equals(ItemAddedEvent.TYPE) || event.getType().equals(ItemUpdatedEvent.TYPE)) {
                 try {
                     logDebug("Added/updatedType: {}", evt);
                     Item item = itemRegistry.getItem(itemName);
                     itemGenerator.generateItemSource(item);
-                    itemGenerator.generateItemsSource(itemRegistry.getItems());
-                    delayedItemsCompiler.call(() -> compileAndReloadItemsAndRules());
+                    delayedItemsCompiler.call(this::compileAndReloadItemsAndRules);
                 } catch (ItemNotFoundException e) {
                     logDebug("Could not find new item", e);
                 }
@@ -321,7 +309,7 @@ public class JRuleHandler implements PropertyChangeListener {
                 || JRuleRulesWatcher.PROPERTY_ENTRY_DELETE.equals(property)) {
             Path newValue = (Path) evt.getNewValue();
             logDebug("Directory watcher new value: {}", newValue);
-            delayedRulesReloader.call(() -> compileAndReloadRules());
+            delayedRulesReloader.call(this::compileAndReloadRules);
         }
     }
 
@@ -368,7 +356,7 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleLog.error(logger, LOG_NAME_HANDLER, message, parameters);
     }
 
-    private class JRuleClassLoader extends URLClassLoader {
+    private static class JRuleClassLoader extends URLClassLoader {
         public JRuleClassLoader(URL[] urls, @Nullable ClassLoader parent) {
             super(urls, parent);
         }
@@ -379,7 +367,7 @@ public class JRuleHandler implements PropertyChangeListener {
                 for (URL url : getURLs()) {
                     if (url.getProtocol().equals("file")) {
                         FileInputStream is = new FileInputStream(
-                                url.getFile() + "/" + name.replaceAll("\\.", "/") + ".class");
+                                url.getFile() + "/" + name.replaceAll("\\.", "/") + JRuleConstants.CLASS_FILE_TYPE);
                         if (is != null) {
                             byte[] buf = is.readAllBytes();
                             is.close();

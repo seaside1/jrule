@@ -85,9 +85,7 @@ public class JRuleCompiler {
             Arrays.stream(jarFiles).forEach(jarItem -> logDebug("Attempting to load jar: {}", jarItem));
             Arrays.stream(jarFiles).forEach(jarItem -> {
                 logDebug("Loading instance for jar: {}", jarItem.getName());
-                JarFile jarFile = null;
-                try {
-                    jarFile = new JarFile(jarItem);
+                try (JarFile jarFile = new JarFile(jarItem)) {
                     final Enumeration<JarEntry> jarEntries = jarFile.entries();
                     while (jarEntries.hasMoreElements()) {
                         JarEntry jarEntry = jarEntries.nextElement();
@@ -105,15 +103,8 @@ public class JRuleCompiler {
                     }
                 } catch (IllegalArgumentException | SecurityException | IOException e) {
                     logError("Error loading classes from jarfile {} due to {}", jarItem.getAbsolutePath(), e);
-                } finally {
-                    if (jarFile != null) {
-                        try {
-                            jarFile.close();
-                        } catch (Exception x) {
-                            // Best effort
-                        }
-                    }
                 }
+                // Best effort
             });
         } catch (Exception e) {
             logError("Error loading classes from jarfile: {}", e);
@@ -169,7 +160,7 @@ public class JRuleCompiler {
             classFiles = walk.filter(p -> !Files.isDirectory(p))
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.CLASS_FILE_TYPE))
                     .map(e -> e.toAbsolutePath().toString().replace(rootFolderPath, ""))
-                    .map(e -> relativePathToFullClassname(e)).filter(e -> e.startsWith(onlyInRootPackage))
+                    .map(this::relativePathToFullClassname).filter(e -> e.startsWith(onlyInRootPackage))
                     .collect(Collectors.toList());
         } catch (IOException e) {
             logError("Error loading classes in {} due to {}", rootFolder.getAbsolutePath(), e);

@@ -401,10 +401,7 @@ public class JRuleCronExpression {
         }
 
         protected boolean matches(int val, FieldPart part) {
-            if (val >= part.from && val <= part.to && (val - part.from) % part.increment == 0) {
-                return true;
-            }
-            return false;
+            return val >= part.from && val <= part.to && (val - part.from) % part.increment == 0;
         }
 
         protected int nextMatch(int val, FieldPart part) {

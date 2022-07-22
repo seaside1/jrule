@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link JRuleMachineThingConfig} encapsulates all the configuration options for an instance of the
- * {@link JRuleClientThingHandler}.
+ * The {@link JRuleConfig} encapsulates all the configuration options for an instance of the
+ * {@link org.openhab.automation.jrule.internal.handler.JRuleHandler}.
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
@@ -89,12 +89,12 @@ public class JRuleConfig {
     public void initConfig() {
         final String workingDirectory = getWorkingDirectory();
         final String configFileName = workingDirectory.concat(File.separator).concat(JRULE_CONFIG_NAME);
-        try (InputStream is = new FileInputStream(new File(configFileName))) {
+        try (InputStream is = new FileInputStream(configFileName)) {
             jRuleProperties.load(is);
         } catch (IOException e) {
             logger.debug("Failed to load properties {}", configFileName);
         }
-        properties.forEach((k, v) -> jRuleProperties.put(k, v));
+        jRuleProperties.putAll(properties);
     }
 
     public int getInitDelaySeconds() {

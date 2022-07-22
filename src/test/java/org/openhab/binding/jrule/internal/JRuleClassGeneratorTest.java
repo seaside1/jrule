@@ -72,7 +72,7 @@ public class JRuleClassGeneratorTest {
     @BeforeEach
     public void wipeFiles() {
         // Wipe any existing files
-        Arrays.stream(targetFolder.listFiles()).forEach(e -> e.delete());
+        Arrays.stream(targetFolder.listFiles()).forEach(File::delete);
     }
 
     @Test

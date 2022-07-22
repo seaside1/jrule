@@ -123,7 +123,7 @@ public class JRuleItemClassGenerator {
 
     public boolean generateItemsSource(Collection<Item> items) {
         List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
-                .map(e -> createItemModel(e)).collect(Collectors.toList());
+                .map(this::createItemModel).collect(Collectors.toList());
         Map<String, Object> processingModel = new HashMap<>();
         processingModel.put("items", model);
         processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
@@ -185,11 +185,7 @@ public class JRuleItemClassGenerator {
 
     private boolean isQuantityType(String type) {
         String[] split = type.split(":");
-        if (split.length > 1 && CoreItemFactory.NUMBER.equals(split[0])) {
-            return true;
-        }
-
-        return false;
+        return split.length > 1 && CoreItemFactory.NUMBER.equals(split[0]);
     }
 
     private String getTemplateFromType(String type) {

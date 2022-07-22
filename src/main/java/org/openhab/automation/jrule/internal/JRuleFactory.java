@@ -45,8 +45,6 @@ public class JRuleFactory {
     private final JRuleHandler jRuleHandler;
     private final JRuleEngine jRuleEngine;
 
-    private final JRuleConfig config;
-
     private static final Logger logger = LoggerFactory.getLogger(JRuleFactory.class);
 
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
@@ -57,7 +55,7 @@ public class JRuleFactory {
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
             final @Reference VoiceManager voiceManager, final ComponentContext componentContext) {
-        config = new JRuleConfig(properties);
+        JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
         jRuleEngine.setConfig(config);

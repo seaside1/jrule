@@ -259,7 +259,7 @@ public class JRuleEngine implements PropertyChangeListener {
         if (d == Double.MIN_VALUE) {
             return null;
         }
-        return Double.valueOf(d);
+        return d;
     }
 
     private String getStringFromAnnotation(String s) {
@@ -384,7 +384,7 @@ public class JRuleEngine implements PropertyChangeListener {
             logDebug("No execution context for changeEvent ");
             return;
         }
-        final String type = ((ItemEvent) event).getType();
+        final String type = event.getType();
 
         final Set<String> triggerValues = new HashSet<>(5);
         final String stringNewValue;
@@ -460,7 +460,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         if (context.isComparatorOperation()) {
             final Boolean evalCompare = evaluateComparatorParameters(context.getGt(), context.getGte(), context.getLt(),
-                    context.getLte(), context.getEq(), context.getNeq(), jRuleEvent.getValue());
+                    context.getLte(), context.getEq(), context.getNeq(), jRuleEvent.getState().getValue());
             if (evalCompare == null) {
                 logError("Failed to compare values for context: {} event: {}", context, jRuleEvent);
                 return;
@@ -553,7 +553,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 logError("Failed to evaluate precondition context: {} precondition: {} state: {}", context,
                         toString(precondition), state);
             }
-            return evalComparatorParams == null ? true : evalComparatorParams.booleanValue();
+            return evalComparatorParams == null || evalComparatorParams;
         } catch (ItemNotFoundException e) {
             JRuleLog.error(logger, context.getRuleName(), "Precondition item not found: {}", precondition.item());
         }

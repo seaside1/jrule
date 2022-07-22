@@ -67,7 +67,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     private final PropertyChangeSupport propertyChangeSupport;
 
-    private Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
 
     private volatile boolean queueEvents = false;
 

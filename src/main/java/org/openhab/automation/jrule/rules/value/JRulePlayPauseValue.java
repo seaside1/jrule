@@ -20,5 +20,5 @@ package org.openhab.automation.jrule.rules.value;
 public enum JRulePlayPauseValue {
     PLAY,
     PAUSE,
-    UNDEF;
+    UNDEF
 }

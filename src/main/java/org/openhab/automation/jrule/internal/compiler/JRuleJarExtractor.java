@@ -94,24 +94,8 @@ public class JRuleJarExtractor {
         final File destFile = new File(destFileName);
         final File destDirectory = destFile.getParentFile();
         destDirectory.mkdirs();
-        final InputStream in = source.openStream();
-        try {
-            final OutputStream out = new FileOutputStream(destFile);
-            try {
-                writeStream(in, out);
-            } finally {
-                try {
-                    out.close();
-                } catch (Exception x) {
-                    // Ignore
-                }
-            }
-        } finally {
-            try {
-                in.close();
-            } catch (Exception x) {
-                // Ignore
-            }
+        try (InputStream in = source.openStream(); OutputStream out = new FileOutputStream(destFile)) {
+            writeStream(in, out);
         }
     }
 

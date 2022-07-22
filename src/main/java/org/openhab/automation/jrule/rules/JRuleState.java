@@ -20,5 +20,5 @@ package org.openhab.automation.jrule.rules;
 public enum JRuleState {
     STATE_ON,
     STATE_OFF,
-    UNDEF;
+    UNDEF
 }

@@ -44,7 +44,7 @@ public class JRuleRulesWatcher implements Runnable {
 
     private static final String BASIC_IS_DIRECTORY = "basic:isDirectory";
 
-    private List<Path> watchFolders;
+    private final List<Path> watchFolders;
     private WatchService watchService = null;
     private final Logger logger = LoggerFactory.getLogger(JRuleRulesWatcher.class);
 
@@ -105,7 +105,7 @@ public class JRuleRulesWatcher implements Runnable {
                 }
             });
             WatchKey key;
-            while (true) {
+            do {
                 key = watchService.take();
                 Kind<?> kind;
                 for (WatchEvent<?> watchEvent : key.pollEvents()) {
@@ -132,13 +132,10 @@ public class JRuleRulesWatcher implements Runnable {
                         logWarn("Unhandled case: {}", kind.name());
                     }
                 }
-                if (!key.reset()) {
-                    break;
-                }
-            }
+            } while (key.reset());
 
         } catch (InterruptedException e) {
-            // Ignore
+            logDebug("Folder watcher was interrupted {}", e);
         } catch (Exception e) {
             logError("Folder watcher terminated due to exception {}", e);
         } finally {

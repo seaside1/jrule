@@ -21,9 +21,9 @@ import org.openhab.automation.jrule.internal.JRuleItemUtil;
  */
 public class JRuleColorValue {
 
-    private JRuleHsbValue hsbValue;
-    private JRuleXyValue xyValue;
-    private JRuleRgbValue rgbValue;
+    private final JRuleHsbValue hsbValue;
+    private final JRuleXyValue xyValue;
+    private final JRuleRgbValue rgbValue;
 
     public JRuleColorValue(JRuleHsbValue hsbValue, JRuleRgbValue rgbValue, JRuleXyValue xyValue) {
         this.hsbValue = hsbValue;

@@ -25,7 +25,7 @@ public class RuleLoadingStatistics {
     private int numRuleClasses;
 
     private int numRuleMethods;
-    private RuleLoadingStatistics previous;
+    private final RuleLoadingStatistics previous;
 
     public RuleLoadingStatistics(RuleLoadingStatistics previous) {
         this.previous = previous;

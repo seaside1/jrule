@@ -23,7 +23,7 @@ import java.util.Map;
  */
 
 public class JRuleItemRegistry {
-    private static Map<String, JRuleItem> itemRegistry = new HashMap<>();
+    private static final Map<String, JRuleItem> itemRegistry = new HashMap<>();
 
     public static void clear() {
         itemRegistry.clear();

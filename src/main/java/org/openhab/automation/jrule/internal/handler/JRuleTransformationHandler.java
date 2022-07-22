@@ -55,7 +55,7 @@ public class JRuleTransformationHandler {
             return TransformationHelper.transform(bundleContext, stateDescPattern, state);
         } catch (TransformationException e) {
             throw new JRuleExecutionException(
-                    String.format("Transformation of %s using %s failed: %s", state, stateDescPattern, e.toString()));
+                    String.format("Transformation of %s using %s failed: %s", state, stateDescPattern, e));
         }
     }
 }

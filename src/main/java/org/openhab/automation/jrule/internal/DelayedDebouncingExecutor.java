@@ -35,9 +35,9 @@ public class DelayedDebouncingExecutor {
     private final ScheduledExecutorService executorService;
     private static final int TERMINATION_AWAIT_TIME_SECONDS = 20;
     private final int delay;
-    private TimeUnit timeUnit;
+    private final TimeUnit timeUnit;
     @Nullable
-    private ScheduledFuture existingInvocationFuture = null;
+    private ScheduledFuture<Boolean> existingInvocationFuture = null;
 
     public DelayedDebouncingExecutor(int delay, TimeUnit timeUnit) {
         this.delay = delay;

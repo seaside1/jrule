@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleTestEventLogParser {
 
-    private URL url;
+    private final URL url;
     private final Logger logger = LoggerFactory.getLogger(JRuleTestEventLogParser.class);
 
     public JRuleTestEventLogParser(String eventLogResourceName) {
@@ -104,9 +104,6 @@ public class JRuleTestEventLogParser {
             } catch (Exception x2) {
 
             }
-        }
-        if (resourceUrl == null) {
-            return null;
         }
         return resourceUrl;
     }

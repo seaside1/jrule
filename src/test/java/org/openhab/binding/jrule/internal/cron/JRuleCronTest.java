@@ -12,7 +12,6 @@
  */
 package org.openhab.binding.jrule.internal.cron;
 
-import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -35,13 +34,13 @@ public class JRuleCronTest {
     private static final Logger logger = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         Logger rootLogger = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.ALL);
     }
 
     @Test
-    public void testParseItemName() throws URISyntaxException, InterruptedException {
+    public void testParseItemName() {
         // sec min hour day month DAY
         JRuleCronExpression expr = new JRuleCronExpression("4 10 21 6 8 *");
         ZonedDateTime nextTimeAfter = expr.nextTimeAfter(ZonedDateTime.now());

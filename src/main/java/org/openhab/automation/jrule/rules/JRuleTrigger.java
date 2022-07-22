@@ -21,6 +21,6 @@ public enum JRuleTrigger {
     UNDEF,
     CHANGED,
     RECEIVED_COMMAND,
-    RECEIVED_UPDATE;
+    RECEIVED_UPDATE
 
 }

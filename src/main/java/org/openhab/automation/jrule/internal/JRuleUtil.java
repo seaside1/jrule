@@ -93,9 +93,7 @@ public class JRuleUtil {
             TimeUnit unit) {
         CompletableFuture<T> completableFuture = new CompletableFuture<>();
         scheduler.schedule((() -> {
-            command.get().thenAccept(t -> {
-                completableFuture.complete(t);
-            }).exceptionally(t -> {
+            command.get().thenAccept(completableFuture::complete).exceptionally(t -> {
                 completableFuture.completeExceptionally(t);
                 return null;
             });
