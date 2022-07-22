@@ -255,11 +255,13 @@ public class JRuleHandler implements PropertyChangeListener {
 
     @Nullable
     private synchronized Boolean compileAndReloadRules() {
+        eventSubscriber.pauseEventDelivery();
         compiler.compileRules();
         JRuleEngine.get().reset();
         createRuleInstances();
         logInfo("JRule Engine Rules Reloaded! {}", JRuleEngine.get().getRuleLoadingStatistics());
-        eventSubscriber.resumeEvents();
+        eventSubscriber.registerSubscribedItemsAndChannels();
+        eventSubscriber.resumeEventDelivery();
         return true;
     }
 

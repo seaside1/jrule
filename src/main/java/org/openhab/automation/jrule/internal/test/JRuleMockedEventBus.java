@@ -14,7 +14,6 @@ package org.openhab.automation.jrule.internal.test;
 
 import java.util.List;
 
-import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 
 /**
@@ -30,7 +29,7 @@ public class JRuleMockedEventBus extends JRuleEventSubscriber {
         super();
         JRuleTestEventLogParser parser = new JRuleTestEventLogParser(eventBusResourceName);
         eventList = parser.parse();
-        JRuleEngine.get().getItemNames().forEach(this::addItemItemName);
+        registerSubscribedItemsAndChannels();
     }
 
     public void start() {

@@ -93,16 +93,18 @@ public class JRuleEventSubscriber implements EventSubscriber {
         return null;
     }
 
-    public void addItemItemName(String name) {
-        JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Adding subscripted item: {}", name);
-        jRuleMonitoredItems.add(name);
+    public void startSubscriber() {
+        JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Starting subscriber");
+        registerSubscribedItemsAndChannels();
+        propertyChangeSupport.addPropertyChangeListener(JRuleEngine.get());
     }
 
-    public void startSubscriber() {
-        JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "starting subscriber");
-        JRuleEngine.get().getItemNames().forEach(this::addItemItemName);
+    public void registerSubscribedItemsAndChannels() {
+        jRuleMonitoredItems.clear();
+        jRuleMonitoredChannels.clear();
+
+        jRuleMonitoredItems.addAll(JRuleEngine.get().getItemNames());
         jRuleMonitoredChannels.addAll(JRuleEngine.get().getChannelNames());
-        propertyChangeSupport.addPropertyChangeListener(JRuleEngine.get());
     }
 
     public void stopSubscriber() {
@@ -111,11 +113,14 @@ public class JRuleEventSubscriber implements EventSubscriber {
         propertyChangeSupport.removePropertyChangeListener(JRuleEngine.get());
     }
 
-    public void pauseEventSubscriber() {
+    /**
+     * Queue events until JRule is ready to process them. See {resumeEventDelivery}
+     */
+    public void pauseEventDelivery() {
         queueEvents = true;
     }
 
-    public void resumeEvents() {
+    public void resumeEventDelivery() {
         while (true) {
             Event event = eventQueue.poll();
             if (event == null) {
