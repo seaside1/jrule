@@ -41,7 +41,6 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -92,7 +91,7 @@ public class JRuleCompiler {
                     final Enumeration<JarEntry> jarEntries = jarFile.entries();
                     while (jarEntries.hasMoreElements()) {
                         JarEntry jarEntry = jarEntries.nextElement();
-                        final @NonNull String jarEntryName = jarEntry.getName() == null ? "" : jarEntry.getName();
+                        final String jarEntryName = jarEntry.getName() == null ? "" : jarEntry.getName();
                         final int lastIndexOfSlash = jarEntryName.lastIndexOf(FRONT_SLASH) + 1;
                         if (jarEntryName.length() < 1 || jarEntry.isDirectory()
                                 || !jarEntryName.endsWith(JRuleConstants.CLASS_FILE_TYPE) || lastIndexOfSlash == -1
@@ -122,8 +121,8 @@ public class JRuleCompiler {
     }
 
     private String relativePathToFullClassname(String path) {
-        if (path.endsWith(".class")) {
-            path = path.substring(0, path.lastIndexOf(".class"));
+        if (path.endsWith(JRuleConstants.CLASS_FILE_TYPE)) {
+            path = path.substring(0, path.lastIndexOf(JRuleConstants.CLASS_FILE_TYPE));
         }
         if (path.startsWith("/")) {
             path = path.substring(1);
@@ -168,7 +167,7 @@ public class JRuleCompiler {
 
         try (Stream<Path> walk = Files.walk(rootFolder.toPath())) {
             classFiles = walk.filter(p -> !Files.isDirectory(p))
-                    .filter(f -> f.getFileName().toString().endsWith(".class"))
+                    .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.CLASS_FILE_TYPE))
                     .map(e -> e.toAbsolutePath().toString().replace(rootFolderPath, ""))
                     .map(e -> relativePathToFullClassname(e)).filter(e -> e.startsWith(onlyInRootPackage))
                     .collect(Collectors.toList());

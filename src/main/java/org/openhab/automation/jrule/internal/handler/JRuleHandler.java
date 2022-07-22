@@ -381,9 +381,9 @@ public class JRuleHandler implements PropertyChangeListener {
                         FileInputStream is = new FileInputStream(
                                 url.getFile() + "/" + name.replaceAll("\\.", "/") + ".class");
                         if (is != null) {
-                            byte[] buf = new byte[1000000];
-                            int len = is.read(buf);
-                            return defineClass(name, buf, 0, len);
+                            byte[] buf = is.readAllBytes();
+                            is.close();
+                            return defineClass(name, is.readAllBytes(), 0, buf.length);
                         }
                     }
                 }
