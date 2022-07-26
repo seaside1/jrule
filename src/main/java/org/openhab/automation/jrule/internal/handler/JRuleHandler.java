@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.internal.DelayedDebouncingExecutor;
+import org.openhab.automation.jrule.internal.JRuleDelayedDebouncingExecutor;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -87,16 +87,16 @@ public class JRuleHandler implements PropertyChangeListener {
     @Nullable
     private Thread rulesDirWatcherThread;
 
-    private final DelayedDebouncingExecutor delayedRulesReloader;
-    private final DelayedDebouncingExecutor delayedItemsCompiler;
+    private final JRuleDelayedDebouncingExecutor delayedRulesReloader;
+    private final JRuleDelayedDebouncingExecutor delayedItemsCompiler;
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, EventPublisher eventPublisher,
             JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.config = config;
-        this.delayedRulesReloader = new DelayedDebouncingExecutor(config.getRulesInitDelaySeconds(), TimeUnit.SECONDS);
-        this.delayedItemsCompiler = new DelayedDebouncingExecutor(config.getItemsRecompilationDelaySeconds(),
+        this.delayedRulesReloader = new JRuleDelayedDebouncingExecutor(config.getRulesInitDelaySeconds(), TimeUnit.SECONDS);
+        this.delayedItemsCompiler = new JRuleDelayedDebouncingExecutor(config.getItemsRecompilationDelaySeconds(),
                 TimeUnit.SECONDS);
         itemGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);

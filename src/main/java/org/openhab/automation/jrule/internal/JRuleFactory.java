@@ -49,7 +49,7 @@ public class JRuleFactory {
 
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
 
-    private final DelayedDebouncingExecutor delayedInit = new DelayedDebouncingExecutor(5, TimeUnit.SECONDS);
+    private final JRuleDelayedDebouncingExecutor delayedInit = new JRuleDelayedDebouncingExecutor(5, TimeUnit.SECONDS);
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,

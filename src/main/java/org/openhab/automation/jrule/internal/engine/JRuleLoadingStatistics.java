@@ -13,11 +13,11 @@
 package org.openhab.automation.jrule.internal.engine;
 
 /**
- * The {@link RuleLoadingStatistics} class holds rule loading statistics
+ * The {@link JRuleLoadingStatistics} class holds rule loading statistics
  *
  * @author Arne Seime - Initial contribution
  */
-public class RuleLoadingStatistics {
+public class JRuleLoadingStatistics {
     private int numChannelTriggers;
     private int numItemStateTriggers;
     private int numTimedTriggers;
@@ -25,9 +25,9 @@ public class RuleLoadingStatistics {
     private int numRuleClasses;
 
     private int numRuleMethods;
-    private final RuleLoadingStatistics previous;
+    private final JRuleLoadingStatistics previous;
 
-    public RuleLoadingStatistics(RuleLoadingStatistics previous) {
+    public JRuleLoadingStatistics(JRuleLoadingStatistics previous) {
         this.previous = previous;
     }
 
