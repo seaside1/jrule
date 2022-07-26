@@ -51,7 +51,7 @@ public class JRuleFactory {
 
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
 
-    private final JRuleDelayedDebouncingExecutor delayedInit = new JRuleDelayedDebouncingExecutor(5, TimeUnit.SECONDS);
+    private final DelayedDebouncingExecutor delayedInit = new DelayedDebouncingExecutor(5, TimeUnit.SECONDS);
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
@@ -68,11 +68,11 @@ public class JRuleFactory {
     }
 
     @Nullable
-    private Void init() {
+    private Boolean init() {
         JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
         jRuleEngine.initialize();
         jRuleHandler.initialize();
-        return null;
+        return Boolean.TRUE;
     }
 
     private String getBundleVersion() {

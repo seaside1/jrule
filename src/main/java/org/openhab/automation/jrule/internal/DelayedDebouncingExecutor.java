@@ -23,15 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link JRuleDelayedDebouncingExecutor} schedules actions to be executed in the future. Any duplicate requests
- * will
+ * The {@link DelayedDebouncingExecutor} schedules actions to be executed in the future. Any duplicate requests will
  * cancel the existing one and add another delay.
  *
  * @author Arne Seime - Initial contribution
  */
 
-public class JRuleDelayedDebouncingExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(JRuleDelayedDebouncingExecutor.class);
+public class DelayedDebouncingExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(DelayedDebouncingExecutor.class);
 
     private final ScheduledExecutorService executorService;
     private static final int TERMINATION_AWAIT_TIME_SECONDS = 20;
@@ -40,7 +39,7 @@ public class JRuleDelayedDebouncingExecutor {
     @Nullable
     private ScheduledFuture existingInvocationFuture = null;
 
-    public JRuleDelayedDebouncingExecutor(int delay, TimeUnit timeUnit) {
+    public DelayedDebouncingExecutor(int delay, TimeUnit timeUnit) {
         this.delay = delay;
         this.timeUnit = timeUnit;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
@@ -62,7 +61,7 @@ public class JRuleDelayedDebouncingExecutor {
      *
      * @param callable the callable to schedule
      */
-    public synchronized void call(Callable<Void> callable) {
+    public synchronized void call(Callable<Boolean> callable) {
         boolean shouldSchedule = true;
         if (existingInvocationFuture != null && !existingInvocationFuture.isDone()) {
             logger.debug("Cancelling existing delayed execution");
