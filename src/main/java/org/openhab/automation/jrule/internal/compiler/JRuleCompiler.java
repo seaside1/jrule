@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -156,7 +157,7 @@ public class JRuleCompiler {
 
         List<String> classFiles = new ArrayList<>();
 
-        try (Stream<Path> walk = Files.walk(rootFolder.toPath())) {
+        try (Stream<Path> walk = Files.walk(rootFolder.toPath(), FileVisitOption.FOLLOW_LINKS)) {
             classFiles = walk.filter(p -> !Files.isDirectory(p))
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.CLASS_FILE_TYPE))
                     .map(e -> e.toAbsolutePath().toString().replace(rootFolderPath, ""))
@@ -266,7 +267,8 @@ public class JRuleCompiler {
         }
         logDebug("Compiling rules in folder: {}", jRuleConfig.getRulesDirectory());
 
-        try (Stream<Path> paths = Files.walk(Paths.get(jRuleConfig.getRulesDirectory()))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(jRuleConfig.getRulesDirectory()),
+                FileVisitOption.FOLLOW_LINKS)) {
             List<File> ruleJavaFiles = paths.filter(Files::isRegularFile) // is a file
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)).map(Path::toFile)
                     .collect(Collectors.toList());
