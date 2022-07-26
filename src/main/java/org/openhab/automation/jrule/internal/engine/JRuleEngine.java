@@ -110,10 +110,10 @@ public class JRuleEngine implements PropertyChangeListener {
             .getScheduledPool(ThreadPoolManager.THREAD_POOL_NAME_COMMON);
     private ItemRegistry itemRegistry;
 
-    private JRuleLoadingStatistics ruleLoadingStatistics;
+    private RuleLoadingStatistics ruleLoadingStatistics;
 
     private JRuleEngine() {
-        ruleLoadingStatistics = new JRuleLoadingStatistics(null);
+        ruleLoadingStatistics = new RuleLoadingStatistics(null);
     }
 
     public static JRuleEngine get() {
@@ -142,7 +142,7 @@ public class JRuleEngine implements PropertyChangeListener {
         itemToRules.clear();
         clearTimers();
 
-        ruleLoadingStatistics = new JRuleLoadingStatistics(ruleLoadingStatistics);
+        ruleLoadingStatistics = new RuleLoadingStatistics(ruleLoadingStatistics);
     }
 
     private synchronized void clearTimers() {
@@ -618,7 +618,7 @@ public class JRuleEngine implements PropertyChangeListener {
         this.itemRegistry = itemRegistry;
     }
 
-    public JRuleLoadingStatistics getRuleLoadingStatistics() {
+    public RuleLoadingStatistics getRuleLoadingStatistics() {
         return ruleLoadingStatistics;
     }
 }
