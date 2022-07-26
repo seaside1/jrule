@@ -23,7 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link JRuleDelayedDebouncingExecutor} schedules actions to be executed in the future. Any duplicate requests will
+ * The {@link JRuleDelayedDebouncingExecutor} schedules actions to be executed in the future. Any duplicate requests
+ * will
  * cancel the existing one and add another delay.
  *
  * @author Arne Seime - Initial contribution

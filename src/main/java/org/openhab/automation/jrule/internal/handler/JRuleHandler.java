@@ -29,9 +29,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.internal.JRuleDelayedDebouncingExecutor;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
+import org.openhab.automation.jrule.internal.JRuleDelayedDebouncingExecutor;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
@@ -95,7 +95,8 @@ public class JRuleHandler implements PropertyChangeListener {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.config = config;
-        this.delayedRulesReloader = new JRuleDelayedDebouncingExecutor(config.getRulesInitDelaySeconds(), TimeUnit.SECONDS);
+        this.delayedRulesReloader = new JRuleDelayedDebouncingExecutor(config.getRulesInitDelaySeconds(),
+                TimeUnit.SECONDS);
         this.delayedItemsCompiler = new JRuleDelayedDebouncingExecutor(config.getItemsRecompilationDelaySeconds(),
                 TimeUnit.SECONDS);
         itemGenerator = new JRuleItemClassGenerator(config);
