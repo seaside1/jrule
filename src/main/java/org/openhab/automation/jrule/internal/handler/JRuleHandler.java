@@ -141,7 +141,7 @@ public class JRuleHandler implements PropertyChangeListener {
         // Extract and copy jrules.jar
         jarExtractor.extractJRuleJar(compiler.getJarPath(JRuleCompiler.JAR_JRULE_NAME));
 
-        // Generate source files for all items + Items.java
+        // Generate source files for all items + JRuleItems.java
         Collection<Item> items = itemRegistry.getItems();
         items.forEach(itemGenerator::generateItemSource);
         itemGenerator.generateItemsSource(items);

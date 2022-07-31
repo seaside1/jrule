@@ -204,7 +204,7 @@ public class JRuleCompiler {
         classFiles.keySet().stream().filter(className -> !sourceFiles.containsKey(className))
                 .forEach(className -> classFiles.get(className).delete());
         // Will trigger compilation of any missing or old item java files
-        return compile(new File(sourceFolder, "Items.java"), itemsClassPath);
+        return compile(new File(sourceFolder, "JRuleItems.java"), itemsClassPath);
     }
 
     public boolean compile(File javaSourceFile, String classPath) {

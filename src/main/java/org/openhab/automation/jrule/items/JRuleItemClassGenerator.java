@@ -129,7 +129,7 @@ public class JRuleItemClassGenerator {
         processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
 
         File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
-                .append(File.separator).append("Items.java").toString());
+                .append(File.separator).append("JRuleItems.java").toString());
 
         try {
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
@@ -142,7 +142,7 @@ public class JRuleItemClassGenerator {
             return true;
         } catch (TemplateException | IOException e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for Items.java: {}", e.toString());
+                    "Internal error when generating java source for JRuleItems.java: {}", e.toString());
 
         }
         return false;

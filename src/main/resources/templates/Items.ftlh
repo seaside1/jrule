@@ -13,7 +13,7 @@ import org.openhab.automation.jrule.items.generated.${item.class};
 *
 * @author Arne Seime - Refactoring
 */
-public class Items {
+public class JRuleItems {
 
 
 
@@ -22,7 +22,7 @@ public class Items {
 
 </#list>
 
- public Items() {
+ public JRuleItems() {
 
    <#list items as item>
     ${item.name} = JRuleItemRegistry.get("${item.name}", ${item.class}.class);
