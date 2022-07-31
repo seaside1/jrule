@@ -167,7 +167,7 @@ Use Case: Invoke another item Switch from rule
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
-        sendCommand(_MySwitch2.ITEM, ON);
+        JRuleItems.MySwitch2.sendCommand(ON);
     }
 ```
 
@@ -181,7 +181,7 @@ This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
     @JRuleWhen(item = _MyTestSwitch2.ITEM, trigger = _MyTestSwitch2.TRIGGER_CHANGED_FROM_OFF_TO_ON)
     public void execLockTestRule() {
         if (getTimedLock("MyLockTestRule1", 20)) {
-            sendCommand(_MyDoorBellItem.ITEM, ON);
+            JRuleItems.MyDoorBellItem.sendCommand(ON);
             logInfo("||||| --> Got Lock! Ding-dong !");
         } else {
             logInfo("||||| --> Ignoring call to rule it is locked!");
@@ -301,7 +301,7 @@ Use case create a timer for automatically turning of a light when it is turned o
         logInfo("Turning on light it will be turned off in 2 mins");
         createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
             logInfo("Time is up! Turning off lights");
-            sendCommand(_MyLightSwitch.ITEM, OFF);
+            JRuleItems.MyLightSwitch.sendCommand(OFF);
         });
     }
 ```
@@ -319,7 +319,7 @@ to send multiple ON statements to be sure it actually turns on.
         createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 10, (Void) -> { // Lambda Expression
             final String messageOn = "repeatRuleExample Repeating.....";
             logInfo(messageOn);
-            sendCommand(_MyBad433Switch.ITEM, ON);
+            JRuleItems.MyBad433Switch.sendCommand(ON);
         });
     }
 ```
@@ -335,7 +335,7 @@ it will not reschedule the timer, if the timer is already running it won't resch
         createTimer("myTimer", 10, (Void) -> { // Lambda Expression
             final String messageOn = "timer example.";
             logInfo(messageOn);
-            sendCommand(ON, _MyTestWitch2.ITEM);
+            JRuleItems.MyTestWitch2.sendCommand(ON);
         });
     }
 ```
@@ -348,7 +348,7 @@ Use case trigger a rule at 22:30 in the evening to set initial brightness for a 
   public synchronized void setDayBrightness(JRuleEvent event) {
       logInfo("Setting night brightness to 30%");
       int dimLevel = 30;
-      sendCommand(_ZwaveDimmerBrightness.ITEM, new JRulePercentType(dimLevel));
+      JRuleItems.ZwaveDimmerBrightness.sendCommand(dimLevel);
   }
 ```
 
@@ -366,7 +366,7 @@ eq = equals
   @JRuleWhen(item = _MyTemperatureSensor.ITEM, trigger = _MyTemperatureSensor.TRIGGER_RECEIVED_UPDATE, lte = 20)
   public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
       logInfo("Starting fan since temeprature dropped below 20");
-      sendCommand(ON, _MyHeatinFanSwitch.ITEM);
+      JRuleItems.MyHeatinFanSwitch.sendCommand(ON);
   }
 ```
 
@@ -451,7 +451,7 @@ can be called without serviceId argument: `ZonedDateTime lastUpdate = JRuleStrin
 @JRuleWhen(cron = "4 * * * * *")
 public void testLastUpdate(JRuleEvent event){
     logInfo("CRON: Running cron from string: {}",event.getState().getValue());
-    ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated("mapdb");
+    ZonedDateTime lastUpdate = JRuleItems.MyCoolItem.getLastUpdated("mapdb");
     DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
     String lastUpdateFormatted=lastUpdate.format(formatter);
     logInfo("Last Update: {}",lastUpdateFormatted);
@@ -466,13 +466,13 @@ Use case: Get the brigtness from a color item, set a color item to white (HSB 0,
     @JRuleName("testBrightnessFromColorItem")
     @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED)
     public void testBrightnessFromColorItem(JRuleEvent event) {
-       JRuleColorValue color = _MyTestColorItem.getState();
+       JRuleColorValue color = JRuleItems.MyTestColorItem.getState();
        int brightness = color.getHsbValue().getBrightness();
     }
    
     @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED) 
     public void testSetWhiteOnColorItem(JRuleEvent event) {
-        sendCommand(_MyTestColorItem.ITEM, JRuleColorValue.fromHsb(0,  0,  100));
+        JRuleItems.MyTestColorItem.sendCommand(JRuleColorValue.fromHsb(0,0,100));
     }
 ```
 
@@ -484,7 +484,7 @@ Use case: Set logging name for a specific rule
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
-        sendCommand(_MySwitch2.ITEM, ON);
+        JRuleItems.MySwitch2.sendCommand(ON);
     }
 ```
 
@@ -497,7 +497,7 @@ Use case: Override logging for all rules defined in one file
     @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
-        sendCommand(_MySwitch2.ITEM, ON);
+        JRuleItems.MySwitch2.sendCommand(ON);
     }
     
     @Override
@@ -519,7 +519,7 @@ Use case: Apply transformation using openHAB transformation service
     public void applyTransformation(JRuleEvent event) {
         String transformedValue = transform("MAP(my.map):%s", event.getState().getValue());
         logInfo("Transformed {} to {}", event.getState().getValue(), transformedValue);
-        sendCommand(_MyTransformationReceiver.ITEM, transformedValue);
+        JRuleItems.MyTransformationReceiver.sendCommand(transformedValue);
     }
 }
 ```
@@ -539,7 +539,7 @@ message is updated.
     public void testPrecondition(JRuleEvent event) {
         String notificationMessage = event.getState().getValue();
         logInfo("It is ok to send notification: {}", notificationMessage);
-        sendCommand(_MySendNoticationItemMqtt.ITEM, notificationMessage);
+        JRuleItems.MySendNoticationItemMqtt.sendCommand(notificationMessage);
     }
 }
 ```
@@ -555,7 +555,7 @@ a motion detector is triggered we will turn on a fan.
     @JRuleWhen(item = _MyMotionDetector.ITEM, trigger = _MyMotionDectetor.TRIGGER_CHANGED_FROM_OFF_TO_ON)
     public void testPrecondition(JRuleEvent event) {
         logInfo("Temperature is above 30 and we should start the fan since the motiondetector is triggered");
-        sendCommand(_MyFan.ITEM, ON);
+        JRuleItems.MyFan.sendCommand(ON);
     }
 }
 ```
@@ -571,7 +571,7 @@ Use case: Send Quantity type Watt (W) from rule.
     @JRuleWhen(item=_MyTestMeterPower.ITEM, trigger=_MyTestMeterPower.TRIGGER_CHANGED)
     public void testQuantityPower(JRuleEvent event) {
         logInfo("TestQuantity power will send this value as Watt: {}", event.getState().getValue());
-        sendCommand(_TestPowerQuantityType.ITEM, event.getState().getValueAsDouble(), "W");
+        JRuleItems.TestPowerQuantityType.sendCommand(event.getState().getValueAsDouble(), "W");
     }
 }
 ```
@@ -629,14 +629,14 @@ public void testAverage(JRuleEvent event){
 
 ## Example 30
 
-Use case: Use generated Items.java to get hold of items. For instance get state of an item. 
+Use case: Use generated JRuleItems.java to get hold of items. For instance get state of an item. 
 ```java
  public class ItemsExampleRule extends JRule {
   
     @JRuleName("testItems")
     @JRuleWhen(item=_MyTestSwitch.ITEM, trigger=_MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void testItems(JRuleEvent event) {
-        Items.MyOtherTestSwitch.getState();
+        JRuleItems.MyOtherTestSwitch.getState();
     }
  }
 
