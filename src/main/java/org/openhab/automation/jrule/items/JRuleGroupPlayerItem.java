@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
@@ -39,16 +40,17 @@ public class JRuleGroupPlayerItem extends JRuleGroupItem implements JRulePlayerT
     }
 
     public void sendCommand(JRulePlayPauseValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     public void postUpdate(JRulePlayPauseValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method
     public JRulePlayPauseValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-
         String string = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
         return JRuleEventHandler.get().getPlayPauseValueFromState(PlayPauseType.valueOf(string));
     }

@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -38,11 +39,13 @@ public class JRuleGroupSwitchItem extends JRuleGroupItem implements JRuleSwitchT
     }
 
     public void sendCommand(JRuleOnOffValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(JRuleOnOffValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     // Persistence method

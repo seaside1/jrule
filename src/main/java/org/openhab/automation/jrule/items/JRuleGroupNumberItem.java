@@ -13,8 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleGroupColorItem} Items
@@ -22,6 +26,9 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleGroupNumberItem extends JRuleGroupItem {
+
+    private static final String LOG_NAME = "JRuleGroupNumberItem";
+    private static final Logger logger = LoggerFactory.getLogger(JRuleGroupNumberItem.class);
 
     protected JRuleGroupNumberItem(String itemName) {
         super(itemName);
@@ -36,29 +43,34 @@ public class JRuleGroupNumberItem extends JRuleGroupItem {
     }
 
     public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method
     public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-
         String string = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
         try {
             return Double.parseDouble(string);
         } catch (NumberFormatException e) {
-            // TODO add logging
+            JRuleLog.error(logger, LOG_NAME,
+                    "Failed to get Historic state for value: {} itemName: {} timestamp: {} persistanceServiceId: {}",
+                    string, itemName, timestamp, persistenceServiceId);
             return null;
         }
     }

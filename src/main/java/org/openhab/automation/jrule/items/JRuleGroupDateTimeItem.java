@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 
@@ -37,11 +38,13 @@ public class JRuleGroupDateTimeItem extends JRuleGroupItem {
     }
 
     public void sendCommand(Date value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(Date value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method

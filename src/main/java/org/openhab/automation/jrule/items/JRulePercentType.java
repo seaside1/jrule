@@ -25,6 +25,10 @@ public class JRulePercentType {
         this.value = value;
     }
 
+    public JRulePercentType(double value) {
+        this.value = (int) Math.round(value + 0.5);
+    }
+
     public int getValue() {
         return value;
     }

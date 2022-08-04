@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
@@ -38,36 +38,37 @@ public class JRuleGroupRollershutterItem extends JRuleGroupItem {
     }
 
     public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     public void sendCommand(JRuleUpDownValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void sendCommand(JRuleStopMoveValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(JRuleUpDownValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method
     public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-
         String string = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
         try {
             return Double.parseDouble(string);

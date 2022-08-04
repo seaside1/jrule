@@ -207,20 +207,20 @@ public class JRuleEventHandler {
         postUpdate(itemName, new PercentType(value.getValue()));
     }
 
-    public void postUpdate(String itemName, JRulePlayPauseValue state) {
-        postUpdate(itemName, getStateFromValue(state));
+    public void postUpdate(String itemName, JRulePlayPauseValue value) {
+        postUpdate(itemName, getStateFromValue(value));
     }
 
-    public void postUpdate(String itemName, JRuleOnOffValue state) {
-        postUpdate(itemName, getStateFromValue(state));
+    public void postUpdate(String itemName, JRuleOnOffValue value) {
+        postUpdate(itemName, getStateFromValue(value));
     }
 
-    public void postUpdate(String itemName, JRuleOpenClosedValue state) {
-        postUpdate(itemName, getStateFromValue(state));
+    public void postUpdate(String itemName, JRuleOpenClosedValue value) {
+        postUpdate(itemName, getStateFromValue(value));
     }
 
-    public void postUpdate(String itemName, JRuleUpDownValue state) {
-        postUpdate(itemName, getStateFromValue(state));
+    public void postUpdate(String itemName, JRuleUpDownValue value) {
+        postUpdate(itemName, getStateFromValue(value));
     }
 
     public void postUpdate(String itemName, String value) {

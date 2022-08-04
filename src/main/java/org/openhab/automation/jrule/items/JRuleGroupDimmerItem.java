@@ -13,11 +13,15 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleGroupColorItem} Items
@@ -25,6 +29,9 @@ import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleDimmerTrigger {
+
+    private static final String LOG_NAME = "JRuleGroupDimmerItem";
+    private static final Logger logger = LoggerFactory.getLogger(JRuleGroupDimmerItem.class);
 
     protected JRuleGroupDimmerItem(String itemName) {
         super(itemName);
@@ -39,37 +46,54 @@ public class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleDimmerT
     }
 
     public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentType(value)));
     }
 
     public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentType(value)));
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentType(value)));
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentType(value)));
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+    }
+
+    public void postUpdate(JRuleIncreaseDecreaseValue value) {
+        JRuleLog.error(logger, LOG_NAME, "PostUpdate on IncreaseDecrease not supported by openHab Core: {}",
+                value.name().toString());
     }
 
     public void sendCommand(JRuleOnOffValue value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+    }
+
+    public void postUpdate(JRuleOnOffValue value) {
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method
     public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-
         String string = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
         try {
             return Double.parseDouble(string);
         } catch (NumberFormatException e) {
-            // TODO add logging
+            JRuleLog.error(logger, LOG_NAME,
+                    "Failed to get Historic state for value: {} itemName: {} timestamp: {} persistanceServiceId: {}",
+                    string, itemName, timestamp, persistenceServiceId);
             return null;
         }
     }

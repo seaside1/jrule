@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
@@ -47,31 +48,38 @@ public class JRuleGroupColorItem extends JRuleGroupItem {
     }
 
     public void sendCommand(JRuleColorValue colorValue) {
-        JRuleEventHandler.get().sendCommand(itemName, colorValue);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, colorValue));
     }
 
     public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command));
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command));
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentType(value)));
     }
 
     public void postUpdate(JRuleColorValue colorValue) {
-        JRuleEventHandler.get().postUpdate(itemName, colorValue);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, colorValue));
     }
 
     public void postUpdate(JRuleOnOffValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, state));
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentType(value)));
     }
 
     // Persistence method

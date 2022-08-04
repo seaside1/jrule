@@ -35,14 +35,6 @@ public class JRuleGroupImageItem extends JRuleGroupItem {
         return JRuleEventHandler.get().getStringValue(itemName);
     }
 
-    public void sendCommand(String value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void postUpdate(String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
     // Persistence method
     public String getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);

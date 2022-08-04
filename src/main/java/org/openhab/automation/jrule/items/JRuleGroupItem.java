@@ -35,8 +35,13 @@ public abstract class JRuleGroupItem extends JRuleItem {
         return JRuleEventHandler.get().getGroupMemberNames(itemName);
     }
 
-    public void sendCommandToAll(String value) {
+    public void sendCommand(String value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+    }
+
+    public void postUpdate(String value) {
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 }
