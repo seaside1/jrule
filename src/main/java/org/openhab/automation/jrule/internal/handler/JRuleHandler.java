@@ -210,12 +210,12 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleItemRegistry.clear();
         // Reload Items class - this will also instantiate all items and load them to the registry
         try {
-            Class<?> cls = Class.forName(config.getGeneratedItemPackage() + ".Items", true, loader);
+            Class<?> cls = Class.forName(config.getGeneratedItemPackage() + ".JRuleItems", true, loader);
             cls.getDeclaredConstructor().newInstance();
-            logger.info("Instantiated Items class");
+            logger.info("Instantiated JRuleItems class");
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
                 | InvocationTargetException e) {
-            logger.error("Could not instantiate Items file {}", e.toString());
+            logger.error("Could not instantiate JRuleItems file {}", e.toString());
         }
 
         // Load rules that refer to the items
