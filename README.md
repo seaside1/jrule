@@ -643,6 +643,10 @@ Use case: Use generated JRuleItems.java to get hold of items. For instance get s
 ```
 
 # Changelog
+## BETA13
+- Fixed a bug with naming of JRuleItems.java
+- Fixed issues with post and sendCommand to groups
+
 ## BETA12
  - Major refactoring by seime https://github.com/seaside1/jrule/pull/42
    - Replaces the templating mechanism with Freemarker, mainly to allow more advanced constructs such as loops - 
