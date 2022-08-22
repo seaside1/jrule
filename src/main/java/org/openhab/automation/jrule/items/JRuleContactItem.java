@@ -16,13 +16,14 @@ import java.time.ZonedDateTime;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.trigger.JRuleContactTrigger;
 
 /**
  * The {@link JRuleContactItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleContactItem extends JRuleItem {
+public class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
 
     protected JRuleContactItem(String itemName) {
         super(itemName);
