@@ -182,6 +182,14 @@ public class JRule {
         JRuleVoiceHandler.get().say(text);
     }
 
+    protected void say(String text, String voiceId, String sinkId, int volumePercent) {
+        JRuleVoiceHandler.get().say(text, voiceId, sinkId, volumePercent);
+    }
+
+    protected void say(String text, int volume) {
+        JRuleVoiceHandler.get().say(text, volume);
+    }
+
     protected String transform(String stateDescPattern, String state) throws JRuleExecutionException {
         return JRuleTransformationHandler.get().transform(stateDescPattern, state);
     }

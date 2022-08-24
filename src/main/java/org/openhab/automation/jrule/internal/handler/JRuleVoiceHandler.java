@@ -53,12 +53,17 @@ public class JRuleVoiceHandler {
         voiceManager.say(text);
     }
 
+    public void say(String text, int volumePercent) {
+        final PercentType volume = new PercentType(volumePercent);
+        voiceManager.say(text, volume);
+    }
+
     public void say(String text, String voiceId, String sinkId) {
         voiceManager.say(text, voiceId, sinkId);
     }
 
     public void say(String text, String voiceId, String sinkId, int volumePercent) {
-        PercentType volume = new PercentType(volumePercent);
+        final PercentType volume = new PercentType(volumePercent);
         voiceManager.say(text, voiceId, sinkId, volume);
     }
 }
