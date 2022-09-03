@@ -293,7 +293,7 @@ public class MyTestUserRule extends JRuleUser {
 ```
 ## Example 8
 
-Use case create a timer for automatically turning of a light when it is turned on. If it's running cancel it and schedule a new one. 
+Use case create a timer for automatically turning off a light when it is turned on. If it's running cancel it and schedule a new one. 
 ```java
     @JRuleName("myTimerRule")
     @JRuleWhen(item = _MyLightSwitch.ITEM, trigger = _MyLightSwitch.TRIGGER_CHANGED_TO_ON)
