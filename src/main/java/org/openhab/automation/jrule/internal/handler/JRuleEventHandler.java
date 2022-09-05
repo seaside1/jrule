@@ -275,6 +275,9 @@ public class JRuleEventHandler {
     }
 
     public JRulePlayPauseValue getPlayPauseValueFromState(State state) {
+        if (state instanceof UnDefType) {
+            return JRulePlayPauseValue.UNDEF;
+        }
         final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
         switch (playPauseType) {
             case PLAY:
@@ -288,6 +291,9 @@ public class JRuleEventHandler {
     }
 
     private JRuleOnOffValue getOnOffValueFromState(State state) {
+        if (state instanceof UnDefType) {
+            return JRuleOnOffValue.UNDEF;
+        }
         OnOffType onOffType = OnOffType.from(state.toFullString());
         switch (onOffType) {
             case OFF:
@@ -301,6 +307,9 @@ public class JRuleEventHandler {
     }
 
     private JRuleOpenClosedValue getOpenClosedValueFromState(State state) {
+        if (state instanceof UnDefType) {
+            return JRuleOpenClosedValue.UNDEF;
+        }
         OpenClosedType openClosedType = OpenClosedType.valueOf(state.toFullString());
         switch (openClosedType) {
             case OPEN:
@@ -314,6 +323,9 @@ public class JRuleEventHandler {
     }
 
     private JRuleUpDownValue getUpDownValueFromState(State state) {
+        if (state instanceof UnDefType) {
+            return JRuleUpDownValue.UNDEF;
+        }
         final UpDownType playPauseType = UpDownType.valueOf(state.toFullString());
         switch (playPauseType) {
             case UP:
