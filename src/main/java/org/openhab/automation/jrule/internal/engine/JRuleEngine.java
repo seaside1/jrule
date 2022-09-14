@@ -65,6 +65,7 @@ import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateEvent;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.events.ChannelTriggeredEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -480,7 +481,7 @@ public class JRuleEngine implements PropertyChangeListener {
             return null;
         }
         try {
-            parseDouble = Double.parseDouble(value);
+            parseDouble = QuantityType.valueOf(value).doubleValue();
         } catch (Exception x) {
             logError("Failed to parse value: {} as double", value, x);
             return null;
