@@ -5,7 +5,7 @@
 #org.openhab.automation.jrule.directory=/etc/openhab/automation/directory
 
 ## Run rules in a separate threadpool
-#org.openhab.automation.jrule.engine.executors.enable=false
+#org.openhab.automation.jrule.engine.executors.enable=true
 
 ## Minimum number of threads
 #org.openhab.automation.jrule.engine.executors.min=2

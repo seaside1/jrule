@@ -51,7 +51,7 @@ public class JRuleConfig {
     private static final int DEFAULT_MIN_EXECUTORS = 2;
     private static final int DEFAULT_MAX_EXECUTORS = 10;
     private static final long DEFAULT_KEEPALIVE_EXECUTORS = 2L;
-    private static final boolean DEFAULT_ENABLE_EXECUTORS = false;
+    private static final boolean DEFAULT_ENABLE_EXECUTORS = true;
 
     public static final String RULES_DIR_START = "rules";
     public static final String RULES_DIR = RULES_DIR_START + File.separator + "org" + File.separator + "openhab"
