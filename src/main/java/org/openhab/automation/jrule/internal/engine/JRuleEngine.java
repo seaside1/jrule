@@ -443,14 +443,20 @@ public class JRuleEngine implements PropertyChangeListener {
             return stateValue.equals(eq);
         } else if (neq != null) {
             return !stateValue.equals(neq);
-        } else if (gt != null) {
-            return getValueAsDouble(stateValue) > gt;
-        } else if (gte != null) {
-            return getValueAsDouble(stateValue) >= gte;
-        } else if (lt != null) {
-            return getValueAsDouble(stateValue) < lt;
-        } else if (lte != null) {
-            return getValueAsDouble(stateValue) <= lte;
+        } else {
+            // valueAsDouble may be null if unparseable ("NULL" or "UNDEF")
+            Double valueAsDouble = getValueAsDouble(stateValue);
+            if (valueAsDouble == null) {
+                return null;
+            } else if (gt != null) {
+                return valueAsDouble > gt;
+            } else if (gte != null) {
+                return valueAsDouble >= gte;
+            } else if (lt != null) {
+                return valueAsDouble < lt;
+            } else if (lte != null) {
+                return valueAsDouble <= lte;
+            }
         }
         return null;
     }
