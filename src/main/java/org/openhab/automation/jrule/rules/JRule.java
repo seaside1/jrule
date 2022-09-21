@@ -46,8 +46,9 @@ public class JRule {
 
     private static final Logger logger = LoggerFactory.getLogger(JRule.class);
 
-    private final static Map<String, CompletableFuture<Void>> ruleNameToCompletableFuture = new HashMap<>();
-    private final static Map<String, List<CompletableFuture<Void>>> ruleNameToCompletableFutureList = new HashMap<>();
+    private final static Map<String, CompletableFuture<Void>> ruleNameToLockFuture = new HashMap<>();
+    private final static Map<String, CompletableFuture<Void>> ruleNameToTimerFuture = new HashMap<>();
+    private final static Map<String, List<CompletableFuture<Void>>> ruleNameToTimerFutureList = new HashMap<>();
 
     private volatile String logName = "";
 
@@ -56,30 +57,29 @@ public class JRule {
     }
 
     protected synchronized boolean isTimerRunning(String ruleName) {
-        final CompletableFuture<Void> completableFuture = ruleNameToCompletableFuture.get(ruleName);
+        final CompletableFuture<Void> completableFuture = ruleNameToTimerFuture.get(ruleName);
         return completableFuture != null && completableFuture.isDone();
     }
 
     protected synchronized CompletableFuture<Void> createOrReplaceTimer(String ruleName, long timeInSeconds,
             Consumer<Void> fn) {
-        CompletableFuture<Void> future = ruleNameToCompletableFuture.get(ruleName);
+        CompletableFuture<Void> future = ruleNameToTimerFuture.get(ruleName);
         if (future != null) {
-            JRuleLog.debug(logger, ruleName, "Future already running");
+            JRuleLog.debug(logger, ruleName, "Future already running hashCode: {}", future.hashCode());
             boolean cancelled = future.cancel(false);
-            ruleNameToCompletableFuture.remove(ruleName);
+            ruleNameToTimerFuture.remove(ruleName);
             JRuleLog.info(logger, ruleName, "Replacing existing timer by removing old timer cancelled: {}", cancelled);
         }
         return createTimer(ruleName, timeInSeconds, fn);
     }
 
     protected boolean timerIsRunning(String ruleName) {
-        return ruleNameToCompletableFuture.containsKey(ruleName)
-                || ruleNameToCompletableFutureList.containsKey(ruleName);
+        return ruleNameToTimerFuture.containsKey(ruleName) || ruleNameToTimerFutureList.containsKey(ruleName);
     }
 
     protected synchronized boolean cancelTimer(String ruleName) {
         boolean cancelled = false;
-        final CompletableFuture<Void> completableFuture = ruleNameToCompletableFuture.get(ruleName);
+        final CompletableFuture<Void> completableFuture = ruleNameToTimerFuture.get(ruleName);
         if (completableFuture != null) {
             JRuleLog.debug(logger, ruleName, "Future already running");
             try {
@@ -87,13 +87,13 @@ public class JRule {
             } catch (Exception x) {
                 JRuleLog.debug(logger, ruleName, "Failed to cancel timer", x);
             } finally {
-                ruleNameToCompletableFuture.remove(ruleName);
+                ruleNameToTimerFuture.remove(ruleName);
             }
         }
 
-        List<CompletableFuture<Void>> completableFutures = ruleNameToCompletableFutureList.get(ruleName);
+        List<CompletableFuture<Void>> completableFutures = ruleNameToTimerFutureList.get(ruleName);
         if (completableFutures != null) {
-            cancelled |= cancelListOfCompletableFutures(ruleName, completableFutures);
+            cancelled |= cancelListOfTimersFutures(ruleName, completableFutures);
         }
 
         return cancelled;
@@ -104,16 +104,17 @@ public class JRule {
     }
 
     protected synchronized CompletableFuture<Void> createTimer(String ruleName, long timeInSeconds, Consumer<Void> fn) {
-        if (ruleNameToCompletableFuture.get(ruleName) != null) {
-            JRuleLog.debug(logger, ruleName, "Future already running");
-            return ruleNameToCompletableFuture.get(ruleName);
+        if (ruleNameToTimerFuture.get(ruleName) != null) {
+            JRuleLog.debug(logger, ruleName, "Future already running hashCode: " + ruleName.hashCode());
+            return ruleNameToTimerFuture.get(ruleName);
         }
         CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
-        ruleNameToCompletableFuture.put(ruleName, future);
-        JRuleLog.info(logger, ruleName, "Start timer timeSeconds: {}", timeInSeconds);
+        ruleNameToTimerFuture.put(ruleName, future);
+        JRuleLog.info(logger, ruleName, "Start timer timeSeconds: {} hashCode: {}", timeInSeconds, future.hashCode());
         return future.thenAccept(fn).thenAccept(s -> {
             JRuleLog.info(logger, ruleName, "Timer has finsihed");
-            ruleNameToCompletableFuture.remove(ruleName);
+            JRuleLog.debug(logger, ruleName, "Timer has finsihed hashCode: {}", future.hashCode());
+            ruleNameToTimerFuture.remove(ruleName);
         });
     }
 
@@ -124,37 +125,37 @@ public class JRule {
 
     protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String ruleName,
             long delayInSeconds, int numberOfRepeats, Consumer<Void> fn) {
-        List<CompletableFuture<Void>> completableFutures = ruleNameToCompletableFutureList.get(ruleName);
+        List<CompletableFuture<Void>> completableFutures = ruleNameToTimerFutureList.get(ruleName);
         if (completableFutures != null) {
-            cancelListOfCompletableFutures(ruleName, completableFutures);
+            cancelListOfTimersFutures(ruleName, completableFutures);
             JRuleLog.info(logger, ruleName, "Replacing existing repeating timer by removing old timer");
         }
         return createRepeatingTimer(ruleName, delayInSeconds, numberOfRepeats, fn);
     }
 
-    private boolean cancelListOfCompletableFutures(String ruleName, List<CompletableFuture<Void>> completableFutures) {
+    private boolean cancelListOfTimersFutures(String ruleName, List<CompletableFuture<Void>> completableFutures) {
         boolean cancelled = false;
-        JRuleLog.debug(logger, ruleName, "Repeating Future already running");
+        JRuleLog.debug(logger, ruleName, "Cancel Futures");
         for (CompletableFuture<?> future : completableFutures) {
             cancelled |= future.cancel(true);
         }
         completableFutures.clear();
-        ruleNameToCompletableFutureList.remove(ruleName);
+        ruleNameToTimerFutureList.remove(ruleName);
         return cancelled;
     }
 
     protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String ruleName, long delayInSeconds,
             int numberOfRepeats, Consumer<Void> fn) {
-        List<CompletableFuture<Void>> futures = ruleNameToCompletableFutureList.get(ruleName);
+        List<CompletableFuture<Void>> futures = ruleNameToTimerFutureList.get(ruleName);
         if (futures != null) {
             JRuleLog.debug(logger, ruleName, "Repeating timer already running");
-            return ruleNameToCompletableFutureList.get(ruleName);
+            return ruleNameToTimerFutureList.get(ruleName);
         }
         JRuleLog.info(logger, ruleName, "Start Repeating timer, delay: {}s repeats: {}", delayInSeconds,
                 numberOfRepeats);
 
         futures = new ArrayList<>();
-        ruleNameToCompletableFutureList.put(ruleName, futures);
+        ruleNameToTimerFutureList.put(ruleName, futures);
         CompletableFuture<Void> lastFuture = null;
         for (int i = 0; i < numberOfRepeats; i++) {
             lastFuture = JRuleUtil.delayedExecution(delayInSeconds * (i + 1), TimeUnit.SECONDS);
@@ -164,7 +165,7 @@ public class JRule {
         if (lastFuture != null) {
             futures.add(lastFuture.thenAccept(s -> {
                 JRuleLog.info(logger, ruleName, "Repeating Timer has finsihed");
-                List<CompletableFuture<Void>> finishedList = ruleNameToCompletableFutureList.remove(ruleName);
+                List<CompletableFuture<Void>> finishedList = ruleNameToTimerFutureList.remove(ruleName);
                 if (finishedList != null) {
                     finishedList.clear();
                 }
@@ -251,16 +252,16 @@ public class JRule {
     }
 
     protected boolean getTimedLock(String ruleName, int seconds) {
-        CompletableFuture<Void> future = ruleNameToCompletableFuture.get(ruleName);
+        CompletableFuture<Void> future = ruleNameToLockFuture.get(ruleName);
         if (future != null) {
             return false;
         }
         Supplier<CompletableFuture<Void>> asyncTask = () -> CompletableFuture.completedFuture(null);
         future = JRuleUtil.scheduleAsync(asyncTask, seconds, TimeUnit.SECONDS);
-        ruleNameToCompletableFuture.put(ruleName, future);
+        ruleNameToLockFuture.put(ruleName, future);
         future.thenAccept(itemName -> {
             JRuleLog.info(logger, ruleName, "Timer completed! Releasing lock");
-            ruleNameToCompletableFuture.remove(ruleName);
+            ruleNameToLockFuture.remove(ruleName);
         });
         return true;
     }
