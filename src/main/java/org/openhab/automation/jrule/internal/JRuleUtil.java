@@ -233,6 +233,18 @@ public class JRuleUtil {
         return end > 0 && end > start ? topic.substring(start, end) : JRuleConstants.EMPTY;
     }
 
+    public static String getThingFromTopic(@NonNull String topic) {
+        if (topic.isEmpty()) {
+            return JRuleConstants.EMPTY;
+        }
+        final int start = topic.indexOf("things/") + "things/".length(); // TODO make constant
+        int end = topic.indexOf(SEPARATOR, start);
+        if (start > end) {
+            end = topic.length();
+        }
+        return end > 0 && end > start ? topic.substring(start, end) : JRuleConstants.EMPTY;
+    }
+
     public static String packageNameToPath(String packageName) {
         return packageName.replace('.', File.separatorChar);
     }

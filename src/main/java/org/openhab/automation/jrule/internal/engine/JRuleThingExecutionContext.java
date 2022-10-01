@@ -18,82 +18,38 @@ import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 
 /**
- * The {@link JRuleItemExecutionContext}
+ * The {@link JRuleThingExecutionContext} - execution context for thing triggers
  *
- * @author Robert Delbrück - Initial contribution
+ * @author Arne Seime - Initial contribution
  */
-public class JRuleItemExecutionContext extends JRuleExecutionContext implements JRuleValueComparators {
+public class JRuleThingExecutionContext extends JRuleExecutionContext {
     private static final String FROM_PREFIX = " from ";
     private static final String TO_PREFIX = " to ";
     private static final String SPACE = " ";
 
-    private final String itemClass;
-    private final String itemName;
+    private final String thing;
     private final String trigger;
     private final String update;
     private final String from;
     private final String to;
-    private final Double gt;
-    private final Double gte;
-    private final Double lt;
-    private final Double lte;
-    protected final String eq;
-    protected final String neq;
 
-    public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, String trigger, String from,
-            String to, String update, String ruleName, String itemClass, String itemName, Method method,
-            boolean eventParameterPresent, Double lt, Double lte, Double gt, Double gte, String eq, String neq,
+    public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, String trigger, String from,
+            String to, String update, String ruleName, String thing, Method method, boolean eventParameterPresent,
             JRulePrecondition[] preconditions) {
         super(jRule, logName, loggingTags, ruleName, method, eventParameterPresent, preconditions);
-        this.itemClass = itemClass;
-        this.itemName = itemName;
+        this.thing = thing;
         this.trigger = trigger;
         this.update = update;
         this.from = from;
         this.to = to;
-        this.gt = gt;
-        this.gte = gte;
-        this.lt = lt;
-        this.lte = lte;
-        this.eq = eq;
-        this.neq = neq;
     }
 
-    public String getItemName() {
-        return itemName;
-    }
-
-    public Double getGt() {
-        return gt;
-    }
-
-    public Double getGte() {
-        return gte;
-    }
-
-    public Double getLt() {
-        return lt;
-    }
-
-    public Double getLte() {
-        return lte;
-    }
-
-    public String getEq() {
-        return eq;
-    }
-
-    public String getNeq() {
-        return neq;
+    public String getThing() {
+        return thing;
     }
 
     public String getTrigger() {
         return trigger;
-    }
-
-    @Override
-    public boolean isComparatorOperation() {
-        return lte != null || lt != null || gt != null || gte != null || eq != null || neq != null;
     }
 
     private String buildFromToString(String trigger, String from, String to) {
@@ -132,9 +88,7 @@ public class JRuleItemExecutionContext extends JRuleExecutionContext implements 
 
     @Override
     public String toString() {
-        return "JRuleExecutionContext [trigger=" + trigger + ", ruleName=" + ruleName + ", itemClass=" + itemClass
-                + ", itemName=" + itemName + ", from=" + from + ", to=" + to + ", gt=" + gt + ", gte=" + gte + ", lt="
-                + lt + ", lte=" + lte + ", eq=" + eq + ", update=" + update + ", jRule=" + jRule + ", method=" + method
-                + ", eventParameterPresent=" + eventParameterPresent + "]";
+        return "JRuleThingExecutionContext{" + "from='" + from + '\'' + ", thing='" + thing + '\'' + ", to='" + to
+                + '\'' + ", trigger='" + trigger + '\'' + ", update='" + update + '\'' + '}';
     }
 }

@@ -101,6 +101,10 @@ public class JRuleEvent {
         return channel;
     }
 
+    public String getThing() {
+        return channel; // TODO must refactor JRuleEvent to support all types of events (item, channel, thing)
+    }
+
     @Override
     public String toString() {
         return String.format("JRuleEvent [state=%s, oldState=%s, memberName=%s, itemName=%s, channel=%s, event=%s]",

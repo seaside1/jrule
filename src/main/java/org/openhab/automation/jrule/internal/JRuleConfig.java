@@ -42,11 +42,13 @@ public class JRuleConfig {
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
     private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
+    private static final String GENERATED_THING_PACKAGE_PROPERTY = "org.openhab.automation.jrule.thingpackage";
     private static final String EXECUTORS_MIN_PROPERTY = "org.openhab.automation.jrule.engine.executors.min";
     private static final String EXECUTORS_MAX_PROPERTY = "org.openhab.automation.jrule.engine.executors.max";
     private static final String EXECUTORS_ENABLE_PROPERTY = "org.openhab.automation.jrule.engine.executors.enable";
     private static final String EXECUTORS_THREAD_KEEPALIVE_PROPERTY = "org.openhab.automation.jrule.engine.executors.keepalive";
     public static final String ITEMS_DIR_START = "items";
+    public static final String THINGS_DIR_START = "things";
 
     private static final int DEFAULT_MIN_EXECUTORS = 2;
     private static final int DEFAULT_MAX_EXECUTORS = 10;
@@ -62,6 +64,7 @@ public class JRuleConfig {
             + File.separator + "automation" + File.separator + "jrule";
     private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
     private static final String DEFAULT_GENERATED_ITEM_PACKAGE = "org.openhab.automation.jrule.items.generated";
+    private static final String DEFAULT_GENERATED_THING_PACKAGE = "org.openhab.automation.jrule.things.generated";
 
     private static final String CLASS_DIR = "class";
 
@@ -130,6 +133,14 @@ public class JRuleConfig {
         final StringBuilder sb = new StringBuilder(getWorkingDirectory());
         sb.append(File.separator).append(ITEMS_DIR_START).append(File.separator);
         final String p = JRuleUtil.packageNameToPath(getGeneratedItemPackage());
+        sb.append(p);
+        return sb.toString();
+    }
+
+    public String getThingsDirectory() {
+        final StringBuilder sb = new StringBuilder(getWorkingDirectory());
+        sb.append(File.separator).append(ITEMS_DIR_START).append(File.separator);
+        final String p = JRuleUtil.packageNameToPath(getGeneratedThingPackage());
         sb.append(p);
         return sb.toString();
     }
@@ -218,6 +229,10 @@ public class JRuleConfig {
 
     public String getGeneratedItemPackage() {
         return getConfigPropertyOrDefaultValue(GENERATED_ITEM_PACKAGE_PROPERTY, DEFAULT_GENERATED_ITEM_PACKAGE);
+    }
+
+    public String getGeneratedThingPackage() {
+        return getConfigPropertyOrDefaultValue(GENERATED_THING_PACKAGE_PROPERTY, DEFAULT_GENERATED_THING_PACKAGE);
     }
 
     public int getRulesInitDelaySeconds() {

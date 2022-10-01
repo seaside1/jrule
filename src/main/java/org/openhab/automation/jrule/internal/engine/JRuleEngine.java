@@ -68,6 +68,7 @@ import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateEvent;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.events.ChannelTriggeredEvent;
+import org.openhab.core.thing.events.ThingStatusInfoChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -107,6 +108,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private final Map<String, List<JRuleItemExecutionContext>> itemToExecutionContexts = new HashMap<>();
 
     private final Map<String, List<JRuleChannelExecutionContext>> channelToExecutionContexts = new HashMap<>();
+    private final Map<String, List<JRuleThingExecutionContext>> thingToExecutionContexts = new HashMap<>();
 
     private final Set<String> itemNames = new HashSet<>();
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
@@ -140,11 +142,16 @@ public class JRuleEngine implements PropertyChangeListener {
         return channelToExecutionContexts.keySet();
     }
 
+    public Set<String> getThingUIDs() {
+        return thingToExecutionContexts.keySet();
+    }
+
     public synchronized void reset() {
         itemNames.clear();
         itemToExecutionContexts.clear();
         channelToExecutionContexts.clear();
         itemToRules.clear();
+        thingToExecutionContexts.clear();
         clearTimers();
 
         ruleLoadingStatistics = new JRuleLoadingStatistics(ruleLoadingStatistics);
@@ -251,6 +258,18 @@ public class JRuleEngine implements PropertyChangeListener {
                     addChannelExecutionContext(jRule, logName, loggingTags, jRuleWhen.channel(), jRuleWhen.event(),
                             jRuleName.value(), method, jRuleEventPresent, preconditions);
                     ruleLoadingStatistics.addChannelTrigger();
+                } else if (!jRuleWhen.thing().isEmpty()) {
+                    // JRuleWhen for a thing
+                    JRuleLog.info(logger, logName, "Validating JRule thing: {} trigger: {} ", jRuleWhen.thing(),
+                            jRuleWhen.trigger());
+                    if (JRuleUtil.isNotEmpty(jRuleWhen.trigger())) {
+                        addThingExecutionContext(jRule, logName, loggingTags, jRuleWhen.thing(), jRuleName.value(),
+                                jRuleWhen.trigger(), jRuleWhen.from(), jRuleWhen.to(), method, jRuleEventPresent,
+                                preconditions);
+                        ruleLoadingStatistics.addThingTrigger();
+                    } else {
+                        JRuleLog.warn(logger, logName, "Ignoring rule as no trigger is specified");
+                    }
                 }
             }
             if (jRuleWhens.length > 0) {
@@ -363,15 +382,72 @@ public class JRuleEngine implements PropertyChangeListener {
         contextList.add(context);
     }
 
+    private void addThingExecutionContext(JRule jRule, String logName, String[] loggingTags, String thing,
+            String ruleName, String trigger, String from, String to, Method method, boolean eventParameterPresent,
+            JRulePrecondition[] preconditions) {
+        List<JRuleThingExecutionContext> contextList = thingToExecutionContexts.computeIfAbsent(thing,
+                k -> new ArrayList<>());
+        final JRuleThingExecutionContext context = new JRuleThingExecutionContext(jRule, logName, loggingTags, trigger,
+                from, to, null, ruleName, thing, method, eventParameterPresent, preconditions);
+        JRuleLog.debug(logger, logName, "ThingContextList add context: {}", context);
+        contextList.add(context);
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_ITEM_EVENT)) {
             logDebug("Property change item event! : {}", ((Event) evt.getNewValue()).getTopic());
-            handleEventUpdate((Event) evt.getNewValue());
-
+            handleItemEvent((Event) evt.getNewValue());
         } else if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_CHANNEL_EVENT)) {
             logDebug("Channel event! : {}", ((Event) evt.getNewValue()).getTopic());
             handleChannelEvent((ChannelTriggeredEvent) evt.getNewValue());
+        } else if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_THING_STATUS_EVENT)) {
+            logDebug("Thing status event! : {}", ((Event) evt.getNewValue()).getTopic());
+            handleThingStatusChangedEvent((ThingStatusInfoChangedEvent) evt.getNewValue());
+        }
+    }
+
+    private void handleThingStatusChangedEvent(ThingStatusInfoChangedEvent thingStatusChangedEvent) {
+        List<JRuleThingExecutionContext> thingExecutionContexts = thingToExecutionContexts
+                .get(thingStatusChangedEvent.getThingUID().toString());
+        List<JRuleThingExecutionContext> executionContextsWildcard = thingToExecutionContexts.get("*");
+        List<JRuleThingExecutionContext> executionContexts = new ArrayList<>();
+        if (executionContextsWildcard != null) {
+            executionContexts.addAll(executionContextsWildcard);
+        }
+        if (thingExecutionContexts != null) {
+            executionContexts.addAll(thingExecutionContexts);
+        }
+
+        if (executionContexts == null || executionContexts.isEmpty()) {
+            logDebug("No execution context for thingStatusEvent: {}", thingStatusChangedEvent);
+            return;
+        }
+        final Set<String> triggerValues = new HashSet<>(5);
+        String newStatus = thingStatusChangedEvent.getStatusInfo().getStatus().toString();
+        String oldStatus = thingStatusChangedEvent.getOldStatusInfo().getStatus().toString();
+
+        if (JRuleUtil.isNotEmpty(oldStatus) && JRuleUtil.isNotEmpty(newStatus)) {
+            triggerValues.add(String.format(CHANGED_FROM_TO_PATTERN, oldStatus, newStatus));
+            triggerValues.add(CHANGED_FROM.concat(oldStatus));
+            triggerValues.add(CHANGED_TO.concat(newStatus));
+            triggerValues.add(CHANGED);
+        } else if (JRuleUtil.isNotEmpty(oldStatus)) {
+            triggerValues.add(CHANGED_FROM.concat(oldStatus));
+            triggerValues.add(CHANGED);
+        } else if (JRuleUtil.isNotEmpty(newStatus)) {
+            triggerValues.add(CHANGED_TO.concat(newStatus));
+            triggerValues.add(CHANGED);
+        } else {
+            triggerValues.add(CHANGED);
+        }
+
+        if (!triggerValues.isEmpty()) {
+            executionContexts.stream().filter(context -> triggerValues.contains(context.getTriggerFullString()))
+                    .forEach(context -> invokeWhenMatchParameters(context,
+                            new JRuleEvent(newStatus, thingStatusChangedEvent.getThingUID().toString(), newStatus)));
+        } else {
+            logDebug("Execution ignored, no trigger values for thing: {}", thingStatusChangedEvent.getThingUID());
         }
     }
 
@@ -390,7 +466,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 });
     }
 
-    private void handleEventUpdate(Event event) {
+    private void handleItemEvent(Event event) {
         final String itemName = getItemNameFromEvent(event);
         final List<JRuleItemExecutionContext> executionContexts = itemToExecutionContexts.get(itemName);
         if (executionContexts == null || executionContexts.isEmpty()) {
@@ -474,12 +550,16 @@ public class JRuleEngine implements PropertyChangeListener {
         return null;
     }
 
-    private void invokeWhenMatchParameters(JRuleItemExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
+    private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
         JRuleLog.debug(logger, context.getLogName(), "invoke when context matches");
 
         if (context.isComparatorOperation()) {
-            final Boolean evalCompare = evaluateComparatorParameters(context.getGt(), context.getGte(), context.getLt(),
-                    context.getLte(), context.getEq(), context.getNeq(), jRuleEvent.getState().getValue());
+
+            JRuleValueComparators comparators = (JRuleValueComparators) context;
+
+            final Boolean evalCompare = evaluateComparatorParameters(comparators.getGt(), comparators.getGte(),
+                    comparators.getLt(), comparators.getLte(), comparators.getEq(), comparators.getNeq(),
+                    jRuleEvent.getState().getValue());
             if (evalCompare == null) {
                 logError("Failed to compare values for context: {} event: {}", context, jRuleEvent);
                 return;

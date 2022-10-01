@@ -43,6 +43,8 @@ public @interface JRuleWhen {
 
     String trigger() default "";
 
+    String thing() default "";
+
     String update() default "";
 
     String from() default "";
