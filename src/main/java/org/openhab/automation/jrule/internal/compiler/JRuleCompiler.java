@@ -180,35 +180,47 @@ public class JRuleCompiler {
         }
     }
 
-    public boolean compileItems() {
-        return compileItems(new File(jRuleConfig.getItemsDirectory()));
+    public boolean compileItemsAndThings() {
+        return compileItemsAndThings(new File(jRuleConfig.getItemsRootDirectory()));
     }
 
-    private boolean compileItems(File sourceFolder) {
+    private boolean compileItemsAndThings(File sourceFolder) {
         final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
                 + getJarPath(JAR_JRULE_NAME) + ":" + jRuleConfig.getItemsRootDirectory();
         logDebug("Compiling items in folder: {}", sourceFolder.getAbsolutePath());
 
-        final File[] javaSourceFiles = sourceFolder.listFiles(JRuleFileNameFilter.JAVA_FILTER);
-        final File[] javaClassFiles = sourceFolder.listFiles(JRuleFileNameFilter.CLASS_FILTER);
+        List<File> javaSourceFiles = new ArrayList<>();
+        List<File> javaClassFiles = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.walk(Paths.get(sourceFolder.toURI()))) {
+            javaSourceFiles = paths.filter(Files::isRegularFile) // is a file
+                    .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)).map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            logError("Error listing source files in folder: {}", sourceFolder.getAbsolutePath(), e);
+        }
+        try (Stream<Path> paths = Files.walk(Paths.get(sourceFolder.toURI()))) {
+            javaClassFiles = paths.filter(Files::isRegularFile) // is a file
+                    .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.CLASS_FILE_TYPE)).map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            logError("Error listing class files in folder: {}", sourceFolder.getAbsolutePath(), e);
+        }
 
         Map<String, File> classFiles = new HashMap<>();
-        Arrays.stream(javaClassFiles).forEach(classFile -> classFiles
+        javaClassFiles.forEach(classFile -> classFiles
                 .put(JRuleUtil.removeExtension(classFile.getName(), JRuleConstants.CLASS_FILE_TYPE), classFile));
 
         Map<String, File> sourceFiles = new HashMap<>();
-        Arrays.stream(javaSourceFiles).forEach(sourceFile -> sourceFiles
+        javaSourceFiles.forEach(sourceFile -> sourceFiles
                 .put(JRuleUtil.removeExtension(sourceFile.getName(), JRuleConstants.JAVA_FILE_TYPE), sourceFile));
 
         // First delete any class files with no corresponding source file
         classFiles.keySet().stream().filter(className -> !sourceFiles.containsKey(className))
                 .forEach(className -> classFiles.get(className).delete());
         // Will trigger compilation of any missing or old item java files
-        return compile(new File(sourceFolder, "JRuleItems.java"), itemsClassPath);
-    }
-
-    public boolean compile(File javaSourceFile, String classPath) {
-        return compile(List.of(javaSourceFile), classPath);
+        return compile(List.of(new File(jRuleConfig.getItemsDirectory(), "JRuleItems.java"),
+                new File(jRuleConfig.getThingsDirectory(), "JRuleThings.java")), itemsClassPath);
     }
 
     public boolean compile(List<File> javaSourceFiles, String classPath) {

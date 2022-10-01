@@ -45,13 +45,13 @@ import org.openhab.core.library.items.SwitchItem;
 import org.vesalainen.util.Lists;
 
 /**
- * The {@link JRuleClassGeneratorTest}
+ * The {@link JRuleItemClassGeneratorTest}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  * @author Arne Seime - Added code generator and compilation tests
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JRuleClassGeneratorTest {
+public class JRuleItemClassGeneratorTest {
 
     private JRuleItemClassGenerator sourceFileGenerator;
     private File targetFolder;
@@ -144,7 +144,7 @@ public class JRuleClassGeneratorTest {
         boolean success = sourceFileGenerator.generateItemsSource(items);
         assertTrue(success, "Failed to generate source file for items");
 
-        compiler.compile(new File(targetFolder, "JRuleItems.java"), "target/classes:target/items");
+        compiler.compile(List.of(new File(targetFolder, "JRuleItems.java")), "target/classes:target/items");
 
         File compiledClass = new File(targetFolder, "JRuleItems.class");
         assertTrue(compiledClass.exists());
@@ -154,7 +154,7 @@ public class JRuleClassGeneratorTest {
         boolean success = sourceFileGenerator.generateItemSource(item);
         assertTrue(success, "Failed to generate source file for " + item);
 
-        compiler.compile(new File(targetFolder, "_" + item.getName() + ".java"), "target/classes");
+        compiler.compile(List.of(new File(targetFolder, "_" + item.getName() + ".java")), "target/classes");
 
         File compiledClass = new File(targetFolder, "_" + item.getName() + ".class");
         assertTrue(compiledClass.exists());

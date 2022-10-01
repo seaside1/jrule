@@ -22,6 +22,8 @@ import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.thing.ThingManager;
+import org.openhab.core.thing.ThingRegistry;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentContext;
@@ -53,15 +55,16 @@ public class JRuleFactory {
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
-            final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
+            final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
+            final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
             final @Reference VoiceManager voiceManager, final ComponentContext componentContext) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
         jRuleEngine.setConfig(config);
         jRuleEngine.setItemRegistry(itemRegistry);
-        jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
-                componentContext.getBundleContext());
+        jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
+                eventSubscriber, voiceManager, componentContext.getBundleContext());
         delayedInit.call(this::init);
     }
 

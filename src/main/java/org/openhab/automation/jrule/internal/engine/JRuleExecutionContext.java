@@ -70,4 +70,11 @@ public abstract class JRuleExecutionContext {
     public String[] getLoggingTags() {
         return loggingTags;
     }
+
+    /**
+     * Override and return true if this ExecutionContext supports gt/lt/etc comparisons for values
+     */
+    public boolean isComparatorOperation() {
+        return false;
+    }
 }

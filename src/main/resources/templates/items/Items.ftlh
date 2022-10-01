@@ -1,4 +1,4 @@
-<#include "CommonLicense.ftlh">
+<#include "../CommonLicense.ftlh">
 
 package ${packageName};
 
