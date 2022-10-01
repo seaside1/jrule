@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
@@ -65,6 +66,11 @@ public class JRuleGroupRollershutterItem extends JRuleGroupItem {
     public void postUpdate(JRuleUpDownValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+    }
+
+    public void sendCommand(JRuleStopMoveValue value) {
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     // Persistence method
