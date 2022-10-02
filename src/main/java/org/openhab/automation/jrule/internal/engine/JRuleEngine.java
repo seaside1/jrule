@@ -538,6 +538,7 @@ public class JRuleEngine implements PropertyChangeListener {
             rule.setRuleLogName(context.getLogName());
             try {
                 JRuleLog.debug(logger, context.getRuleName(), "setting mdc tags: {}", context.getLoggingTags());
+                MDC.put("rule", context.getRuleName());
                 Arrays.stream(context.getLoggingTags()).forEach(s -> MDC.put(s, s));
                 return context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
             } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
@@ -548,6 +549,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 JRuleLog.error(logger, context.getRuleName(), "Error Stacktrace: {}", getStackTraceAsString(ex));
             } finally {
                 Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
+                MDC.remove("rule");
             }
         } else {
             JRuleLog.debug(logger, context.getLogName(), "Preconditions failed for context: {}", context);
