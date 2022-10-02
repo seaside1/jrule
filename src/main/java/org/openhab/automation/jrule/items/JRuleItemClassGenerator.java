@@ -150,6 +150,7 @@ public class JRuleItemClassGenerator {
 
     private Map<String, Object> createItemModel(Item item) {
         Map<String, Object> itemModel = new HashMap<>();
+        itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
         itemModel.put("package", jRuleConfig.getGeneratedItemPackage());
         itemModel.put("class", jRuleConfig.getGeneratedItemPrefix() + item.getName());

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupNumberItem extends JRuleGroupItem {
+public abstract class JRuleGroupNumberItem extends JRuleGroupItem {
 
     private static final String LOG_NAME = "JRuleGroupNumberItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleGroupNumberItem.class);

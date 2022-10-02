@@ -4,6 +4,8 @@
 
     public static final String TYPE = "${item.type}";
 
+    public static final String ID = "${item.id}";
+
     @Override
     public String getLabel() {
         return LABEL;
@@ -12,6 +14,11 @@
     @Override
     public String getType() {
         return TYPE;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 
     @Override

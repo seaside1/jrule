@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupDateTimeItem extends JRuleGroupItem {
+public abstract class JRuleGroupDateTimeItem extends JRuleGroupItem {
 
     protected JRuleGroupDateTimeItem(String itemName) {
         super(itemName);

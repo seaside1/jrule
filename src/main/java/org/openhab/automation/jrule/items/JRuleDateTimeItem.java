@@ -22,7 +22,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDateTimeItem extends JRuleItem {
+public abstract class JRuleDateTimeItem extends JRuleItem {
 
     protected JRuleDateTimeItem(String itemName) {
         super(itemName);

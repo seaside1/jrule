@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupSwitchItem extends JRuleGroupItem implements JRuleSwitchTrigger {
+public abstract class JRuleGroupSwitchItem extends JRuleGroupItem implements JRuleSwitchTrigger {
 
     protected JRuleGroupSwitchItem(String itemName) {
         super(itemName);

@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.items;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleLocationItem extends JRuleItem {
+public abstract class JRuleLocationItem extends JRuleItem {
 
     protected JRuleLocationItem(String itemName) {
         super(itemName);
