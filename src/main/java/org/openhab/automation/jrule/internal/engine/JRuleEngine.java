@@ -49,7 +49,13 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.cron.JRuleCronExpression;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
-import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleLogName;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.JRuleTag;
+import org.openhab.automation.jrule.rules.JRuleWhen;
 import org.openhab.core.common.ThreadPoolManager;
 import org.openhab.core.events.Event;
 import org.openhab.core.items.Item;
@@ -73,6 +79,7 @@ import org.slf4j.MDC;
  */
 public class JRuleEngine implements PropertyChangeListener {
 
+    private static final String MDC_KEY_RULE = "rule";
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private static final String RECEIVED_COMMAND = "received command";
     private static final String RECEIVED_COMMAND_APPEND = RECEIVED_COMMAND + " ";
@@ -202,7 +209,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     : jRuleName.value();
 
             final JRuleTag jRuleTags = method.getDeclaredAnnotation(JRuleTag.class);
-            String[] loggingTags = jRuleTags.value();
+            final String[] loggingTags = jRuleTags.value();
 
             // TODO: Do validation on syntax in when annotations
             // Loop for other ORs
@@ -532,13 +539,12 @@ public class JRuleEngine implements PropertyChangeListener {
         }
 
         if (preconditionsSatisified) {
-
             final JRule rule = context.getJrule();
             final Method method = context.getMethod();
             rule.setRuleLogName(context.getLogName());
             try {
                 JRuleLog.debug(logger, context.getRuleName(), "setting mdc tags: {}", context.getLoggingTags());
-                MDC.put("rule", context.getRuleName());
+                MDC.put(MDC_KEY_RULE, context.getRuleName());
                 Arrays.stream(context.getLoggingTags()).forEach(s -> MDC.put(s, s));
                 return context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
             } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
@@ -549,7 +555,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 JRuleLog.error(logger, context.getRuleName(), "Error Stacktrace: {}", getStackTraceAsString(ex));
             } finally {
                 Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
-                MDC.remove("rule");
+                MDC.remove(MDC_KEY_RULE);
             }
         } else {
             JRuleLog.debug(logger, context.getLogName(), "Preconditions failed for context: {}", context);

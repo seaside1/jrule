@@ -32,6 +32,10 @@ public class JRuleLog {
         logger.debug(PREFIX_DEBUG_LOG, logPrefix, logMessage.getMessage());
     }
 
+    public static void debug(Logger logger, String logPrefix, String message, String... parameters) {
+        debug(logger, logPrefix, message, (Object[]) parameters);
+    }
+
     public static void info(Logger logger, String logPrefix, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
         logger.info(PREFIX_INFO_LOG, logPrefix, logMessage.getMessage());
