@@ -22,7 +22,7 @@ import org.openhab.core.library.types.DecimalType;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleNumberItem extends JRuleItem {
+public abstract class JRuleNumberItem extends JRuleItem {
 
     protected JRuleNumberItem(String itemName) {
         super(itemName);

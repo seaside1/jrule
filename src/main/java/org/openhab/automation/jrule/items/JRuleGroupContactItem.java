@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupContactItem extends JRuleGroupItem {
+public abstract class JRuleGroupContactItem extends JRuleGroupItem {
 
     protected JRuleGroupContactItem(String itemName) {
         super(itemName);

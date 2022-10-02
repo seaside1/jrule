@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupRollershutterItem extends JRuleGroupItem {
+public abstract class JRuleGroupRollershutterItem extends JRuleGroupItem {
 
     protected JRuleGroupRollershutterItem(String itemName) {
         super(itemName);

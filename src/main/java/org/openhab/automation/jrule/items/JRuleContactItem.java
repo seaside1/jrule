@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.trigger.JRuleContactTrigger;
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
+public abstract class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
 
     protected JRuleContactItem(String itemName) {
         super(itemName);

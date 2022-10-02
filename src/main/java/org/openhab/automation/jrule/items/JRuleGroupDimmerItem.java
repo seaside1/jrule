@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleDimmerTrigger {
+public abstract class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleDimmerTrigger {
 
     private static final String LOG_NAME = "JRuleGroupDimmerItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleGroupDimmerItem.class);
