@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.openhab.automation.jrule.JRuleExecutionException;
+import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;

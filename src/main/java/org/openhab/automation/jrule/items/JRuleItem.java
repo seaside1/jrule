@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.trigger.JRuleCommonTrigger;
 
@@ -39,12 +40,12 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
 
     public abstract String getId();
 
-    public ZonedDateTime lastUpdated() {
+    public Optional<ZonedDateTime> lastUpdated() {
         return lastUpdated(null);
     }
 
-    public ZonedDateTime lastUpdated(String persistenceServiceId) {
-        return JRulePersistenceExtentions.lastUpdate(itemName, persistenceServiceId);
+    public Optional<ZonedDateTime> lastUpdated(String persistenceServiceId) {
+        return JRulePersistenceExtensions.lastUpdate(itemName, persistenceServiceId);
     }
 
     public boolean changedSince(ZonedDateTime timestamp) {
@@ -52,7 +53,7 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
     }
 
     public boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtentions.changedSince(itemName, timestamp, persistenceServiceId);
+        return JRulePersistenceExtensions.changedSince(itemName, timestamp, persistenceServiceId);
     }
 
     public boolean updatedSince(ZonedDateTime timestamp) {
@@ -60,6 +61,6 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
     }
 
     public boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtentions.updatedSince(itemName, timestamp, persistenceServiceId);
+        return JRulePersistenceExtensions.updatedSince(itemName, timestamp, persistenceServiceId);
     }
 }

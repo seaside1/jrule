@@ -13,8 +13,10 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Set;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -31,7 +33,7 @@ public abstract class JRuleGroupColorItem extends JRuleGroupItem {
         super(itemName);
     }
 
-    public static JRuleGroupColorItem forName(String itemName) {
+    public static JRuleGroupColorItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleGroupColorItem.class);
     }
 
@@ -83,7 +85,7 @@ public abstract class JRuleGroupColorItem extends JRuleGroupItem {
     }
 
     // Persistence method
-    public String getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
+    public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId);
     }
 }

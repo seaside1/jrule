@@ -13,8 +13,10 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Set;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
@@ -30,7 +32,7 @@ public abstract class JRuleGroupSwitchItem extends JRuleGroupItem implements JRu
         super(itemName);
     }
 
-    public static JRuleGroupSwitchItem forName(String itemName) {
+    public static JRuleGroupSwitchItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleGroupSwitchItem.class);
     }
 
@@ -49,8 +51,8 @@ public abstract class JRuleGroupSwitchItem extends JRuleGroupItem implements JRu
     }
 
     // Persistence method
-    public JRuleOnOffValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRuleEventHandler.get()
-                .getOnOffValue(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
+    public Optional<JRuleOnOffValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(s -> JRuleEventHandler.get().getOnOffValue(s));
     }
 }

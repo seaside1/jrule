@@ -13,9 +13,10 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 
 /**
@@ -29,27 +30,27 @@ public abstract class JRuleGroupDateTimeItem extends JRuleGroupItem {
         super(itemName);
     }
 
-    public static JRuleGroupDateTimeItem forName(String itemName) {
+    public static JRuleGroupDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleGroupDateTimeItem.class);
     }
 
-    public Date getState() {
-        return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
+    public ZonedDateTime getState() {
+        return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
     }
 
-    public void sendCommand(Date value) {
+    public void sendCommand(ZonedDateTime value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
-    public void postUpdate(Date value) {
+    public void postUpdate(ZonedDateTime value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method
-    public String getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        // TODO should return as Date
-        return JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
+    public Optional<ZonedDateTime> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(ZonedDateTime::parse);
     }
 }

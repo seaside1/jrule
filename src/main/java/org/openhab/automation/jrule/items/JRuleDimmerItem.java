@@ -13,7 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -30,7 +32,7 @@ public abstract class JRuleDimmerItem extends JRuleItem implements JRuleDimmerTr
         super(itemName);
     }
 
-    public static JRuleDimmerItem forName(String itemName) {
+    public static JRuleDimmerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleDimmerItem.class);
     }
 
@@ -58,12 +60,8 @@ public abstract class JRuleDimmerItem extends JRuleItem implements JRuleDimmerTr
         JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
     }
 
-    public Integer getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        String state = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return Integer.parseInt(state);
-        } else {
-            return null;
-        }
+    public Optional<Integer> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(Integer::parseInt);
     }
 }

@@ -13,8 +13,10 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Set;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -37,7 +39,7 @@ public abstract class JRuleGroupDimmerItem extends JRuleGroupItem implements JRu
         super(itemName);
     }
 
-    public static JRuleGroupDimmerItem forName(String itemName) {
+    public static JRuleGroupDimmerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleGroupDimmerItem.class);
     }
 
@@ -86,15 +88,8 @@ public abstract class JRuleGroupDimmerItem extends JRuleGroupItem implements JRu
     }
 
     // Persistence method
-    public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        String string = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
-        try {
-            return Double.parseDouble(string);
-        } catch (NumberFormatException e) {
-            JRuleLog.error(logger, LOG_NAME,
-                    "Failed to get Historic state for value: {} itemName: {} timestamp: {} persistanceServiceId: {}",
-                    string, itemName, timestamp, persistenceServiceId);
-            return null;
-        }
+    public Optional<Double> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(Double::parseDouble);
     }
 }

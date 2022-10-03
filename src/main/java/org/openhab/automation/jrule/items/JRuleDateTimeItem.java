@@ -14,7 +14,9 @@ package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Optional;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 
 /**
@@ -28,7 +30,7 @@ public abstract class JRuleDateTimeItem extends JRuleItem {
         super(itemName);
     }
 
-    public static JRuleDateTimeItem forName(String itemName) {
+    public static JRuleDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleDateTimeItem.class);
     }
 
@@ -56,12 +58,8 @@ public abstract class JRuleDateTimeItem extends JRuleItem {
         return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
     }
 
-    public Date getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        String state = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return new Date(ZonedDateTime.parse(state).toInstant().toEpochMilli());
-        } else {
-            return null;
-        }
+    public Optional<ZonedDateTime> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(ZonedDateTime::parse);
     }
 }

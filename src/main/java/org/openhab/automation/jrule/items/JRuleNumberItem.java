@@ -13,7 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.core.library.types.DecimalType;
 
@@ -28,7 +30,7 @@ public abstract class JRuleNumberItem extends JRuleItem {
         super(itemName);
     }
 
-    public static JRuleNumberItem forName(String itemName) {
+    public static JRuleNumberItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleNumberItem.class);
     }
 
@@ -52,85 +54,62 @@ public abstract class JRuleNumberItem extends JRuleItem {
         return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
     }
 
-    public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return Double.parseDouble(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
+    public Optional<Double> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(Double::parseDouble);
     }
 
-    public Double maximumSince(ZonedDateTime timestamp) {
+    public Optional<Double> maximumSince(ZonedDateTime timestamp) {
         return maximumSince(timestamp, null);
     }
 
-    public Double maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        DecimalType state = JRulePersistenceExtentions.maximumSince(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return state.doubleValue();
-        } else {
-            return null;
-        }
+    public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.maximumSince(itemName, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 
-    public Double minimumSince(ZonedDateTime timestamp) {
+    public Optional<Double> minimumSince(ZonedDateTime timestamp) {
         return minimumSince(timestamp, null);
     }
 
-    public Double minimumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        DecimalType state = JRulePersistenceExtentions.minimumSince(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return state.doubleValue();
-        } else {
-            return null;
-        }
+    public Optional<Double> minimumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.minimumSince(itemName, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 
-    public Double varianceSince(ZonedDateTime timestamp) {
+    public Optional<Double> varianceSince(ZonedDateTime timestamp) {
         return varianceSince(timestamp, null);
     }
 
-    public Double varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        DecimalType state = JRulePersistenceExtentions.varianceSince(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return state.doubleValue();
-        } else {
-            return null;
-        }
+    public Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.varianceSince(itemName, timestamp, persistenceServiceId)
+                .map(decimalType -> decimalType.doubleValue());
     }
 
-    public Double deviationSince(ZonedDateTime timestamp) {
+    public Optional<Double> deviationSince(ZonedDateTime timestamp) {
         return deviationSince(timestamp, null);
     }
 
-    public Double deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        DecimalType state = JRulePersistenceExtentions.deviationSince(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return state.doubleValue();
-        } else {
-            return null;
-        }
+    public Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.deviationSince(itemName, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 
-    public Double averageSince(ZonedDateTime timestamp) {
+    public Optional<Double> averageSince(ZonedDateTime timestamp) {
         return averageSince(timestamp, null);
     }
 
-    public Double averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        DecimalType state = JRulePersistenceExtentions.averageSince(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return state.doubleValue();
-        } else {
-            return null;
-        }
+    public Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.averageSince(itemName, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 
-    public Double sumSince(ZonedDateTime timestamp) {
+    public Optional<Double> sumSince(ZonedDateTime timestamp) {
         return sumSince(timestamp, null);
     }
 
-    public Double sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        DecimalType state = JRulePersistenceExtentions.sumSince(itemName, timestamp, persistenceServiceId);
-        if (state != null) {
-            return state.doubleValue();
-        } else {
-            return null;
-        }
+    public Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.sumSince(itemName, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 }
