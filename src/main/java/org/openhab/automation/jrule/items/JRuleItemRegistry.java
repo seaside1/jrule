@@ -16,6 +16,11 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
+
 /**
  * The {@link JRuleItemRegistry} Items
  *
@@ -29,9 +34,11 @@ public class JRuleItemRegistry {
         itemRegistry.clear();
     }
 
-    public static <T> T get(String itemName, Class<T> jRuleItemClass) {
+    public static <T> T get(String itemName, Class<T> jRuleItemClass) throws JRuleItemNotFoundException {
         JRuleItem jruleItem = itemRegistry.get(itemName);
         if (jruleItem == null) {
+            verifyThatItemExist(itemName);
+
             try {
                 Constructor<T> constructor = jRuleItemClass.getDeclaredConstructor(String.class);
                 constructor.setAccessible(true);
@@ -42,5 +49,18 @@ public class JRuleItemRegistry {
             }
         }
         return (T) jruleItem;
+    }
+
+    private static void verifyThatItemExist(String itemName) throws JRuleItemNotFoundException {
+        try {
+            ItemRegistry itemRegistry = JRuleEventHandler.get().getItemRegistry();
+            if (itemRegistry == null) {
+                throw new IllegalStateException(
+                        String.format("Item registry is not set can't get item for name: %s", itemName));
+            }
+            itemRegistry.getItem(itemName);
+        } catch (ItemNotFoundException e) {
+            throw new JRuleItemNotFoundException(String.format("cannot find item for name: %s", itemName), e);
+        }
     }
 }

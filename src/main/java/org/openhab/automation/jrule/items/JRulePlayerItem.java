@@ -13,7 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
@@ -29,7 +31,7 @@ public class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
         super(itemName);
     }
 
-    public static JRulePlayerItem forName(String itemName) {
+    public static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
     }
 
@@ -46,8 +48,8 @@ public class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
     }
 
     // Persistence method
-    public JRulePlayPauseValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePlayPauseValue
-                .valueOf(JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
+    public Optional<JRulePlayPauseValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(JRulePlayPauseValue::valueOf);
     }
 }

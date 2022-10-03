@@ -13,8 +13,10 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Set;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
@@ -29,7 +31,7 @@ public class JRuleGroupRollershutterItem extends JRuleGroupItem {
         super(itemName);
     }
 
-    public static JRuleGroupRollershutterItem forName(String itemName) {
+    public static JRuleGroupRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleGroupRollershutterItem.class);
     }
 
@@ -68,13 +70,8 @@ public class JRuleGroupRollershutterItem extends JRuleGroupItem {
     }
 
     // Persistence method
-    public Double getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        String string = JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId);
-        try {
-            return Double.parseDouble(string);
-        } catch (NumberFormatException e) {
-            // TODO add logging
-            return null;
-        }
+    public Optional<Double> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(Double::parseDouble);
     }
 }

@@ -12,7 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
-import org.openhab.automation.jrule.JRuleExecutionException;
+import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.core.transform.TransformationException;
 import org.openhab.core.transform.TransformationHelper;
 import org.osgi.framework.BundleContext;
