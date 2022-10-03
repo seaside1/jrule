@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+
 /**
  * The {@link JRuleLocationItem} Items
  *
@@ -23,7 +25,7 @@ public class JRuleLocationItem extends JRuleItem {
         super(itemName);
     }
 
-    public static JRuleLocationItem forName(String itemName) {
+    public static JRuleLocationItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleLocationItem.class);
     }
 

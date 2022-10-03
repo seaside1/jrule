@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule;
+package org.openhab.automation.jrule.exception;
 
 /**
  * The {@link JRuleExecutionException} wraps underlying openHAB exceptions
@@ -20,5 +20,9 @@ package org.openhab.automation.jrule;
 public class JRuleExecutionException extends Exception {
     public JRuleExecutionException(String message) {
         super(message);
+    }
+
+    public JRuleExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

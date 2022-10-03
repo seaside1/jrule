@@ -13,7 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.trigger.JRuleContactTrigger;
@@ -29,7 +31,7 @@ public class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
         super(itemName);
     }
 
-    public static JRuleContactItem forName(String itemName) {
+    public static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
     }
 
@@ -38,8 +40,8 @@ public class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
     }
 
     // Persistence method
-    public JRuleOpenClosedValue getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRuleOpenClosedValue.getValueFromString(
-                JRulePersistenceExtentions.historicState(itemName, timestamp, persistenceServiceId));
+    public Optional<JRuleOpenClosedValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+                .map(JRuleOpenClosedValue::getValueFromString);
     }
 }
