@@ -93,6 +93,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final String RECEIVED_UPDATE_APPEND = RECEIVED_UPDATE + " ";
 
     private static final String LOG_NAME_ENGINE = "JRuleEngine";
+    private static final String[] EMPTY_LOG_TAGS = new String[0];
 
     private static volatile JRuleEngine instance;
 
@@ -208,9 +209,10 @@ public class JRuleEngine implements PropertyChangeListener {
             String logName = (jRuleLogName != null && !jRuleLogName.value().isEmpty()) ? jRuleLogName.value()
                     : jRuleName.value();
 
-            final JRuleTag jRuleTags = method.getDeclaredAnnotation(JRuleTag.class);
-            final String[] loggingTags = jRuleTags.value();
-
+            final JRuleTag jRuleTags = method.isAnnotationPresent(JRuleTag.class)
+                    ? method.getDeclaredAnnotation(JRuleTag.class)
+                    : null;
+            final String[] loggingTags = jRuleTags != null ? jRuleTags.value() : EMPTY_LOG_TAGS;
             // TODO: Do validation on syntax in when annotations
             // Loop for other ORs
             for (JRuleWhen jRuleWhen : jRuleWhens) {
