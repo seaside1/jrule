@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
+public abstract class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
 
     protected JRulePlayerItem(String itemName) {
         super(itemName);

@@ -26,7 +26,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleColorItem extends JRuleItem {
+public abstract class JRuleColorItem extends JRuleItem {
 
     protected JRuleColorItem(String itemName) {
         super(itemName);

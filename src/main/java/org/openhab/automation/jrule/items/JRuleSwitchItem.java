@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleSwitchItem extends JRuleItem implements JRuleSwitchTrigger {
+public abstract class JRuleSwitchItem extends JRuleItem implements JRuleSwitchTrigger {
 
     protected JRuleSwitchItem(String itemName) {
         super(itemName);

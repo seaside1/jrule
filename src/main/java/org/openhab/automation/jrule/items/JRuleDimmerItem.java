@@ -26,7 +26,7 @@ import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDimmerItem extends JRuleItem implements JRuleDimmerTrigger {
+public abstract class JRuleDimmerItem extends JRuleItem implements JRuleDimmerTrigger {
 
     protected JRuleDimmerItem(String itemName) {
         super(itemName);

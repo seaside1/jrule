@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleRawValue;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleImageItem extends JRuleItem {
+public abstract class JRuleImageItem extends JRuleItem {
 
     protected JRuleImageItem(String itemName) {
         super(itemName);

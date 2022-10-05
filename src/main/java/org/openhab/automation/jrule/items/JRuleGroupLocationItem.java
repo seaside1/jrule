@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupLocationItem extends JRuleGroupItem {
+public abstract class JRuleGroupLocationItem extends JRuleGroupItem {
 
     protected JRuleGroupLocationItem(String itemName) {
         super(itemName);

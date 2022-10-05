@@ -34,13 +34,11 @@ public abstract class JRuleItem implements JRuleCommonTrigger {
         return itemName;
     }
 
-    public String getLabel() {
-        return null; // Method overridden by generated item
-    }
+    public abstract String getLabel();
 
-    public String getType() {
-        return null; // Method overridden by generated item
-    }
+    public abstract String getType();
+
+    public abstract String getId();
 
     public Optional<ZonedDateTime> lastUpdated() {
         return lastUpdated(null);

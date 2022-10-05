@@ -27,7 +27,7 @@ import org.openhab.core.library.types.PlayPauseType;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleGroupPlayerItem extends JRuleGroupItem implements JRulePlayerTrigger {
+public abstract class JRuleGroupPlayerItem extends JRuleGroupItem implements JRulePlayerTrigger {
 
     protected JRuleGroupPlayerItem(String itemName) {
         super(itemName);
