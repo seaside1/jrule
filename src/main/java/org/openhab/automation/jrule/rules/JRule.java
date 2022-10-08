@@ -29,8 +29,8 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
+import org.openhab.automation.jrule.internal.handler.JRuleAddonActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.internal.handler.JRuleTelegramHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.items.JRulePercentType;
@@ -208,8 +208,8 @@ public class JRule {
         JRuleVoiceHandler.get().say(text, voiceId, sinkId);
     }
 
-    protected void sendTelegram(String message) {
-        JRuleTelegramHandler.get().doIt();
+    protected JRuleAddonActionHandler getAction(String scope, String thingUid) {
+        return JRuleAddonActionHandler.get(scope, thingUid);
     }
 
     protected void sendCommand(String itemName, JRuleOnOffValue command) {
