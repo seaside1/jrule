@@ -1,10 +1,27 @@
+/**
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.automation.jrule.internal.engine;
+
+import java.lang.reflect.Method;
 
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 
-import java.lang.reflect.Method;
-
+/**
+ * The {@link JRuleItemExecutionContext}
+ *
+ * @author Robert Delbrück - Initial contribution
+ */
 public class JRuleItemExecutionContext extends JRuleExecutionContext {
     private static final String FROM_PREFIX = " from ";
     private static final String TO_PREFIX = " to ";
@@ -23,7 +40,10 @@ public class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final String eq;
     protected final String neq;
 
-    public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, String trigger, String from, String to, String update, String ruleName, String itemClass, String itemName, Method method, boolean eventParameterPresent, Double lt, Double lte, Double gt, Double gte, String eq, String neq, JRulePrecondition[] preconditions) {
+    public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, String trigger, String from,
+            String to, String update, String ruleName, String itemClass, String itemName, Method method,
+            boolean eventParameterPresent, Double lt, Double lte, Double gt, Double gte, String eq, String neq,
+            JRulePrecondition[] preconditions) {
         super(jRule, logName, loggingTags, ruleName, method, eventParameterPresent, preconditions);
         this.itemClass = itemClass;
         this.itemName = itemName;
@@ -89,11 +109,8 @@ public class JRuleItemExecutionContext extends JRuleExecutionContext {
         return builder.toString();
     }
 
-
     private String buildUpdateString(String trigger, String update) {
-        return trigger +
-                SPACE +
-                update;
+        return trigger + SPACE + update;
     }
 
     public String getTriggerFullString() {
