@@ -154,8 +154,8 @@ public class JRuleEngine implements PropertyChangeListener {
         timers.clear();
     }
 
-    private void logInfo(String message, Object... paramteres) {
-        JRuleLog.info(logger, LOG_NAME_ENGINE, message, paramteres);
+    private void logInfo(String message, Object... parameters) {
+        JRuleLog.info(logger, LOG_NAME_ENGINE, message, parameters);
     }
 
     private void logDebug(String message, Object... parameters) {
@@ -228,10 +228,9 @@ public class JRuleEngine implements PropertyChangeListener {
                     JRuleLog.info(logger, logName, "Validating JRule item: {} trigger: {} ", jRuleWhen.item(),
                             jRuleWhen.trigger());
                     addItemExecutionContext(jRule, logName, loggingTags, jRuleName.value(), jRuleWhen.trigger(),
-                            jRuleWhen.update(), jRuleWhen.item(), method,
-                            jRuleEventPresent,
-                            getStringFromAnnotation(jRuleWhen.eq()),
-                            getStringFromAnnotation(jRuleWhen.neq()), preconditions);
+                            jRuleWhen.update(), jRuleWhen.item(), method, jRuleEventPresent,
+                            getStringFromAnnotation(jRuleWhen.eq()), getStringFromAnnotation(jRuleWhen.neq()),
+                            preconditions);
                     itemNames.add(jRuleWhen.item());
 
                     ruleLoadingStatistics.addItemStateTrigger();
@@ -248,9 +247,8 @@ public class JRuleEngine implements PropertyChangeListener {
                     // JRuleWhen for a channel
                     JRuleLog.info(logger, logName, "Validating JRule channel: {} trigger: {} ", jRuleWhen.channel(),
                             jRuleWhen.trigger());
-                    addChannelExecutionContext(jRule, logName, loggingTags, jRuleWhen.channel(), jRuleWhen.event(), jRuleName.value(),
-                            method, jRuleEventPresent,
-                            preconditions);
+                    addChannelExecutionContext(jRule, logName, loggingTags, jRuleWhen.channel(), jRuleWhen.event(),
+                            jRuleName.value(), method, jRuleEventPresent, preconditions);
                     ruleLoadingStatistics.addChannelTrigger();
                 }
             }
@@ -322,8 +320,8 @@ public class JRuleEngine implements PropertyChangeListener {
             timers.add(future);
             JRuleLog.info(logger, logName, "Scheduling timer for rule: {} hours: {} minutes: {} seconds: {} cron: {}",
                     jRuleWhen.hours(), jRuleWhen.minutes(), jRuleWhen.seconds(), jRuleWhen.cron());
-            JRuleTimedExecutionContext executionContext = new JRuleTimedExecutionContext(jRule, logName, loggingTags, method,
-                    jRuleName, jRuleEventPresent, preconditions);
+            JRuleTimedExecutionContext executionContext = new JRuleTimedExecutionContext(jRule, logName, loggingTags,
+                    method, jRuleName, jRuleEventPresent, preconditions);
             Consumer<Void> consumer = t -> {
                 try {
                     invokeRule(executionContext, jRuleEventPresent ? new JRuleEvent("") : null);
@@ -341,26 +339,25 @@ public class JRuleEngine implements PropertyChangeListener {
         }
     }
 
-    private void addItemExecutionContext(JRule jRule, String logName, String[] loggingTags,
-                                         String ruleName, String trigger, String update, String itemName, Method method,
-                                         boolean eventParameterPresent, String eq, String neq,
-                                         JRulePrecondition[] preconditions) {
+    private void addItemExecutionContext(JRule jRule, String logName, String[] loggingTags, String ruleName,
+            String trigger, String update, String itemName, Method method, boolean eventParameterPresent, String eq,
+            String neq, JRulePrecondition[] preconditions) {
         List<JRuleItemExecutionContext> contextList = itemToExecutionContexts.computeIfAbsent(itemName,
                 k -> new ArrayList<>());
         final JRuleItemExecutionContext context = new JRuleItemExecutionContext(jRule, logName, loggingTags, trigger,
-                null, null, update, ruleName, null, null, method, eventParameterPresent, null, null, null, null, eq, neq,
-                preconditions);
+                null, null, update, ruleName, null, null, method, eventParameterPresent, null, null, null, null, eq,
+                neq, preconditions);
         JRuleLog.debug(logger, logName, "ItemContextList add context: {}", context);
         contextList.add(context);
     }
 
     private void addChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, String channel,
-                                            String event, String ruleName, Method method, boolean eventParameterPresent,
-                                            JRulePrecondition[] preconditions) {
+            String event, String ruleName, Method method, boolean eventParameterPresent,
+            JRulePrecondition[] preconditions) {
         List<JRuleChannelExecutionContext> contextList = channelToExecutionContexts.computeIfAbsent(channel,
                 k -> new ArrayList<>());
-        final JRuleChannelExecutionContext context = new JRuleChannelExecutionContext(jRule, logName, loggingTags, ruleName, method, eventParameterPresent,
-                preconditions, channel, event);
+        final JRuleChannelExecutionContext context = new JRuleChannelExecutionContext(jRule, logName, loggingTags,
+                ruleName, method, eventParameterPresent, preconditions, channel, event);
         JRuleLog.debug(logger, logName, "ChannelContextList add context: {}", context);
         contextList.add(context);
     }
@@ -384,13 +381,12 @@ public class JRuleEngine implements PropertyChangeListener {
             logDebug("No execution context for channelEvent: {}", channelEvent);
             return;
         }
-        executionContexts.stream()
-                .filter(context -> context.getChannel().equals(channelEvent.getChannel().toString()))
-                .filter(context -> context.getEvent().equals(channelEvent.getEvent()))
-                .forEach(context -> {
-            JRuleLog.debug(logger, context.getLogName(), "invoke when context matches");
-            invokeRule(context, new JRuleEvent(channelEvent.getEvent(), channelEvent.getChannel().toString(), channelEvent.getEvent()));
-        });
+        executionContexts.stream().filter(context -> context.getChannel().equals(channelEvent.getChannel().toString()))
+                .filter(context -> context.getEvent().equals(channelEvent.getEvent())).forEach(context -> {
+                    JRuleLog.debug(logger, context.getLogName(), "invoke when context matches");
+                    invokeRule(context, new JRuleEvent(channelEvent.getEvent(), channelEvent.getChannel().toString(),
+                            channelEvent.getEvent()));
+                });
     }
 
     private void handleEventUpdate(Event event) {
@@ -552,12 +548,12 @@ public class JRuleEngine implements PropertyChangeListener {
                 MDC.put(MDC_KEY_RULE, context.getRuleName());
                 Arrays.stream(context.getLoggingTags()).forEach(s -> MDC.put(s, s));
                 return context.isEventParameterPresent() ? method.invoke(rule, event) : method.invoke(rule);
-            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
-                JRuleLog.error(logger, context.getRuleName(), "Error {}", e);
             } catch (InvocationTargetException e) {
                 Throwable ex = e.getCause() != null ? e.getCause() : null;
                 JRuleLog.error(logger, context.getRuleName(), "Error message: {}", ex.getMessage());
                 JRuleLog.error(logger, context.getRuleName(), "Error Stacktrace: {}", getStackTraceAsString(ex));
+            } catch (Exception e) {
+                JRuleLog.error(logger, context.getRuleName(), "Error {}", e);
             } finally {
                 Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
                 MDC.remove(MDC_KEY_RULE);
