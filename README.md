@@ -642,6 +642,49 @@ Use case: Use generated JRuleItems.java to get hold of items. For instance get s
 
 ```
 
+## Example 31
+
+Use case: Restart thing every night due to binding flakyness
+
+```java
+@JRuleName("Restart thing every night")
+@JRuleWhen(hours = 3)
+public void restartThing() {
+    JRuleThings.my_flaky_thing.restart();
+}
+```
+
+## Example 32
+
+Use case: Detect if a specific thing goes offline, wait for it to come online again within a given time
+
+```java
+@JRuleName("Notify if thing stays offline")
+@JRuleWhen(thing = remoteopenhab_thing.ID, trigger = remoteopenhab_thing.TRIGGER_CHANGED, from = "ONLINE")
+public void warnIfThingStaysOffline() {
+    createOrReplaceTimer("MY_TIMER", 3 * 60, unused -> {
+        if (JRuleThings.remoteopenhab_thing.getStatus() != JRuleThingStatus.ONLINE) {
+            logWarn("Thing {} is still offline, restarting",remoteopenhab_thing.ID);
+            JRuleThings.remoteopenhab_thing.restart();
+        }
+    });
+}
+```
+
+## Example 33
+
+Use case: Listen for thing status events on _all_ things
+
+```java
+@JRuleName("Log every thing that goes offline")
+@JRuleWhen(thing = "*", trigger = JRuleThingStatusTrigger.TRIGGER_CHANGED, from = "ONLINE")
+public void startTrackingNonOnlineThing(JRuleEvent event) {
+    String offlineThingUID = event.getChannel(); // event.getChannel() to be replaced with separate method
+    // ...
+}
+```
+
+
 # Changelog
 ## BETA13
 - Fixed a bug with naming of JRuleItems.java
