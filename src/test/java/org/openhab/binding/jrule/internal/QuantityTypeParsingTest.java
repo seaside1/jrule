@@ -1,6 +1,7 @@
 package org.openhab.binding.jrule.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.openhab.core.library.types.QuantityType;
@@ -12,5 +13,8 @@ public class QuantityTypeParsingTest {
     public void testParseQuantityType() {
         assertEquals(10, new QuantityType<>(10, SIUnits.CELSIUS).doubleValue());
         assertEquals(10, QuantityType.valueOf("10").doubleValue());
+
+        assertThrows(NumberFormatException.class, () -> QuantityType.valueOf("UNDEF"));
+        assertThrows(NumberFormatException.class, () -> Double.parseDouble("UNDEF"));
     }
 }
