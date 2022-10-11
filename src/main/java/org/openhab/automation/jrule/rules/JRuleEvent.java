@@ -25,6 +25,7 @@ public class JRuleEvent {
 
     private final JRuleEventState state;
     private final JRuleEventState oldState;
+    private String event;
 
     private String memberName;
 
@@ -43,10 +44,11 @@ public class JRuleEvent {
         this.memberName = memberName;
     }
 
-    public JRuleEvent(String value, String channel) {
+    public JRuleEvent(String value, String channel, String event) {
         this.state = new JRuleEventState(value);
         this.oldState = null;
         this.channel = channel;
+        this.event = event;
     }
 
     public JRuleEventState getState() {
@@ -101,7 +103,7 @@ public class JRuleEvent {
 
     @Override
     public String toString() {
-        return String.format("JRuleEvent [state=%s, oldState=%s, memberName=%s, itemName=%s, channel=%s]", state,
-                oldState, memberName, itemName, channel);
+        return String.format("JRuleEvent [state=%s, oldState=%s, memberName=%s, itemName=%s, channel=%s, event=%s]",
+                state, oldState, memberName, itemName, channel);
     }
 }
