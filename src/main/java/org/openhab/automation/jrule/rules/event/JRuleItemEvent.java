@@ -10,45 +10,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.rules;
+package org.openhab.automation.jrule.rules.event;
 
+import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
- * The {@link JRuleEvent}
+ * The {@link JRuleItemEvent}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück
  */
-public class JRuleEvent {
-
+public class JRuleItemEvent extends JRuleEvent {
+    private final String itemName;
     private final JRuleEventState state;
     private final JRuleEventState oldState;
-    private String event;
 
-    private String memberName;
-
-    private String itemName;
-
-    private String channel;
-
-    public JRuleEvent(String value) {
-        this(value, null, null, null);
-    }
-
-    public JRuleEvent(String value, String oldValue, String itemName, String memberName) {
+    public JRuleItemEvent(String itemName, JRuleEventState state, JRuleEventState oldState) {
         this.itemName = itemName;
-        this.state = new JRuleEventState(value);
-        this.oldState = new JRuleEventState(oldValue);
-        this.memberName = memberName;
-    }
-
-    public JRuleEvent(String value, String channel, String event) {
-        this.state = new JRuleEventState(value);
-        this.oldState = null;
-        this.channel = channel;
-        this.event = event;
+        this.state = state;
+        this.oldState = oldState;
     }
 
     public JRuleEventState getState() {
@@ -89,21 +71,12 @@ public class JRuleEvent {
         return state.getValueAsInteger();
     }
 
-    public String getMemberName() {
-        return memberName;
-    }
-
     public String getItemName() {
         return itemName;
     }
 
-    public String getChannel() {
-        return channel;
-    }
-
     @Override
     public String toString() {
-        return String.format("JRuleEvent [state=%s, oldState=%s, memberName=%s, itemName=%s, channel=%s, event=%s]",
-                state, oldState, memberName, itemName, channel);
+        return String.format("JRuleEvent [state=%s, oldState=%s, itemName=%s]", state, oldState, itemName);
     }
 }

@@ -29,7 +29,6 @@ public class JRuleMockedEventBus extends JRuleEventSubscriber {
         super();
         JRuleTestEventLogParser parser = new JRuleTestEventLogParser(eventBusResourceName);
         eventList = parser.parse();
-        registerSubscribedItemsAndChannels();
     }
 
     public void start() {

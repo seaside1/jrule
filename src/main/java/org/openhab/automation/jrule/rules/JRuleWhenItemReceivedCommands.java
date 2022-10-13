@@ -18,12 +18,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRuleWhen}
+ * The {@link JRuleWhenItemReceivedCommands}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRuleWhens {
-    JRuleWhen[] value();
+public @interface JRuleWhenItemReceivedCommands {
+    JRuleWhenItemReceivedCommand[] value();
 }

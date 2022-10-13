@@ -19,45 +19,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRuleWhen}
+ * The {@link JRuleWhenChannelTriggers}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück
  */
-@Repeatable(JRuleWhens.class)
+@Repeatable(JRuleWhenChannelTriggers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRuleWhen {
-    String cron() default "";
-
-    int hours() default -1;
-
-    int minutes() default -1;
-
-    int seconds() default -1;
-
-    String item() default "";
-
+public @interface JRuleWhenChannelTrigger {
     String channel() default "";
 
     String event() default "";
-
-    String trigger() default "";
-
-    String update() default "";
-
-    String from() default "";
-
-    String to() default "";
-
-    double gt() default Double.MIN_VALUE;
-
-    double lt() default Double.MIN_VALUE;
-
-    double gte() default Double.MIN_VALUE;
-
-    double lte() default Double.MIN_VALUE;
-
-    String eq() default "";
-
-    String neq() default "";
 }

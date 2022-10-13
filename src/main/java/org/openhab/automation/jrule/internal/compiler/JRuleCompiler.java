@@ -124,7 +124,7 @@ public class JRuleCompiler {
     }
 
     public void loadClass(ClassLoader classLoader, String className, boolean createInstance) {
-        Class<?> loadedClass = null;
+        Class<?> loadedClass;
         try {
             loadedClass = classLoader.loadClass(className);
         } catch (ClassNotFoundException e) {

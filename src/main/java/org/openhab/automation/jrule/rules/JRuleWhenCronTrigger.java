@@ -19,15 +19,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRulePrecondition}
+ * The {@link JRuleWhenCronTriggers}
  *
- * @author Arne Seime- Initial contribution
+ * @author Robert Delbrück
  */
-@Repeatable(JRulePreconditions.class)
+@Repeatable(JRuleWhenCronTriggers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRulePrecondition {
-    String item() default "";
-
-    Condition condition() default @Condition;
+public @interface JRuleWhenCronTrigger {
+    String cron() default "";
 }

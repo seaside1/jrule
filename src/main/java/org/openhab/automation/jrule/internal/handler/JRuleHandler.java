@@ -49,6 +49,7 @@ import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
+import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -91,7 +92,8 @@ public class JRuleHandler implements PropertyChangeListener {
     private final JRuleDelayedDebouncingExecutor delayedItemsCompiler;
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, EventPublisher eventPublisher,
-            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, BundleContext bundleContext) {
+            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, CronScheduler cronScheduler,
+            BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.config = config;
@@ -261,7 +263,6 @@ public class JRuleHandler implements PropertyChangeListener {
         JRuleEngine.get().reset();
         createRuleInstances();
         logInfo("JRule Engine Rules Reloaded! {}", JRuleEngine.get().getRuleLoadingStatistics());
-        eventSubscriber.registerSubscribedItemsAndChannels();
         eventSubscriber.resumeEventDelivery();
         return true;
     }

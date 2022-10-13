@@ -61,15 +61,12 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     private final Set<String> subscribedEventTypes = new HashSet<>();
 
-    private final Set<String> jRuleMonitoredItems = new HashSet<>();
-
-    private final Set<String> jRuleMonitoredChannels = new HashSet<>();
-
     private final PropertyChangeSupport propertyChangeSupport;
 
     private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
 
     private volatile boolean queueEvents = false;
+    private JRuleEngine jRuleEngine = JRuleEngine.get();
 
     public JRuleEventSubscriber() {
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -95,22 +92,11 @@ public class JRuleEventSubscriber implements EventSubscriber {
 
     public void startSubscriber() {
         JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Starting subscriber");
-        registerSubscribedItemsAndChannels();
         propertyChangeSupport.addPropertyChangeListener(JRuleEngine.get());
     }
 
-    public void registerSubscribedItemsAndChannels() {
-        jRuleMonitoredItems.clear();
-        jRuleMonitoredChannels.clear();
-
-        jRuleMonitoredItems.addAll(JRuleEngine.get().getItemNames());
-        jRuleMonitoredChannels.addAll(JRuleEngine.get().getChannelNames());
-    }
-
     public void stopSubscriber() {
-        jRuleMonitoredItems.clear();
-        jRuleMonitoredChannels.clear();
-        propertyChangeSupport.removePropertyChangeListener(JRuleEngine.get());
+        propertyChangeSupport.removePropertyChangeListener(jRuleEngine);
     }
 
     /**
@@ -157,7 +143,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_REGISTRY_EVENT, null, event);
             return;
         }
-        if (jRuleMonitoredItems.contains(itemFromTopic)) {
+        if (jRuleEngine.watchingForItem(itemFromTopic)) {
             JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
                     PROPERTY_ITEM_EVENT, event.getTopic(), event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
@@ -167,7 +153,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
             ChannelTriggeredEvent channelTriggeredEvent = (ChannelTriggeredEvent) event;
             String channel = channelTriggeredEvent.getChannel().toString();
 
-            if (jRuleMonitoredChannels.contains(channel)) {
+            if (jRuleEngine.watchingForChannel(channel)) {
                 JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
                         PROPERTY_CHANNEL_EVENT, event.getTopic(), event.getPayload());
                 propertyChangeSupport.firePropertyChange(PROPERTY_CHANNEL_EVENT, null, event);

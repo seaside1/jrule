@@ -87,16 +87,14 @@ Switch MyTestSwitch2  "Test Switch 2" (JRule)
 
 ```java
 package org.openhab.automation.jrule.rules.user;
-import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.ON;
+
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MySwitchRule extends JRule {
-    
+
     @JRuleName("MySwitchRule")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execOffToOnRule() {
         logInfo("||||| --> Hello World!");
     }
@@ -235,16 +233,15 @@ public class JRuleUser extends JRule {
 
 Your class rules can now extend the JRuleUser
 package org.openhab.automation.jrule.rules.user;
+
 ```java
 import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
-import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.user.JRuleUser;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MySwitchRule extends JRuleUser {
- 
+
 }
 ```
 
@@ -276,14 +273,12 @@ We then extend the rule from the Java Rules file:
 package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
-import org.openhab.automation.jrule.rules.JRuleEvent;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MyTestUserRule extends JRuleUser {
-  
+
     @JRuleName("TestUserDefinedRule")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
     public void mySendNotificationRUle(JRuleEvent event) {
         if (timeIsOkforDisturbance()) {
             logInfo("It's ok to send a disturbing notification");
