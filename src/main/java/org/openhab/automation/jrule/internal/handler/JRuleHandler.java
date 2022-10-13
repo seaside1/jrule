@@ -50,6 +50,7 @@ import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
 import org.openhab.core.voice.VoiceManager;
+import org.openhab.core.ephemeris.EphemerisManager;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,8 @@ public class JRuleHandler implements PropertyChangeListener {
     private final JRuleDelayedDebouncingExecutor delayedItemsCompiler;
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, EventPublisher eventPublisher,
-            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, BundleContext bundleContext) {
+            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, 
+            EphemerisManager ephemerisManager, BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.eventSubscriber = eventSubscriber;
         this.config = config;
@@ -108,6 +110,8 @@ public class JRuleHandler implements PropertyChangeListener {
         eventSubscriber.addPropertyChangeListener(this);
         JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
+        JRuleEphemerisHandler jRuleEphemerisHandler = JRuleEphemerisHandler.get();
+        jRuleEphemerisHandler.setEphemerisManager(ephemerisManager);
         JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
         jRuleTransformationHandler.setBundleContext(bundleContext);
         logDebug("JRuleHandler()");

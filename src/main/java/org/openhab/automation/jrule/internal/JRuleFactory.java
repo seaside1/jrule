@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
+import org.openhab.core.ephemeris.EphemerisManager;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.voice.VoiceManager;
@@ -54,13 +55,13 @@ public class JRuleFactory {
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference EventPublisher eventPublisher,
-            final @Reference VoiceManager voiceManager, final ComponentContext componentContext) {
+            final @Reference VoiceManager voiceManager, final @Reference EphemerisManager ephemerisManager, final ComponentContext componentContext) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
         jRuleEngine.setConfig(config);
         jRuleEngine.setItemRegistry(itemRegistry);
-        jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager,
+        jRuleHandler = new JRuleHandler(config, itemRegistry, eventPublisher, eventSubscriber, voiceManager, ephemerisManager,
                 componentContext.getBundleContext());
         delayedInit.call(this::init);
     }
