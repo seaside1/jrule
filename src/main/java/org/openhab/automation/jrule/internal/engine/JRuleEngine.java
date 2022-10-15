@@ -62,6 +62,7 @@ import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.scheduler.CronScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,19 +226,19 @@ public class JRuleEngine implements PropertyChangeListener {
                 return false;
             }
             if (context.getLt().isPresent()
-                    && context.getLt().filter(ref -> ref < Double.parseDouble(state)).isEmpty()) {
+                    && context.getLt().filter(ref -> ref < QuantityType.valueOf(state).doubleValue()).isEmpty()) {
                 return false;
             }
             if (context.getLte().isPresent()
-                    && context.getLte().filter(ref -> ref <= Double.parseDouble(state)).isEmpty()) {
+                    && context.getLte().filter(ref -> ref <= QuantityType.valueOf(state).doubleValue()).isEmpty()) {
                 return false;
             }
             if (context.getGt().isPresent()
-                    && context.getGt().filter(ref -> ref > Double.parseDouble(state)).isEmpty()) {
+                    && context.getGt().filter(ref -> ref > QuantityType.valueOf(state).doubleValue()).isEmpty()) {
                 return false;
             }
             if (context.getGte().isPresent()
-                    && context.getGte().filter(ref -> ref >= Double.parseDouble(state)).isEmpty()) {
+                    && context.getGte().filter(ref -> ref >= QuantityType.valueOf(state).doubleValue()).isEmpty()) {
                 return false;
             }
             return true;
