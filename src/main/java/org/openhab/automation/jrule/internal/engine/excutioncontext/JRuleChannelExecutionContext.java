@@ -24,21 +24,29 @@ import org.openhab.automation.jrule.rules.JRulePrecondition;
  */
 public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     private final String channel;
-    private final String event;
+
+    private String eq;
+
+    private String neq;
 
     public JRuleChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, String ruleName,
-            Method method, boolean eventParameterPresent, JRulePrecondition[] preconditions, String channel,
-            String event) {
+            Method method, boolean eventParameterPresent, JRulePrecondition[] preconditions, String channel, String eq,
+            String neq) {
         super(jRule, logName, loggingTags, ruleName, method, eventParameterPresent, preconditions);
         this.channel = channel;
-        this.event = event;
+        this.eq = eq;
+        this.neq = neq;
     }
 
     public String getChannel() {
         return channel;
     }
 
-    public String getEvent() {
-        return this.event;
+    public String getEq() {
+        return eq;
+    }
+
+    public String getNeq() {
+        return neq;
     }
 }
