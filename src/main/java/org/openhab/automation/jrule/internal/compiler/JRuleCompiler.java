@@ -59,7 +59,7 @@ public class JRuleCompiler {
     private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
     private static final String CLASSPATH_OPTION = "-classpath";
     public static final String JAR_JRULE_NAME = "jrule.jar";
-    public static final String JAR_JRULE_ITEMS_NAME = "jrule-items.jar";
+    public static final String JAR_JRULE_GENERATED_JAR_NAME = "jrule-generated.jar";
     private static final String LOG_NAME_COMPILER = "JRuleCompiler";
     private static final String FRONT_SLASH = "/";
 
@@ -270,7 +270,7 @@ public class JRuleCompiler {
     public boolean compileRules() {
         String rulesClassPath = //
                 System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator //
-                        + getJarPath(JAR_JRULE_ITEMS_NAME) + File.pathSeparator //
+                        + getJarPath(JAR_JRULE_GENERATED_JAR_NAME) + File.pathSeparator //
                         + getJarPath(JAR_JRULE_NAME) + File.pathSeparator; //
         String extLibPath = getExtLibPaths();
         logDebug("extLibPath: {}", extLibPath);

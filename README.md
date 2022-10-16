@@ -49,7 +49,7 @@ The following jar files can be found under the jrule/jar-folder:
 
 | Jar File                               | Description                                                                                   |
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
-| jrule-items.jar                        | Contains all generated items, which will be used when developing rules                        |
+| jrule-generated.jar                    | Contains all generated items, which will be used when developing rules                        |
 | jrule.jar                              | JRule Addon classes neeed as dependency when doing development                              |
 
 
@@ -63,7 +63,7 @@ The following jar files can be found under the jrule/jar-folder:
 2. Compile java source files and create a resulting jrule.jar file under /etc/openhab/automation/jrule/jar
 3. Compile any java rules file under  /etc/openhab/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
  It is possible to use package structure with subdirectories in this folder, or the can be place in a flat structure right under this folder
-4. Create jar files with dependencies to be used when creating your java-rules (jrule-items.jar).
+4. Create jar files with dependencies to be used when creating your java-rules (jrule-generated.jar).
 The two jar files needed for Java rules development can be found under /etc/openhab/automation/jrule/jar
 
 Once the JAVA rule engine has started and compiled items successfully you can either copy the jar files
@@ -684,8 +684,13 @@ public void startTrackingNonOnlineThing(JRuleEvent event) {
 }
 ```
 
-
 # Changelog
+
+## NEXT
+
+- Added thing rule support
+  - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
+
 ## BETA13
 - Fixed a bug with naming of JRuleItems.java
 - Fixed issues with post and sendCommand to groups
