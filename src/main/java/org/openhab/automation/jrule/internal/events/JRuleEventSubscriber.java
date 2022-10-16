@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
@@ -63,8 +64,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
     public static final String PROPERTY_THING_STATUS_EVENT = "THING_STATUS_EVENT";
 
     private static final String LOG_NAME_SUBSCRIBER = "JRuleSubscriber";
-    public static final String ANY_THING_UID = "*"; // Wildcard, allows registering rules that listen for all thing
-                                                    // status changes
+    // status changes
 
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
 
@@ -196,7 +196,8 @@ public class JRuleEventSubscriber implements EventSubscriber {
             ThingStatusInfoChangedEvent thingStatusChangedEvent = (ThingStatusInfoChangedEvent) event;
             String thingUID = thingStatusChangedEvent.getThingUID().toString();
 
-            if (jRuleMonitoredThings.contains(thingUID) || jRuleMonitoredThings.contains(ANY_THING_UID)) {
+            if (jRuleMonitoredThings.contains(thingUID)
+                    || jRuleMonitoredThings.contains(JRuleThingExecutionContext.ANY_THING_UID)) {
                 JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
                         PROPERTY_THING_STATUS_EVENT, event.getTopic(), event.getPayload());
                 propertyChangeSupport.firePropertyChange(PROPERTY_THING_STATUS_EVENT, null, event);
