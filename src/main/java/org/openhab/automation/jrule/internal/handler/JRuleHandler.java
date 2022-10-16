@@ -285,7 +285,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
             logInfo("Creating items and things jar");
             JRuleUtil.createJarFile(config.getItemsRootDirectory(),
-                    compiler.getJarPath(JRuleCompiler.JAR_JRULE_ITEMS_NAME));
+                    compiler.getJarPath(JRuleCompiler.JAR_JRULE_GENERATED_JAR_NAME));
             result = true;
         } else {
             logError("Compilation failed, not creating jar file");
