@@ -32,8 +32,8 @@ public class JRuleTimeTimerExecutionContext extends JRuleTimedExecutionContext {
     private final Optional<Integer> second;
 
     public JRuleTimeTimerExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-                                          List<JRulePreconditionContext> preconditionContextList, Optional<Integer> hour, Optional<Integer> minute,
-                                          Optional<Integer> second) {
+            List<JRulePreconditionContext> preconditionContextList, Optional<Integer> hour, Optional<Integer> minute,
+            Optional<Integer> second) {
         super(jRule, logName, loggingTags, method, preconditionContextList);
         this.hour = hour;
         this.minute = minute;

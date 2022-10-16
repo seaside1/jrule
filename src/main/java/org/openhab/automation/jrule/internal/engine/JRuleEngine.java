@@ -41,8 +41,8 @@ import org.openhab.automation.jrule.internal.engine.context.JRuleItemExecutionCo
 import org.openhab.automation.jrule.internal.engine.context.JRuleItemReceivedCommandExecutionContext;
 import org.openhab.automation.jrule.internal.engine.context.JRuleItemReceivedUpdateExecutionContext;
 import org.openhab.automation.jrule.internal.engine.context.JRulePreconditionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.engine.context.JRuleTimeTimerExecutionContext;
+import org.openhab.automation.jrule.internal.engine.context.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.TimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.Condition;
@@ -272,12 +272,15 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
-        return this.contextList.stream().map(context -> ((JRuleItemExecutionContext) context))
+        return this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
+                .map(context -> ((JRuleItemExecutionContext) context))
                 .anyMatch(context -> context.getItemName().equals(itemName));
     }
 
     public boolean watchingForChannel(String channel) {
-        return this.contextList.stream().map(context -> ((JRuleChannelExecutionContext) context))
+        logDebug("watching for channel: '{}'?", channel);
+        return this.contextList.stream().filter(context -> context instanceof JRuleChannelExecutionContext)
+                .map(context -> ((JRuleChannelExecutionContext) context))
                 .anyMatch(context -> context.getChannel().equals(channel));
     }
 
