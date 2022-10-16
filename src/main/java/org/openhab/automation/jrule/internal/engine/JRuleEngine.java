@@ -48,6 +48,12 @@ import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.cron.JRuleCronExpression;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleContextValueComparators;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleEvent;
@@ -388,7 +394,7 @@ public class JRuleEngine implements PropertyChangeListener {
         List<JRuleThingExecutionContext> contextList = thingToExecutionContexts.computeIfAbsent(thing,
                 k -> new ArrayList<>());
         final JRuleThingExecutionContext context = new JRuleThingExecutionContext(jRule, logName, loggingTags, trigger,
-                from, to, null, ruleName, thing, method, eventParameterPresent, preconditions);
+                from, to, ruleName, thing, method, eventParameterPresent, preconditions);
         JRuleLog.debug(logger, logName, "ThingContextList add context: {}", context);
         contextList.add(context);
     }
@@ -410,7 +416,8 @@ public class JRuleEngine implements PropertyChangeListener {
     private void handleThingStatusChangedEvent(ThingStatusInfoChangedEvent thingStatusChangedEvent) {
         List<JRuleThingExecutionContext> thingExecutionContexts = thingToExecutionContexts
                 .get(thingStatusChangedEvent.getThingUID().toString());
-        List<JRuleThingExecutionContext> executionContextsWildcard = thingToExecutionContexts.get("*");
+        List<JRuleThingExecutionContext> executionContextsWildcard = thingToExecutionContexts
+                .get(JRuleThingExecutionContext.ANY_THING_UID);
         List<JRuleThingExecutionContext> executionContexts = new ArrayList<>();
         if (executionContextsWildcard != null) {
             executionContexts.addAll(executionContextsWildcard);
@@ -553,21 +560,22 @@ public class JRuleEngine implements PropertyChangeListener {
     private void invokeWhenMatchParameters(JRuleExecutionContext context, @NonNull JRuleEvent jRuleEvent) {
         JRuleLog.debug(logger, context.getLogName(), "invoke when context matches");
 
-        if (context.isComparatorOperation()) {
+        if (context instanceof JRuleContextValueComparators) {
+            JRuleContextValueComparators comparators = (JRuleContextValueComparators) context;
+            if (comparators.hasCompartorsSet()) {
 
-            JRuleValueComparators comparators = (JRuleValueComparators) context;
-
-            final Boolean evalCompare = evaluateComparatorParameters(comparators.getGt(), comparators.getGte(),
-                    comparators.getLt(), comparators.getLte(), comparators.getEq(), comparators.getNeq(),
-                    jRuleEvent.getState().getValue());
-            if (evalCompare == null) {
-                logError("Failed to compare values for context: {} event: {}", context, jRuleEvent);
-                return;
-            }
-            if (!evalCompare) {
-                logDebug("Not invoking rule since comparator compare is false context: {} event: {}", context,
-                        jRuleEvent);
-                return;
+                final Boolean evalCompare = evaluateComparatorParameters(comparators.getGt(), comparators.getGte(),
+                        comparators.getLt(), comparators.getLte(), comparators.getEq(), comparators.getNeq(),
+                        jRuleEvent.getState().getValue());
+                if (evalCompare == null) {
+                    logError("Failed to compare values for context: {} event: {}", context, jRuleEvent);
+                    return;
+                }
+                if (!evalCompare) {
+                    logDebug("Not invoking rule since comparator compare is false context: {} event: {}", context,
+                            jRuleEvent);
+                    return;
+                }
             }
         }
         invokeRule(context, jRuleEvent);

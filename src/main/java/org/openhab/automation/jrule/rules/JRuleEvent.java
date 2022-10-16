@@ -108,6 +108,6 @@ public class JRuleEvent {
     @Override
     public String toString() {
         return String.format("JRuleEvent [state=%s, oldState=%s, memberName=%s, itemName=%s, channel=%s, event=%s]",
-                state, oldState, memberName, itemName, channel);
+                state, oldState, memberName, itemName, channel, event);
     }
 }

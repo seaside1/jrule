@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.internal.engine;
+package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
 
@@ -69,12 +69,5 @@ public abstract class JRuleExecutionContext {
 
     public String[] getLoggingTags() {
         return loggingTags;
-    }
-
-    /**
-     * Override and return true if this ExecutionContext supports gt/lt/etc comparisons for values
-     */
-    public boolean isComparatorOperation() {
-        return false;
     }
 }

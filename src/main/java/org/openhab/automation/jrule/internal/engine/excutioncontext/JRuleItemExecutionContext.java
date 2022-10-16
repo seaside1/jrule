@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.internal.engine;
+package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
 
@@ -22,7 +22,7 @@ import org.openhab.automation.jrule.rules.JRulePrecondition;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public class JRuleItemExecutionContext extends JRuleExecutionContext implements JRuleValueComparators {
+public class JRuleItemExecutionContext extends JRuleExecutionContext implements JRuleContextValueComparators {
     private static final String FROM_PREFIX = " from ";
     private static final String TO_PREFIX = " to ";
     private static final String SPACE = " ";
@@ -89,11 +89,6 @@ public class JRuleItemExecutionContext extends JRuleExecutionContext implements 
 
     public String getTrigger() {
         return trigger;
-    }
-
-    @Override
-    public boolean isComparatorOperation() {
-        return lte != null || lt != null || gt != null || gte != null || eq != null || neq != null;
     }
 
     private String buildFromToString(String trigger, String from, String to) {

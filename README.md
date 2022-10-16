@@ -679,7 +679,7 @@ Use case: Listen for thing status events on _all_ things
 @JRuleName("Log every thing that goes offline")
 @JRuleWhen(thing = "*", trigger = JRuleThingStatusTrigger.TRIGGER_CHANGED, from = "ONLINE")
 public void startTrackingNonOnlineThing(JRuleEvent event) {
-    String offlineThingUID = event.getChannel(); // event.getChannel() to be replaced with separate method
+    String offlineThingUID = event.getThing();
     // ...
 }
 ```

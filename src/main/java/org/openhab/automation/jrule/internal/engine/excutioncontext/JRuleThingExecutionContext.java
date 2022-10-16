@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.internal.engine;
+package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
 
@@ -23,23 +23,21 @@ import org.openhab.automation.jrule.rules.JRulePrecondition;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleThingExecutionContext extends JRuleExecutionContext {
+    public static final String ANY_THING_UID = "*"; // Wildcard, allows registering rules that listen for all thing
     private static final String FROM_PREFIX = " from ";
     private static final String TO_PREFIX = " to ";
-    private static final String SPACE = " ";
 
     private final String thing;
     private final String trigger;
-    private final String update;
     private final String from;
     private final String to;
 
     public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, String trigger, String from,
-            String to, String update, String ruleName, String thing, Method method, boolean eventParameterPresent,
+            String to, String ruleName, String thing, Method method, boolean eventParameterPresent,
             JRulePrecondition[] preconditions) {
         super(jRule, logName, loggingTags, ruleName, method, eventParameterPresent, preconditions);
         this.thing = thing;
         this.trigger = trigger;
-        this.update = update;
         this.from = from;
         this.to = to;
     }
@@ -49,6 +47,20 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     }
 
     public String getTrigger() {
+        return trigger;
+    }
+
+    public String getTriggerFullString() {
+        if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
+            return buildFromToString(trigger, from, to);
+        }
+        if (from != null && !from.isEmpty()) {
+            return buildFromToString(trigger, from, null);
+        }
+        if (to != null && !to.isEmpty()) {
+            return buildFromToString(trigger, null, to);
+        }
+
         return trigger;
     }
 
@@ -66,29 +78,9 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
         return builder.toString();
     }
 
-    private String buildUpdateString(String trigger, String update) {
-        return trigger + SPACE + update;
-    }
-
-    public String getTriggerFullString() {
-        if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
-            return buildFromToString(trigger, from, to);
-        }
-        if (from != null && !from.isEmpty()) {
-            return buildFromToString(trigger, from, null);
-        }
-        if (to != null && !to.isEmpty()) {
-            return buildFromToString(trigger, null, to);
-        }
-        if (update != null && !update.isEmpty()) {
-            return buildUpdateString(trigger, update);
-        }
-        return trigger;
-    }
-
     @Override
     public String toString() {
-        return "JRuleThingExecutionContext{" + "from='" + from + '\'' + ", thing='" + thing + '\'' + ", to='" + to
-                + '\'' + ", trigger='" + trigger + '\'' + ", update='" + update + '\'' + '}';
+        return "JRuleThingExecutionContext{" + "thing='" + thing + '\'' + ", trigger='" + trigger + '\'' + ", from='"
+                + from + '\'' + ", to='" + to + '\'' + '}';
     }
 }
