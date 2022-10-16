@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The {@link JRuleBridgeThing} thing represents a thing that is connected to a bridge
+ * The {@link JRuleBridgeThing} thing represents a bridge thing
  *
  * @author Arne Seime - Initial contribution
  */
