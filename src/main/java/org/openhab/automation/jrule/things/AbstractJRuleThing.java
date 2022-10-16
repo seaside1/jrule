@@ -16,8 +16,8 @@ import org.openhab.automation.jrule.internal.handler.JRuleThingHandler;
 import org.openhab.automation.jrule.trigger.JRuleThingStatusTrigger;
 
 /**
- * The {@link AbstractJRuleThing} represents a thing that is either a bridge or a standalone thing not in need of a
- * bridge
+ * The {@link AbstractJRuleThing} represents a thing that is either a bridge, a bridged (sub thing of a bridge) or a
+ * standalone thing not in need of a bridge
  *
  * @author Arne Seime - Initial contribution
  */

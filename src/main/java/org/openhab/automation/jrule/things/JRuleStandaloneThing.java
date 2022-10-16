@@ -13,7 +13,7 @@
 package org.openhab.automation.jrule.things;
 
 /**
- * The {@link JRuleStandaloneThing} thing represents a thing that is connected to a bridge
+ * The {@link JRuleStandaloneThing} thing represents a thing that is standalone (not a bridge nor connected to a bridge)
  *
  * @author Arne Seime - Initial contribution
  */
