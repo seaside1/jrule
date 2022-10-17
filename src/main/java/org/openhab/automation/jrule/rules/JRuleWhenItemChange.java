@@ -33,5 +33,5 @@ public @interface JRuleWhenItemChange {
 
     String to() default "";
 
-    Condition condition() default @Condition;
+    JRuleCondition condition() default @JRuleCondition;
 }

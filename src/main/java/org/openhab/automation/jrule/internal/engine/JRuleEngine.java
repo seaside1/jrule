@@ -45,8 +45,8 @@ import org.openhab.automation.jrule.internal.engine.context.JRuleTimeTimerExecut
 import org.openhab.automation.jrule.internal.engine.context.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.TimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
-import org.openhab.automation.jrule.rules.Condition;
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleCondition;
 import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
@@ -128,14 +128,14 @@ public class JRuleEngine implements PropertyChangeListener {
 
         List<JRulePreconditionContext> jRulePreconditionContexts = Arrays
                 .stream(method.getAnnotationsByType(JRulePrecondition.class)).map(jRulePrecondition -> {
-                    Condition condition = jRulePrecondition.condition();
+                    JRuleCondition jRuleCondition = jRulePrecondition.condition();
                     return new JRulePreconditionContext(jRulePrecondition.item(),
-                            Optional.of(condition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                            Optional.of(condition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                            Optional.of(condition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                            Optional.of(condition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                            Optional.of(condition.eq()).filter(StringUtils::isNotEmpty),
-                            Optional.of(condition.neq()).filter(StringUtils::isNotEmpty));
+                            Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                            Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                            Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                            Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                            Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
+                            Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty));
                 }).collect(Collectors.toList());
 
         final String[] loggingTags = Optional.ofNullable(method.getDeclaredAnnotation(JRuleTag.class))
@@ -144,40 +144,40 @@ public class JRuleEngine implements PropertyChangeListener {
         ruleLoadingStatistics.addRuleMethod();
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedUpdate.class)).forEach(jRuleWhen -> {
-            Condition condition = jRuleWhen.condition();
+            JRuleCondition jRuleCondition = jRuleWhen.condition();
             contextList.add(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(),
-                    method, Optional.of(condition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.eq()).filter(StringUtils::isNotEmpty),
-                    Optional.of(condition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
+                    method, Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
+                    Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
                     Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedCommand.class)).forEach(jRuleWhen -> {
-            Condition condition = jRuleWhen.condition();
+            JRuleCondition jRuleCondition = jRuleWhen.condition();
             contextList.add(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(),
-                    method, Optional.of(condition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.eq()).filter(StringUtils::isNotEmpty),
-                    Optional.of(condition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
+                    method, Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
+                    Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
                     Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemChange.class)).forEach(jRuleWhen -> {
-            Condition condition = jRuleWhen.condition();
+            JRuleCondition jRuleCondition = jRuleWhen.condition();
             contextList.add(new JRuleItemChangeExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(), method,
-                    Optional.of(condition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(condition.eq()).filter(StringUtils::isNotEmpty),
-                    Optional.of(condition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
+                    Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
+                    Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
                     Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
                     Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();

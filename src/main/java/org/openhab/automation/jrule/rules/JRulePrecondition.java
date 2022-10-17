@@ -29,5 +29,5 @@ import java.lang.annotation.Target;
 public @interface JRulePrecondition {
     String item() default "";
 
-    Condition condition() default @Condition;
+    JRuleCondition condition() default @JRuleCondition;
 }

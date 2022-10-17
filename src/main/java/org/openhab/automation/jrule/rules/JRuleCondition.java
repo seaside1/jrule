@@ -13,11 +13,11 @@
 package org.openhab.automation.jrule.rules;
 
 /**
- * The {@link Condition}
+ * The {@link JRuleCondition}
  *
  * @author Robert Delbrück
  */
-public @interface Condition {
+public @interface JRuleCondition {
     double gt() default Double.MIN_VALUE;
 
     double lt() default Double.MIN_VALUE;

@@ -31,5 +31,5 @@ public @interface JRuleWhenItemReceivedUpdate {
 
     String to() default "";
 
-    Condition condition() default @Condition;
+    JRuleCondition condition() default @JRuleCondition;
 }

@@ -18,14 +18,6 @@ package org.openhab.automation.jrule.trigger;
  * @author Gerhard Riegler - Initial contribution
  */
 public interface JRuleSwitchTrigger extends JRuleCommonTrigger {
-    String TRIGGER_RECEIVED_UPDATE_ON = "received update ON";
-    String TRIGGER_RECEIVED_UPDATE_OFF = "received update OFF";
-    String TRIGGER_RECEIVED_COMMAND_ON = "received command ON";
-    String TRIGGER_RECEIVED_COMMAND_OFF = "received command OFF";
-    String TRIGGER_CHANGED_FROM_ON_TO_OFF = "Changed from ON to OFF";
-    String TRIGGER_CHANGED_FROM_ON = "Changed from ON";
-    String TRIGGER_CHANGED_FROM_OFF = "Changed from OFF";
-    String TRIGGER_CHANGED_TO_OFF = "Changed to OFF";
-    String TRIGGER_CHANGED_TO_ON = "Changed to ON";
-    String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from OFF to ON";
+    String ON = "ON";
+    String OFF = "OFF";
 }
