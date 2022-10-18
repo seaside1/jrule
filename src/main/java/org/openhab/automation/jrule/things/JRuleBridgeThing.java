@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleBridgeThing extends AbstractJRuleThing {
+public abstract class JRuleBridgeThing extends JRuleAbstractThing {
 
     public JRuleBridgeThing(String thingUID) {
         super(thingUID);

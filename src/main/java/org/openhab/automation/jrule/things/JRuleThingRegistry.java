@@ -23,19 +23,19 @@ import java.util.Map;
  */
 
 public class JRuleThingRegistry {
-    private static final Map<String, AbstractJRuleThing> thingRegistry = new HashMap<>();
+    private static final Map<String, JRuleAbstractThing> thingRegistry = new HashMap<>();
 
     public static void clear() {
         thingRegistry.clear();
     }
 
     public static <T> T get(String thingName, Class<T> jRuleThingClass) {
-        AbstractJRuleThing jRuleThing = thingRegistry.get(thingName);
+        JRuleAbstractThing jRuleThing = thingRegistry.get(thingName);
         if (jRuleThing == null) {
             try {
                 Constructor<T> constructor = jRuleThingClass.getDeclaredConstructor(String.class);
                 constructor.setAccessible(true);
-                jRuleThing = (AbstractJRuleThing) constructor.newInstance(thingName);
+                jRuleThing = (JRuleAbstractThing) constructor.newInstance(thingName);
                 thingRegistry.put(thingName, jRuleThing);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
