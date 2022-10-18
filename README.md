@@ -383,11 +383,11 @@ Use case: Using say command for tts
 Use case: Executing command from CLI
 ```java
 
-    @JRuleName("testExecutingCommandLine")
-    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED)
+    @JRuleName("TestExecutingCommandLine")
+    @JRuleWhenItemReceivedCommand(item = _MySwitchGroup.ITEM)
     public synchronized void testExecutingCommandLine(JRuleEvent event) {
         logInfo("Creating dummy file using CLI");
-        executeCommandLine("touch ~/example.txt");
+        executeCommandLine("touch", "/openhab/userdata/example.txt");
     }
 ```
 ## Example 15
@@ -418,10 +418,10 @@ Use case: A group of switches , trigger when it's changed from OFF to ON
 
 Use case: Listen for a Channel Trigger Event
 ```java
-    @JRuleName("channelTriggered")
-    @JRuleWhen(channel = "binding:thing:buttonevent")
+    @JRuleName("ChannelTriggered")
+    @JRuleWhenChannelTrigger(channel = "mqtt:topic:mqtt:generic:numberTrigger")
     public synchronized void channelTriggered(JRuleEvent event) {
-        logInfo("Channel triggered with value: {}", event.getState().getValue());
+        logInfo("Channel triggered with value: {}", ((JRuleChannelEvent) event).getEvent());
     }
 ```
 
@@ -526,17 +526,14 @@ if it is ok for disturbance. If it is ok the switch is set to ON and we can send
 message is updated.
 
 ```java
-   public class PreConditionTestDisturbance extends JRule {
-
-    @JRulePrecondition(item=_MyTestDisturbanceSwitch.ITEM, eq = "ON")
+    @JRulePrecondition(item = _MyTestDisturbanceSwitch.ITEM, condition = @JRuleCondition(eq = "ON"))
     @JRuleName("MyTestPreConditionRule1")
-    @JRuleWhen(item = _MyMessageNotification.ITEM, trigger = _MyMessageNotification.TRIGGER_RECEIVED_COMMAND)
+    @JRuleWhenItemReceivedCommand(item = _MyMessageNotification.ITEM)
     public void testPrecondition(JRuleEvent event) {
-        String notificationMessage = event.getState().getValue();
+        String notificationMessage = ((JRuleItemEvent) event).getState().getValue();
         logInfo("It is ok to send notification: {}", notificationMessage);
-        JRuleItems.MySendNoticationItemMqtt.sendCommand(notificationMessage);
-    }
-}
+//        JRuleItems.MySendNoticationItemMqtt.sendCommand(notificationMessage);
+        }
 ```
 ## Example 25
 Use case: Use precondition annotation in order to create "AND" logic. Example when the temperature is above 30 degrees (celcius probably) and
