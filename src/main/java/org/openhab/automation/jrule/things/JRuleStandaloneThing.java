@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.things;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleStandaloneThing extends AbstractJRuleThing {
+public abstract class JRuleStandaloneThing extends JRuleAbstractThing {
     public JRuleStandaloneThing(String thingUID) {
         super(thingUID);
     }

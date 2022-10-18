@@ -16,15 +16,15 @@ import org.openhab.automation.jrule.internal.handler.JRuleThingHandler;
 import org.openhab.automation.jrule.trigger.JRuleThingStatusTrigger;
 
 /**
- * The {@link AbstractJRuleThing} represents a thing that is either a bridge, a bridged (sub thing of a bridge) or a
+ * The {@link JRuleAbstractThing} represents a thing that is either a bridge, a bridged (sub thing of a bridge) or a
  * standalone thing not in need of a bridge
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class AbstractJRuleThing implements JRuleThingStatusTrigger {
+public abstract class JRuleAbstractThing implements JRuleThingStatusTrigger {
     private String thingUID;
 
-    protected AbstractJRuleThing(String thingUID) {
+    protected JRuleAbstractThing(String thingUID) {
         this.thingUID = thingUID;
     }
 

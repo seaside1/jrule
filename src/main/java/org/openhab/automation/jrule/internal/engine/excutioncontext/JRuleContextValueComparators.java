@@ -20,17 +20,17 @@ package org.openhab.automation.jrule.internal.engine.excutioncontext;
  */
 public interface JRuleContextValueComparators {
 
-    public Double getGt();
+    Double getGt();
 
-    public Double getGte();
+    Double getGte();
 
-    public Double getLt();
+    Double getLt();
 
-    public Double getLte();
+    Double getLte();
 
-    public String getEq();
+    String getEq();
 
-    public String getNeq();
+    String getNeq();
 
     default boolean hasCompartorsSet() {
         return getGt() != null || getGte() != null || getLt() != null || getLte() != null || getEq() != null

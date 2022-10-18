@@ -20,15 +20,15 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 
 /**
- * The {@link AbstractClassGenerator} provides common setup of Freemarker for the class generators
+ * The {@link JRuleAbstractClassGenerator} provides common setup of Freemarker for the class generators
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class AbstractClassGenerator {
+public abstract class JRuleAbstractClassGenerator {
     protected final JRuleConfig jRuleConfig;
     protected final Configuration freemarkerConfiguration;
 
-    public AbstractClassGenerator(JRuleConfig jRuleConfig) {
+    public JRuleAbstractClassGenerator(JRuleConfig jRuleConfig) {
         this.jRuleConfig = jRuleConfig;
 
         // Create your Configuration instance, and specify if up to what FreeMarker

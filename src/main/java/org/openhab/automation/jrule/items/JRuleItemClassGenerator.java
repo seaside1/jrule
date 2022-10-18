@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.generator.AbstractClassGenerator;
+import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.library.CoreItemFactory;
@@ -40,7 +40,7 @@ import freemarker.template.TemplateException;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleItemClassGenerator extends AbstractClassGenerator {
+public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
 
     private static final String TEMPLATE_SUFFIX = ".ftlh";
 

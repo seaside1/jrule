@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.things;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleSubThing extends AbstractJRuleThing {
+public abstract class JRuleSubThing extends JRuleAbstractThing {
 
     public abstract String getBridgeUID();
 
