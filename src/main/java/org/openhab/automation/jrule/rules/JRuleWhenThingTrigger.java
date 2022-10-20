@@ -18,6 +18,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.openhab.automation.jrule.things.JRuleThingStatus;
+
 /**
  * The {@link JRuleWhenThingTrigger}
  *
@@ -29,7 +31,7 @@ import java.lang.annotation.Target;
 public @interface JRuleWhenThingTrigger {
     String thing() default "";
 
-    String from() default "";
+    JRuleThingStatus from() default JRuleThingStatus.THING_UNKNOWN;
 
-    String to() default "";
+    JRuleThingStatus to() default JRuleThingStatus.THING_UNKNOWN;
 }

@@ -42,7 +42,7 @@ public class JRuleTimeTimerExecutionContext extends JRuleTimedExecutionContext {
 
     @Override
     public boolean match(AbstractEvent event) {
-        throw new IllegalStateException("not implemented");
+        return false;
     }
 
     @Override

@@ -60,6 +60,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -146,7 +147,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedUpdate.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
-            contextList.add(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(),
+            addToContext(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(),
                     method, Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
@@ -159,7 +160,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedCommand.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
-            contextList.add(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(),
+            addToContext(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(),
                     method, Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
@@ -172,7 +173,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemChange.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
-            contextList.add(new JRuleItemChangeExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(), method,
+            addToContext(new JRuleItemChangeExecutionContext(jRule, logName, loggingTags, jRuleWhen.item(), method,
                     Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
@@ -185,20 +186,20 @@ public class JRuleEngine implements PropertyChangeListener {
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenChannelTrigger.class)).forEach(jRuleWhen -> {
-            contextList.add(
+            addToContext(
                     new JRuleChannelExecutionContext(jRule, logName, loggingTags, method, jRulePreconditionContexts,
                             jRuleWhen.channel(), Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addChannelTrigger();
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenCronTrigger.class)).forEach(jRuleWhen -> {
-            timerExecutor.add(new JRuleTimedCronExecutionContext(jRule, logName, loggingTags, method,
+            addToContext(new JRuleTimedCronExecutionContext(jRule, logName, loggingTags, method,
                     jRulePreconditionContexts, jRuleWhen.cron()));
             ruleLoadingStatistics.addTimedTrigger();
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenTimeTrigger.class)).forEach(jRuleWhen -> {
-            timerExecutor.add(new JRuleTimeTimerExecutionContext(jRule, logName, loggingTags, method,
+            addToContext(new JRuleTimeTimerExecutionContext(jRule, logName, loggingTags, method,
                     jRulePreconditionContexts, Optional.of(jRuleWhen.hours()).filter(i -> i != -1),
                     Optional.of(jRuleWhen.minutes()).filter(i -> i != -1),
                     Optional.of(jRuleWhen.seconds()).filter(i -> i != -1)));
@@ -206,12 +207,18 @@ public class JRuleEngine implements PropertyChangeListener {
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenThingTrigger.class)).forEach(jRuleWhen -> {
-            contextList.add(new JRuleThingExecutionContext(jRule, logName, loggingTags,
-                    Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
-                    Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), method, jRulePreconditionContexts));
             ruleLoadingStatistics.addThingTrigger();
+            addToContext(new JRuleThingExecutionContext(jRule, logName, loggingTags,
+                    Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
+                    Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
+                    Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN), method,
+                    jRulePreconditionContexts));
         });
+    }
+
+    private void addToContext(JRuleExecutionContext context) {
+        logDebug("add to context: {}", context);
+        contextList.add(context);
     }
 
     public void fire(AbstractEvent event) {
@@ -282,24 +289,27 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
-        logDebug("watching for item: '{}'?", itemName);
-        return this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
+        boolean b = this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
                 .map(context -> ((JRuleItemExecutionContext) context))
                 .anyMatch(context -> context.getItemName().equals(itemName));
+        logDebug("watching for item: '{}'? -> {}", itemName, b);
+        return b;
     }
 
     public boolean watchingForChannel(String channel) {
-        logDebug("watching for channel: '{}'?", channel);
-        return this.contextList.stream().filter(context -> context instanceof JRuleChannelExecutionContext)
+        boolean b = this.contextList.stream().filter(context -> context instanceof JRuleChannelExecutionContext)
                 .map(context -> ((JRuleChannelExecutionContext) context))
                 .anyMatch(context -> context.getChannel().equals(channel));
+        logDebug("watching for channel: '{}'? -> {}", channel, b);
+        return b;
     }
 
     public boolean watchingForThing(String thing) {
-        logDebug("watching for thing: '{}'?", thing);
-        return this.contextList.stream().filter(context -> context instanceof JRuleThingExecutionContext)
+        boolean b = this.contextList.stream().filter(context -> context instanceof JRuleThingExecutionContext)
                 .map(context -> ((JRuleThingExecutionContext) context))
                 .anyMatch(context -> context.getThing().map(s -> s.equals(thing)).orElse(true));
+        logDebug("watching for thing: '{}'? -> {}", thing, b);
+        return b;
     }
 
     public void setCronScheduler(CronScheduler cronScheduler) {

@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
+import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.thing.events.ThingStatusInfoChangedEvent;
 
@@ -29,11 +30,12 @@ import org.openhab.core.thing.events.ThingStatusInfoChangedEvent;
  */
 public class JRuleThingExecutionContext extends JRuleExecutionContext {
     private final Optional<String> thing;
-    private final Optional<String> from;
-    private final Optional<String> to;
+    private final Optional<JRuleThingStatus> from;
+    private final Optional<JRuleThingStatus> to;
 
     public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Optional<String> thing,
-            Optional<String> from, Optional<String> to, Method method, List<JRulePreconditionContext> preconditions) {
+            Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to, Method method,
+            List<JRulePreconditionContext> preconditions) {
         super(jRule, logName, loggingTags, method, preconditions);
         this.thing = thing;
         this.from = from;
@@ -57,8 +59,8 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
         }
         ThingStatusInfoChangedEvent evt = (ThingStatusInfoChangedEvent) event;
         return thing.map(s -> evt.getThingUID().toString().equals(s)).orElse(true)
-                && from.map(s -> evt.getOldStatusInfo().getStatus().name().equals(s)).orElse(true)
-                && to.map(s -> evt.getStatusInfo().getStatus().name().equals(s)).orElse(true);
+                && from.map(s -> evt.getOldStatusInfo().getStatus().name().equals(s.name())).orElse(true)
+                && to.map(s -> evt.getStatusInfo().getStatus().name().equals(s.name())).orElse(true);
     }
 
     @Override
