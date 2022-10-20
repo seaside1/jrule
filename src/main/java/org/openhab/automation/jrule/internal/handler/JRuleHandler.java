@@ -52,6 +52,7 @@ import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
+import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
@@ -59,7 +60,6 @@ import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.events.ThingAddedEvent;
 import org.openhab.core.thing.events.ThingRemovedEvent;
 import org.openhab.core.thing.events.ThingUpdatedEvent;
-import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -107,8 +107,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, ThingRegistry thingRegistry,
             ThingManager thingManager, EventPublisher eventPublisher, JRuleEventSubscriber eventSubscriber,
-            VoiceManager voiceManager, CronScheduler cronScheduler,
-            BundleContext bundleContext) {
+            VoiceManager voiceManager, CronScheduler cronScheduler, BundleContext bundleContext) {
         this.itemRegistry = itemRegistry;
         this.thingRegistry = thingRegistry;
         this.eventSubscriber = eventSubscriber;

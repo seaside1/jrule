@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2010-2022 Contributors to the openHAB project
- * <p>
+ *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- * <p>
+ *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- * <p>
+ *
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
@@ -33,9 +33,7 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     private final Optional<String> to;
 
     public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Optional<String> thing,
-                                      Optional<String> from,
-                                      Optional<String> to, Method method,
-                                      List<JRulePreconditionContext> preconditions) {
+            Optional<String> from, Optional<String> to, Method method, List<JRulePreconditionContext> preconditions) {
         super(jRule, logName, loggingTags, method, preconditions);
         this.thing = thing;
         this.from = from;
@@ -48,8 +46,8 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
 
     @Override
     public String toString() {
-        return "JRuleThingExecutionContext{" + "thing='" + thing + '\'' + ", from='"
-                + from + '\'' + ", to='" + to + '\'' + '}';
+        return "JRuleThingExecutionContext{" + "thing='" + thing + '\'' + ", from='" + from + '\'' + ", to='" + to
+                + '\'' + '}';
     }
 
     @Override
@@ -58,16 +56,14 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
             return false;
         }
         ThingStatusInfoChangedEvent evt = (ThingStatusInfoChangedEvent) event;
-        return thing.map(s -> evt.getThingUID().equals(s)).orElse(true)
+        return thing.map(s -> evt.getThingUID().toString().equals(s)).orElse(true)
                 && from.map(s -> evt.getOldStatusInfo().getStatus().name().equals(s)).orElse(true)
                 && to.map(s -> evt.getStatusInfo().getStatus().name().equals(s)).orElse(true);
     }
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        return new JRuleThingEvent(
-                ((ThingStatusInfoChangedEvent) event).getThingUID().toString(),
-                ((ThingStatusInfoChangedEvent) event).getStatusInfo().getStatus().name()
-        );
+        return new JRuleThingEvent(((ThingStatusInfoChangedEvent) event).getThingUID().toString(),
+                ((ThingStatusInfoChangedEvent) event).getStatusInfo().getStatus().name());
     }
 }

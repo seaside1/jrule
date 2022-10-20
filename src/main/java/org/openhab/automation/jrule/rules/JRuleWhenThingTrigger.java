@@ -28,6 +28,8 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 public @interface JRuleWhenThingTrigger {
     String thing() default "";
+
     String from() default "";
+
     String to() default "";
 }

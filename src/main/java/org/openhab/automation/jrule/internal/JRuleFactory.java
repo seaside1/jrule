@@ -22,9 +22,9 @@ import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
-import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentContext;
@@ -68,8 +68,8 @@ public class JRuleFactory {
         jRuleEngine.setCronScheduler(cronScheduler);
         jRuleEngine.initialize();
 
-        jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager,eventPublisher, eventSubscriber, voiceManager,
-                cronScheduler, componentContext.getBundleContext());
+        jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
+                eventSubscriber, voiceManager, cronScheduler, componentContext.getBundleContext());
         delayedInit.call(this::init);
     }
 

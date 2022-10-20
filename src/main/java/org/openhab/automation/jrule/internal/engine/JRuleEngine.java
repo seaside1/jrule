@@ -206,12 +206,10 @@ public class JRuleEngine implements PropertyChangeListener {
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenThingTrigger.class)).forEach(jRuleWhen -> {
-            contextList.add(
-                    new JRuleThingExecutionContext(jRule, logName, loggingTags,
-                            Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
-                            Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
-                            Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty),
-                            method, jRulePreconditionContexts));
+            contextList.add(new JRuleThingExecutionContext(jRule, logName, loggingTags,
+                    Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
+                    Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
+                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), method, jRulePreconditionContexts));
             ruleLoadingStatistics.addThingTrigger();
         });
     }
