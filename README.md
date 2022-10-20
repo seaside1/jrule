@@ -703,7 +703,7 @@ public void sendPushover(JRuleEvent event) {
 
 ## BETA14
 - Thing support in rules by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/59
- - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
+  - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
 - Added missing sendCommand for StopMove commands by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/57
 - Fixed parsing of double value for Quantity type by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/56
 - Added generic action handler by [querdenker2k](https://github.com/querdenker2k) pr https://github.com/seaside1/jrule/pull/55 see exampe #34
