@@ -8,7 +8,7 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
 
 # Limitations
 
-- Not supporting OH3 GUI rules, script actions and script conditions 
+- Not supporting OH3 GUI rules, script conditions 
 
 # Why
 
@@ -683,6 +683,21 @@ public void startTrackingNonOnlineThing(JRuleEvent event) {
     // ...
 }
 ```
+
+## Example 34
+
+Use case: Thing actions, send message with pushover and other services
+
+```java
+@JRuleName("PushOverTest")
+@JRuleWhen(item = _MyTestSendPushOverButton.ITEM, trigger = __MyTestSendPushOverButton.TRIGGER_CHANGED_TO_ON)
+public void sendPushover(JRuleEvent event) {
+       logInfo("Sending Test message using pushover via actions");
+       JRuleAddonActionHandler action = getAction("pushover", "pushover:pushover-account:myaccount");
+       action.doAction("sendMessage",  "MyMessage", "MyTitle");
+}
+```
+
 
 # Changelog
 
