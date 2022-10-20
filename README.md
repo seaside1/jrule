@@ -701,10 +701,18 @@ public void sendPushover(JRuleEvent event) {
 
 # Changelog
 
-## NEXT
-
-- Added thing rule support
-  - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
+## BETA14
+- Thing support in rules by https://github.com/seime pr https://github.com/seaside1/jrule/pull/59
+ - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
+- Added missing sendCommand for StopMove commands by https://github.com/seime pr https://github.com/seaside1/jrule/pull/57
+- Fixed parsing of double value for Quantity type by https://github.com/seime pr https://github.com/seaside1/jrule/pull/56
+- Added generic action handler by https://github.com/querdenker2k pr https://github.com/seaside1/jrule/pull/55 see exampe #34
+- Refactoring of event for channel plus cleanup by https://github.com/querdenker2k prhttps://github.com/seaside1/jrule/pull/52
+- Refactoring of persistance functions and item handling with exceptions by https://github.com/querdenker2k pr https://github.com/seaside1/jrule/pull/51
+- Added item id and fixes for generated items by https://github.com/LumnitzF pr https://github.com/seaside1/jrule/pull/50
+- Added MDC Logging tags to be used with elastic search (logstash,kibana and similar) by https://github.com/querdenker2k pr https://github.com/seaside1/jrule/pull/49
+- Fixed parsing of double values in rule conditions by https://github.com/seime pr https://github.com/seaside1/jrule/pull/48
+- Fixed parsing of UNDEF by https://github.com/seime pr https://github.com/seaside1/jrule/pull/45
 
 ## BETA13
 - Fixed a bug with naming of JRuleItems.java
