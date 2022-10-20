@@ -34,15 +34,16 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.engine.context.JRuleChannelExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleItemChangeExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleItemExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleItemReceivedCommandExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleItemReceivedUpdateExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRulePreconditionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleTimeTimerExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleTimedCronExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemChangeExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedCommandExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedUpdateExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRulePreconditionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.TimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.JRule;
@@ -56,6 +57,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -84,7 +86,6 @@ public class JRuleEngine implements PropertyChangeListener {
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
     protected ItemRegistry itemRegistry;
     protected JRuleLoadingStatistics ruleLoadingStatistics;
-
     private static volatile JRuleEngine instance;
 
     public static JRuleEngine get() {
@@ -203,6 +204,16 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleWhen.seconds()).filter(i -> i != -1)));
             ruleLoadingStatistics.addTimedTrigger();
         });
+
+        Arrays.stream(method.getAnnotationsByType(JRuleWhenThingTrigger.class)).forEach(jRuleWhen -> {
+            contextList.add(
+                    new JRuleThingExecutionContext(jRule, logName, loggingTags,
+                            Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
+                            Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
+                            Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty),
+                            method, jRulePreconditionContexts));
+            ruleLoadingStatistics.addThingTrigger();
+        });
     }
 
     public void fire(AbstractEvent event) {
@@ -248,7 +259,8 @@ public class JRuleEngine implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_ITEM_EVENT)
-                || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_CHANNEL_EVENT)) {
+                || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_CHANNEL_EVENT)
+                || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_THING_STATUS_EVENT)) {
             fire((AbstractEvent) evt.getNewValue());
         }
     }
@@ -272,6 +284,7 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
+        logDebug("watching for item: '{}'?", itemName);
         return this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
                 .map(context -> ((JRuleItemExecutionContext) context))
                 .anyMatch(context -> context.getItemName().equals(itemName));
@@ -282,6 +295,13 @@ public class JRuleEngine implements PropertyChangeListener {
         return this.contextList.stream().filter(context -> context instanceof JRuleChannelExecutionContext)
                 .map(context -> ((JRuleChannelExecutionContext) context))
                 .anyMatch(context -> context.getChannel().equals(channel));
+    }
+
+    public boolean watchingForThing(String thing) {
+        logDebug("watching for thing: '{}'?", thing);
+        return this.contextList.stream().filter(context -> context instanceof JRuleThingExecutionContext)
+                .map(context -> ((JRuleThingExecutionContext) context))
+                .anyMatch(context -> context.getThing().map(s -> s.equals(thing)).orElse(true));
     }
 
     public void setCronScheduler(CronScheduler cronScheduler) {

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
+ * <p>
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- *
+ * <p>
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- *
+ * <p>
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.automation.jrule.internal.events;
@@ -35,6 +35,10 @@ import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
 import org.openhab.core.thing.events.ChannelTriggeredEvent;
+import org.openhab.core.thing.events.ThingAddedEvent;
+import org.openhab.core.thing.events.ThingRemovedEvent;
+import org.openhab.core.thing.events.ThingStatusInfoChangedEvent;
+import org.openhab.core.thing.events.ThingUpdatedEvent;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,22 +48,30 @@ import org.slf4j.LoggerFactory;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-@Component(service = { EventSubscriber.class,
-        JRuleEventSubscriber.class }, configurationPid = "automation.jrule.eventsubscriber")
+@Component(service = {EventSubscriber.class,
+        JRuleEventSubscriber.class}, configurationPid = "automation.jrule.eventsubscriber")
 @NonNullByDefault
 public class JRuleEventSubscriber implements EventSubscriber {
 
     public static final String PROPERTY_ITEM_EVENT = "PROPERTY_ITEM_EVENT";
 
     public static final String PROPERTY_ITEM_REGISTRY_EVENT = "PROPERTY_ITEM_REGISTRY_EVENT";
+    public static final String PROPERTY_THING_REGISTRY_EVENT = "PROPERTY_THING_REGISTRY_EVENT";
 
     public static final String PROPERTY_CHANNEL_EVENT = "CHANNEL_EVENT";
 
+    public static final String PROPERTY_THING_STATUS_EVENT = "THING_STATUS_EVENT";
+
     private static final String LOG_NAME_SUBSCRIBER = "JRuleSubscriber";
+    // status changes
 
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
 
     private final Set<String> subscribedEventTypes = new HashSet<>();
+
+    private final Set<String> jRuleMonitoredChannels = new HashSet<>();
+
+    private final Set<String> jRuleMonitoredThings = new HashSet<>();
 
     private final PropertyChangeSupport propertyChangeSupport;
 
@@ -78,6 +90,12 @@ public class JRuleEventSubscriber implements EventSubscriber {
         subscribedEventTypes.add(ItemAddedEvent.TYPE);
         subscribedEventTypes.add(ItemRemovedEvent.TYPE);
         subscribedEventTypes.add(ChannelTriggeredEvent.TYPE);
+        subscribedEventTypes.add(ThingAddedEvent.TYPE);
+        // TODO disabled for now. ThingDTO is missing hashCode+equals, so it is not possible (easily) to determine if
+        // thing is really changed of if a binding just has called updateThing() with no new data
+        // subscribedEventTypes.add(ThingUpdatedEvent.TYPE);
+        subscribedEventTypes.add(ThingRemovedEvent.TYPE);
+        subscribedEventTypes.add(ThingStatusInfoChangedEvent.TYPE);
     }
 
     @Override
@@ -96,6 +114,8 @@ public class JRuleEventSubscriber implements EventSubscriber {
     }
 
     public void stopSubscriber() {
+        jRuleMonitoredThings.clear();
+        propertyChangeSupport.removePropertyChangeListener(JRuleEngine.get());
         propertyChangeSupport.removePropertyChangeListener(jRuleEngine);
     }
 
@@ -143,22 +163,34 @@ public class JRuleEventSubscriber implements EventSubscriber {
             JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "event processed as {}: topic {} payload: {}",
                     PROPERTY_ITEM_REGISTRY_EVENT, event.getTopic(), event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_REGISTRY_EVENT, null, event);
-            return;
-        }
-        if (jRuleEngine.watchingForItem(itemFromTopic)) {
+        } else if (event.getType().equals(ThingAddedEvent.TYPE) || event.getType().equals(ThingRemovedEvent.TYPE)
+                || event.getType().equals(ThingUpdatedEvent.TYPE)) {
+            JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "event processed as {}: topic {} payload: {}",
+                    PROPERTY_THING_REGISTRY_EVENT, event.getTopic(), event.getPayload());
+            propertyChangeSupport.firePropertyChange(PROPERTY_THING_REGISTRY_EVENT, null, event);
+        } else if (jRuleEngine.watchingForItem(itemFromTopic)) {
             JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
                     PROPERTY_ITEM_EVENT, event.getTopic(), event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_ITEM_EVENT, null, event);
-        }
-        if (event.getType().equals(ChannelTriggeredEvent.TYPE)) {
-
+        } else if (event.getType().equals(ChannelTriggeredEvent.TYPE)) {
             ChannelTriggeredEvent channelTriggeredEvent = (ChannelTriggeredEvent) event;
             String channel = channelTriggeredEvent.getChannel().toString();
+            if (jRuleMonitoredChannels.contains(channel)) {
 
-            if (jRuleEngine.watchingForChannel(channel)) {
-                JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
-                        PROPERTY_CHANNEL_EVENT, event.getTopic(), event.getPayload());
-                propertyChangeSupport.firePropertyChange(PROPERTY_CHANNEL_EVENT, null, event);
+                if (jRuleEngine.watchingForChannel(channel)) {
+                    JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
+                            PROPERTY_CHANNEL_EVENT, event.getTopic(), event.getPayload());
+                    propertyChangeSupport.firePropertyChange(PROPERTY_CHANNEL_EVENT, null, event);
+                }
+            } else if (event.getType().equals(ThingStatusInfoChangedEvent.TYPE)) {
+                ThingStatusInfoChangedEvent thingStatusChangedEvent = (ThingStatusInfoChangedEvent) event;
+                String thingUID = thingStatusChangedEvent.getThingUID().toString();
+
+                if (jRuleEngine.watchingForThing(thingUID)) {
+                    JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
+                            PROPERTY_THING_STATUS_EVENT, event.getTopic(), event.getPayload());
+                    propertyChangeSupport.firePropertyChange(PROPERTY_THING_STATUS_EVENT, null, event);
+                }
             }
         }
     }

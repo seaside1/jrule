@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
-import org.openhab.automation.jrule.internal.engine.context.JRuleTimeTimerExecutionContext;
-import org.openhab.automation.jrule.internal.engine.context.JRuleTimedCronExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
 import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.scheduler.ScheduledCompletableFuture;
 import org.slf4j.Logger;

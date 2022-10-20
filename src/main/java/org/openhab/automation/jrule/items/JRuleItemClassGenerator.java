@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.items;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,64 +25,32 @@ import java.util.stream.Collectors;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.library.CoreItemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 
 /**
  * The {@link JRuleItemClassGenerator} Class Generator
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleItemClassGenerator {
+public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
 
     private static final String TEMPLATE_SUFFIX = ".ftlh";
 
-    private static final String LOG_NAME_CLASS_GENERATOR = "JRuleItemClassGen";
+    protected static final String LOG_NAME_CLASS_GENERATOR = "JRuleItemClassGen";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
-    private final JRuleConfig jRuleConfig;
-    private final Configuration freemarkerConfiguration;
-
     public JRuleItemClassGenerator(JRuleConfig jRuleConfig) {
 
-        this.jRuleConfig = jRuleConfig;
-
-        // Create your Configuration instance, and specify if up to what FreeMarker
-        // version (here 2.3.29) do you want to apply the fixes that are not 100%
-        // backward-compatible. See the Configuration JavaDoc for details.
-        freemarkerConfiguration = new Configuration(Configuration.VERSION_2_3_31);
-
-        // Specify the source where the template files come from. Here I set a
-        // plain directory for it, but non-file-system sources are possible too:
-        freemarkerConfiguration.setClassForTemplateLoading(this.getClass(), "/templates");
-        // From here we will set the settings recommended for new projects. These
-        // aren't the defaults for backward compatibilty.
-
-        // Set the preferred charset template files are stored in. UTF-8 is
-        // a good choice in most applications:
-        freemarkerConfiguration.setDefaultEncoding(StandardCharsets.UTF_8.name());
-
-        // Sets how errors will appear.
-        // During web page *development* TemplateExceptionHandler.HTML_DEBUG_HANDLER is better.
-        freemarkerConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-
-        // Don't log exceptions inside FreeMarker that it will thrown at you anyway:
-        freemarkerConfiguration.setLogTemplateExceptions(false);
-
-        // Wrap unchecked exceptions thrown during template processing into TemplateException-s:
-        freemarkerConfiguration.setWrapUncheckedExceptions(true);
-
-        // Do not fall back to higher scopes when reading a null loop variable:
-        freemarkerConfiguration.setFallbackOnNullLoopVariable(false);
+        super(jRuleConfig);
     }
 
     public boolean generateItemSource(Item item) {
@@ -104,7 +71,7 @@ public class JRuleItemClassGenerator {
                         .append(JRuleConstants.JAVA_FILE_TYPE).toString());
 
                 try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
-                    Template template = freemarkerConfiguration.getTemplate(templateName);
+                    Template template = freemarkerConfiguration.getTemplate("items/" + templateName);
                     template.process(processingModel, fileWriter);
                 }
 
@@ -133,7 +100,7 @@ public class JRuleItemClassGenerator {
 
         try {
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
-                Template template = freemarkerConfiguration.getTemplate("Items" + TEMPLATE_SUFFIX);
+                Template template = freemarkerConfiguration.getTemplate("items/Items" + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
             }
 
