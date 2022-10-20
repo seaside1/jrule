@@ -700,7 +700,7 @@ public void sendPushover(JRuleEvent event) {
 
 
 # Changelog
-
+## NEXT
 ## BETA14
 - Thing support in rules by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/59
   - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
