@@ -163,7 +163,8 @@ public class JRuleEventSubscriber implements EventSubscriber {
                     PROPERTY_THING_REGISTRY_EVENT, event.getTopic(), event.getPayload());
             propertyChangeSupport.firePropertyChange(PROPERTY_THING_REGISTRY_EVENT, null, event);
         } else if (event.getType().equals(ItemUpdatedEvent.TYPE) || event.getType().equals(ItemCommandEvent.TYPE)
-                || event.getType().equals(ItemStateChangedEvent.TYPE)) {
+                || event.getType().equals(ItemStateChangedEvent.TYPE)
+                || event.getType().equals(GroupItemStateChangedEvent.TYPE)) {
             final String itemFromTopic = JRuleUtil.getItemNameFromTopic(event.getTopic());
             if (jRuleEngine.watchingForItem(itemFromTopic)) {
                 JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",

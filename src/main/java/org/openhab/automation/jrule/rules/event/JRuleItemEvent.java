@@ -24,11 +24,13 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
  */
 public class JRuleItemEvent extends JRuleEvent {
     private final String itemName;
+    private final String memberName;
     private final JRuleEventState state;
     private final JRuleEventState oldState;
 
-    public JRuleItemEvent(String itemName, JRuleEventState state, JRuleEventState oldState) {
+    public JRuleItemEvent(String itemName, String memberName, JRuleEventState state, JRuleEventState oldState) {
         this.itemName = itemName;
+        this.memberName = memberName;
         this.state = state;
         this.oldState = oldState;
     }
@@ -44,6 +46,10 @@ public class JRuleItemEvent extends JRuleEvent {
     @Deprecated
     public String getValue() {
         return state.getValue();
+    }
+
+    public String getMemberName() {
+        return memberName;
     }
 
     @Deprecated

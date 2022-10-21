@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.core.library.types.QuantityType;
 
 /**
  * The {@link JRuleItemExecutionContext}
@@ -50,24 +51,50 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     }
 
     public boolean matchCondition(String state) {
-        if (eq.isPresent() && eq.filter(state::equals).isEmpty()) {
+        if (getEq().isPresent() && getEq().filter(state::equals).isEmpty()) {
             return false;
         }
-        if (neq.isPresent() && neq.filter(ref -> !state.equals(ref)).isEmpty()) {
+        if (getNeq().isPresent() && getNeq().filter(ref -> !state.equals(ref)).isEmpty()) {
             return false;
         }
-        if (lt.isPresent() && lt.filter(ref -> ref < Double.parseDouble(state)).isEmpty()) {
+        if (getLt().isPresent() && getLt().filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty()) {
             return false;
         }
-        if (lte.isPresent() && lte.filter(ref -> ref <= Double.parseDouble(state)).isEmpty()) {
+        if (getLte().isPresent()
+                && getLte().filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty()) {
             return false;
         }
-        if (gt.isPresent() && gt.filter(ref -> ref > Double.parseDouble(state)).isEmpty()) {
+        if (getGt().isPresent() && getGt().filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty()) {
             return false;
         }
-        if (gte.isPresent() && gte.filter(ref -> ref >= Double.parseDouble(state)).isEmpty()) {
+        if (getGte().isPresent()
+                && getGte().filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty()) {
             return false;
         }
         return true;
+    }
+
+    public Optional<Double> getGt() {
+        return gt;
+    }
+
+    public Optional<Double> getGte() {
+        return gte;
+    }
+
+    public Optional<Double> getLt() {
+        return lt;
+    }
+
+    public Optional<Double> getLte() {
+        return lte;
+    }
+
+    public Optional<String> getEq() {
+        return eq;
+    }
+
+    public Optional<String> getNeq() {
+        return neq;
     }
 }

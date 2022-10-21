@@ -21,6 +21,7 @@ import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
+import org.openhab.core.items.events.GroupItemStateChangedEvent;
 import org.openhab.core.items.events.ItemStateChangedEvent;
 
 /**
@@ -52,7 +53,10 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        return new JRuleItemEvent(this.getItemName(),
+        String memberName = event instanceof GroupItemStateChangedEvent
+                ? ((GroupItemStateChangedEvent) event).getMemberName()
+                : null;
+        return new JRuleItemEvent(this.getItemName(), memberName,
                 new JRuleEventState(((ItemStateChangedEvent) event).getItemState().toString()),
                 new JRuleEventState(((ItemStateChangedEvent) event).getOldItemState().toString()));
     }

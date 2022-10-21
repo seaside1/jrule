@@ -48,7 +48,7 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        return new JRuleItemEvent(this.getItemName(),
+        return new JRuleItemEvent(this.getItemName(), null,
                 new JRuleEventState(((ItemCommandEvent) event).getItemCommand().toString()), null);
     }
 }

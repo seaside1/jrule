@@ -236,25 +236,31 @@ public class JRuleEngine implements PropertyChangeListener {
             }
             final String state = item.getState().toString();
             if (context.getEq().isPresent() && context.getEq().filter(state::equals).isEmpty()) {
+                logDebug("precondition mismatch: {} = {}", state, context.getEq());
                 return false;
             }
             if (context.getNeq().isPresent() && context.getNeq().filter(ref -> !state.equals(ref)).isEmpty()) {
+                logDebug("precondition mismatch: {} != {}", state, context.getEq());
                 return false;
             }
             if (context.getLt().isPresent()
-                    && context.getLt().filter(ref -> ref < QuantityType.valueOf(state).doubleValue()).isEmpty()) {
+                    && context.getLt().filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty()) {
+                logDebug("precondition mismatch: {} < {}", state, context.getEq());
                 return false;
             }
             if (context.getLte().isPresent()
-                    && context.getLte().filter(ref -> ref <= QuantityType.valueOf(state).doubleValue()).isEmpty()) {
+                    && context.getLte().filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty()) {
+                logDebug("precondition mismatch: {} <= {}", state, context.getEq());
                 return false;
             }
             if (context.getGt().isPresent()
-                    && context.getGt().filter(ref -> ref > QuantityType.valueOf(state).doubleValue()).isEmpty()) {
+                    && context.getGt().filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty()) {
+                logDebug("precondition mismatch: {} > {}", state, context.getEq());
                 return false;
             }
             if (context.getGte().isPresent()
-                    && context.getGte().filter(ref -> ref >= QuantityType.valueOf(state).doubleValue()).isEmpty()) {
+                    && context.getGte().filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty()) {
+                logDebug("precondition mismatch: {} >= {}", state, context.getEq());
                 return false;
             }
             return true;
