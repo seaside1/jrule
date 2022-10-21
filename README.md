@@ -8,7 +8,7 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
 
 # Limitations
 
-- Not supporting OH3 GUI rules, script actions and script conditions 
+- Not supporting OH3 GUI rules, script conditions 
 
 # Why
 
@@ -676,12 +676,35 @@ public void startTrackingNonOnlineThing(JRuleEvent event) {
 }
 ```
 
+## Example 34
+
+Use case: Thing actions, send message with pushover and other services
+
+```java
+@JRuleName("PushOverTest")
+@JRuleWhen(item = _MyTestSendPushOverButton.ITEM, trigger = __MyTestSendPushOverButton.TRIGGER_CHANGED_TO_ON)
+public void sendPushover(JRuleEvent event) {
+       logInfo("Sending Test message using pushover via actions");
+       JRuleAddonActionHandler action = getAction("pushover", "pushover:pushover-account:myaccount");
+       action.doAction("sendMessage",  "MyMessage", "MyTitle");
+}
+```
+
+
 # Changelog
-
 ## NEXT
-
-- Added thing rule support
+## BETA14
+- Thing support in rules by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/59
   - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar
+- Added missing sendCommand for StopMove commands by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/57
+- Fixed parsing of double value for Quantity type by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/56
+- Added generic action handler by [querdenker2k](https://github.com/querdenker2k) pr https://github.com/seaside1/jrule/pull/55 see exampe #34
+- Refactoring of event for channel plus cleanup by [querdenker2k](https://github.com/querdenker2k) pr https://github.com/seaside1/jrule/pull/52
+- Refactoring of persistance functions and item handling with exceptions by [querdenker2k](https://github.com/querdenker2k) pr https://github.com/seaside1/jrule/pull/51
+- Added item id and fixes for generated items by [LumnitzF](https://github.com/LumnitzF) pr https://github.com/seaside1/jrule/pull/50
+- Added MDC Logging tags to be used with elastic search (logstash,kibana and similar) by [querdenker2k](https://github.com/querdenker2k) pr https://github.com/seaside1/jrule/pull/49
+- Fixed parsing of double values in rule conditions by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/48
+- Fixed parsing of UNDEF by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/45
 
 ## BETA13
 - Fixed a bug with naming of JRuleItems.java
