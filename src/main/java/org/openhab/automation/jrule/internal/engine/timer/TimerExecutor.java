@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
 import org.openhab.core.scheduler.CronScheduler;
@@ -52,6 +53,14 @@ public class TimerExecutor {
         JRuleLog.info(logger, TimerExecutor.class.getSimpleName(), "Generated cron for timer: {}", cron);
         timers.add(cronScheduler.schedule(
                 () -> jRuleEngine.invokeRule(executionContext, executionContext.createJRuleEvent(null)), cron));
+    }
+
+    public void add(JRuleExecutionContext context) {
+        if (context instanceof JRuleTimedCronExecutionContext) {
+            this.add((JRuleTimedCronExecutionContext) context);
+        } else if (context instanceof JRuleTimeTimerExecutionContext) {
+            this.add((JRuleTimeTimerExecutionContext) context);
+        }
     }
 
     public void setCronScheduler(CronScheduler cronScheduler) {

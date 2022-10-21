@@ -44,6 +44,7 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRulePrecond
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.TimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.JRule;
@@ -218,7 +219,11 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void addToContext(JRuleExecutionContext context) {
         logDebug("add to context: {}", context);
-        contextList.add(context);
+        if (context instanceof JRuleTimedExecutionContext) {
+            timerExecutor.add(context);
+        } else {
+            contextList.add(context);
+        }
     }
 
     public void fire(AbstractEvent event) {
