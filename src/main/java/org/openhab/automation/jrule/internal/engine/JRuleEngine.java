@@ -54,12 +54,19 @@ import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 import org.openhab.automation.jrule.rules.JRuleTag;
 import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenChannelTriggers;
 import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTriggers;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChanges;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommands;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdates;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTriggers;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenTimeTriggers;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
@@ -142,7 +149,14 @@ public class JRuleEngine implements PropertyChangeListener {
                 || method.isAnnotationPresent(JRuleWhenItemReceivedCommand.class)
                 || method.isAnnotationPresent(JRuleWhenItemReceivedUpdate.class)
                 || method.isAnnotationPresent(JRuleWhenThingTrigger.class)
-                || method.isAnnotationPresent(JRuleWhenTimeTrigger.class);
+                || method.isAnnotationPresent(JRuleWhenTimeTrigger.class)
+                || method.isAnnotationPresent(JRuleWhenChannelTriggers.class)
+                || method.isAnnotationPresent(JRuleWhenCronTriggers.class)
+                || method.isAnnotationPresent(JRuleWhenItemChanges.class)
+                || method.isAnnotationPresent(JRuleWhenItemReceivedCommands.class)
+                || method.isAnnotationPresent(JRuleWhenItemReceivedUpdates.class)
+                || method.isAnnotationPresent(JRuleWhenThingTriggers.class)
+                || method.isAnnotationPresent(JRuleWhenTimeTriggers.class);
         if (!triggersPresent) {
             logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
                     jRule.getClass().getName());
