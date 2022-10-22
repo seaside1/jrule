@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 public @interface JRuleWhenItemReceivedCommand {
     String item() default "";
 
-    String to() default "";
+    String command() default "";
 
     JRuleCondition condition() default @JRuleCondition;
 }

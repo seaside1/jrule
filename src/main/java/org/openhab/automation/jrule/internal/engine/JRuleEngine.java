@@ -115,14 +115,37 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void add(Method method, JRule jRule) {
         logDebug("Adding rule method: {}", method.getName());
+
         if (!method.isAnnotationPresent(JRuleName.class)) {
-            logError("Rule method ignored since JRuleName annotation is missing: {}", method.getName());
+            logWarn("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
+                    jRule.getClass().getName());
             return;
         }
+
         // Check if method is public, else execution will fail at runtime
         boolean isPublic = (method.getModifiers() & Modifier.PUBLIC) != 0;
         if (!isPublic) {
-            logError("Rule method ignored since method isn't public: {}", method.getName());
+            logWarn("Skipping non-public method {} on class {}", method.getName(), jRule.getClass().getName());
+            return;
+        }
+        // Check if method is has none or a single parameter
+        if (method.getParameterCount() > 1) {
+            logWarn("Skipping method {} on class {}. Rule methods should have none or a single parameter",
+                    method.getName(), jRule.getClass().getName());
+            return;
+        }
+
+        // Check if any rule triggers are present
+        boolean triggersPresent = method.isAnnotationPresent(JRuleWhenChannelTrigger.class)
+                || method.isAnnotationPresent(JRuleWhenCronTrigger.class)
+                || method.isAnnotationPresent(JRuleWhenItemChange.class)
+                || method.isAnnotationPresent(JRuleWhenItemReceivedCommand.class)
+                || method.isAnnotationPresent(JRuleWhenItemReceivedUpdate.class)
+                || method.isAnnotationPresent(JRuleWhenThingTrigger.class)
+                || method.isAnnotationPresent(JRuleWhenTimeTrigger.class);
+        if (!triggersPresent) {
+            logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
+                    jRule.getClass().getName());
             return;
         }
 
@@ -168,7 +191,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
                     Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
-                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
+                    Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
         });
 
