@@ -198,6 +198,7 @@ public class JRuleHandler implements PropertyChangeListener {
         delayedItemsCompiler.cancel();
         delayedItemsCompiler.shutdown();
         JRuleEngine.get().reset();
+        JRuleEngine.get().dispose();
         if (directoryWatcher != null) {
             directoryWatcher.removePropertyChangeListener(this);
         }
