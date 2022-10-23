@@ -180,14 +180,14 @@ public class JRuleCompiler {
         }
     }
 
-    public boolean compileItemsAndThings() {
-        return compileItemsAndThings(new File(jRuleConfig.getItemsRootDirectory()));
+    public boolean compileGeneratedSource() {
+        return compileGeneratedSource(new File(jRuleConfig.getSourceDirectory()));
     }
 
-    private boolean compileItemsAndThings(File sourceFolder) {
-        final String itemsClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
-                + getJarPath(JAR_JRULE_NAME) + ":" + jRuleConfig.getItemsRootDirectory();
-        logDebug("Compiling items in folder: {}", sourceFolder.getAbsolutePath());
+    private boolean compileGeneratedSource(File sourceFolder) {
+        final String genClassPath = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
+                + getJarPath(JAR_JRULE_NAME) + ":" + jRuleConfig.getSourceDirectory();
+        logDebug("Compiling generated source in folder: {}", sourceFolder.getAbsolutePath());
 
         List<File> javaSourceFiles = new ArrayList<>();
         List<File> javaClassFiles = new ArrayList<>();
@@ -220,7 +220,8 @@ public class JRuleCompiler {
                 .forEach(className -> classFiles.get(className).delete());
         // Will trigger compilation of any missing or old item java files
         return compile(List.of(new File(jRuleConfig.getItemsDirectory(), "JRuleItems.java"),
-                new File(jRuleConfig.getThingsDirectory(), "JRuleThings.java")), itemsClassPath);
+                new File(jRuleConfig.getThingsDirectory(), "JRuleThings.java"),
+                new File(jRuleConfig.getActionsDirectory(), "JRuleActions.java")), genClassPath);
     }
 
     public boolean compile(List<File> javaSourceFiles, String classPath) {

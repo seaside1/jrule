@@ -8,7 +8,7 @@ import org.openhab.automation.jrule.things.JRuleStandaloneThing;
 import org.openhab.automation.jrule.things.JRuleSubThing;
 
 <#list things as thing>
-import org.openhab.automation.jrule.things.generated.${thing.class};
+import org.openhab.automation.jrule.generated.things.${thing.class};
 </#list>
 
 /**
