@@ -12,22 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.engine;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.jdt.annotation.NonNull;
@@ -54,19 +38,12 @@ import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 import org.openhab.automation.jrule.rules.JRuleTag;
 import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenChannelTriggers;
 import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenCronTriggers;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChanges;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommands;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdates;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenThingTriggers;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenTimeTriggers;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
@@ -78,6 +55,23 @@ import org.openhab.core.scheduler.CronScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * The {@link JRuleEngine}
@@ -142,27 +136,6 @@ public class JRuleEngine implements PropertyChangeListener {
             return;
         }
 
-        // Check if any rule triggers are present
-        boolean triggersPresent = method.isAnnotationPresent(JRuleWhenChannelTrigger.class)
-                || method.isAnnotationPresent(JRuleWhenCronTrigger.class)
-                || method.isAnnotationPresent(JRuleWhenItemChange.class)
-                || method.isAnnotationPresent(JRuleWhenItemReceivedCommand.class)
-                || method.isAnnotationPresent(JRuleWhenItemReceivedUpdate.class)
-                || method.isAnnotationPresent(JRuleWhenThingTrigger.class)
-                || method.isAnnotationPresent(JRuleWhenTimeTrigger.class)
-                || method.isAnnotationPresent(JRuleWhenChannelTriggers.class)
-                || method.isAnnotationPresent(JRuleWhenCronTriggers.class)
-                || method.isAnnotationPresent(JRuleWhenItemChanges.class)
-                || method.isAnnotationPresent(JRuleWhenItemReceivedCommands.class)
-                || method.isAnnotationPresent(JRuleWhenItemReceivedUpdates.class)
-                || method.isAnnotationPresent(JRuleWhenThingTriggers.class)
-                || method.isAnnotationPresent(JRuleWhenTimeTriggers.class);
-        if (!triggersPresent) {
-            logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
-                    jRule.getClass().getName());
-            return;
-        }
-
         final String logName = Optional.ofNullable(method.getDeclaredAnnotation(JRuleLogName.class))
                 .map(JRuleLogName::value).orElse(method.getDeclaredAnnotation(JRuleName.class).value());
 
@@ -182,6 +155,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 .map(JRuleTag::value).orElse(EMPTY_LOG_TAGS);
 
         ruleLoadingStatistics.addRuleMethod();
+        AtomicBoolean addedToContext = new AtomicBoolean(false);
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedUpdate.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
@@ -194,6 +168,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
                     Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
+            addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedCommand.class)).forEach(jRuleWhen -> {
@@ -207,6 +182,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
                     Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
+            addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemChange.class)).forEach(jRuleWhen -> {
@@ -221,6 +197,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
                     Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
+            addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenChannelTrigger.class)).forEach(jRuleWhen -> {
@@ -228,12 +205,14 @@ public class JRuleEngine implements PropertyChangeListener {
                     new JRuleChannelExecutionContext(jRule, logName, loggingTags, method, jRulePreconditionContexts,
                             jRuleWhen.channel(), Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addChannelTrigger();
+            addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenCronTrigger.class)).forEach(jRuleWhen -> {
             addToContext(new JRuleTimedCronExecutionContext(jRule, logName, loggingTags, method,
                     jRulePreconditionContexts, jRuleWhen.cron()));
             ruleLoadingStatistics.addTimedTrigger();
+            addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenTimeTrigger.class)).forEach(jRuleWhen -> {
@@ -242,6 +221,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleWhen.minutes()).filter(i -> i != -1),
                     Optional.of(jRuleWhen.seconds()).filter(i -> i != -1)));
             ruleLoadingStatistics.addTimedTrigger();
+            addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenThingTrigger.class)).forEach(jRuleWhen -> {
@@ -251,16 +231,24 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
                     Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN), method,
                     jRulePreconditionContexts));
+            addedToContext.set(true);
         });
+
+        // Check if any rule triggers are present
+        if (!addedToContext.get()) {
+            logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
+                    jRule.getClass().getName());
+        }
     }
 
-    private void addToContext(JRuleExecutionContext context) {
+    private boolean addToContext(JRuleExecutionContext context) {
         logDebug("add to context: {}", context);
         if (context instanceof JRuleTimedExecutionContext) {
             timerExecutor.add(context);
         } else {
             contextList.add(context);
         }
+        return true;
     }
 
     public void fire(AbstractEvent event) {
