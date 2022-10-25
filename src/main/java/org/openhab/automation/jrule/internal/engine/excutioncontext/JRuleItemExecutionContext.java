@@ -33,7 +33,7 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final Optional<String> eq;
     protected final Optional<String> neq;
 
-    public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, String itemName, Method method,
+    public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
             Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte, Optional<String> eq,
             Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
         super(jRule, logName, loggingTags, method, preconditionContextList);

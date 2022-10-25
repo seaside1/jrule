@@ -17,13 +17,7 @@ package org.openhab.automation.jrule.trigger;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public interface JRuleContactTrigger extends JRuleCommonTrigger {
-    String TRIGGER_RECEIVED_UPDATE_OPEN = "received update OPEN";
-    String TRIGGER_RECEIVED_UPDATE_CLOSED = "received update CLOSED";
-    String TRIGGER_CHANGED_FROM_OPEN_TO_CLOSED = "Changed from OPEN to CLOSED";
-    String TRIGGER_CHANGED_FROM_OPEN = "Changed from OPEN";
-    String TRIGGER_CHANGED_FROM_CLOSED = "Changed from CLOSED";
-    String TRIGGER_CHANGED_TO_CLOSED = "Changed to CLOSED";
-    String TRIGGER_CHANGED_TO_OPEN = "Changed to OPEN";
-    String TRIGGER_CHANGED_FROM_CLOSED_TO_OPEN = "Changed from CLOSED to OPEN";
+public interface JRuleContactTrigger {
+    String OPEN = "OPEN";
+    String CLOSED = "CLOSED";
 }

@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.trigger;
  *
  * @author Gerhard Riegler - Initial contribution
  */
-public interface JRuleSwitchTrigger extends JRuleCommonTrigger {
+public interface JRuleSwitchTrigger {
     String ON = "ON";
     String OFF = "OFF";
 }

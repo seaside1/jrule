@@ -50,7 +50,8 @@ public abstract class JRuleExecutionContext {
     }
 
     public boolean hasEventParameterPresent() {
-        return Arrays.stream(method.getParameters()).anyMatch(param -> (param.getType().equals(JRuleEvent.class)));
+        return Arrays.stream(method.getParameters())
+                .anyMatch(param -> (JRuleEvent.class.isAssignableFrom(param.getType())));
     }
 
     public String getLogName() {

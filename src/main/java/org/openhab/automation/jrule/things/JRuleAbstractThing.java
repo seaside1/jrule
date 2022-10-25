@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.things;
 
 import org.openhab.automation.jrule.internal.handler.JRuleThingHandler;
-import org.openhab.automation.jrule.trigger.JRuleThingStatusTrigger;
 
 /**
  * The {@link JRuleAbstractThing} represents a thing that is either a bridge, a bridged (sub thing of a bridge) or a
@@ -21,7 +20,7 @@ import org.openhab.automation.jrule.trigger.JRuleThingStatusTrigger;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleAbstractThing implements JRuleThingStatusTrigger {
+public abstract class JRuleAbstractThing {
     private String thingUID;
 
     protected JRuleAbstractThing(String thingUID) {

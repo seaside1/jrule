@@ -29,20 +29,20 @@ import org.openhab.core.items.events.ItemStateEvent;
  * @author Robert Delbrück - Initial contribution
  */
 public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionContext {
-    private final Optional<String> to;
+    private final Optional<String> state;
 
-    public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, String itemName,
-            Method method, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
+    public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            String itemName, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
             Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-            Optional<String> to) {
-        super(jRule, logName, loggingTags, itemName, method, lt, lte, gt, gte, eq, neq, preconditionContextList);
-        this.to = to;
+            Optional<String> state) {
+        super(jRule, logName, loggingTags, method, itemName, lt, lte, gt, gte, eq, neq, preconditionContextList);
+        this.state = state;
     }
 
     @Override
     public boolean match(AbstractEvent event) {
         return event instanceof ItemStateEvent && ((ItemStateEvent) event).getItemName().equals(this.getItemName())
-                && to.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true)
+                && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true)
                 && super.matchCondition(((ItemStateEvent) event).getItemState().toString());
     }
 

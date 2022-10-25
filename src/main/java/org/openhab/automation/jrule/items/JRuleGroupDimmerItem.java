@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
+import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleDimmerTrigger {
+public abstract class JRuleGroupDimmerItem extends JRuleGroupItem implements JRuleSwitchTrigger {
 
     private static final String LOG_NAME = "JRuleGroupDimmerItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleGroupDimmerItem.class);

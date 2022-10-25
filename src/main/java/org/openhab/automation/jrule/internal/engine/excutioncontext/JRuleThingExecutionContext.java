@@ -33,8 +33,8 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     private final Optional<JRuleThingStatus> from;
     private final Optional<JRuleThingStatus> to;
 
-    public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Optional<String> thing,
-            Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to, Method method,
+    public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            Optional<String> thing, Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to,
             List<JRulePreconditionContext> preconditions) {
         super(jRule, logName, loggingTags, method, preconditions);
         this.thing = thing;

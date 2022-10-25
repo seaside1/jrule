@@ -33,11 +33,11 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     private final Optional<String> from;
     private final Optional<String> to;
 
-    public JRuleItemChangeExecutionContext(JRule jRule, String logName, String[] loggingTags, String itemName,
-            Method method, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
+    public JRuleItemChangeExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            String itemName, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
             Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
             Optional<String> from, Optional<String> to) {
-        super(jRule, logName, loggingTags, itemName, method, lt, lte, gt, gte, eq, neq, preconditionContextList);
+        super(jRule, logName, loggingTags, method, itemName, lt, lte, gt, gte, eq, neq, preconditionContextList);
         this.from = from;
         this.to = to;
     }

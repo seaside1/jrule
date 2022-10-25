@@ -29,20 +29,20 @@ import org.openhab.core.items.events.ItemCommandEvent;
  * @author Robert Delbrück - Initial contribution
  */
 public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecutionContext {
-    private final Optional<String> to;
+    private final Optional<String> command;
 
-    public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, String itemName,
-            Method method, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
+    public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            String itemName, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
             Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-            Optional<String> to) {
-        super(jRule, logName, loggingTags, itemName, method, lt, lte, gt, gte, eq, neq, preconditionContextList);
-        this.to = to;
+            Optional<String> command) {
+        super(jRule, logName, loggingTags, method, itemName, lt, lte, gt, gte, eq, neq, preconditionContextList);
+        this.command = command;
     }
 
     @Override
     public boolean match(AbstractEvent event) {
         return event instanceof ItemCommandEvent && ((ItemCommandEvent) event).getItemName().equals(this.getItemName())
-                && to.map(s -> ((ItemCommandEvent) event).getItemCommand().toString().equals(s)).orElse(true)
+                && command.map(s -> ((ItemCommandEvent) event).getItemCommand().toString().equals(s)).orElse(true)
                 && super.matchCondition(((ItemCommandEvent) event).getItemCommand().toString());
     }
 
