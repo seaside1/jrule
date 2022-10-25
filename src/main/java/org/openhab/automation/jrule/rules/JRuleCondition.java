@@ -10,14 +10,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.trigger;
+package org.openhab.automation.jrule.rules;
 
 /**
- * The {@link JRuleSwitchTrigger} Items
+ * The {@link JRuleCondition}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück
  */
-public interface JRuleContactTrigger {
-    String OPEN = "OPEN";
-    String CLOSED = "CLOSED";
+public @interface JRuleCondition {
+    double gt() default Double.MIN_VALUE;
+
+    double lt() default Double.MIN_VALUE;
+
+    double gte() default Double.MIN_VALUE;
+
+    double lte() default Double.MIN_VALUE;
+
+    String eq() default "";
+
+    String neq() default "";
 }

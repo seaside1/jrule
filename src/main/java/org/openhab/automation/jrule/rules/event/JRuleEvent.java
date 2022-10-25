@@ -10,13 +10,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.trigger;
+package org.openhab.automation.jrule.rules.event;
 
 /**
- * The {@link JRuleThingStatusTrigger} Items
+ * The {@link JRuleEvent}
  *
- * @author Gerhard Riegler - Initial contribution
+ * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public interface JRuleThingStatusTrigger {
-    String TRIGGER_CHANGED = "Changed";
+public abstract class JRuleEvent {
+
 }

@@ -13,9 +13,14 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.core.events.AbstractEvent;
+import org.openhab.core.thing.events.ChannelTriggeredEvent;
 
 /**
  * The {@link JRuleChannelExecutionContext}
@@ -24,29 +29,33 @@ import org.openhab.automation.jrule.rules.JRulePrecondition;
  */
 public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     private final String channel;
+    private final Optional<String> event;
 
-    private String eq;
-
-    private String neq;
-
-    public JRuleChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, String ruleName,
-            Method method, boolean eventParameterPresent, JRulePrecondition[] preconditions, String channel, String eq,
-            String neq) {
-        super(jRule, logName, loggingTags, ruleName, method, eventParameterPresent, preconditions);
+    public JRuleChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            List<JRulePreconditionContext> preconditionContextList, String channel, Optional<String> event) {
+        super(jRule, logName, loggingTags, method, preconditionContextList);
         this.channel = channel;
-        this.eq = eq;
-        this.neq = neq;
+        this.event = event;
     }
 
     public String getChannel() {
         return channel;
     }
 
-    public String getEq() {
-        return eq;
+    public Optional<String> getEvent() {
+        return this.event;
     }
 
-    public String getNeq() {
-        return neq;
+    @Override
+    public boolean match(AbstractEvent event) {
+        return event instanceof ChannelTriggeredEvent
+                && ((ChannelTriggeredEvent) event).getChannel().getAsString().equals(this.channel)
+                && this.event.map(e -> e.equals(((ChannelTriggeredEvent) event).getEvent())).orElse(true);
+    }
+
+    @Override
+    public JRuleEvent createJRuleEvent(AbstractEvent event) {
+        return new JRuleChannelEvent(((ChannelTriggeredEvent) event).getChannel().getAsString(),
+                ((ChannelTriggeredEvent) event).getEvent());
     }
 }

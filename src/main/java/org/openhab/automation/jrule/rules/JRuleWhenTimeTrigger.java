@@ -19,15 +19,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRulePrecondition}
+ * The {@link JRuleWhenTimeTrigger}
  *
- * @author Arne Seime- Initial contribution
+ * @author Robert Delbrück
  */
-@Repeatable(JRulePreconditions.class)
+@Repeatable(JRuleWhenTimeTriggers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRulePrecondition {
-    String item() default "";
+public @interface JRuleWhenTimeTrigger {
+    int hours() default -1;
 
-    JRuleCondition condition() default @JRuleCondition;
+    int minutes() default -1;
+
+    int seconds() default -1;
 }

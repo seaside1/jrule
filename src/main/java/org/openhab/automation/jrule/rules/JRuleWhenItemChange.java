@@ -19,15 +19,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRulePrecondition}
+ * The {@link JRuleWhenItemChange}
  *
- * @author Arne Seime- Initial contribution
+ * @author Robert Delbrück
  */
-@Repeatable(JRulePreconditions.class)
+@Repeatable(JRuleWhenItemChanges.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRulePrecondition {
+public @interface JRuleWhenItemChange {
     String item() default "";
+
+    String from() default "";
+
+    String to() default "";
 
     JRuleCondition condition() default @JRuleCondition;
 }

@@ -19,14 +19,14 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.trigger.JRuleDimmerTrigger;
+import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 
 /**
  * The {@link JRuleDimmerItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleDimmerItem extends JRuleItem implements JRuleDimmerTrigger {
+public abstract class JRuleDimmerItem extends JRuleItem implements JRuleSwitchTrigger {
 
     protected JRuleDimmerItem(String itemName) {
         super(itemName);

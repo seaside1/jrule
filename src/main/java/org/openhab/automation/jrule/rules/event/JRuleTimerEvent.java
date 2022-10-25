@@ -10,15 +10,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.trigger;
+package org.openhab.automation.jrule.rules.event;
 
 /**
- * The {@link JRuleCommonTrigger} Items
+ * The {@link JRuleTimerEvent}
  *
- * @author Gerhard Riegler - Initial contribution
+ * @author Robert Delbrück
  */
-public interface JRuleCommonTrigger {
-    String TRIGGER_CHANGED = "Changed";
-    String TRIGGER_RECEIVED_COMMAND = "received command";
-    String TRIGGER_RECEIVED_UPDATE = "received update";
+public class JRuleTimerEvent extends JRuleEvent {
 }
