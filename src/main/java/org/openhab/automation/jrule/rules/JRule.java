@@ -208,10 +208,6 @@ public class JRule {
         JRuleVoiceHandler.get().say(text, voiceId, sinkId);
     }
 
-    protected JRuleAddonActionHandler getAction(String scope, String thingUid) {
-        return JRuleAddonActionHandler.get(scope, thingUid);
-    }
-
     protected void sendCommand(String itemName, JRuleOnOffValue command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
