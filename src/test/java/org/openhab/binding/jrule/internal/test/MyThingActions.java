@@ -24,6 +24,10 @@ import org.openhab.core.thing.binding.ThingHandler;
  * @author Robert Delbrück - Initial contribution
  */
 public class MyThingActions implements ThingActions {
+    @RuleAction(label = "doWhatWithoutParams")
+    public void doWhatWithoutParams() {
+    }
+
     @RuleAction(label = "sendData")
     public void sendData(@ActionInput(name = "value") String value) {
     }

@@ -150,14 +150,15 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
             Class<? extends ThingHandlerService> thingActionsClass = thing.getHandler().getServices().stream()
                     .filter(ThingActions.class::isAssignableFrom).findFirst()
                     .orElseThrow(() -> new IllegalStateException("should not occur here"));
+
+            freemarkerModel.put("type", thingActionsClass.getTypeName());
             Arrays.stream(thingActionsClass.getDeclaredMethods())
                     .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
                     .forEach(method -> {
                         Map<Object, Object> methodMap = new HashMap<>();
                         methodMap.put("name", method.getName());
-                        methodMap.put("returnType", "void");// method.getReturnType().getTypeName());
-                        methodMap.put("hasReturnType", false); // !method.getReturnType().getTypeName().equalsIgnoreCase("void"));
-                        methodMap.put("type", thingActionsClass.getTypeName());
+                        methodMap.put("returnType", method.getReturnType().getTypeName());
+                        methodMap.put("hasReturnType", !method.getReturnType().getTypeName().equalsIgnoreCase("void"));
                         List<Object> args = new ArrayList<>();
                         methodMap.put("args", args);
                         Arrays.stream(method.getParameters()).forEach(parameter -> {

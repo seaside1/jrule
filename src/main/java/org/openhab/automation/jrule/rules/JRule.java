@@ -29,7 +29,6 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
-import org.openhab.automation.jrule.internal.handler.JRuleAddonActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
