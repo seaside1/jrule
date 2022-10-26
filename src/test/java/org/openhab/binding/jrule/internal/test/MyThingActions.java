@@ -15,6 +15,7 @@ package org.openhab.binding.jrule.internal.test;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.core.automation.annotation.ActionInput;
 import org.openhab.core.automation.annotation.RuleAction;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.binding.ThingHandler;
 
@@ -29,7 +30,8 @@ public class MyThingActions implements ThingActions {
     }
 
     @RuleAction(label = "sendData")
-    public void sendData(@ActionInput(name = "value") String value) {
+    public QuantityType sendData(@ActionInput(name = "value") String value) {
+        return QuantityType.ONE;
     }
 
     @RuleAction(label = "doSomething")

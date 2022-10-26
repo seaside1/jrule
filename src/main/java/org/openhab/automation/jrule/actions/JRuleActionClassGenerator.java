@@ -158,6 +158,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                         Map<Object, Object> methodMap = new HashMap<>();
                         methodMap.put("name", method.getName());
                         methodMap.put("returnType", method.getReturnType().getTypeName());
+                        methodMap.put("import", !method.getReturnType().isPrimitive());
                         methodMap.put("hasReturnType", !method.getReturnType().getTypeName().equalsIgnoreCase("void"));
                         List<Object> args = new ArrayList<>();
                         methodMap.put("args", args);

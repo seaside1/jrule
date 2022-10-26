@@ -235,8 +235,9 @@ public class JRuleCompiler {
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
         optionList.add(CLASSPATH_OPTION);
-        optionList.add(classPath);
-        logDebug("Compiling classes using classpath: {}", classPath);
+        String cp = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
+        optionList.add(cp);
+        logDebug("Compiling classes using classpath: {}", cp);
         javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
                 .forEach(javaSourceFile -> logDebug("Compiling java Source file: {}", javaSourceFile));
 
