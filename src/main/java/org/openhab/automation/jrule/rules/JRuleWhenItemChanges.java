@@ -13,21 +13,17 @@
 package org.openhab.automation.jrule.rules;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRulePrecondition}
+ * The {@link JRuleWhenItemChanges}
  *
- * @author Arne Seime- Initial contribution
+ * @author Robert Delbrück
  */
-@Repeatable(JRulePreconditions.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRulePrecondition {
-    String item() default "";
-
-    JRuleCondition condition() default @JRuleCondition;
+public @interface JRuleWhenItemChanges {
+    JRuleWhenItemChange[] value();
 }

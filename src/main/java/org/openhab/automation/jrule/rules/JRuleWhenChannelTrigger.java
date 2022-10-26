@@ -19,15 +19,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The {@link JRulePrecondition}
+ * The {@link JRuleWhenChannelTriggers}
  *
- * @author Arne Seime- Initial contribution
+ * @author Robert Delbrück
  */
-@Repeatable(JRulePreconditions.class)
+@Repeatable(JRuleWhenChannelTriggers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRulePrecondition {
-    String item() default "";
+public @interface JRuleWhenChannelTrigger {
+    String channel() default "";
 
-    JRuleCondition condition() default @JRuleCondition;
+    String event() default "";
 }

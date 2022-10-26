@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.core.events.AbstractEvent;
 
 /**
  * The {@link JRuleExecutionContext}
@@ -24,31 +27,18 @@ import org.openhab.automation.jrule.rules.JRulePrecondition;
  */
 public abstract class JRuleExecutionContext {
     private final String logName;
-    protected final String ruleName;
     protected final JRule jRule;
     protected final Method method;
-    protected final boolean eventParameterPresent;
     private final String[] loggingTags;
+    private final List<JRulePreconditionContext> preconditionContextList;
 
-    public JRulePrecondition[] getPreconditions() {
-        return preconditions;
-    }
-
-    private final JRulePrecondition[] preconditions;
-
-    public JRuleExecutionContext(JRule jRule, String logName, String[] loggingTags, String ruleName, Method method,
-            boolean eventParameterPresent, JRulePrecondition[] preconditions) {
+    public JRuleExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            List<JRulePreconditionContext> preconditionContextList) {
         this.logName = logName;
         this.loggingTags = loggingTags;
         this.jRule = jRule;
-        this.ruleName = ruleName;
         this.method = method;
-        this.eventParameterPresent = eventParameterPresent;
-        this.preconditions = preconditions;
-    }
-
-    public String getRuleName() {
-        return ruleName;
+        this.preconditionContextList = preconditionContextList;
     }
 
     public JRule getJrule() {
@@ -59,8 +49,9 @@ public abstract class JRuleExecutionContext {
         return method;
     }
 
-    public boolean isEventParameterPresent() {
-        return eventParameterPresent;
+    public boolean hasEventParameterPresent() {
+        return Arrays.stream(method.getParameters())
+                .anyMatch(param -> (JRuleEvent.class.isAssignableFrom(param.getType())));
     }
 
     public String getLogName() {
@@ -69,5 +60,13 @@ public abstract class JRuleExecutionContext {
 
     public String[] getLoggingTags() {
         return loggingTags;
+    }
+
+    public abstract boolean match(AbstractEvent event);
+
+    public abstract JRuleEvent createJRuleEvent(AbstractEvent event);
+
+    public List<JRulePreconditionContext> getPreconditionContextList() {
+        return preconditionContextList;
     }
 }

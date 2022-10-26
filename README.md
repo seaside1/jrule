@@ -87,16 +87,14 @@ Switch MyTestSwitch2  "Test Switch 2" (JRule)
 
 ```java
 package org.openhab.automation.jrule.rules.user;
-import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.ON;
+
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MySwitchRule extends JRule {
-    
+
     @JRuleName("MySwitchRule")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
     public void execOffToOnRule() {
         logInfo("||||| --> Hello World!");
     }
@@ -164,7 +162,7 @@ See example 12, 25 and 26
 Use Case: Invoke another item Switch from rule
 ```java
     @JRuleName("MyRuleTurnSwich2On")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
         JRuleItems.MySwitch2.sendCommand(ON);
@@ -178,7 +176,7 @@ This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
 
 ```java
     @JRuleName("MyLockTestRule1")
-    @JRuleWhen(item = _MyTestSwitch2.ITEM, trigger = _MyTestSwitch2.TRIGGER_CHANGED_FROM_OFF_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch2.ITEM, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void execLockTestRule() {
         if (getTimedLock("MyLockTestRule1", 20)) {
             JRuleItems.MyDoorBellItem.sendCommand(ON);
@@ -194,11 +192,11 @@ Use case: Use the value that caused the trigger
 When the rule is triggered, the triggered value is stored in the event.
 
 ```java
-   @JRuleName("MyEventValueTest")
-   @JRuleWhen(item = __MyTestSwitch2.ITEM, trigger = __MyTestSwitch2.TRIGGER_RECEIVED_COMMAND)
-   public void myEventValueTest(JRuleEvent event) {
-      logInfo("Got value from event: {}", event.getState().getValue());
-   }
+    @JRuleName("MyEventValueTest")
+    @JRuleWhenItemReceivedCommand(item = _MyTestSwitch2.ITEM)
+    public void myEventValueTest(JRuleEvent event) {
+        logInfo("Got value from event: {}", event.getState().getValue());
+    }
 ```
 ## Example 4
 
@@ -206,12 +204,12 @@ Use case: Or statement for rule trigger
 To add an OR statement we simply add multiple @JRuleWhen statements
 
 ```java
-   @JRuleName("MyNumberRule1")
-   @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "14", to = "10")
-   @JRuleWhen(item = _MyTestNumber.ITEM, trigger = _MyTestNumber.TRIGGER_CHANGED, from = "10", to = "12")
-   public void myOrRuleNumber(JRuleEvent event) {
-      logInfo("Got change number: {}", event.getState().getValue());
-   }
+    @JRuleName("MyNumberRule1")
+    @JRuleWhenItemChange(item = _MyTestNumber.ITEM, from = "14", to = "10")
+    @JRuleWhenItemChange(item = _MyTestNumber.ITEM, from = "10", to = "12")
+    public void myOrRuleNumber(JRuleEvent event) {
+        logInfo("Got change number: {}", event.getState().getValue());
+    }
 ```
 
 ## Example 5
@@ -235,16 +233,15 @@ public class JRuleUser extends JRule {
 
 Your class rules can now extend the JRuleUser
 package org.openhab.automation.jrule.rules.user;
+
 ```java
 import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
-import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.user.JRuleUser;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MySwitchRule extends JRuleUser {
- 
+
 }
 ```
 
@@ -276,14 +273,12 @@ We then extend the rule from the Java Rules file:
 package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.items.generated._MyTestSwitch;
-import org.openhab.automation.jrule.rules.JRuleEvent;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhen;
 
 public class MyTestUserRule extends JRuleUser {
-  
+
     @JRuleName("TestUserDefinedRule")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_RECEIVED_COMMAND)
     public void mySendNotificationRUle(JRuleEvent event) {
         if (timeIsOkforDisturbance()) {
             logInfo("It's ok to send a disturbing notification");
@@ -296,7 +291,7 @@ public class MyTestUserRule extends JRuleUser {
 Use case create a timer for automatically turning off a light when it is turned on. If it's running cancel it and schedule a new one. 
 ```java
     @JRuleName("myTimerRule")
-    @JRuleWhen(item = _MyLightSwitch.ITEM, trigger = _MyLightSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyLightSwitch.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void myTimerRule(JRuleEvent event) {
         logInfo("Turning on light it will be turned off in 2 mins");
         createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
@@ -314,7 +309,7 @@ to send multiple ON statements to be sure it actually turns on.
  
 ```java
     @JRuleName("repeatRuleExample")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void repeatRuleExample(JRuleEvent event) {
         createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 10, (Void) -> { // Lambda Expression
             final String messageOn = "repeatRuleExample Repeating.....";
@@ -330,7 +325,7 @@ Use case Create a simple timer. When MyTestSwitch turns on it will wait 10 secon
 it will not reschedule the timer, if the timer is already running it won't reschedule it.
 ```java
     @JRuleName("timerRuleExample")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void timerRuleExample(JRuleEvent event) {
         createTimer("myTimer", 10, (Void) -> { // Lambda Expression
             final String messageOn = "timer example.";
@@ -343,13 +338,13 @@ it will not reschedule the timer, if the timer is already running it won't resch
 
 Use case trigger a rule at 22:30 in the evening to set initial brightness for a ZwaveDimmer to 30%
 ```java
-  @JRuleName("setDayBrightness")
-  @JRuleWhen(hours=22, minutes=30)
-  public synchronized void setDayBrightness(JRuleEvent event) {
-      logInfo("Setting night brightness to 30%");
-      int dimLevel = 30;
-      JRuleItems.ZwaveDimmerBrightness.sendCommand(dimLevel);
-  }
+    @JRuleName("setDayBrightness")
+    @JRuleWhenTimeTrigger(hours=22, minutes=30)
+    public synchronized void setDayBrightness(JRuleEvent event) {
+        logInfo("Setting night brightness to 30%");
+        int dimLevel = 30;
+        JRuleItems.MyDimmerBrightness.sendCommand(dimLevel);
+    }
 ```
 
 ## Example 12
@@ -362,12 +357,12 @@ gt = greater than
 gte = greater than or equals  
 eq = equals  
 ```java
-  @JRuleName("turnOnFanIfTemperatureIsLow")
-  @JRuleWhen(item = _MyTemperatureSensor.ITEM, trigger = _MyTemperatureSensor.TRIGGER_RECEIVED_UPDATE, lte = 20)
-  public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
-      logInfo("Starting fan since temeprature dropped below 20");
-      JRuleItems.MyHeatinFanSwitch.sendCommand(ON);
-  }
+    @JRuleName("turnOnFanIfTemperatureIsLow")
+    @JRuleWhenItemChange(item = _MyTemperatureSensor.ITEM, condition = @JRuleCondition(lte = 20))
+    public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
+        logInfo("Starting fan since temperature dropped below 20");
+        JRuleItems.MyHeatingFanSwitch.sendCommand(JRuleOnOffValue.ON);
+    }
 ```
 
 ## Example 13
@@ -375,7 +370,7 @@ eq = equals
 Use case: Using say command for tts
 ```java
     @JRuleName("testSystemTts")
-    @JRuleWhen(item = _TestSystemTts.ITEM, trigger = _TestSystemTts.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _TestSystemTts.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void testSystemTts(JRuleEvent event) {
         logInfo("System TTS Test");
         String message = "Testing tts! I hope you can hear it!";
@@ -388,11 +383,11 @@ Use case: Using say command for tts
 Use case: Executing command from CLI
 ```java
 
-    @JRuleName("testExecutingCommandLine")
-    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED)
+    @JRuleName("TestExecutingCommandLine")
+    @JRuleWhenItemReceivedCommand(item = _MySwitchGroup.ITEM)
     public synchronized void testExecutingCommandLine(JRuleEvent event) {
         logInfo("Creating dummy file using CLI");
-        executeCommandLine("touch ~/example.txt");
+        executeCommandLine("touch", "/openhab/userdata/example.txt");
     }
 ```
 ## Example 15
@@ -400,10 +395,10 @@ Use case: Executing command from CLI
 Use case: A group of switches, see if status is changed, and also which member in the group changed state
 ```java
     @JRuleName("groupMySwitchesChanged")
-    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED)
+    @JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
     public synchronized void groupMySwitchGroupChanged(JRuleEvent event) {
-        final boolean groupIsOnline = event.getState().getValueAsOnOffValue() == ON;
-        final String memberThatChangedStatus = event.getMemberName();
+    final boolean groupIsOnline = ((JRuleItemEvent) event).getState().getValueAsOnOffValue() == JRuleOnOffValue.ON;
+    final String memberThatChangedStatus = ((JRuleItemEvent) event).getMemberName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
     }
 ```
@@ -413,7 +408,7 @@ Use case: A group of switches, see if status is changed, and also which member i
 Use case: A group of switches , trigger when it's changed from OFF to ON
 ```java
     @JRuleName("groupMySwitchesChangedOffToOn")
-    @JRuleWhen(item = _gMySwitchGroup.ITEM, trigger = _gMySwitchGroup.TRIGGER_CHANGED, from="OFF", to="ON")
+    @JRuleWhenItemChange(item = _MySwitchGroup.ITEM, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public synchronized void groupMySwitchesChangedOffToOn(JRuleEvent event) {
         logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberName());
     }
@@ -423,10 +418,10 @@ Use case: A group of switches , trigger when it's changed from OFF to ON
 
 Use case: Listen for a Channel Trigger Event
 ```java
-    @JRuleName("channelTriggered")
-    @JRuleWhen(channel = "binding:thing:buttonevent")
+    @JRuleName("ChannelTriggered")
+    @JRuleWhenChannelTrigger(channel = "mqtt:topic:mqtt:generic:numberTrigger")
     public synchronized void channelTriggered(JRuleEvent event) {
-        logInfo("Channel triggered with value: {}", event.getState().getValue());
+        logInfo("Channel triggered with value: {}", ((JRuleChannelEvent) event).getEvent());
     }
 ```
 
@@ -435,9 +430,9 @@ Use case: Listen for a Channel Trigger Event
 Use case: Cron based expression to trigger rule
 ```java
     @JRuleName("testCron")
-    @JRuleWhen(cron = "4 * * * * *")
+    @JRuleWhenCronTrigger(cron = "*/5 * * * * *")
     public void testCron(JRuleEvent event) {
-        logInfo("CRON: Running cron from string every minute when seconds is at 4: {}", event.getState().getValue());
+        logInfo("CRON: Running cron from string every 5 seconds: {}", event);
     }
 ```
 
@@ -448,7 +443,7 @@ Note that `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).
 can be called without serviceId argument: `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated();`
 ```java
 @JRuleName("testLastUpdate")
-@JRuleWhen(cron = "4 * * * * *")
+@JRuleWhenCronTrigger(cron = "4 * * * * *")
 public void testLastUpdate(JRuleEvent event){
     logInfo("CRON: Running cron from string: {}",event.getState().getValue());
     ZonedDateTime lastUpdate = JRuleItems.MyCoolItem.getLastUpdated("mapdb");
@@ -464,13 +459,13 @@ Use case: Get the brigtness from a color item, set a color item to white (HSB 0,
 ```java
   
     @JRuleName("testBrightnessFromColorItem")
-    @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED)
+    @JRuleWhenItemChange(item = _MyTestColorItem.ITEM)
     public void testBrightnessFromColorItem(JRuleEvent event) {
        JRuleColorValue color = JRuleItems.MyTestColorItem.getState();
        int brightness = color.getHsbValue().getBrightness();
     }
-   
-    @JRuleWhen(item = _MyTestColorItem.ITEM, trigger = _MyTestColorItem.TRIGGER_CHANGED) 
+
+    @JRuleWhenItemChange(item = _MyTestColorItem.ITEM)
     public void testSetWhiteOnColorItem(JRuleEvent event) {
         JRuleItems.MyTestColorItem.sendCommand(JRuleColorValue.fromHsb(0,0,100));
     }
@@ -481,7 +476,7 @@ Use case: Set logging name for a specific rule
 ```java
     @JRuleName("MyCustomLoggingRule")
     @JRuleLogName("MYLOG")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
         JRuleItems.MySwitch2.sendCommand(ON);
@@ -494,7 +489,7 @@ Use case: Override logging for all rules defined in one file
    public class ColorRules extends JRule {
 
     @JRuleName("MyCustomLoggingRuleOnClass")
-    @JRuleWhen(item = _MyTestSwitch.ITEM, trigger = _MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
         JRuleItems.MySwitch2.sendCommand(ON);
@@ -515,7 +510,7 @@ Use case: Apply transformation using openHAB transformation service
    public class TransformationRule extends JRule {
 
     @JRuleName("MyTransformation")
-    @JRuleWhen(item = _MyStringValue.ITEM, trigger = _MyStringValue.TRIGGER_RECEIVED_COMMAND)
+    @JRuleWhenItemReceivedCommand(item = _MyStringValue.ITEM)
     public void applyTransformation(JRuleEvent event) {
         String transformedValue = transform("MAP(my.map):%s", event.getState().getValue());
         logInfo("Transformed {} to {}", event.getState().getValue(), transformedValue);
@@ -531,17 +526,14 @@ if it is ok for disturbance. If it is ok the switch is set to ON and we can send
 message is updated.
 
 ```java
-   public class PreConditionTestDisturbance extends JRule {
-
-    @JRulePrecondition(item=_MyTestDisturbanceSwitch.ITEM, eq = "ON")
+    @JRulePrecondition(item = _MyTestDisturbanceSwitch.ITEM, condition = @JRuleCondition(eq = "ON"))
     @JRuleName("MyTestPreConditionRule1")
-    @JRuleWhen(item = _MyMessageNotification.ITEM, trigger = _MyMessageNotification.TRIGGER_RECEIVED_COMMAND)
+    @JRuleWhenItemReceivedCommand(item = _MyMessageNotification.ITEM)
     public void testPrecondition(JRuleEvent event) {
-        String notificationMessage = event.getState().getValue();
+        String notificationMessage = ((JRuleItemEvent) event).getState().getValue();
         logInfo("It is ok to send notification: {}", notificationMessage);
-        JRuleItems.MySendNoticationItemMqtt.sendCommand(notificationMessage);
-    }
-}
+//        JRuleItems.MySendNoticationItemMqtt.sendCommand(notificationMessage);
+        }
 ```
 ## Example 25
 Use case: Use precondition annotation in order to create "AND" logic. Example when the temperature is above 30 degrees (celcius probably) and
@@ -552,7 +544,7 @@ a motion detector is triggered we will turn on a fan.
 
     @JRulePrecondition(item=_MyTestTemperatureSensor.ITEM, gt = 30)
     @JRuleName("MyTestPreConditionRuleTemperature")
-    @JRuleWhen(item = _MyMotionDetector.ITEM, trigger = _MyMotionDectetor.TRIGGER_CHANGED_FROM_OFF_TO_ON)
+    @JRuleWhenItemChange(item = _MyMotionDetector.ITEM, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void testPrecondition(JRuleEvent event) {
         logInfo("Temperature is above 30 and we should start the fan since the motiondetector is triggered");
         JRuleItems.MyFan.sendCommand(ON);
@@ -568,7 +560,7 @@ Use case: Send Quantity type Watt (W) from rule.
    public class QuantityTypeRule extends JRule {
   
     @JRuleName("testQuantityPowerWatt")
-    @JRuleWhen(item=_MyTestMeterPower.ITEM, trigger=_MyTestMeterPower.TRIGGER_CHANGED)
+    @JRuleWhenItemChange(item = _MyTestMeterPower.ITEM)
     public void testQuantityPower(JRuleEvent event) {
         logInfo("TestQuantity power will send this value as Watt: {}", event.getState().getValue());
         JRuleItems.TestPowerQuantityType.sendCommand(event.getState().getValueAsDouble(), "W");
@@ -583,7 +575,7 @@ Use case: Use forName to create and item and send commands and get status
  public class ForNameExampleRule extends JRule {
   
     @JRuleName("testForName")
-    @JRuleWhen(item=_MyTestSwitch.ITEM, trigger=_MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public void testForName(JRuleEvent event) {
         JRuleSwitchItem switchItem = JRuleSwitchItem.forName("MyOtherTestSwitch");
         switchItem.sendItemCommand(OFF);
@@ -604,8 +596,8 @@ triggered the rule.
  public class TriggerNameExample extends JRule {
   
     @JRuleName("triggerNameExample")
-    @JRuleWhen(item=_MyTestSwitch1.ITEM, trigger=_MyTestSwitch1.TRIGGER_CHANGED_TO_ON)
-    @JRuleWhen(item=_MyTestSwitch2.ITEM, trigger=_MyTestSwitch2.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch1.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch2.ITEM, to = JRuleSwitchItem.ON)
     public void triggerNameExample(JRuleEvent event) {
      logInfo("The rule was triggered by the following item: {}", event.getItemName());
      logInfo("The rule was Old Value was: {} and new value: {}", event.getOldState().getValue(), event.getState().getValue());  
@@ -619,7 +611,7 @@ triggered the rule.
 Use case: get average value for a Number item last hour 
 ```java
 @JRuleName("testAverageLastHour")
-@JRuleWhen(cron = "4 * * * * *")
+@JRuleWhenCronTrigger(cron = "4 * * * * *")
 public void testAverage(JRuleEvent event){
     Double average = JRuleNumberItem.forName(_MyNumberItem.ITEM).averageSince(ZonedDateTime.now().minus(1,ChronoUnit.HOURS));
     logInfo("Average value last hour: {}",average);
@@ -634,7 +626,7 @@ Use case: Use generated JRuleItems.java to get hold of items. For instance get s
  public class ItemsExampleRule extends JRule {
   
     @JRuleName("testItems")
-    @JRuleWhen(item=_MyTestSwitch.ITEM, trigger=_MyTestSwitch.TRIGGER_CHANGED_TO_ON)
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public void testItems(JRuleEvent event) {
         JRuleItems.MyOtherTestSwitch.getState();
     }
@@ -648,7 +640,7 @@ Use case: Restart thing every night due to binding flakyness
 
 ```java
 @JRuleName("Restart thing every night")
-@JRuleWhen(hours = 3)
+@JRuleWhenTimeTrigger(hours=3)
 public void restartThing() {
     JRuleThings.my_flaky_thing.restart();
 }
@@ -660,7 +652,7 @@ Use case: Detect if a specific thing goes offline, wait for it to come online ag
 
 ```java
 @JRuleName("Notify if thing stays offline")
-@JRuleWhen(thing = remoteopenhab_thing.ID, trigger = remoteopenhab_thing.TRIGGER_CHANGED, from = "ONLINE")
+@JRuleWhenThingTrigger(thing = remoteopenhab_thing.ID, from = JRuleThingStatus.ONLINE)
 public void warnIfThingStaysOffline() {
     createOrReplaceTimer("MY_TIMER", 3 * 60, unused -> {
         if (JRuleThings.remoteopenhab_thing.getStatus() != JRuleThingStatus.ONLINE) {
@@ -677,7 +669,7 @@ Use case: Listen for thing status events on _all_ things
 
 ```java
 @JRuleName("Log every thing that goes offline")
-@JRuleWhen(thing = "*", trigger = JRuleThingStatusTrigger.TRIGGER_CHANGED, from = "ONLINE")
+@JRuleWhenThingTrigger(from = JRuleThingStatus.ONLINE)
 public void startTrackingNonOnlineThing(JRuleEvent event) {
     String offlineThingUID = event.getThing();
     // ...
@@ -690,7 +682,7 @@ Use case: Thing actions, send message with pushover and other services
 
 ```java
 @JRuleName("PushOverTest")
-@JRuleWhen(item = _MyTestSendPushOverButton.ITEM, trigger = __MyTestSendPushOverButton.TRIGGER_CHANGED_TO_ON)
+@JRuleWhenItemChange(item = _MyTestSendPushOverButton.ITEM, to = JRuleSwitchItem.ON)
 public void sendPushover(JRuleEvent event) {
        logInfo("Sending Test message using pushover via actions");
        JRuleAddonActionHandler action = getAction("pushover", "pushover:pushover-account:myaccount");

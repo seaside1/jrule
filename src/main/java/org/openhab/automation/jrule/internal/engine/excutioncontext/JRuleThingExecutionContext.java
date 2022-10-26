@@ -13,9 +13,15 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
+import org.openhab.automation.jrule.things.JRuleThingStatus;
+import org.openhab.core.events.AbstractEvent;
+import org.openhab.core.thing.events.ThingStatusInfoChangedEvent;
 
 /**
  * The {@link JRuleThingExecutionContext} - execution context for thing triggers
@@ -23,64 +29,43 @@ import org.openhab.automation.jrule.rules.JRulePrecondition;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleThingExecutionContext extends JRuleExecutionContext {
-    public static final String ANY_THING_UID = "*"; // Wildcard, allows registering rules that listen for all thing
-    private static final String FROM_PREFIX = " from ";
-    private static final String TO_PREFIX = " to ";
+    private final Optional<String> thing;
+    private final Optional<JRuleThingStatus> from;
+    private final Optional<JRuleThingStatus> to;
 
-    private final String thing;
-    private final String trigger;
-    private final String from;
-    private final String to;
-
-    public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, String trigger, String from,
-            String to, String ruleName, String thing, Method method, boolean eventParameterPresent,
-            JRulePrecondition[] preconditions) {
-        super(jRule, logName, loggingTags, ruleName, method, eventParameterPresent, preconditions);
+    public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+            Optional<String> thing, Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to,
+            List<JRulePreconditionContext> preconditions) {
+        super(jRule, logName, loggingTags, method, preconditions);
         this.thing = thing;
-        this.trigger = trigger;
         this.from = from;
         this.to = to;
     }
 
-    public String getThing() {
+    public Optional<String> getThing() {
         return thing;
-    }
-
-    public String getTrigger() {
-        return trigger;
-    }
-
-    public String getTriggerFullString() {
-        if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
-            return buildFromToString(trigger, from, to);
-        }
-        if (from != null && !from.isEmpty()) {
-            return buildFromToString(trigger, from, null);
-        }
-        if (to != null && !to.isEmpty()) {
-            return buildFromToString(trigger, null, to);
-        }
-
-        return trigger;
-    }
-
-    private String buildFromToString(String trigger, String from, String to) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(trigger);
-        if (from != null) {
-            builder.append(FROM_PREFIX);
-            builder.append(from);
-        }
-        if (to != null) {
-            builder.append(TO_PREFIX);
-            builder.append(to);
-        }
-        return builder.toString();
     }
 
     @Override
     public String toString() {
-        return "JRuleThingExecutionContext{" + "thing='" + thing + '\'' + ", trigger='" + trigger + '\'' + ", from='"
-                + from + '\'' + ", to='" + to + '\'' + '}';
+        return "JRuleThingExecutionContext{" + "thing='" + thing + '\'' + ", from='" + from + '\'' + ", to='" + to
+                + '\'' + '}';
+    }
+
+    @Override
+    public boolean match(AbstractEvent event) {
+        if (!(event instanceof ThingStatusInfoChangedEvent)) {
+            return false;
+        }
+        ThingStatusInfoChangedEvent evt = (ThingStatusInfoChangedEvent) event;
+        return thing.map(s -> evt.getThingUID().toString().equals(s)).orElse(true)
+                && from.map(s -> evt.getOldStatusInfo().getStatus().name().equals(s.name())).orElse(true)
+                && to.map(s -> evt.getStatusInfo().getStatus().name().equals(s.name())).orElse(true);
+    }
+
+    @Override
+    public JRuleEvent createJRuleEvent(AbstractEvent event) {
+        return new JRuleThingEvent(((ThingStatusInfoChangedEvent) event).getThingUID().toString(),
+                ((ThingStatusInfoChangedEvent) event).getStatusInfo().getStatus().name());
     }
 }

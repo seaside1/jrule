@@ -22,6 +22,7 @@ import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
 import org.openhab.core.voice.VoiceManager;
@@ -57,21 +58,24 @@ public class JRuleFactory {
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
             final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
-            final @Reference VoiceManager voiceManager, final ComponentContext componentContext) {
+            final @Reference VoiceManager voiceManager, final ComponentContext componentContext,
+            final @Reference CronScheduler cronScheduler) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
         jRuleEngine.setConfig(config);
         jRuleEngine.setItemRegistry(itemRegistry);
+        jRuleEngine.setCronScheduler(cronScheduler);
+        jRuleEngine.initialize();
+
         jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
-                eventSubscriber, voiceManager, componentContext.getBundleContext());
+                eventSubscriber, voiceManager, cronScheduler, componentContext.getBundleContext());
         delayedInit.call(this::init);
     }
 
     @Nullable
     private Boolean init() {
         JRuleLog.info(logger, LOG_NAME_FACTORY, "Initializing Java Rules Engine v{}", getBundleVersion());
-        jRuleEngine.initialize();
         jRuleHandler.initialize();
         return Boolean.TRUE;
     }
@@ -84,6 +88,5 @@ public class JRuleFactory {
     public synchronized void dispose() {
         delayedInit.cancel();
         jRuleHandler.dispose();
-        jRuleEngine.dispose();
     }
 }

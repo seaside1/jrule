@@ -17,15 +17,7 @@ package org.openhab.automation.jrule.trigger;
  *
  * @author Gerhard Riegler - Initial contribution
  */
-public interface JRulePlayerTrigger extends JRuleCommonTrigger {
-    String TRIGGER_RECEIVED_UPDATE_ON = "received update PLAY";
-    String TRIGGER_RECEIVED_UPDATE_OFF = "received update PAUSE";
-    String TRIGGER_RECEIVED_COMMAND_ON = "received command PLAY";
-    String TRIGGER_RECEIVED_COMMAND_OFF = "received command PAUSE";
-    String TRIGGER_CHANGED_FROM_ON_TO_OFF = "Changed from PLAY to PAUSE";
-    String TRIGGER_CHANGED_FROM_OFF_TO_ON = "Changed from PAUSE to PLAY";
-    String TRIGGER_CHANGED_FROM_ON = "Changed from PLAY";
-    String TRIGGER_CHANGED_FROM_OFF = "Changed from PAUSE";
-    String TRIGGER_CHANGED_TO_OFF = "Changed to PAUSE";
-    String TRIGGER_CHANGED_TO_ON = "Changed to PLAY";
+public interface JRulePlayerTrigger {
+    String PLAY = "PLAY";
+    String PAUSE = "PAUSE";
 }
