@@ -55,11 +55,12 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCr
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
+import org.openhab.automation.jrule.internal.handler.JRuleRuleProvider;
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
-import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
 import org.openhab.automation.jrule.rules.JRuleDebounce;
+import org.openhab.automation.jrule.rules.JRuleDelayed;
 import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.JRuleName;
@@ -102,9 +103,12 @@ public class JRuleEngine implements PropertyChangeListener {
     protected ThreadPoolExecutor ruleExecutorService;
     protected JRuleConfig config;
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
+
     protected ItemRegistry itemRegistry;
     protected JRuleLoadingStatistics ruleLoadingStatistics;
     private static volatile JRuleEngine instance;
+
+    private JRuleRuleProvider ruleProvider;
 
     public static JRuleEngine get() {
         if (instance == null) {
@@ -515,5 +519,10 @@ public class JRuleEngine implements PropertyChangeListener {
         } else {
             ruleInvoker.accept(context, event);
         }
+    }
+
+    public void setRuleProvider(JRuleRuleProvider ruleProvider) {
+
+        this.ruleProvider = ruleProvider;
     }
 }
