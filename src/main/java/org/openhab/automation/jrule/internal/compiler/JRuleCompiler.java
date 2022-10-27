@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -62,6 +63,8 @@ public class JRuleCompiler {
     public static final String JAR_JRULE_GENERATED_JAR_NAME = "jrule-generated.jar";
     private static final String LOG_NAME_COMPILER = "JRuleCompiler";
     private static final String FRONT_SLASH = "/";
+    public static final String PROPERTY_KARAF_HOME_URI = "karaf.home.uri";
+    public static final String PROPERTY_KARAF_DEFAULT_REPOSITORY = "karaf.default.repository";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleCompiler.class);
 
@@ -235,7 +238,9 @@ public class JRuleCompiler {
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
         optionList.add(CLASSPATH_OPTION);
-        String cp = System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
+        String openhabCoreJar = getOpenhabCoreJar().map(s -> s + File.pathSeparator).orElse("");
+        logDebug("Openhab-Core Jar: {}", openhabCoreJar);
+        String cp = openhabCoreJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
         optionList.add(cp);
         logDebug("Compiling classes using classpath: {}", cp);
         javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
@@ -262,6 +267,27 @@ public class JRuleCompiler {
         }
 
         return false;
+    }
+
+    private Optional<String> getOpenhabCoreJar() {
+        if (!System.getProperties().containsKey(PROPERTY_KARAF_HOME_URI)
+                && !System.getProperties().containsKey(PROPERTY_KARAF_DEFAULT_REPOSITORY)) {
+            logWarn("required system properties does not exist");
+            return Optional.empty();
+        }
+        String openhabJars = System.getProperty(PROPERTY_KARAF_HOME_URI).replace("file:", "")
+                + System.getProperty(PROPERTY_KARAF_DEFAULT_REPOSITORY);
+        logDebug("Openhab Jars path: {}", openhabJars);
+        Optional<String> coreJarPath;
+        try (Stream<Path> stream = Files.walk(Paths.get(openhabJars))) {
+            coreJarPath = stream.filter(path -> path.getFileName().toString().endsWith(JRuleConstants.JAR_FILE_TYPE))
+                    .filter(path -> path.getFileName().toString().startsWith("org.openhab.core-"))
+                    .map(path -> path.toFile().getAbsolutePath()).findFirst();
+        } catch (IOException e) {
+            logError(e.getMessage());
+            return Optional.empty();
+        }
+        return coreJarPath;
     }
 
     public String getJarPath(String jarName) {

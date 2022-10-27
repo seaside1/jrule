@@ -3,8 +3,6 @@
 package ${action.package};
 
 import org.openhab.automation.jrule.actions.${action.parentClass};
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 <#list action.methods as method>
 <#if method.import == true>
