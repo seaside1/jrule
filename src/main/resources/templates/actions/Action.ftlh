@@ -11,7 +11,6 @@ import ${method.returnType};
 </#list>
 
 <#include "ActionJavadoc.ftlh">
-// Wrapping class: ${action.type}
 public class ${action.class} extends ${action.parentClass} {
 <#include "ActionConstructor.ftlh">
 <#list action.methods as method>
