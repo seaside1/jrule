@@ -27,11 +27,15 @@ import org.junit.jupiter.api.TestInstance;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.things.JRuleThingClassGenerator;
+import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.ThingUID;
+import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.thing.internal.BridgeImpl;
 import org.openhab.core.thing.internal.ThingImpl;
+import org.openhab.core.thing.type.ChannelKind;
 import org.vesalainen.util.Lists;
 
 /**
@@ -67,9 +71,19 @@ public class JRuleThingClassGeneratorTest {
 
     @Test
     public void testGenerateAndCompileThingFile() {
+        ThingImpl thing = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
+                new ThingUID("mybinding", "thingtype", "id"));
+        Channel triggerChannel = ChannelBuilder.create(new ChannelUID(thing.getUID(), "triggerChannel"))
+                .withKind(ChannelKind.TRIGGER).build();
+        Channel triggerChannelWithType = ChannelBuilder.create(new ChannelUID(thing.getUID(), "triggerChannel#start"))
+                .withKind(ChannelKind.TRIGGER).build();
+        Channel stateChannel = ChannelBuilder.create(new ChannelUID(thing.getUID(), "stateChannel"))
+                .withKind(ChannelKind.STATE).build();
+        thing.addChannel(triggerChannel);
+        thing.addChannel(triggerChannelWithType);
+        thing.addChannel(stateChannel);
 
-        generateAndCompile(new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
-                new ThingUID("mybinding", "thingtype", "id")));
+        generateAndCompile(thing);
     }
 
     @Test

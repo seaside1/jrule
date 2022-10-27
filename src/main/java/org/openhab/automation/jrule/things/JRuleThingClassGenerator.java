@@ -28,6 +28,7 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Thing;
+import org.openhab.core.thing.type.ChannelKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +118,7 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
         freemarkerModel.put("package", jRuleConfig.getGeneratedThingPackage());
         freemarkerModel.put("class", jRuleConfig.getGeneratedItemPrefix() + getThingFriendlyName(thing));
         freemarkerModel.put("label", thing.getLabel());
+        freemarkerModel.put("triggerChannels", extractTriggerChannels(thing));
 
         if (thing.getBridgeUID() != null) {
             freemarkerModel.put("parentClass", "JRuleSubThing");
@@ -136,7 +138,30 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
         return freemarkerModel;
     }
 
+    private List<JRuleTriggerChannel> extractTriggerChannels(Thing thing) {
+        return thing.getChannels().stream().filter(e -> e.getKind() == ChannelKind.TRIGGER).map(e -> e.getUID().getId())
+                .map(e -> new JRuleTriggerChannel(e, e.replace("#", "_"))).collect(Collectors.toList());
+    }
+
     public static String getThingFriendlyName(Thing thing) {
         return thing.getUID().toString().replace(':', '_').replace('-', '_');
+    }
+
+    public static class JRuleTriggerChannel {
+        public String channelName;
+        public String fieldName;
+
+        public JRuleTriggerChannel(String channelName, String fieldName) {
+            this.channelName = channelName;
+            this.fieldName = fieldName;
+        }
+
+        public String getChannelName() {
+            return channelName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
     }
 }
