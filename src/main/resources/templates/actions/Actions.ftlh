@@ -8,11 +8,16 @@ import org.openhab.automation.jrule.generated.actions.${action.class};
 
 /**
 * Automatically Generated Class for Actions - DO NOT EDIT!
+* <br/>
+* Includes all available actions for all things
 *
 * @author Robert Delbrück - Initial contribution
 */
 public class JRuleActions {
     <#list actions as action>
+    /**
+     * thingUid: ${action.id}
+     */
     public static final ${action.class} ${action.name};
     </#list>
 
