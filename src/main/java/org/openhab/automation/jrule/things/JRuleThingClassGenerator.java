@@ -138,20 +138,20 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
         return freemarkerModel;
     }
 
-    private List<TriggerChannel> extractTriggerChannels(Thing thing) {
+    private List<JRuleTriggerChannel> extractTriggerChannels(Thing thing) {
         return thing.getChannels().stream().filter(e -> e.getKind() == ChannelKind.TRIGGER).map(e -> e.getUID().getId())
-                .map(e -> new TriggerChannel(e, e.replace("#", "_"))).collect(Collectors.toList());
+                .map(e -> new JRuleTriggerChannel(e, e.replace("#", "_"))).collect(Collectors.toList());
     }
 
     public static String getThingFriendlyName(Thing thing) {
         return thing.getUID().toString().replace(':', '_').replace('-', '_');
     }
 
-    public static class TriggerChannel {
+    public static class JRuleTriggerChannel {
         public String channelName;
         public String fieldName;
 
-        public TriggerChannel(String channelName, String fieldName) {
+        public JRuleTriggerChannel(String channelName, String fieldName) {
             this.channelName = channelName;
             this.fieldName = fieldName;
         }
