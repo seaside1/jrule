@@ -33,10 +33,11 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
     private final Optional<String> state;
 
     public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-                                                   String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
-                                                   Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-                                                   Optional<String> state) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq, preconditionContextList);
+            String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
+            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> state) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq,
+                preconditionContextList);
         this.state = state;
     }
 
@@ -47,12 +48,10 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
                 && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true))) {
             return false;
         }
-        if (!(!isMemberOf()
-                && ((ItemStateEvent) event).getItemName().equals(this.getItemName()))) {
+        if (!(!isMemberOf() && ((ItemStateEvent) event).getItemName().equals(this.getItemName()))) {
             return false;
         }
-        if (!(isMemberOf()
-                && checkData instanceof JRuleAdditionalItemCheckData
+        if (!(isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
                 && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName()))) {
             return false;
         }

@@ -33,10 +33,11 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     private final Optional<String> command;
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-                                                    String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
-                                                    Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-                                                    Optional<String> command) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq, preconditionContextList);
+            String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
+            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> command) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq,
+                preconditionContextList);
         this.command = command;
     }
 
@@ -47,12 +48,10 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
                 && command.map(s -> ((ItemCommandEvent) event).getItemCommand().toString().equals(s)).orElse(true))) {
             return false;
         }
-        if (!(!isMemberOf()
-                && ((ItemCommandEvent) event).getItemName().equals(this.getItemName()))) {
+        if (!(!isMemberOf() && ((ItemCommandEvent) event).getItemName().equals(this.getItemName()))) {
             return false;
         }
-        if (!(isMemberOf()
-                && checkData instanceof JRuleAdditionalItemCheckData
+        if (!(isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
                 && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName()))) {
             return false;
         }

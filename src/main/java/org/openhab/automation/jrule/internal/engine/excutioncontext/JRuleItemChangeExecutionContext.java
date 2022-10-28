@@ -35,10 +35,11 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     private final Optional<String> to;
 
     public JRuleItemChangeExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-                                           String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
-                                           Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-                                           Optional<String> from, Optional<String> to) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq, preconditionContextList);
+            String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
+            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> from, Optional<String> to) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq,
+                preconditionContextList);
         this.from = from;
         this.to = to;
     }
@@ -51,12 +52,10 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
                 && to.map(s -> ((ItemStateChangedEvent) event).getItemState().toString().equals(s)).orElse(true))) {
             return false;
         }
-        if (!(!isMemberOf()
-                && ((ItemStateChangedEvent) event).getItemName().equals(this.getItemName()))) {
+        if (!(!isMemberOf() && ((ItemStateChangedEvent) event).getItemName().equals(this.getItemName()))) {
             return false;
         }
-        if (!(isMemberOf()
-                && checkData instanceof JRuleAdditionalItemCheckData
+        if (!(isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
                 && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName()))) {
             return false;
         }

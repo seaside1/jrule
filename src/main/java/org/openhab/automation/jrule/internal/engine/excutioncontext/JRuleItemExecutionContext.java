@@ -35,8 +35,8 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final Optional<String> neq;
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
-                                     boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte, Optional<String> eq,
-                                     Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
+            boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
+            Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
         super(jRule, logName, loggingTags, method, preconditionContextList);
         this.itemName = itemName;
         this.memberOf = memberOf;
