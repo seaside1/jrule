@@ -72,8 +72,15 @@ public class JRuleActionClassGeneratorTest {
     @Test
     public void testGenerateAndCompileActionFile() {
 
-        generateAndCompile(new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
-                new ThingUID("mybinding", "thingtype", "id")));
+        ThingImpl thing = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
+                new ThingUID("mybinding", "thingtype", "id"));
+        thing.setHandler(new MagicActionModuleThingHandler(thing) {
+            @Override
+            public Collection<Class<? extends ThingHandlerService>> getServices() {
+                return List.of(MyThingActions.class);
+            }
+        });
+        generateAndCompile(thing);
     }
 
     @Test
