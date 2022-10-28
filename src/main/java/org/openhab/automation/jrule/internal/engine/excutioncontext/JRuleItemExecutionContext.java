@@ -26,6 +26,7 @@ import org.openhab.core.library.types.QuantityType;
  */
 public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     private final String itemName;
+    private final boolean memberOf;
     private final Optional<Double> gt;
     private final Optional<Double> gte;
     private final Optional<Double> lt;
@@ -34,10 +35,11 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final Optional<String> neq;
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
-            Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte, Optional<String> eq,
-            Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
+                                     boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte, Optional<String> eq,
+                                     Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
         super(jRule, logName, loggingTags, method, preconditionContextList);
         this.itemName = itemName;
+        this.memberOf = memberOf;
         this.gt = gt;
         this.gte = gte;
         this.lt = lt;
@@ -96,5 +98,21 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
 
     public Optional<String> getNeq() {
         return neq;
+    }
+
+    public boolean isMemberOf() {
+        return memberOf;
+    }
+
+    public static class JRuleAdditionalItemCheckData extends JRuleAdditionalCheckData {
+        private final List<String> belongingGroups;
+
+        public JRuleAdditionalItemCheckData(List<String> belongingGroups) {
+            this.belongingGroups = belongingGroups;
+        }
+
+        public List<String> getBelongingGroups() {
+            return belongingGroups;
+        }
     }
 }

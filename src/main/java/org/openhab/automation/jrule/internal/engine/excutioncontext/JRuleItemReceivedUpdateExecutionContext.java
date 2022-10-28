@@ -21,6 +21,7 @@ import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
+import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemStateEvent;
 
 /**
@@ -32,23 +33,42 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
     private final Optional<String> state;
 
     public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
-            Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-            Optional<String> state) {
-        super(jRule, logName, loggingTags, method, itemName, lt, lte, gt, gte, eq, neq, preconditionContextList);
+                                                   String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
+                                                   Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
+                                                   Optional<String> state) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq, preconditionContextList);
         this.state = state;
     }
 
     @Override
-    public boolean match(AbstractEvent event) {
-        return event instanceof ItemStateEvent && ((ItemStateEvent) event).getItemName().equals(this.getItemName())
-                && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true)
-                && super.matchCondition(((ItemStateEvent) event).getItemState().toString());
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
+        if (!(event instanceof ItemStateEvent
+                && super.matchCondition(((ItemStateEvent) event).getItemState().toString())
+                && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true))) {
+            return false;
+        }
+        if (!(!isMemberOf()
+                && ((ItemStateEvent) event).getItemName().equals(this.getItemName()))) {
+            return false;
+        }
+        if (!(isMemberOf()
+                && checkData instanceof JRuleAdditionalItemCheckData
+                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName()))) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        return new JRuleItemEvent(this.getItemName(), null,
+        final String memberName;
+        if (isMemberOf()) {
+            memberName = ((ItemEvent) event).getItemName();
+        } else {
+            memberName = null;
+        }
+
+        return new JRuleItemEvent(this.getItemName(), memberName,
                 new JRuleEventState(((ItemStateEvent) event).getItemState().toString()), null);
     }
 }

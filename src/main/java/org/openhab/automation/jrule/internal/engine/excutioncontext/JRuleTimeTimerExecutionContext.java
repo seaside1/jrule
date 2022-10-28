@@ -41,7 +41,7 @@ public class JRuleTimeTimerExecutionContext extends JRuleTimedExecutionContext {
     }
 
     @Override
-    public boolean match(AbstractEvent event) {
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
         return false;
     }
 

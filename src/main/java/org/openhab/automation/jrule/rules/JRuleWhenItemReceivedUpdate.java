@@ -31,5 +31,7 @@ public @interface JRuleWhenItemReceivedUpdate {
 
     String state() default "";
 
+    boolean memberOf() default false;
+
     JRuleCondition condition() default @JRuleCondition;
 }

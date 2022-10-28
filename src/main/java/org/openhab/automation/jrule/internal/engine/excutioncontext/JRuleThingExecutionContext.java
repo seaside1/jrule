@@ -53,7 +53,7 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     }
 
     @Override
-    public boolean match(AbstractEvent event) {
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
         if (!(event instanceof ThingStatusInfoChangedEvent)) {
             return false;
         }

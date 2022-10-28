@@ -47,7 +47,7 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     }
 
     @Override
-    public boolean match(AbstractEvent event) {
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
         return event instanceof ChannelTriggeredEvent
                 && ((ChannelTriggeredEvent) event).getChannel().getAsString().equals(this.channel)
                 && this.event.map(e -> e.equals(((ChannelTriggeredEvent) event).getEvent())).orElse(true);

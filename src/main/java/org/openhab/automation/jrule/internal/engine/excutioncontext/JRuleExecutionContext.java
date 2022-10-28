@@ -62,11 +62,15 @@ public abstract class JRuleExecutionContext {
         return loggingTags;
     }
 
-    public abstract boolean match(AbstractEvent event);
+    public abstract boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData);
 
     public abstract JRuleEvent createJRuleEvent(AbstractEvent event);
 
     public List<JRulePreconditionContext> getPreconditionContextList() {
         return preconditionContextList;
+    }
+
+    public static class JRuleAdditionalCheckData {
+
     }
 }
