@@ -59,7 +59,7 @@ public class JRuleItemClassGeneratorTest {
 
     @BeforeAll
     public void setup() {
-        targetFolder = new File("target/items/org/openhab/automation/jrule/items/generated/");
+        targetFolder = new File("target/gen/org/openhab/automation/jrule/generated/items/");
         targetFolder.mkdirs();
 
         Map<String, Object> map = new HashMap<>();
@@ -131,7 +131,7 @@ public class JRuleItemClassGeneratorTest {
         numberItem.setLabel("NumberLabel");
         generateAndCompile(numberItem);
 
-        NumberItem quantityItem = new NumberItem("Number:Temperature", "QuanitityItem");
+        NumberItem quantityItem = new NumberItem("Number:Temperature", "QuantityItem");
         quantityItem.setLabel("QuantityLabel");
         generateAndCompile(quantityItem);
 
@@ -144,7 +144,7 @@ public class JRuleItemClassGeneratorTest {
         boolean success = sourceFileGenerator.generateItemsSource(items);
         assertTrue(success, "Failed to generate source file for items");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleItems.java")), "target/classes:target/items");
+        compiler.compile(List.of(new File(targetFolder, "JRuleItems.java")), "target/classes:target/gen");
 
         File compiledClass = new File(targetFolder, "JRuleItems.class");
         assertTrue(compiledClass.exists());
