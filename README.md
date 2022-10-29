@@ -690,6 +690,19 @@ public void sendPushover(JRuleEvent event) {
 }
 ```
 
+## Example 35
+
+Use case: Want to listen on all Item events of a group (without the groupstate must change)
+
+```java
+    @JRuleName("MemberOfUpdateTrigger")
+    @JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = true)
+    public synchronized void memberOfUpdateTrigger(JRuleItemEvent event) {
+        final String memberThatChangedStatus = event.getMemberName();
+        logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
+    }
+```
+
 
 # Changelog
 ## NEXT

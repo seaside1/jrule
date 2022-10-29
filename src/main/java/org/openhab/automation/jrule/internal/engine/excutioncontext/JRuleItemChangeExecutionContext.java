@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,5 +82,14 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
         return new JRuleItemEvent(this.getItemName(), memberName,
                 new JRuleEventState(((ItemStateChangedEvent) event).getItemState().toString()),
                 new JRuleEventState(((ItemStateChangedEvent) event).getOldItemState().toString()));
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleItemChangeExecutionContext{" + "from=" + from + ", to=" + to + ", itemName='" + itemName + '\''
+                + ", memberOf=" + memberOf + ", gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq="
+                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + jRule + ", method=" + method
+                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
+                + preconditionContextList + '}';
     }
 }
