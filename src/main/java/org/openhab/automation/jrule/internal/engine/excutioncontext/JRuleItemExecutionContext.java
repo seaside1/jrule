@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,12 +26,12 @@ import org.openhab.core.library.types.QuantityType;
  * @author Robert Delbrück - Initial contribution
  */
 public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
-    private final String itemName;
-    private final boolean memberOf;
-    private final Optional<Double> gt;
-    private final Optional<Double> gte;
-    private final Optional<Double> lt;
-    private final Optional<Double> lte;
+    protected final String itemName;
+    protected final boolean memberOf;
+    protected final Optional<Double> gt;
+    protected final Optional<Double> gte;
+    protected final Optional<Double> lt;
+    protected final Optional<Double> lte;
     protected final Optional<String> eq;
     protected final Optional<String> neq;
 
@@ -104,6 +105,14 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
         return memberOf;
     }
 
+    @Override
+    public String toString() {
+        return "JRuleItemExecutionContext{" + "itemName='" + itemName + '\'' + ", memberOf=" + memberOf + ", gt=" + gt
+                + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq=" + eq + ", neq=" + neq + ", logName='"
+                + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
+    }
+
     public static class JRuleAdditionalItemCheckData extends JRuleAdditionalCheckData {
         private final List<String> belongingGroups;
 
@@ -113,6 +122,11 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
 
         public List<String> getBelongingGroups() {
             return belongingGroups;
+        }
+
+        @Override
+        public String toString() {
+            return "JRuleAdditionalItemCheckData{" + "belongingGroups=" + belongingGroups + '}';
         }
     }
 }

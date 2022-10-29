@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,5 +61,12 @@ public class JRuleTimeTimerExecutionContext extends JRuleTimedExecutionContext {
 
     public Optional<Integer> getSecond() {
         return second;
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleTimeTimerExecutionContext{" + "hour=" + hour + ", minute=" + minute + ", second=" + second
+                + ", logName='" + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

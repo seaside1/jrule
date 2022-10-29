@@ -13,9 +13,11 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
@@ -23,6 +25,8 @@ import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemStateEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleItemReceivedUpdateExecutionContext}
@@ -30,6 +34,7 @@ import org.openhab.core.items.events.ItemStateEvent;
  * @author Robert Delbrück - Initial contribution
  */
 public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionContext {
+    private final Logger log = LoggerFactory.getLogger(JRuleItemReceivedUpdateExecutionContext.class);
     private final Optional<String> state;
 
     public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
@@ -43,19 +48,21 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
 
     @Override
     public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
+        JRuleLog.debug(log, "JRuleItemReceivedUpdateExecutionContext", "does it match?: {}, {}, {}", this, event,
+                checkData);
         if (!(event instanceof ItemStateEvent
                 && super.matchCondition(((ItemStateEvent) event).getItemState().toString())
                 && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true))) {
             return false;
         }
-        if (!(!isMemberOf() && ((ItemStateEvent) event).getItemName().equals(this.getItemName()))) {
-            return false;
+        if (!isMemberOf() && ((ItemStateEvent) event).getItemName().equals(this.getItemName())) {
+            return true;
         }
-        if (!(isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
-                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName()))) {
-            return false;
+        if (isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
+                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName())) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -69,5 +76,14 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
 
         return new JRuleItemEvent(this.getItemName(), memberName,
                 new JRuleEventState(((ItemStateEvent) event).getItemState().toString()), null);
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleItemReceivedUpdateExecutionContext{" + "state=" + state + ", itemName='" + itemName + '\''
+                + ", memberOf=" + memberOf + ", gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq="
+                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + jRule + ", method=" + method
+                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
+                + preconditionContextList + '}';
     }
 }

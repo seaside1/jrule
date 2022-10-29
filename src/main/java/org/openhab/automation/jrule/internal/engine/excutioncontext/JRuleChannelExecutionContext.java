@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,5 +58,12 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
         return new JRuleChannelEvent(((ChannelTriggeredEvent) event).getChannel().getAsString(),
                 ((ChannelTriggeredEvent) event).getEvent());
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleChannelExecutionContext{" + "channel='" + channel + '\'' + ", event=" + event + ", logName='"
+                + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
