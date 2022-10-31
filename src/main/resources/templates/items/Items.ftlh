@@ -5,7 +5,7 @@ package ${packageName};
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 <#list items as item>
-import org.openhab.automation.jrule.items.generated.${item.class};
+import org.openhab.automation.jrule.generated.items.${item.class};
 </#list>
 
 /**

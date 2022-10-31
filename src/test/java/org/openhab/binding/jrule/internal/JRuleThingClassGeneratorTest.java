@@ -53,7 +53,7 @@ public class JRuleThingClassGeneratorTest {
 
     @BeforeAll
     public void setup() {
-        targetFolder = new File("target/items/org/openhab/automation/jrule/things/generated/");
+        targetFolder = new File("target/gen/org/openhab/automation/jrule/generated/things/");
         targetFolder.mkdirs();
 
         Map<String, Object> map = new HashMap<>();
@@ -115,7 +115,7 @@ public class JRuleThingClassGeneratorTest {
         boolean success = sourceFileGenerator.generateThingsSource(things);
         assertTrue(success, "Failed to generate source file for things");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleThings.java")), "target/classes:target/items");
+        compiler.compile(List.of(new File(targetFolder, "JRuleThings.java")), "target/classes:target/gen");
 
         File compiledClass = new File(targetFolder, "JRuleThings.class");
         assertTrue(compiledClass.exists());

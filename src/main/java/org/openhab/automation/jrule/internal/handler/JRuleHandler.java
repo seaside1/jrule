@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.actions.JRuleActionClassGenerator;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleDelayedDebouncingExecutor;
@@ -57,6 +60,7 @@ import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
 import org.openhab.core.thing.ThingUID;
+import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.events.ThingAddedEvent;
 import org.openhab.core.thing.events.ThingRemovedEvent;
 import org.openhab.core.thing.events.ThingUpdatedEvent;
@@ -94,6 +98,7 @@ public class JRuleHandler implements PropertyChangeListener {
     private final JRuleItemClassGenerator itemGenerator;
 
     private JRuleThingClassGenerator thingGenerator;
+    private final JRuleActionClassGenerator actionGenerator;
     private final JRuleCompiler compiler;
 
     private final JRuleConfig config;
@@ -118,6 +123,7 @@ public class JRuleHandler implements PropertyChangeListener {
                 TimeUnit.SECONDS);
         itemGenerator = new JRuleItemClassGenerator(config);
         thingGenerator = new JRuleThingClassGenerator(config);
+        actionGenerator = new JRuleActionClassGenerator(config);
         compiler = new JRuleCompiler(config);
 
         JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
@@ -158,6 +164,9 @@ public class JRuleHandler implements PropertyChangeListener {
         if (!initializeFolder(config.getThingsDirectory())) {
             return;
         }
+        if (!initializeFolder(config.getActionsDirectory())) {
+            return;
+        }
         if (!initializeFolder(config.getRulesDirectory())) {
             return;
         }
@@ -172,9 +181,12 @@ public class JRuleHandler implements PropertyChangeListener {
         items.forEach(itemGenerator::generateItemSource);
         Collection<Thing> things = thingRegistry.getAll();
         things.forEach(thingGenerator::generateThingSource);
+        things.stream().filter(thing -> thing.getHandler() != null).filter(
+                thing -> thing.getHandler().getServices().stream().anyMatch(ThingActions.class::isAssignableFrom))
+                .forEach(actionGenerator::generateActionSource);
 
         // Compilation of items
-        compileItemsAndThingsInternal();
+        compileGeneratedSourcesInternal();
 
         // Compile rules
         logInfo("Compiling rules");
@@ -221,19 +233,20 @@ public class JRuleHandler implements PropertyChangeListener {
         final List<URL> extLibPath = compiler.getExtLibsAsUrls();
         final List<URL> jarRulesPath = compiler.getJarRulesAsUrls();
         try {
-            urlList.add(new File(config.getItemsRootDirectory()).toURI().toURL());
+            urlList.add(new File(config.getSourceDirectory()).toURI().toURL());
             urlList.add(new File(config.getRulesRootDirectory()).toURI().toURL());
         } catch (MalformedURLException x) {
             logError("Failed to build class path for creating rule instance");
         }
         urlList.addAll(extLibPath);
         urlList.addAll(jarRulesPath);
+        logDebug("Classloader URLs: {}", urlList);
 
         final JRuleClassLoader loader = new JRuleClassLoader(urlList.toArray(URL[]::new),
                 JRuleUtil.class.getClassLoader());
 
-        // Load item/thing classes first
-        compiler.loadClassesFromFolder(loader, new File(config.getItemsRootDirectory()), JRuleConfig.ITEMS_PACKAGE,
+        // Load item/thing/action classes first
+        compiler.loadClassesFromFolder(loader, new File(config.getSourceDirectory()), JRuleConfig.GENERATED_PACKAGE,
                 false);
         // Clear registry from old items
         JRuleItemRegistry.clear();
@@ -259,6 +272,16 @@ public class JRuleHandler implements PropertyChangeListener {
             logger.error("Could not instantiate JRuleThings file", e);
         }
 
+        // Reload Actions class - this will also instantiate all actions
+        try {
+            Class<?> cls = Class.forName(config.getGeneratedActionPackage() + ".JRuleActions", true, loader);
+            cls.getDeclaredConstructor().newInstance();
+            logger.info("Instantiated JRuleActions class");
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
+                | InvocationTargetException e) {
+            logger.error("Could not instantiate JRuleActions file", e);
+        }
+
         // Load rules that refer to the items
         compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), JRuleConfig.RULES_PACKAGE,
                 true);
@@ -278,15 +301,29 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     @Nullable
-    private synchronized Boolean compileItemsAndThingsInternal() {
-        logInfo("Compiling items and things");
+    private synchronized Boolean compileGeneratedSourcesInternal() {
+        logInfo("Compiling generated sources");
         itemGenerator.generateItemsSource(itemRegistry.getItems());
         thingGenerator.generateThingsSource(thingRegistry.getAll());
+        Set<Thing> filteredThings = thingRegistry.getAll().stream().filter(thing -> {
+            boolean b = thing.getHandler() != null;
+            logDebug("has handler? -> {}", b);
+            return b;
+        }).filter(thing -> {
+            boolean hasThingActions = thing.getHandler().getServices().stream()
+                    .anyMatch(ThingActions.class::isAssignableFrom);
+            logDebug("has thingActions? -> {}", hasThingActions);
+            return hasThingActions;
+        }).collect(Collectors.toSet());
+        logDebug("generating actions for: {}",
+                filteredThings.stream().map(thing -> thing.getUID().toString()).collect(Collectors.joining(", ")));
+        filteredThings.forEach(actionGenerator::generateActionSource);
+        actionGenerator.generateActionsSource(filteredThings);
         Boolean result = false;
-        if (compiler.compileItemsAndThings()) {
+        if (compiler.compileGeneratedSource()) {
 
-            logInfo("Creating items and things jar");
-            JRuleUtil.createJarFile(config.getItemsRootDirectory(),
+            logInfo("Creating " + JRuleCompiler.JAR_JRULE_GENERATED_JAR_NAME);
+            JRuleUtil.createJarFile(config.getSourceDirectory(),
                     compiler.getJarPath(JRuleCompiler.JAR_JRULE_GENERATED_JAR_NAME));
             result = true;
         } else {
@@ -308,8 +345,8 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     @Nullable
-    private Boolean compileAndReloadItemsAndRules() {
-        if (compileItemsAndThingsInternal()) {
+    private Boolean compileAndReloadGeneratedSources() {
+        if (compileGeneratedSourcesInternal()) {
             compileAndReloadRules();
             return Boolean.TRUE;
         }
@@ -335,13 +372,13 @@ public class JRuleHandler implements PropertyChangeListener {
             if (eventType.equals(ItemRemovedEvent.TYPE)) {
                 logDebug("RemovedType: {}", evt);
                 deleteSourceFileForItem(itemName);
-                delayedItemsCompiler.call(this::compileItemsAndThingsInternal);
+                delayedItemsCompiler.call(this::compileGeneratedSourcesInternal);
             } else if (eventType.equals(ItemAddedEvent.TYPE) || event.getType().equals(ItemUpdatedEvent.TYPE)) {
                 try {
                     logDebug("Added/updatedType: {}", evt);
                     Item item = itemRegistry.getItem(itemName);
                     itemGenerator.generateItemSource(item);
-                    delayedItemsCompiler.call(this::compileAndReloadItemsAndRules);
+                    delayedItemsCompiler.call(this::compileAndReloadGeneratedSources);
                 } catch (ItemNotFoundException e) {
                     logDebug("Could not find new item", e);
                 }
@@ -360,13 +397,18 @@ public class JRuleHandler implements PropertyChangeListener {
             if (eventType.equals(ThingRemovedEvent.TYPE)) {
                 logDebug("Thing Removed: {}", evt);
                 deleteSourceFileForThing(thingUID);
-                delayedItemsCompiler.call(this::compileItemsAndThingsInternal);
+                deleteSourceFileForAction(thingUID);
+                delayedItemsCompiler.call(this::compileGeneratedSourcesInternal);
             } else if (eventType.equals(ThingAddedEvent.TYPE)) {
                 logDebug("Thing Added: {}", evt);
                 Thing thing = thingRegistry.get(new ThingUID(thingUID));
                 if (thing != null) {
                     thingGenerator.generateThingSource(thing);
-                    delayedItemsCompiler.call(this::compileAndReloadItemsAndRules);
+                    if (thing.getHandler() != null && thing.getHandler().getServices().stream()
+                            .anyMatch(ThingActions.class::isAssignableFrom)) {
+                        actionGenerator.generateActionSource(thing);
+                    }
+                    delayedItemsCompiler.call(this::compileAndReloadGeneratedSources);
                 }
             } else if (event.getType().equals(ThingUpdatedEvent.TYPE)) {
                 logDebug("Thing Updated: {}", evt);
@@ -376,7 +418,11 @@ public class JRuleHandler implements PropertyChangeListener {
                     Thing thing = thingRegistry.get(new ThingUID(thingUID));
                     if (thing != null) {
                         thingGenerator.generateThingSource(thing);
-                        delayedItemsCompiler.call(this::compileAndReloadItemsAndRules);
+                        if (thing.getHandler() != null && thing.getHandler().getServices().stream()
+                                .anyMatch(ThingActions.class::isAssignableFrom)) {
+                            actionGenerator.generateActionSource(thing);
+                        }
+                        delayedItemsCompiler.call(this::compileAndReloadGeneratedSources);
                     }
                 } else {
                     logDebug("Thing updated, but no real change");
@@ -427,6 +473,13 @@ public class JRuleHandler implements PropertyChangeListener {
                 .append(JRuleConstants.JAVA_FILE_TYPE).toString()));
     }
 
+    private synchronized void deleteSourceFileForAction(String thingUID) {
+        deleteFile(new File(new StringBuilder().append(config.getActionsDirectory()).append(File.separator)
+                .append(config.getGeneratedItemPrefix())
+                .append(JRuleActionClassGenerator.getActionFriendlyName(thingUID)).append(JRuleConstants.JAVA_FILE_TYPE)
+                .toString()));
+    }
+
     private void logDebug(String message, Object... parameters) {
         JRuleLog.debug(logger, LOG_NAME_HANDLER, message, parameters);
     }
@@ -444,6 +497,8 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     private static class JRuleClassLoader extends URLClassLoader {
+        private final static Logger logger = LoggerFactory.getLogger(JRuleClassLoader.class);
+
         public JRuleClassLoader(URL[] urls, @Nullable ClassLoader parent) {
             super(urls, parent);
         }
@@ -465,6 +520,7 @@ public class JRuleHandler implements PropertyChangeListener {
                 return super.loadClass(name);
 
             } catch (IOException e) {
+                JRuleLog.warn(logger, LOG_NAME_HANDLER, e.getMessage());
                 return super.loadClass(name);
             }
         }
