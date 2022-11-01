@@ -41,9 +41,11 @@ public class TimerExecutor {
     }
 
     public void add(JRuleTimedCronExecutionContext executionContext) {
-        timers.add(cronScheduler.schedule(
-                () -> jRuleEngine.invokeRule(executionContext, executionContext.createJRuleEvent(null)),
-                executionContext.getCron()));
+        timers.add(cronScheduler.schedule(() -> {
+            if (jRuleEngine.matchPrecondition(executionContext)) {
+                jRuleEngine.invokeRule(executionContext, executionContext.createJRuleEvent(null));
+            }
+        }, executionContext.getCron()));
     }
 
     public void add(JRuleTimeTimerExecutionContext executionContext) {
@@ -51,8 +53,11 @@ public class TimerExecutor {
                 executionContext.getMinute().map(String::valueOf).orElse("*"),
                 executionContext.getHour().map(String::valueOf).orElse("*"), "*", "*", "*");
         JRuleLog.info(logger, TimerExecutor.class.getSimpleName(), "Generated cron for timer: {}", cron);
-        timers.add(cronScheduler.schedule(
-                () -> jRuleEngine.invokeRule(executionContext, executionContext.createJRuleEvent(null)), cron));
+        timers.add(cronScheduler.schedule(() -> {
+            if (jRuleEngine.matchPrecondition(executionContext)) {
+                jRuleEngine.invokeRule(executionContext, executionContext.createJRuleEvent(null));
+            }
+        }, cron));
     }
 
     public void add(JRuleExecutionContext context) {
