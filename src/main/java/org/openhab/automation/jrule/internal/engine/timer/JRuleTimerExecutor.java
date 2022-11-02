@@ -49,9 +49,9 @@ public class JRuleTimerExecutor {
     }
 
     public void add(JRuleTimeTimerExecutionContext executionContext) {
-        String cron = String.format("%s %s %s %s %s %s", executionContext.getSecond().map(String::valueOf).orElse("*"),
-                executionContext.getMinute().map(String::valueOf).orElse("*"),
-                executionContext.getHour().map(String::valueOf).orElse("*"), "*", "*", "*");
+        String cron = String.format("%s %s %s %s %s %s", executionContext.getSecond().map(String::valueOf).orElse("0"),
+                executionContext.getMinute().map(String::valueOf).orElse("0"),
+                executionContext.getHour().map(String::valueOf).orElse("0"), "*", "*", "*");
         JRuleLog.info(logger, JRuleTimerExecutor.class.getSimpleName(), "Generated cron for timer: {}", cron);
         timers.add(cronScheduler.schedule(() -> {
             if (jRuleEngine.matchPrecondition(executionContext)) {
