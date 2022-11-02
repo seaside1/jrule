@@ -22,6 +22,7 @@ import java.util.List;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
+import org.openhab.core.events.Event;
 import org.openhab.core.types.State;
 import org.openhab.core.types.Type;
 import org.openhab.core.types.TypeParser;
@@ -43,12 +44,14 @@ public class JRuleTestEventLogParser {
         url = getResourceUrl(eventLogResourceName);
     }
 
-    private List<JRuleMockedItemStateChangedEvent> readFromUrl(URL url) {
-        final List<JRuleMockedItemStateChangedEvent> changeEventList = new ArrayList<>();
+    private List<Event> readFromUrl(URL url) {
+        final List<Event> changeEventList = new ArrayList<>();
         try {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
             while (reader.ready()) {
                 final String line = reader.readLine();
+
+                // TODO must parse all kinds of events
                 final JRuleMockedItemStateChangedEvent parseItemFromLine = parseItemFromLine(line);
                 if (parseItemFromLine != null) {
                     changeEventList.add(parseItemFromLine);
@@ -90,7 +93,7 @@ public class JRuleTestEventLogParser {
         return null;
     }
 
-    public List<JRuleMockedItemStateChangedEvent> parse() {
+    public List<Event> parse() {
         return readFromUrl(url);
     }
 

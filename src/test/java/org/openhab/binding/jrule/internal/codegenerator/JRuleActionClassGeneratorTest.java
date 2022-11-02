@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.jrule.internal;
+package org.openhab.binding.jrule.internal.codegenerator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.openhab.automation.jrule.actions.JRuleActionClassGenerator;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
-import org.openhab.binding.jrule.internal.test.MyThingActions;
+import org.openhab.binding.jrule.internal.thingaction.MyThingActions;
 import org.openhab.core.magic.binding.handler.MagicActionModuleThingHandler;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
