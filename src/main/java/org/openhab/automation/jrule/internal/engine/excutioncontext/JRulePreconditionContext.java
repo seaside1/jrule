@@ -67,4 +67,10 @@ public class JRulePreconditionContext {
     public Optional<String> getNeq() {
         return neq;
     }
+
+    @Override
+    public String toString() {
+        return "JRulePreconditionContext{" + "item='" + item + '\'' + ", lt=" + lt + ", lte=" + lte + ", gt=" + gt
+                + ", gte=" + gte + ", eq=" + eq + ", neq=" + neq + '}';
+    }
 }

@@ -46,7 +46,7 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingEx
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
-import org.openhab.automation.jrule.internal.engine.timer.TimerExecutor;
+import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
@@ -82,7 +82,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final String[] EMPTY_LOG_TAGS = new String[0];
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private List<JRuleExecutionContext> contextList = new ArrayList<>();
-    private TimerExecutor timerExecutor = new TimerExecutor(this);
+    private JRuleTimerExecutor timerExecutor = new JRuleTimerExecutor(this);
     private static final String MDC_KEY_RULE = "rule";
     protected ThreadPoolExecutor ruleExecutorService;
     protected JRuleConfig config;
@@ -256,7 +256,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 .forEach(context -> invokeRule(context, context.createJRuleEvent(event)));
     }
 
-    private boolean matchPrecondition(JRuleExecutionContext jRuleExecutionContext) {
+    public boolean matchPrecondition(JRuleExecutionContext jRuleExecutionContext) {
         return jRuleExecutionContext.getPreconditionContextList().stream().allMatch(context -> {
             final Item item;
             try {
@@ -266,33 +266,35 @@ public class JRuleEngine implements PropertyChangeListener {
             }
             final String state = item.getState().toString();
             if (context.getEq().isPresent() && context.getEq().filter(state::equals).isEmpty()) {
-                logDebug("precondition mismatch: {} = {}", state, context.getEq());
+                logDebug("precondition mismatch: {} = {}", state, context.getEq().get());
                 return false;
             }
             if (context.getNeq().isPresent() && context.getNeq().filter(ref -> !state.equals(ref)).isEmpty()) {
-                logDebug("precondition mismatch: {} != {}", state, context.getEq());
+                logDebug("precondition mismatch: {} != {}", state, context.getNeq().get());
                 return false;
             }
             if (context.getLt().isPresent()
                     && context.getLt().filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty()) {
-                logDebug("precondition mismatch: {} < {}", state, context.getEq());
+                logDebug("precondition mismatch: {} < {}", state, context.getLt().get());
                 return false;
             }
             if (context.getLte().isPresent()
                     && context.getLte().filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty()) {
-                logDebug("precondition mismatch: {} <= {}", state, context.getEq());
+                logDebug("precondition mismatch: {} <= {}", state, context.getLte().get());
                 return false;
             }
             if (context.getGt().isPresent()
                     && context.getGt().filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty()) {
-                logDebug("precondition mismatch: {} > {}", state, context.getEq());
+                logDebug("precondition mismatch: {} > {}", state, context.getGt().get());
                 return false;
             }
             if (context.getGte().isPresent()
                     && context.getGte().filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty()) {
-                logDebug("precondition mismatch: {} >= {}", state, context.getEq());
+                logDebug("precondition mismatch: {} >= {}", state, context.getGte().get());
                 return false;
             }
+
+            logDebug("precondition match: {} matches {}", state, context);
             return true;
         });
     }
