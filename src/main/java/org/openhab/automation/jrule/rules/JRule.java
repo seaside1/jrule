@@ -28,6 +28,7 @@ import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
@@ -50,7 +51,7 @@ public class JRule {
     private final static Map<String, CompletableFuture<Void>> ruleNameToTimerFuture = new HashMap<>();
     private final static Map<String, List<CompletableFuture<Void>>> ruleNameToTimerFutureList = new HashMap<>();
 
-    private volatile String logName = "";
+    private static ThreadLocal<JRuleExecutionContext> threadContext = new ThreadLocal<>();
 
     public JRule() {
         JRuleEngine.get().add(this);
@@ -295,10 +296,14 @@ public class JRule {
     }
 
     protected String getRuleLogName() {
-        return logName;
+        return threadContext.get().getLogName();
     }
 
-    public void setRuleLogName(String logName) {
-        this.logName = logName;
+    public void setRuleContext(JRuleExecutionContext context) {
+        threadContext.set(context);
+    }
+
+    public void removeContext() {
+        threadContext.remove();
     }
 }

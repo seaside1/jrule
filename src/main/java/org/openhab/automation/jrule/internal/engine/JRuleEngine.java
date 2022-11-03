@@ -77,7 +77,8 @@ import org.slf4j.MDC;
 /**
  * The {@link JRuleEngine}
  *
- * @author Robert Delbrück
+ * @author Joseph (Seaside) Hagberg - Initial Contribution
+ * @author Robert Delbrück - Refactoring
  */
 public class JRuleEngine implements PropertyChangeListener {
     private static final String[] EMPTY_LOG_TAGS = new String[0];
@@ -446,8 +447,8 @@ public class JRuleEngine implements PropertyChangeListener {
 
         final JRule rule = context.getJrule();
         final Method method = context.getMethod();
-        rule.setRuleLogName(context.getLogName());
         try {
+            rule.setRuleContext(context);
             JRuleLog.debug(logger, context.getMethod().getName(), "setting mdc tags: {}", context.getLoggingTags());
             MDC.put(MDC_KEY_RULE, context.getMethod().getName());
             Arrays.stream(context.getLoggingTags()).forEach(s -> MDC.put(s, s));
@@ -466,6 +467,7 @@ public class JRuleEngine implements PropertyChangeListener {
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
+            rule.removeContext();
         }
     }
 }
