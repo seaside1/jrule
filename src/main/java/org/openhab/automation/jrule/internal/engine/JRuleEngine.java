@@ -46,7 +46,7 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingEx
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
-import org.openhab.automation.jrule.internal.engine.timer.TimerExecutor;
+import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
@@ -82,7 +82,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final String[] EMPTY_LOG_TAGS = new String[0];
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private List<JRuleExecutionContext> contextList = new ArrayList<>();
-    private TimerExecutor timerExecutor = new TimerExecutor(this);
+    private JRuleTimerExecutor timerExecutor = new JRuleTimerExecutor(this);
     private static final String MDC_KEY_RULE = "rule";
     protected ThreadPoolExecutor ruleExecutorService;
     protected JRuleConfig config;

@@ -26,17 +26,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link TimerExecutor}
+ * The {@link JRuleTimerExecutor}
  *
  * @author Robert Delbrück
  */
-public class TimerExecutor {
-    private final Logger logger = LoggerFactory.getLogger(TimerExecutor.class);
+public class JRuleTimerExecutor {
+    private final Logger logger = LoggerFactory.getLogger(JRuleTimerExecutor.class);
     private final List<ScheduledCompletableFuture<Void>> timers = new ArrayList<>();
     private final JRuleEngine jRuleEngine;
     private CronScheduler cronScheduler;
 
-    public TimerExecutor(JRuleEngine jRuleEngine) {
+    public JRuleTimerExecutor(JRuleEngine jRuleEngine) {
         this.jRuleEngine = jRuleEngine;
     }
 
@@ -52,7 +52,7 @@ public class TimerExecutor {
         String cron = String.format("%s %s %s %s %s %s", executionContext.getSecond().map(String::valueOf).orElse("*"),
                 executionContext.getMinute().map(String::valueOf).orElse("*"),
                 executionContext.getHour().map(String::valueOf).orElse("*"), "*", "*", "*");
-        JRuleLog.info(logger, TimerExecutor.class.getSimpleName(), "Generated cron for timer: {}", cron);
+        JRuleLog.info(logger, JRuleTimerExecutor.class.getSimpleName(), "Generated cron for timer: {}", cron);
         timers.add(cronScheduler.schedule(() -> {
             if (jRuleEngine.matchPrecondition(executionContext)) {
                 jRuleEngine.invokeRule(executionContext, executionContext.createJRuleEvent(null));
