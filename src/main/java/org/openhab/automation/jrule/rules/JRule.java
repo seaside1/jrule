@@ -111,11 +111,11 @@ public class JRule {
         CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
         ruleNameToTimerFuture.put(ruleName, future);
         JRuleLog.info(logger, ruleName, "Start timer timeSeconds: {} hashCode: {}", timeInSeconds, future.hashCode());
-        return future.thenAccept(fn).thenAccept(s -> {
+        return future.thenAccept(s -> {
             JRuleLog.info(logger, ruleName, "Timer has finsihed");
             JRuleLog.debug(logger, ruleName, "Timer has finsihed hashCode: {}", future.hashCode());
             ruleNameToTimerFuture.remove(ruleName);
-        });
+        }).thenAccept(fn);
     }
 
     protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String ruleName,

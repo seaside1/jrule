@@ -12,9 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
+import org.openhab.core.events.Event;
 
 /**
  * The {@link JRuleMockedEventBus}
@@ -23,7 +25,7 @@ import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
  */
 public class JRuleMockedEventBus extends JRuleEventSubscriber {
 
-    private final List<JRuleMockedItemStateChangedEvent> eventList;
+    private final List<Event> eventList;
 
     public JRuleMockedEventBus(String eventBusResourceName) {
         super();
@@ -31,8 +33,14 @@ public class JRuleMockedEventBus extends JRuleEventSubscriber {
         eventList = parser.parse();
     }
 
+    public JRuleMockedEventBus(List<Event> events) {
+        eventList = new ArrayList<>();
+        eventList.addAll(events);
+    }
+
     public void start() {
         startSubscriber();
         eventList.forEach(super::receive);
+        stopSubscriber();
     }
 }
