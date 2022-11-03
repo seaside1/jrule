@@ -508,21 +508,19 @@ public class JRuleHandler implements PropertyChangeListener {
             try {
                 for (URL url : getURLs()) {
                     if (url.getProtocol().equals("file")) {
-                        File classFile = new File(url.getPath(),
-                                name.replaceAll("\\.", "/") + JRuleConstants.CLASS_FILE_TYPE);
-                        if (classFile.exists()) {
-                            FileInputStream is = new FileInputStream(classFile);
-                            if (is != null) {
-                                byte[] buf = is.readAllBytes();
-                                is.close();
-                                return defineClass(name, buf, 0, buf.length);
-                            }
+                        FileInputStream is = new FileInputStream(
+                                url.getFile() + "/" + name.replaceAll("\\.", "/") + JRuleConstants.CLASS_FILE_TYPE);
+                        if (is != null) {
+                            byte[] buf = is.readAllBytes();
+                            is.close();
+                            return defineClass(name, is.readAllBytes(), 0, buf.length);
                         }
                     }
                 }
                 return super.loadClass(name);
+
             } catch (IOException e) {
-                JRuleLog.warn(logger, LOG_NAME_HANDLER, "Trouble loading class {}: {}", name, e.toString());
+                JRuleLog.warn(logger, LOG_NAME_HANDLER, e.getMessage());
                 return super.loadClass(name);
             }
         }
