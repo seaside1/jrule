@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
@@ -37,9 +37,10 @@ import org.openhab.core.library.types.StringType;
  *
  * @author Arne Seime - Initial contribution
  */
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JRuleItemChangeTest extends JRuleAbstractTest {
-    @BeforeAll
+    @BeforeEach
     public void initTestClass() throws ItemNotFoundException {
         Mockito.when(itemRegistry.getItem(Mockito.anyString()))
                 .then((Answer<Item>) invocationOnMock -> new StringItem(invocationOnMock.getArgument(0)));
@@ -80,6 +81,14 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
                 itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "3", "2"),
                 itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "1", "2")));
         verify(rule, times(1)).itemChangeFromTo(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
+    public void testItemChange_multipleMatchingContexts() {
+        JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_DUPLICATE, "2", "1")));
+        verify(rule, times(1)).duplicateMatchingWhen(Mockito.any(JRuleEvent.class));
     }
 
     // Syntactic sugar

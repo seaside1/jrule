@@ -64,6 +64,7 @@ public abstract class JRuleAbstractTest {
 
     protected <T extends JRule> T initRule(Class<T> rule) {
         T spyRule = Mockito.spy(rule);
+        JRuleEngine.get().reset();
         return spyRule;
     }
 

@@ -19,7 +19,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -27,6 +29,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -259,9 +263,15 @@ public class JRuleEngine implements PropertyChangeListener {
     public void fire(AbstractEvent event) {
         JRuleItemExecutionContext.JRuleAdditionalItemCheckData additionalCheckData = getAdditionalCheckData(event);
 
-        contextList.stream().filter(context -> context.match(event, additionalCheckData))
-                .filter(this::matchPrecondition)
-                .forEach(context -> invokeRule(context, context.createJRuleEvent(event)));
+        List<JRuleExecutionContext> matchingExecutionContexts = contextList.stream()
+                .filter(context -> context.match(event, additionalCheckData)).filter(this::matchPrecondition)
+                .filter(distinctByKey(p -> p.getMethod().getName())).collect(Collectors.toList());
+        matchingExecutionContexts.forEach(context -> invokeRule(context, context.createJRuleEvent(event)));
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     private JRuleItemExecutionContext.JRuleAdditionalItemCheckData getAdditionalCheckData(AbstractEvent event) {
