@@ -18,16 +18,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.events.Event;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
-import org.openhab.core.library.items.StringItem;
 
 /**
  * The {@link JRuleAbstractTest} is a base class for simple rule trigger testing
@@ -36,6 +32,8 @@ import org.openhab.core.library.items.StringItem;
  * @author Arne Seime - Initial contribution
  */
 public abstract class JRuleAbstractTest {
+    protected static ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
+
     @BeforeAll
     public static void initEngine() {
         Map<String, Object> properties = new HashMap<>();
@@ -45,14 +43,6 @@ public abstract class JRuleAbstractTest {
 
         JRuleEngine engine = JRuleEngine.get();
         engine.setConfig(config);
-
-        ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        try {
-            Mockito.when(itemRegistry.getItem(Mockito.anyString()))
-                    .then((Answer<Item>) invocationOnMock -> new StringItem(invocationOnMock.getArgument(0)));
-        } catch (ItemNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         engine.setItemRegistry(itemRegistry);
     }
 
