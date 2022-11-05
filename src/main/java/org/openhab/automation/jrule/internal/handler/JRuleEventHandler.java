@@ -23,9 +23,11 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleItemUtil;
 import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRulePercentType;
+import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -177,7 +179,7 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
-        logInfo("SendCommand itemName: {} command: {}", itemName, command);
+        logInfo("SendCommand {} {}", itemName, command);
         final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
         eventPublisher.post(commandEvent);
     }
@@ -248,7 +250,7 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
-        logInfo("PostUpdate itemName: {} state: {}", itemName, state);
+        logInfo("PostUpdate {} {}", itemName, state);
         final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state);
         eventPublisher.post(itemEvent);
     }
@@ -580,19 +582,28 @@ public class JRuleEventHandler {
     }
 
     private void logDebug(String message, Object... parameters) {
-        JRuleLog.debug(logger, LOG_NAME_EVENT, message, parameters);
+        JRuleLog.debug(logger, getLogName(LOG_NAME_EVENT), message, parameters);
     }
 
     private void logInfo(String message, Object... parameters) {
-        JRuleLog.info(logger, LOG_NAME_EVENT, message, parameters);
+        JRuleLog.info(logger, getLogName(LOG_NAME_EVENT), message, parameters);
     }
 
     @SuppressWarnings("unused")
     private void logWarn(String message, Object... parameters) {
-        JRuleLog.warn(logger, LOG_NAME_EVENT, message, parameters);
+        JRuleLog.warn(logger, getLogName(LOG_NAME_EVENT), message, parameters);
     }
 
     private void logError(String message, Object... parameters) {
-        JRuleLog.error(logger, LOG_NAME_EVENT, message, parameters);
+        JRuleLog.error(logger, getLogName(LOG_NAME_EVENT), message, parameters);
+    }
+
+    private String getLogName(String defaultValue) {
+        JRuleExecutionContext context = JRule.JRULE_EXECUTION_CONTEXT.get();
+        if (context != null) {
+            return context.getLogName();
+        } else {
+            return defaultValue;
+        }
     }
 }

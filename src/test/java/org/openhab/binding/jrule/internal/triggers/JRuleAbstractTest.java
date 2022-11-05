@@ -1,29 +1,40 @@
 /**
  * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
+ * <p>
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- *
+ * <p>
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- *
+ * <p>
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.binding.jrule.internal.triggers;
 
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.events.Event;
+import org.openhab.core.events.EventPublisher;
+import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.events.ItemCommandEvent;
+import org.openhab.core.items.events.ItemStateEvent;
+import org.openhab.core.types.State;
 
 /**
  * The {@link JRuleAbstractTest} is a base class for simple rule trigger testing
@@ -31,11 +42,14 @@ import org.openhab.core.items.ItemRegistry;
  *
  * @author Arne Seime - Initial contribution
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class JRuleAbstractTest {
-    protected static ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
+
+    protected ItemRegistry itemRegistry;
+    protected CollectingEventPublisher eventPublisher;
 
     @BeforeAll
-    public static void initEngine() {
+    protected void initEngine() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("org.openhab.automation.jrule.engine.executors.enable", "false");
         JRuleConfig config = new JRuleConfig(properties);
@@ -43,17 +57,53 @@ public abstract class JRuleAbstractTest {
 
         JRuleEngine engine = JRuleEngine.get();
         engine.setConfig(config);
-        engine.setItemRegistry(itemRegistry);
+
+        itemRegistry = Mockito.mock(ItemRegistry.class);
+        JRuleEventHandler.get().setItemRegistry(itemRegistry);
+        JRuleEngine.get().setItemRegistry(itemRegistry);
+
+        eventPublisher = new CollectingEventPublisher();
+        JRuleEventHandler.get().setEventPublisher(eventPublisher);
     }
 
-    protected <T extends JRule> T initRule(T rule) {
+    protected <T extends JRule> T initRule(Class<T> rule) {
         T spyRule = Mockito.spy(rule);
-        JRuleEngine.get().add(spyRule);
         return spyRule;
     }
 
     protected void fireEvents(List<Event> events) {
         JRuleMockedEventBus eventBus = new JRuleMockedEventBus(events);
         eventBus.start();
+    }
+
+    protected void setState(GenericItem item, State state) throws ItemNotFoundException {
+        item.setState(state);
+        when(itemRegistry.getItem(item.getName())).thenReturn(item);
+    }
+
+    class CollectingEventPublisher implements EventPublisher {
+
+        private final List<Event> events = new ArrayList<>();
+
+        @Override
+        public void post(Event event) throws IllegalArgumentException, IllegalStateException {
+            events.add(event);
+        }
+
+        public boolean hasCommandEvent(String itemName, Object command) {
+            return events.stream().filter(e -> e instanceof ItemCommandEvent).map(e -> (ItemCommandEvent) e)
+                    .anyMatch(e -> e.getTopic().equals(createTopic(itemName, "command"))
+                            && e.getItemCommand().toString().equals(command.toString()));
+        }
+
+        public boolean hasUpdateEvent(String itemName, Object update) {
+            return events.stream().filter(e -> e instanceof ItemStateEvent).map(e -> (ItemStateEvent) e)
+                    .anyMatch(e -> e.getTopic().equals(createTopic(itemName, "state"))
+                            && e.getItemState().toString().equals(update.toString()));
+        }
+
+        private String createTopic(String itemName, String type) {
+            return "openhab/items/" + itemName + "/" + type;
+        }
     }
 }

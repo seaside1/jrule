@@ -36,7 +36,9 @@ import java.util.jar.Manifest;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
+import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.common.ThreadPoolManager;
 import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
@@ -90,13 +92,18 @@ public class JRuleUtil {
     }
 
     public static <T> CompletableFuture<T> scheduleAsync(Supplier<CompletableFuture<T>> command, long delay,
-            TimeUnit unit) {
+            TimeUnit unit, JRuleExecutionContext context) {
         CompletableFuture<T> completableFuture = new CompletableFuture<>();
         scheduler.schedule((() -> {
-            command.get().thenAccept(completableFuture::complete).exceptionally(t -> {
-                completableFuture.completeExceptionally(t);
-                return null;
-            });
+            try {
+                JRule.JRULE_EXECUTION_CONTEXT.set(context);
+                command.get().thenAccept(completableFuture::complete).exceptionally(t -> {
+                    completableFuture.completeExceptionally(t);
+                    return null;
+                });
+            } finally {
+                JRule.JRULE_EXECUTION_CONTEXT.remove();
+            }
         }), delay, unit);
         return completableFuture;
     }

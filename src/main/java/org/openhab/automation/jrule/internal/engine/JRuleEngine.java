@@ -445,10 +445,12 @@ public class JRuleEngine implements PropertyChangeListener {
     private void invokeRuleInternal(JRuleExecutionContext context, JRuleEvent event) {
         JRuleLog.debug(logger, context.getLogName(), "Invoking rule for context: {}", context);
 
-        final JRule rule = context.getJrule();
+        final JRule rule = context.getRule();
         final Method method = context.getMethod();
+
         try {
-            rule.setRuleContext(context);
+
+            JRule.JRULE_EXECUTION_CONTEXT.set(context);
             JRuleLog.debug(logger, context.getMethod().getName(), "setting mdc tags: {}", context.getLoggingTags());
             MDC.put(MDC_KEY_RULE, context.getMethod().getName());
             Arrays.stream(context.getLoggingTags()).forEach(s -> MDC.put(s, s));
@@ -467,7 +469,7 @@ public class JRuleEngine implements PropertyChangeListener {
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
-            rule.removeContext();
+            JRule.JRULE_EXECUTION_CONTEXT.remove();
         }
     }
 }
