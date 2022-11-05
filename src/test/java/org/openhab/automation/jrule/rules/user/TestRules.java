@@ -130,25 +130,26 @@ public class TestRules extends JRule {
         logInfo("thing '{}' goes '{}'", event.getThing(), event.getStatus());
     }
 
-    @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
-    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
-    public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
-        logInfo("Member of Group ({}) received command", event.getMemberName());
-    }
-
-    @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
-    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
-    public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) received update", event.getMemberName());
-    }
-
-    @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
-    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
-    public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) changed", event.getMemberName());
-    }
+    // currently not merged
+    // @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
+    // @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
+    // public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
+    // logInfo("Member of Group ({}) received command", event.getMemberName());
+    // }
+    //
+    // @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
+    // @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
+    // public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
+    // final String memberThatChangedStatus = event.getMemberName();
+    // logInfo("Member of Group ({}) received update", event.getMemberName());
+    // }
+    //
+    // @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
+    // @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
+    // public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
+    // final String memberThatChangedStatus = event.getMemberName();
+    // logInfo("Member of Group ({}) changed", event.getMemberName());
+    // }
 
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
