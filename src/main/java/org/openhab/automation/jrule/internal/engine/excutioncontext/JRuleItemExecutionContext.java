@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.library.types.QuantityType;
 
@@ -57,18 +58,20 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
         if (getNeq().isPresent() && getNeq().filter(ref -> !state.equals(ref)).isEmpty()) {
             return false;
         }
-        if (getLt().isPresent() && getLt().filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty()) {
+        if (getLt().isPresent() && (!NumberUtils.isCreatable(state)
+                || getLt().filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty())) {
             return false;
         }
-        if (getLte().isPresent()
-                && getLte().filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty()) {
+        if (getLte().isPresent() && (!NumberUtils.isCreatable(state)
+                || getLte().filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty())) {
             return false;
         }
-        if (getGt().isPresent() && getGt().filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty()) {
+        if (getGt().isPresent() && (!NumberUtils.isCreatable(state)
+                || getGt().filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty())) {
             return false;
         }
-        if (getGte().isPresent()
-                && getGte().filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty()) {
+        if (getGte().isPresent() && (!NumberUtils.isCreatable(state)
+                || getGte().filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty())) {
             return false;
         }
         return true;
