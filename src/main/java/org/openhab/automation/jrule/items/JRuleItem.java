@@ -15,6 +15,9 @@ package org.openhab.automation.jrule.items;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+
 /**
  * The {@link JRuleItem} Items
  *
@@ -26,6 +29,14 @@ public abstract class JRuleItem {
 
     public JRuleItem(String itemName) {
         this.itemName = itemName;
+    }
+
+    public static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName);
+    }
+
+    public String getStateAsString() {
+        return JRuleEventHandler.get().getStringValue(itemName);
     }
 
     public String getName() {

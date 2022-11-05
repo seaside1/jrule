@@ -29,7 +29,6 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
-import org.openhab.automation.jrule.internal.handler.JRuleAddonActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
@@ -112,11 +111,11 @@ public class JRule {
         CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
         ruleNameToTimerFuture.put(ruleName, future);
         JRuleLog.info(logger, ruleName, "Start timer timeSeconds: {} hashCode: {}", timeInSeconds, future.hashCode());
-        return future.thenAccept(fn).thenAccept(s -> {
+        return future.thenAccept(s -> {
             JRuleLog.info(logger, ruleName, "Timer has finsihed");
             JRuleLog.debug(logger, ruleName, "Timer has finsihed hashCode: {}", future.hashCode());
             ruleNameToTimerFuture.remove(ruleName);
-        });
+        }).thenAccept(fn);
     }
 
     protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String ruleName,
@@ -206,10 +205,6 @@ public class JRule {
 
     protected void say(String text, String voiceId, String sinkId) {
         JRuleVoiceHandler.get().say(text, voiceId, sinkId);
-    }
-
-    protected JRuleAddonActionHandler getAction(String scope, String thingUid) {
-        return JRuleAddonActionHandler.get(scope, thingUid);
     }
 
     protected void sendCommand(String itemName, JRuleOnOffValue command) {

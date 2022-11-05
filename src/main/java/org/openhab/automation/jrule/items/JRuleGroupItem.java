@@ -14,7 +14,6 @@ package org.openhab.automation.jrule.items;
 
 import java.util.Set;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 
 /**
@@ -28,12 +27,12 @@ public abstract class JRuleGroupItem extends JRuleItem {
         super(itemName);
     }
 
-    public static JRuleGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleGroupItem.class);
-    }
-
     public Set<String> members() {
         return JRuleEventHandler.get().getGroupMemberNames(itemName);
+    }
+
+    public Set<JRuleItem> memberItems() {
+        return JRuleEventHandler.get().getGroupMemberItems(itemName);
     }
 
     public void sendCommand(String value) {

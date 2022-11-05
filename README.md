@@ -419,7 +419,7 @@ Use case: A group of switches , trigger when it's changed from OFF to ON
 Use case: Listen for a Channel Trigger Event
 ```java
     @JRuleName("ChannelTriggered")
-    @JRuleWhenChannelTrigger(channel = "mqtt:topic:mqtt:generic:numberTrigger")
+    @JRuleWhenChannelTrigger(channel = binding_thing.buttonevent)
     public synchronized void channelTriggered(JRuleEvent event) {
         logInfo("Channel triggered with value: {}", ((JRuleChannelEvent) event).getEvent());
     }
@@ -706,6 +706,9 @@ Use case: Want to listen on all Item events of a group (without the groupstate m
 
 # Changelog
 ## NEXT
+
+- Added typing for thing channel triggers, ie `JRuleWhen(channel = binding_thing.triggerChannel)` instead of typing the channel id string
+
 ## BETA14
 - Thing support in rules by [seime](https://github.com/seime) pr https://github.com/seaside1/jrule/pull/59
   - BREAKING: jrule-items.jar has been renamed to jrule-generated.jar

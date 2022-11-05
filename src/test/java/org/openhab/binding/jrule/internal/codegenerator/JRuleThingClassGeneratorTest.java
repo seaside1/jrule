@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.jrule.internal;
+package org.openhab.binding.jrule.internal.codegenerator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,11 +27,15 @@ import org.junit.jupiter.api.TestInstance;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.things.JRuleThingClassGenerator;
+import org.openhab.core.thing.Channel;
+import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.ThingUID;
+import org.openhab.core.thing.binding.builder.ChannelBuilder;
 import org.openhab.core.thing.internal.BridgeImpl;
 import org.openhab.core.thing.internal.ThingImpl;
+import org.openhab.core.thing.type.ChannelKind;
 import org.vesalainen.util.Lists;
 
 /**
@@ -49,7 +53,7 @@ public class JRuleThingClassGeneratorTest {
 
     @BeforeAll
     public void setup() {
-        targetFolder = new File("target/items/org/openhab/automation/jrule/things/generated/");
+        targetFolder = new File("target/gen/org/openhab/automation/jrule/generated/things/");
         targetFolder.mkdirs();
 
         Map<String, Object> map = new HashMap<>();
@@ -67,9 +71,19 @@ public class JRuleThingClassGeneratorTest {
 
     @Test
     public void testGenerateAndCompileThingFile() {
+        ThingImpl thing = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
+                new ThingUID("mybinding", "thingtype", "id"));
+        Channel triggerChannel = ChannelBuilder.create(new ChannelUID(thing.getUID(), "triggerChannel"))
+                .withKind(ChannelKind.TRIGGER).build();
+        Channel triggerChannelWithType = ChannelBuilder.create(new ChannelUID(thing.getUID(), "triggerChannel#start"))
+                .withKind(ChannelKind.TRIGGER).build();
+        Channel stateChannel = ChannelBuilder.create(new ChannelUID(thing.getUID(), "stateChannel"))
+                .withKind(ChannelKind.STATE).build();
+        thing.addChannel(triggerChannel);
+        thing.addChannel(triggerChannelWithType);
+        thing.addChannel(stateChannel);
 
-        generateAndCompile(new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
-                new ThingUID("mybinding", "thingtype", "id")));
+        generateAndCompile(thing);
     }
 
     @Test
@@ -101,7 +115,7 @@ public class JRuleThingClassGeneratorTest {
         boolean success = sourceFileGenerator.generateThingsSource(things);
         assertTrue(success, "Failed to generate source file for things");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleThings.java")), "target/classes:target/items");
+        compiler.compile(List.of(new File(targetFolder, "JRuleThings.java")), "target/classes:target/gen");
 
         File compiledClass = new File(targetFolder, "JRuleThings.class");
         assertTrue(compiledClass.exists());

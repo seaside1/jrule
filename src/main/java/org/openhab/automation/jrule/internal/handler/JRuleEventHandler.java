@@ -15,12 +15,16 @@ package org.openhab.automation.jrule.internal.handler;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleItemUtil;
 import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -552,20 +556,23 @@ public class JRuleEventHandler {
     }
 
     public Set<String> getGroupMemberNames(String groupName) {
-        Item item;
-        final Set<String> memberNames = new HashSet<>();
+        return getGroupMemberItems(groupName).stream().map(JRuleItem::getName).collect(Collectors.toSet());
+    }
+
+    public Set<JRuleItem> getGroupMemberItems(String groupName) {
         try {
-            item = itemRegistry.getItem(groupName);
+            Item item = itemRegistry.getItem(groupName);
+            if (item instanceof GroupItem) {
+                GroupItem g = (GroupItem) item;
+                return g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
+                        .collect(Collectors.toSet());
+            } else {
+                throw new JRuleRuntimeException(String.format("Given itemname '%s' is not a groupitem", groupName));
+            }
         } catch (ItemNotFoundException e) {
-            logError("Item not found in registry for group: {}", groupName);
-            return null;
+            throw new JRuleItemNotFoundException(
+                    String.format("Item not found in registry for groupname '%s'", groupName));
         }
-        if (item instanceof GroupItem) {
-            GroupItem g = (GroupItem) item;
-            Set<@NonNull Item> members = g.getMembers();
-            members.forEach(m -> memberNames.add(m.getName()));
-        }
-        return memberNames;
     }
 
     public ItemRegistry getItemRegistry() {
