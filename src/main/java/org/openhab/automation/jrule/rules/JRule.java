@@ -29,7 +29,7 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.LocalTimerExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleLocalTimerExecutionContext;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
@@ -112,7 +112,8 @@ public class JRule {
             JRuleLog.debug(logger, timerName, "Future already running hashCode: " + timerName.hashCode());
             return timerNameToTimerFuture.get(timerName);
         }
-        LocalTimerExecutionContext context = new LocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(), timerName);
+        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                timerName);
         CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
         timerNameToTimerFuture.put(timerName, future);
 
@@ -183,7 +184,8 @@ public class JRule {
             futures.add(lastFuture);
         }
 
-        LocalTimerExecutionContext context = new LocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(), timerName);
+        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                timerName);
 
         futures.forEach(f -> {
             try {
@@ -288,7 +290,8 @@ public class JRule {
             return false;
         }
         Supplier<CompletableFuture<Void>> asyncTask = () -> CompletableFuture.completedFuture(null);
-        LocalTimerExecutionContext context = new LocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(), lockName);
+        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                lockName);
         future = JRuleUtil.scheduleAsync(asyncTask, seconds, TimeUnit.SECONDS, context);
 
         timerNameToLockFuture.put(lockName, future);

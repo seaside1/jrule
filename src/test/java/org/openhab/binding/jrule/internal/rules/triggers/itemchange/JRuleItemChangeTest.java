@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.jrule.internal.triggers.itemchange;
+package org.openhab.binding.jrule.internal.rules.triggers.itemchange;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
-import org.openhab.binding.jrule.internal.triggers.JRuleAbstractTest;
+import org.openhab.binding.jrule.internal.rules.JRuleAbstractTest;
 import org.openhab.core.events.Event;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;

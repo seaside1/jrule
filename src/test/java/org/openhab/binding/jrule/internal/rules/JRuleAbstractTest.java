@@ -1,20 +1,19 @@
 /**
  * Copyright (c) 2010-2022 Contributors to the openHAB project
- * <p>
+ *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- * <p>
+ *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- * <p>
+ *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.jrule.internal.triggers;
+package org.openhab.binding.jrule.internal.rules;
 
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +27,9 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.events.Event;
-import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
-import org.openhab.core.items.events.ItemCommandEvent;
-import org.openhab.core.items.events.ItemStateEvent;
 import org.openhab.core.types.State;
 
 /**
@@ -79,31 +75,5 @@ public abstract class JRuleAbstractTest {
     protected void setState(GenericItem item, State state) throws ItemNotFoundException {
         item.setState(state);
         when(itemRegistry.getItem(item.getName())).thenReturn(item);
-    }
-
-    class CollectingEventPublisher implements EventPublisher {
-
-        private final List<Event> events = new ArrayList<>();
-
-        @Override
-        public void post(Event event) throws IllegalArgumentException, IllegalStateException {
-            events.add(event);
-        }
-
-        public boolean hasCommandEvent(String itemName, Object command) {
-            return events.stream().filter(e -> e instanceof ItemCommandEvent).map(e -> (ItemCommandEvent) e)
-                    .anyMatch(e -> e.getTopic().equals(createTopic(itemName, "command"))
-                            && e.getItemCommand().toString().equals(command.toString()));
-        }
-
-        public boolean hasUpdateEvent(String itemName, Object update) {
-            return events.stream().filter(e -> e instanceof ItemStateEvent).map(e -> (ItemStateEvent) e)
-                    .anyMatch(e -> e.getTopic().equals(createTopic(itemName, "state"))
-                            && e.getItemState().toString().equals(update.toString()));
-        }
-
-        private String createTopic(String itemName, String type) {
-            return "openhab/items/" + itemName + "/" + type;
-        }
     }
 }
