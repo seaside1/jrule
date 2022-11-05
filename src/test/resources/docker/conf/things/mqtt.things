@@ -1,0 +1,8 @@
+Bridge mqtt:broker:mqtt [ host="mqtt", port=8666, username="admin", password="admin", reconnectTime=5000, keepAlive=5 ]
+{
+	Thing topic generic {
+		Channels:
+		Type number : number [ stateTopic="number/state" ]
+		Type number : numberTrigger [ stateTopic="number/state", trigger="true" ]
+	}
+}
