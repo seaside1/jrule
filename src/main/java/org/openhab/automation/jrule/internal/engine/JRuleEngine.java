@@ -67,6 +67,7 @@ import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.scheduler.CronScheduler;
 import org.slf4j.Logger;
@@ -160,7 +161,8 @@ public class JRuleEngine implements PropertyChangeListener {
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedUpdate.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
             addToContext(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, method,
-                    jRuleWhen.item(), Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    jRuleWhen.item(), jRuleWhen.memberOf(),
+                    Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
@@ -174,7 +176,8 @@ public class JRuleEngine implements PropertyChangeListener {
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedCommand.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
             addToContext(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, method,
-                    jRuleWhen.item(), Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
+                    jRuleWhen.item(), jRuleWhen.memberOf(),
+                    Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
@@ -188,6 +191,7 @@ public class JRuleEngine implements PropertyChangeListener {
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemChange.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
             addToContext(new JRuleItemChangeExecutionContext(jRule, logName, loggingTags, method, jRuleWhen.item(),
+                    jRuleWhen.memberOf(),
                     Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
                     Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
@@ -252,8 +256,22 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public void fire(AbstractEvent event) {
-        contextList.stream().filter(context -> context.match(event)).filter(this::matchPrecondition)
+        JRuleItemExecutionContext.JRuleAdditionalItemCheckData additionalCheckData = getAdditionalCheckData(event);
+
+        contextList.stream().filter(context -> context.match(event, additionalCheckData))
+                .filter(this::matchPrecondition)
                 .forEach(context -> invokeRule(context, context.createJRuleEvent(event)));
+    }
+
+    private JRuleItemExecutionContext.JRuleAdditionalItemCheckData getAdditionalCheckData(AbstractEvent event) {
+        return Optional.ofNullable(event instanceof ItemEvent ? ((ItemEvent) event).getItemName() : null).map(s -> {
+            try {
+                return itemRegistry.getItem(s);
+            } catch (ItemNotFoundException e) {
+                throw new IllegalStateException("this can never occur", e);
+            }
+        }).map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getGroupNames()))
+                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(List.of()));
     }
 
     public boolean matchPrecondition(JRuleExecutionContext jRuleExecutionContext) {
@@ -327,9 +345,18 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
+        List<String> belongingGroups = Optional.of(itemName).map(s -> {
+            try {
+                return itemRegistry.getItem(s);
+            } catch (ItemNotFoundException e) {
+                throw new IllegalStateException("this can never occur", e);
+            }
+        }).map(Item::getGroupNames).orElse(List.of());
+
         boolean b = this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
                 .map(context -> ((JRuleItemExecutionContext) context))
-                .anyMatch(context -> context.getItemName().equals(itemName));
+                .anyMatch(context -> (context.getItemName().equals(itemName) && !context.isMemberOf())
+                        || (belongingGroups.contains(context.getItemName()) && context.isMemberOf()));
         logDebug("watching for item: '{}'? -> {}", itemName, b);
         return b;
     }

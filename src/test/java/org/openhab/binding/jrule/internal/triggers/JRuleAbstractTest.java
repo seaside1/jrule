@@ -23,6 +23,7 @@ import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.events.Event;
+import org.openhab.core.items.ItemRegistry;
 
 /**
  * The {@link JRuleAbstractTest} is a base class for simple rule trigger testing
@@ -31,6 +32,8 @@ import org.openhab.core.events.Event;
  * @author Arne Seime - Initial contribution
  */
 public abstract class JRuleAbstractTest {
+    protected static ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
+
     @BeforeAll
     public static void initEngine() {
         Map<String, Object> properties = new HashMap<>();
@@ -40,6 +43,7 @@ public abstract class JRuleAbstractTest {
 
         JRuleEngine engine = JRuleEngine.get();
         engine.setConfig(config);
+        engine.setItemRegistry(itemRegistry);
     }
 
     protected <T extends JRule> T initRule(T rule) {

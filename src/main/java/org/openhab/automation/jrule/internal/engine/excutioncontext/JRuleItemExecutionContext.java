@@ -25,19 +25,21 @@ import org.openhab.core.library.types.QuantityType;
  * @author Robert Delbrück - Initial contribution
  */
 public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
-    private final String itemName;
-    private final Optional<Double> gt;
-    private final Optional<Double> gte;
-    private final Optional<Double> lt;
-    private final Optional<Double> lte;
+    protected final String itemName;
+    protected final boolean memberOf;
+    protected final Optional<Double> gt;
+    protected final Optional<Double> gte;
+    protected final Optional<Double> lt;
+    protected final Optional<Double> lte;
     protected final Optional<String> eq;
     protected final Optional<String> neq;
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
-            Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte, Optional<String> eq,
-            Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
+            boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
+            Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
         super(jRule, logName, loggingTags, method, preconditionContextList);
         this.itemName = itemName;
+        this.memberOf = memberOf;
         this.gt = gt;
         this.gte = gte;
         this.lt = lt;
@@ -96,5 +98,26 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
 
     public Optional<String> getNeq() {
         return neq;
+    }
+
+    public boolean isMemberOf() {
+        return memberOf;
+    }
+
+    public static class JRuleAdditionalItemCheckData extends JRuleAdditionalCheckData {
+        private final List<String> belongingGroups;
+
+        public JRuleAdditionalItemCheckData(List<String> belongingGroups) {
+            this.belongingGroups = belongingGroups;
+        }
+
+        public List<String> getBelongingGroups() {
+            return belongingGroups;
+        }
+
+        @Override
+        public String toString() {
+            return "JRuleAdditionalItemCheckData{" + "belongingGroups=" + belongingGroups + '}';
+        }
     }
 }

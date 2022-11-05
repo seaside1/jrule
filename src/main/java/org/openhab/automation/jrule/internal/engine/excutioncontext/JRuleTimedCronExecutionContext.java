@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openhab.automation.jrule.rules.JRule;
@@ -35,7 +36,7 @@ public class JRuleTimedCronExecutionContext extends JRuleTimedExecutionContext {
     }
 
     @Override
-    public boolean match(AbstractEvent event) {
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
         return false;
     }
 
@@ -46,5 +47,12 @@ public class JRuleTimedCronExecutionContext extends JRuleTimedExecutionContext {
 
     public String getCron() {
         return cron;
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleTimedCronExecutionContext{" + "cron='" + cron + '\'' + ", logName='" + logName + '\'' + ", jRule="
+                + jRule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
+                + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

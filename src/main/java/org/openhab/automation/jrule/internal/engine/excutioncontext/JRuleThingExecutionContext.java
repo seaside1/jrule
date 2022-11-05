@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,13 +48,7 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     }
 
     @Override
-    public String toString() {
-        return "JRuleThingExecutionContext{" + "thing='" + thing + '\'' + ", from='" + from + '\'' + ", to='" + to
-                + '\'' + '}';
-    }
-
-    @Override
-    public boolean match(AbstractEvent event) {
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
         if (!(event instanceof ThingStatusInfoChangedEvent)) {
             return false;
         }
@@ -67,5 +62,12 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
         return new JRuleThingEvent(((ThingStatusInfoChangedEvent) event).getThingUID().toString(),
                 ((ThingStatusInfoChangedEvent) event).getStatusInfo().getStatus().name());
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleThingExecutionContext{" + "thing=" + thing + ", from=" + from + ", to=" + to + ", logName='"
+                + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
