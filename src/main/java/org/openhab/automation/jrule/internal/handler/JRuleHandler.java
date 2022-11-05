@@ -16,6 +16,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -518,9 +519,12 @@ public class JRuleHandler implements PropertyChangeListener {
                     }
                 }
                 return super.loadClass(name);
-
+            } catch (FileNotFoundException e) {
+                return super.loadClass(name);
             } catch (IOException e) {
-                JRuleLog.warn(logger, LOG_NAME_HANDLER, e.getMessage());
+                JRuleLog.warn(logger, LOG_NAME_HANDLER,
+                        "Trouble loading class {} from file system, deferring to parent clasloader: {}", name,
+                        e.toString());
                 return super.loadClass(name);
             }
         }
