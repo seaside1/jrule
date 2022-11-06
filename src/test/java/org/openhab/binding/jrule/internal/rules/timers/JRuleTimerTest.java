@@ -36,10 +36,11 @@ import org.openhab.core.types.UnDefType;
 public class JRuleTimerTest extends JRuleAbstractTest {
 
     @Test
-    public void testSendCommand() throws ItemNotFoundException, InterruptedException {
+    public void testOneOffTimerWithNestedtimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
         fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "2", "1")));
         verify(rule, times(1)).testSendCommand();

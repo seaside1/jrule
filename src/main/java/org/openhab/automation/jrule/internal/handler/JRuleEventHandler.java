@@ -179,7 +179,7 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
-        logInfo("SendCommand {} {}", itemName, command);
+        logInfo("SendCommand '{}' to '{}'", command, itemName);
         final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
         eventPublisher.post(commandEvent);
     }
@@ -250,7 +250,7 @@ public class JRuleEventHandler {
         if (eventPublisher == null) {
             return;
         }
-        logInfo("PostUpdate {} {}", itemName, state);
+        logInfo("PostUpdate '{}' to '{}'", state, itemName);
         final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state);
         eventPublisher.post(itemEvent);
     }
