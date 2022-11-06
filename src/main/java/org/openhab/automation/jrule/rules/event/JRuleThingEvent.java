@@ -21,6 +21,8 @@ public class JRuleThingEvent extends JRuleEvent {
     private String thing;
     private String status;
 
+    private String oldStatus;
+
     public String getThing() {
         return thing;
     }
@@ -29,13 +31,19 @@ public class JRuleThingEvent extends JRuleEvent {
         return status;
     }
 
-    public JRuleThingEvent(String thing, String status) {
+    public String getOldStatus() {
+        return oldStatus;
+    }
+
+    public JRuleThingEvent(String thing, String status, String oldStatus) {
         this.thing = thing;
         this.status = status;
+        this.oldStatus = oldStatus;
     }
 
     @Override
     public String toString() {
-        return String.format("JRuleThingEvent [thing=%s, status=%s]", thing, status);
+        return "JRuleThingEvent{" + "thing='" + thing + '\'' + ", status='" + status + '\'' + ", oldStatus='"
+                + oldStatus + '\'' + '}';
     }
 }

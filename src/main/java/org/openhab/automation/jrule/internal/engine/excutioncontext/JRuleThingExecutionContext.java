@@ -60,8 +60,11 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        return new JRuleThingEvent(((ThingStatusInfoChangedEvent) event).getThingUID().toString(),
-                ((ThingStatusInfoChangedEvent) event).getStatusInfo().getStatus().name());
+        ThingStatusInfoChangedEvent thingStatusChanged = (ThingStatusInfoChangedEvent) event;
+
+        return new JRuleThingEvent((thingStatusChanged).getThingUID().toString(),
+                thingStatusChanged.getStatusInfo().getStatus().name(),
+                thingStatusChanged.getOldStatusInfo().getStatus().name());
     }
 
     @Override
