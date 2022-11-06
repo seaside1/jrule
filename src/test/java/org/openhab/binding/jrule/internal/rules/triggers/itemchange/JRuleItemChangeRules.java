@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.jrule.internal.triggers.itemchange;
+package org.openhab.binding.jrule.internal.rules.triggers.itemchange;
 
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;

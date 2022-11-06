@@ -26,23 +26,23 @@ import org.openhab.core.events.AbstractEvent;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public abstract class JRuleExecutionContext {
-    private final String logName;
-    protected final JRule jRule;
+    protected final String logName;
+    protected final JRule rule;
     protected final Method method;
-    private final String[] loggingTags;
-    private final List<JRulePreconditionContext> preconditionContextList;
+    protected final String[] loggingTags;
+    protected final List<JRulePreconditionContext> preconditionContextList;
 
-    public JRuleExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+    public JRuleExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
             List<JRulePreconditionContext> preconditionContextList) {
         this.logName = logName;
         this.loggingTags = loggingTags;
-        this.jRule = jRule;
+        this.rule = rule;
         this.method = method;
         this.preconditionContextList = preconditionContextList;
     }
 
-    public JRule getJrule() {
-        return jRule;
+    public JRule getRule() {
+        return rule;
     }
 
     public Method getMethod() {
@@ -62,11 +62,22 @@ public abstract class JRuleExecutionContext {
         return loggingTags;
     }
 
-    public abstract boolean match(AbstractEvent event);
+    public abstract boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData);
 
     public abstract JRuleEvent createJRuleEvent(AbstractEvent event);
 
     public List<JRulePreconditionContext> getPreconditionContextList() {
         return preconditionContextList;
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleExecutionContext{" + "logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
+                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
+                + preconditionContextList + '}';
+    }
+
+    public static class JRuleAdditionalCheckData {
+
     }
 }

@@ -31,5 +31,7 @@ public @interface JRuleWhenItemReceivedCommand {
 
     String command() default "";
 
+    boolean memberOf() default false;
+
     JRuleCondition condition() default @JRuleCondition;
 }
