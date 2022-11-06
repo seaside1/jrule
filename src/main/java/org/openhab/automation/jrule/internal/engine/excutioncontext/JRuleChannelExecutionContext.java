@@ -63,7 +63,7 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     @Override
     public String toString() {
         return "JRuleChannelExecutionContext{" + "channel='" + channel + '\'' + ", event=" + event + ", logName='"
-                + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + logName + '\'' + ", jRule=" + rule + ", method=" + method + ", loggingTags="
                 + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

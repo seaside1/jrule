@@ -26,7 +26,7 @@ import org.openhab.core.events.AbstractEvent;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public abstract class JRuleExecutionContext {
-    private final String logName;
+    protected final String logName;
     protected final JRule rule;
     protected final Method method;
     protected final String[] loggingTags;

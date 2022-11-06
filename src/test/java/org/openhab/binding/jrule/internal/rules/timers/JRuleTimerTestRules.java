@@ -33,6 +33,10 @@ public class JRuleTimerTestRules extends JRule {
     @JRuleWhenItemChange(item = TRIGGER_ITEM)
     public void testSendCommand() {
         JRuleStringItem.forName(TARGET_ITEM).sendCommand("command");
+        cancelTimer("NON_EXISTING_TIMER");
+        createRepeatingTimer("REPEATING_TIMER", 1, 1, unused -> logInfo("Repeating timer completed"));
+        createOrReplaceTimer("CREATE_OR_REPLACE_TIMER", 1, unused -> logInfo("Replaced timer completed"));
+
         createTimer("TimerName", 1, unused -> {
             JRuleStringItem.forName(TARGET_ITEM).sendCommand("timedCommand");
             createTimer("NestedTimer", 1, unused2 -> {

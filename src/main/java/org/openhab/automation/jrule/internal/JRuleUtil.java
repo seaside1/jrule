@@ -102,6 +102,7 @@ public class JRuleUtil {
                     return null;
                 });
             } finally {
+                logger.debug("Removing thread local after scheduleAsync");
                 JRule.JRULE_EXECUTION_CONTEXT.remove();
             }
         }), delay, unit);

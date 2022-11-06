@@ -67,11 +67,14 @@ public class JRule {
             Consumer<Void> fn) {
         CompletableFuture<Void> future = timerNameToTimerFuture.get(timerName);
         if (future != null) {
-            JRuleLog.debug(logger, timerName, "Future already running hashCode: {}", future.hashCode());
+            JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                    timerName);
+            JRuleLog.debug(logger, context.getLogName(), "Future already running hashCode: {}", future.hashCode());
             boolean cancelled = future.cancel(false);
             timerNameToTimerFuture.remove(timerName);
 
-            JRuleLog.info(logger, timerName, "Replacing existing timer by removing old timer cancelled: {}", cancelled);
+            JRuleLog.info(logger, context.getLogName(), "Replacing existing timer by removing old timer cancelled: {}",
+                    cancelled);
         }
         return createTimer(timerName, timeInSeconds, fn);
     }
@@ -80,23 +83,25 @@ public class JRule {
         return timerNameToTimerFuture.containsKey(timerName) || timerNameToTimerFutureList.containsKey(timerName);
     }
 
-    protected synchronized boolean cancelTimer(String timeName) {
+    protected synchronized boolean cancelTimer(String timerName) {
         boolean cancelled = false;
-        final CompletableFuture<Void> completableFuture = timerNameToTimerFuture.get(timeName);
+        final CompletableFuture<Void> completableFuture = timerNameToTimerFuture.get(timerName);
         if (completableFuture != null) {
-            JRuleLog.debug(logger, timeName, "Future already running");
+            JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                    timerName);
+            JRuleLog.debug(logger, context.getLogName(), "Future already running");
             try {
                 cancelled = completableFuture.cancel(false);
             } catch (Exception x) {
-                JRuleLog.debug(logger, timeName, "Failed to cancel timer", x);
+                JRuleLog.debug(logger, context.getLogName(), "Failed to cancel timer", x);
             } finally {
-                timerNameToTimerFuture.remove(timeName);
+                timerNameToTimerFuture.remove(timerName);
             }
         }
 
-        List<CompletableFuture<Void>> completableFutures = timerNameToTimerFutureList.get(timeName);
+        List<CompletableFuture<Void>> completableFutures = timerNameToTimerFutureList.get(timerName);
         if (completableFutures != null) {
-            cancelled |= cancelListOfTimersFutures(timeName, completableFutures);
+            cancelled |= cancelListOfTimersFutures(timerName, completableFutures);
         }
 
         return cancelled;
@@ -108,12 +113,12 @@ public class JRule {
 
     protected synchronized CompletableFuture<Void> createTimer(String timerName, long timeInSeconds,
             Consumer<Void> fn) {
-        if (timerNameToTimerFuture.containsKey(timerName)) {
-            JRuleLog.debug(logger, timerName, "Future already running hashCode: " + timerName.hashCode());
-            return timerNameToTimerFuture.get(timerName);
-        }
         JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
                 timerName);
+        if (timerNameToTimerFuture.containsKey(timerName)) {
+            JRuleLog.debug(logger, context.getLogName(), "Future already running hashCode: " + timerName.hashCode());
+            return timerNameToTimerFuture.get(timerName);
+        }
         CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
         timerNameToTimerFuture.put(timerName, future);
 
@@ -125,15 +130,9 @@ public class JRule {
                 JRuleLog.info(logger, context.getLogName(), "Timer has finsihed");
                 JRuleLog.debug(logger, context.getLogName(), "Timer has finsihed hashCode: {}", future.hashCode());
                 timerNameToTimerFuture.remove(timerName);
-            } finally {
-                JRule.JRULE_EXECUTION_CONTEXT.remove();
-            }
-
-        }).thenAccept(s -> {
-            try {
-                JRule.JRULE_EXECUTION_CONTEXT.set(context);
                 fn.accept(null);
             } finally {
+                logger.debug("Removing thread local after createTimer");
                 JRule.JRULE_EXECUTION_CONTEXT.remove();
             }
         });
@@ -147,16 +146,20 @@ public class JRule {
     protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String timerName,
             long delayInSeconds, int numberOfRepeats, Consumer<Void> fn) {
         List<CompletableFuture<Void>> completableFutures = timerNameToTimerFutureList.get(timerName);
+        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                timerName);
         if (completableFutures != null) {
             cancelListOfTimersFutures(timerName, completableFutures);
-            JRuleLog.info(logger, timerName, "Replacing existing repeating timer by removing old timer");
+            JRuleLog.info(logger, context.getLogName(), "Replacing existing repeating timer by removing old timer");
         }
         return createRepeatingTimer(timerName, delayInSeconds, numberOfRepeats, fn);
     }
 
     private boolean cancelListOfTimersFutures(String timerName, List<CompletableFuture<Void>> completableFutures) {
         boolean cancelled = false;
-        JRuleLog.debug(logger, timerName, "Cancel Futures");
+        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                timerName);
+        JRuleLog.debug(logger, context.getLogName(), "Cancel Futures");
         for (CompletableFuture<?> future : completableFutures) {
             cancelled |= future.cancel(true);
         }
@@ -169,11 +172,14 @@ public class JRule {
             int numberOfRepeats, Consumer<Void> fn) {
         List<CompletableFuture<Void>> futures = timerNameToTimerFutureList.get(timerName);
 
+        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
+                timerName);
+
         if (futures != null) {
-            JRuleLog.debug(logger, timerName, "Repeating timer already running");
+            JRuleLog.debug(logger, context.getLogName(), "Repeating timer already running");
             return timerNameToTimerFutureList.get(timerName);
         }
-        JRuleLog.info(logger, timerName, "Start Repeating timer, delay: {}s repeats: {}", delayInSeconds,
+        JRuleLog.info(logger, context.getLogName(), "Start Repeating timer, delay: {}s repeats: {}", delayInSeconds,
                 numberOfRepeats);
 
         futures = new ArrayList<>();
@@ -184,19 +190,26 @@ public class JRule {
             futures.add(lastFuture);
         }
 
-        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                timerName);
-
-        futures.forEach(f -> {
+        futures.forEach(f -> f.thenAccept(s -> {
             try {
                 JRule.JRULE_EXECUTION_CONTEXT.set(context);
-                f.thenAccept(fn);
+                fn.accept(s);
             } finally {
+                logger.info("Removing thread local after createRepeatingTimer (initial)");
                 JRULE_EXECUTION_CONTEXT.remove();
             }
-        });
+
+        }));
         if (lastFuture != null) {
             futures.add(lastFuture.thenAccept(s -> {
+                try {
+                    JRule.JRULE_EXECUTION_CONTEXT.set(context);
+                    fn.accept(s);
+                } finally {
+                    logger.debug("Removing thread local after createRepeatingTimer (lastFuture)");
+                    JRULE_EXECUTION_CONTEXT.remove();
+                }
+
                 JRuleLog.info(logger, context.getLogName(), "Repeating Timer has finsihed");
                 List<CompletableFuture<Void>> finishedList = timerNameToTimerFutureList.remove(timerName);
                 if (finishedList != null) {

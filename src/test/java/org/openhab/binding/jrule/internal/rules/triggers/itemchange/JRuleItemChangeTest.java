@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
@@ -36,9 +37,10 @@ import org.openhab.core.library.types.StringType;
  *
  * @author Arne Seime - Initial contribution
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JRuleItemChangeTest extends JRuleAbstractTest {
     @BeforeAll
-    public static void initTestClass() throws ItemNotFoundException {
+    public void initTestClass() throws ItemNotFoundException {
         Mockito.when(itemRegistry.getItem(Mockito.anyString()))
                 .then((Answer<Item>) invocationOnMock -> new StringItem(invocationOnMock.getArgument(0)));
     }

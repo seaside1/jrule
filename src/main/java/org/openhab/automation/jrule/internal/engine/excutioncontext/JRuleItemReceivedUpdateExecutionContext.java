@@ -82,7 +82,7 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
     public String toString() {
         return "JRuleItemReceivedUpdateExecutionContext{" + "state=" + state + ", itemName='" + itemName + '\''
                 + ", memberOf=" + memberOf + ", gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq="
-                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + jRule + ", method=" + method
+                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
                 + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
                 + preconditionContextList + '}';
     }

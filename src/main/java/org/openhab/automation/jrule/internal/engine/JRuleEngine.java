@@ -469,6 +469,7 @@ public class JRuleEngine implements PropertyChangeListener {
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
+            logger.debug("Removing thread local after rule completion");
             JRule.JRULE_EXECUTION_CONTEXT.remove();
         }
     }

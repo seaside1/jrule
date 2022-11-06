@@ -31,11 +31,6 @@ public class JRuleLocalTimerExecutionContext extends JRuleExecutionContext {
     }
 
     @Override
-    public boolean match(AbstractEvent event) {
-        return false;
-    }
-
-    @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
         return null;
     }
@@ -43,5 +38,10 @@ public class JRuleLocalTimerExecutionContext extends JRuleExecutionContext {
     @Override
     public String getLogName() {
         return super.getLogName() + "/" + timerName;
+    }
+
+    @Override
+    public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
+        return false;
     }
 }
