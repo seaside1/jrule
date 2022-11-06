@@ -52,7 +52,7 @@ public class JRuleTimedCronExecutionContext extends JRuleTimedExecutionContext {
     @Override
     public String toString() {
         return "JRuleTimedCronExecutionContext{" + "cron='" + cron + '\'' + ", logName='" + logName + '\'' + ", jRule="
-                + jRule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
+                + rule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
                 + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

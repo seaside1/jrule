@@ -27,22 +27,22 @@ import org.openhab.core.events.AbstractEvent;
  */
 public abstract class JRuleExecutionContext {
     protected final String logName;
-    protected final JRule jRule;
+    protected final JRule rule;
     protected final Method method;
     protected final String[] loggingTags;
     protected final List<JRulePreconditionContext> preconditionContextList;
 
-    public JRuleExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
+    public JRuleExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
             List<JRulePreconditionContext> preconditionContextList) {
         this.logName = logName;
         this.loggingTags = loggingTags;
-        this.jRule = jRule;
+        this.rule = rule;
         this.method = method;
         this.preconditionContextList = preconditionContextList;
     }
 
-    public JRule getJrule() {
-        return jRule;
+    public JRule getRule() {
+        return rule;
     }
 
     public Method getMethod() {
@@ -72,7 +72,7 @@ public abstract class JRuleExecutionContext {
 
     @Override
     public String toString() {
-        return "JRuleExecutionContext{" + "logName='" + logName + '\'' + ", jRule=" + jRule + ", method=" + method
+        return "JRuleExecutionContext{" + "logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
                 + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
                 + preconditionContextList + '}';
     }

@@ -67,7 +67,7 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     @Override
     public String toString() {
         return "JRuleThingExecutionContext{" + "thing=" + thing + ", from=" + from + ", to=" + to + ", logName='"
-                + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + logName + '\'' + ", jRule=" + rule + ", method=" + method + ", loggingTags="
                 + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

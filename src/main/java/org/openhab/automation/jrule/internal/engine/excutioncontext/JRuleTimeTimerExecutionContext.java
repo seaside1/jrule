@@ -66,7 +66,7 @@ public class JRuleTimeTimerExecutionContext extends JRuleTimedExecutionContext {
     @Override
     public String toString() {
         return "JRuleTimeTimerExecutionContext{" + "hour=" + hour + ", minute=" + minute + ", second=" + second
-                + ", logName='" + logName + '\'' + ", jRule=" + jRule + ", method=" + method + ", loggingTags="
+                + ", logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method + ", loggingTags="
                 + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
