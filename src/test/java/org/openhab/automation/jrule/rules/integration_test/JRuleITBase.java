@@ -105,10 +105,9 @@ public abstract class JRuleITBase {
             .withCopyFileToContainer(MountableFile
                     .forHostPath(String.format("target/org.openhab.automation.jrule-%s.jar", version), 777),
                     "/openhab/addons/jrule-engine.jar")
-            .withCopyFileToContainer(
-                    MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user/TestRules.java",
-                            777),
-                    "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user/TestRules.java")
+            .withCopyToContainer(
+                    MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user/", 777),
+                    "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user/")
             .withExposedPorts(8080).withLogConsumer(outputFrame -> {
                 logLines.add(outputFrame.getUtf8String().strip());
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
@@ -232,7 +231,7 @@ public abstract class JRuleITBase {
             byte[] credentials = Base64.getEncoder().encode(("admin:admin").getBytes(StandardCharsets.UTF_8));
             request.setHeader("Authorization", "Basic " + new String(credentials, StandardCharsets.UTF_8));
             CloseableHttpResponse response = client.execute(request);
-            if (2 != response.getCode() / 100) {
+            if (isHttp2xx(response)) {
                 return response.getReasonPhrase();
             }
             JsonElement jsonElement = JsonParser.parseString(EntityUtils.toString(response.getEntity()));
@@ -240,6 +239,10 @@ public abstract class JRuleITBase {
             log.debug("querying status for '{}' -> '{}'", thing, status);
             return status;
         }
+    }
+
+    private static boolean isHttp2xx(CloseableHttpResponse response) {
+        return 2 != response.getCode() / 100;
     }
 
     private static int getOpenhabPort() {
