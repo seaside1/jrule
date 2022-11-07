@@ -98,21 +98,21 @@ public abstract class JRuleITBase {
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/timezone"), "/etc/timezone")
             .withCopyToContainer(MountableFile.forClasspathResource("docker/conf"), "/openhab/conf")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 777),
+            .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("docker/users.json", 777),
+            .withCopyFileToContainer(MountableFile.forClasspathResource("docker/users.json", 0777),
                     "/openhab/userdata/jsondb/users.json")
             .withCopyFileToContainer(MountableFile
-                    .forHostPath(String.format("target/org.openhab.automation.jrule-%s.jar", version), 777),
+                    .forHostPath(String.format("target/org.openhab.automation.jrule-%s.jar", version), 0777),
                     "/openhab/addons/jrule-engine.jar")
             .withCopyToContainer(
-                    MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user/", 777),
-                    "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user/")
+                    MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user", 0777),
+                    "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user")
             .withExposedPorts(8080).withLogConsumer(outputFrame -> {
                 logLines.add(outputFrame.getUtf8String().strip());
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
             }).waitingFor(new LogMessageWaitStrategy().withRegEx(".*JRule Engine Rules Reloaded.*")
-                    .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)))
+                    .withStartupTimeout(Duration.of(900, ChronoUnit.SECONDS)))
             .withNetwork(network);
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
@@ -144,8 +144,18 @@ public abstract class JRuleITBase {
     @AfterAll
     static void testFinished() {
         if (openhabContainer != null && openhabContainer.isRunning()) {
-            openhabContainer.copyFileFromContainer("/openhab/conf/automation/jrule/jar/jrule-generated.jar",
-                    "target/jrule-generated.jar");
+            try {
+                openhabContainer.copyFileFromContainer("/openhab/conf/automation/jrule/jar/jrule.jar",
+                        "target/jrule.jar");
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            try {
+                openhabContainer.copyFileFromContainer("/openhab/conf/automation/jrule/jar/jrule-generated.jar",
+                        "target/jrule-generated.jar");
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 
