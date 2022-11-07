@@ -112,7 +112,7 @@ public abstract class JRuleITBase {
                 logLines.add(outputFrame.getUtf8String().strip());
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
             }).waitingFor(new LogMessageWaitStrategy().withRegEx(".*JRule Engine Rules Reloaded.*")
-                    .withStartupTimeout(Duration.of(900, ChronoUnit.SECONDS)))
+                    .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)))
             .withNetwork(network);
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
