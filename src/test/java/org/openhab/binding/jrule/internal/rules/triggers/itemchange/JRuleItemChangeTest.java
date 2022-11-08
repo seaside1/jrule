@@ -86,7 +86,6 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     @Test
     public void testItemChange_multipleMatchingContexts() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
-        // Only last event should trigger rule method
         fireEvents(List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_DUPLICATE, "2", "1")));
         verify(rule, times(1)).duplicateMatchingWhen(Mockito.any(JRuleEvent.class));
     }
