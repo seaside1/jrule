@@ -29,6 +29,7 @@ public class JRuleItemChangeRules extends JRule {
     public static final String ITEM_FROM = "item_from";
     public static final String ITEM_TO = "item_to";
     public static final String ITEM_FROM_TO = "item_from_to";
+    public static final String ITEM_DUPLICATE = "item_duplicate";
 
     @JRuleName("Test JRuleWhenItemChange")
     @JRuleWhenItemChange(item = ITEM)
@@ -48,5 +49,11 @@ public class JRuleItemChangeRules extends JRule {
     @JRuleName("Test JRuleWhenItemChange/from/to")
     @JRuleWhenItemChange(item = ITEM_FROM_TO, from = "1", to = "2")
     public void itemChangeFromTo(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenItemChange/multiple")
+    @JRuleWhenItemChange(item = ITEM_DUPLICATE, to = "1")
+    @JRuleWhenItemChange(item = ITEM_DUPLICATE)
+    public void duplicateMatchingWhen(JRuleEvent event) {
     }
 }
