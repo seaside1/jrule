@@ -15,6 +15,9 @@ package org.openhab.automation.jrule.internal.handler;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,17 +29,23 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
-import org.openhab.automation.jrule.items.JRulePercentType;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.automation.jrule.rules.value.JRuleXyValue;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
@@ -54,9 +63,12 @@ import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.PlayPauseType;
+import org.openhab.core.library.types.PointType;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.RawType;
+import org.openhab.core.library.types.RewindFastforwardType;
 import org.openhab.core.library.types.StopMoveType;
+import org.openhab.core.library.types.StringListType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.Command;
@@ -72,6 +84,25 @@ import org.slf4j.LoggerFactory;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleEventHandler {
+    private static final Map<Class<? extends JRuleValue>, Class<? extends State>> stateMapping = new HashMap<>();
+
+    static {
+//        stateMapping.put(JRuleStringValue.class, QuantityType.class);
+        stateMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
+        stateMapping.put(JRuleStringValue.class, StringType.class);
+//        stateMapping.put(JRuleStringValue.class, UnDefType.class);
+        stateMapping.put(JRuleUpDownValue.class, UpDownType.class);
+        stateMapping.put(JRuleOnOffValue.class, OnOffType.class);
+        stateMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
+        stateMapping.put(JRuleRawValue.class, RawType.class);
+//        stateMapping.put(JRuleRe.class, RewindFastforwardType.class);
+        stateMapping.put(JRulePointValue.class, PointType.class);
+        stateMapping.put(JRuleHsbValue.class, HSBType.class);
+//        stateMapping.put(JRuleStL.class, StringListType.class);
+        stateMapping.put(JRuleDecimalValue.class, DecimalType.class);
+        stateMapping.put(JRulePercentValue.class, PercentType.class);
+        stateMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
+    }
 
     private static final String LOG_NAME_EVENT = "JRuleEvent";
 
@@ -133,7 +164,7 @@ public class JRuleEventHandler {
         postUpdate(itemName, new RawType(command.getData(), command.getMimeType()));
     }
 
-    public void sendCommand(String itemName, JRulePercentType value) {
+    public void sendCommand(String itemName, JRulePercentValue value) {
         sendCommand(itemName, new PercentType(value.getValue()));
     }
 
@@ -209,7 +240,7 @@ public class JRuleEventHandler {
         postUpdate(itemName, new DateTimeType(zonedDateTime));
     }
 
-    public void postUpdate(String itemName, JRulePercentType value) {
+    public void postUpdate(String itemName, JRulePercentValue value) {
         postUpdate(itemName, new PercentType(value.getValue()));
     }
 
@@ -561,7 +592,7 @@ public class JRuleEventHandler {
         return getGroupMemberItems(groupName).stream().map(JRuleItem::getName).collect(Collectors.toSet());
     }
 
-    public Set<JRuleItem> getGroupMemberItems(String groupName) {
+    public Set<JRuleItem<JRuleValue>> getGroupMemberItems(String groupName) {
         try {
             Item item = itemRegistry.getItem(groupName);
             if (item instanceof GroupItem) {
@@ -605,5 +636,36 @@ public class JRuleEventHandler {
         } else {
             return defaultValue;
         }
+    }
+
+    public <V extends JRuleValue> V getValue(String name, Class<V> valueClass) {
+        State state = getStateFromItem(name);
+        Class<? extends State> castTo = stateMapping.get(valueClass);
+        State as = Objects.requireNonNull(state.as(castTo), String.format("no mapping for type: %s", state));
+
+        if (JRuleOpenClosedValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleOpenClosedValue.valueOf(as.toFullString());
+        } else if (JRuleStringValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleStringValue(as.toFullString());
+        } else if (JRuleUpDownValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleUpDownValue.getValueFromString(as.toFullString());
+        } else if (JRuleOnOffValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleOnOffValue.getValueFromString(as.toFullString());
+        } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleDateTimeValue(as.toFullString());
+        } else if (JRuleRawValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleRawValue(as.toFullString());
+        } else if (JRulePointValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRulePointValue(as.toFullString());
+        } else if (JRuleHsbValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleHsbValue(as.toFullString());
+        } else if (JRuleDecimalValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleDecimalValue(as.toFullString());
+        } else if (JRulePercentValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRulePercentValue(as.toFullString());
+        } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRulePlayPauseValue.valueOf(as.toFullString());
+        }
+        throw new IllegalStateException(String.format("not implemented type: %s", valueClass));
     }
 }

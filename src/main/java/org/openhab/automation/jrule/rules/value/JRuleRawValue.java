@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleRawValue {
+public class JRuleRawValue implements JRuleValue {
 
     private final String mimeType;
     private final byte[] data;
@@ -25,6 +25,10 @@ public class JRuleRawValue {
     public JRuleRawValue(String mimeType, byte[] data) {
         this.mimeType = mimeType;
         this.data = data;
+    }
+
+    public JRuleRawValue(String fullString) {
+
     }
 
     public String getMimeType() {

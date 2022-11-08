@@ -2,7 +2,7 @@
 
 package ${item.package};
 
-import org.openhab.automation.jrule.items.JRuleLocationItem;
+import org.openhab.automation.jrule.internal.items.JRuleLocationItem;
 
 <#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleLocationItem {

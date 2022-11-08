@@ -2,7 +2,7 @@
 
 package ${item.package};
 
-import org.openhab.automation.jrule.items.JRuleRollershutterItem;
+import org.openhab.automation.jrule.internal.items.JRuleRollershutterItem;
 
 <#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleRollershutterItem {

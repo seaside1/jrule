@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Timo Litzius - Initial contribution
  */
-public enum JRuleOpenClosedValue {
+public enum JRuleOpenClosedValue implements JRuleValue {
     OPEN,
     CLOSED,
     UNDEF;

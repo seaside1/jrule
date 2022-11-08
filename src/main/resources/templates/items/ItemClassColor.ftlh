@@ -2,7 +2,7 @@
 
 package ${item.package};
 
-import org.openhab.automation.jrule.items.JRuleColorItem;
+import org.openhab.automation.jrule.internal.items.JRuleColorItem;
 
 <#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleColorItem {

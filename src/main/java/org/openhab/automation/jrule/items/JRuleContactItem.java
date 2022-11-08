@@ -1,47 +1,11 @@
-/**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0
- *
- * SPDX-License-Identifier: EPL-2.0
- */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
-import org.openhab.automation.jrule.trigger.JRuleContactTrigger;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
-/**
- * The {@link JRuleContactItem} Items
- *
- * @author Timo Litzius - Initial contribution
- */
-public abstract class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
-
-    protected JRuleContactItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleContactItem extends JRuleItem<JRuleOpenClosedValue> {
+    static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
-    }
-
-    public JRuleOpenClosedValue getState() {
-        return JRuleEventHandler.get().getOpenClosedValue(itemName);
-    }
-
-    // Persistence method
-    public Optional<JRuleOpenClosedValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(JRuleOpenClosedValue::getValueFromString);
     }
 }

@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.jrule.internal.rules.timers;
 
-import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringItem;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleName;
@@ -32,15 +32,15 @@ public class JRuleTimerTestRules extends JRule {
     @JRuleLogName("Rule log name")
     @JRuleWhenItemChange(item = TRIGGER_ITEM)
     public void testSendCommand() {
-        JRuleStringItem.forName(TARGET_ITEM).sendCommand("command");
+        JRuleInternalStringItem.forName(TARGET_ITEM).sendCommand("command");
         cancelTimer("NON_EXISTING_TIMER");
         createRepeatingTimer("REPEATING_TIMER", 1, 1, unused -> logInfo("Repeating timer completed"));
         createOrReplaceTimer("CREATE_OR_REPLACE_TIMER", 1, unused -> logInfo("Replaced timer completed"));
 
         createTimer("TimerName", 1, unused -> {
-            JRuleStringItem.forName(TARGET_ITEM).sendCommand("timedCommand");
+            JRuleInternalStringItem.forName(TARGET_ITEM).sendCommand("timedCommand");
             createTimer("NestedTimer", 1, unused2 -> {
-                JRuleStringItem.forName(TARGET_ITEM).sendCommand("nestedTimedCommand");
+                JRuleInternalStringItem.forName(TARGET_ITEM).sendCommand("nestedTimedCommand");
             });
         });
     }

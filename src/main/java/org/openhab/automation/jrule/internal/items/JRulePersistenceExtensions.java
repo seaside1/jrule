@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items;
+package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;

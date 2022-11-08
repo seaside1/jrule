@@ -1,75 +1,68 @@
-/**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0
- *
- * SPDX-License-Identifier: EPL-2.0
- */
 package org.openhab.automation.jrule.items;
+
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-
-/**
- * The {@link JRuleItem} Items
- *
- * @author Joseph (Seaside) Hagberg - Initial contribution
- */
-public abstract class JRuleItem {
-
-    protected String itemName;
-
-    public JRuleItem(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleItem<T extends JRuleValue> {
+    static <T extends JRuleValue> JRuleItem<T> forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName);
     }
+    String getName();
 
-    public String getStateAsString() {
-        return JRuleEventHandler.get().getStringValue(itemName);
+    String getLabel();
+
+    String getType();
+
+    String getId();
+
+    default String getStateAsString() {
+        return getState().toString();
     }
 
-    public String getName() {
-        return itemName;
+    T getState();
+
+    default void sendCommand(T command) {
+        JRuleEventHandler.get().sendCommand(getName(), command.toString());
     }
 
-    public abstract String getLabel();
+    default void postUpdate(T state) {
+        JRuleEventHandler.get().postUpdate(getName(), state.toString());
+    }
 
-    public abstract String getType();
+    default void sendCommand(String state) {
+        JRuleEventHandler.get().sendCommand(getName(), state);
+    }
 
-    public abstract String getId();
+    default void postUpdate(String state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
+    }
 
-    public Optional<ZonedDateTime> lastUpdated() {
+    default Optional<ZonedDateTime> lastUpdated() {
         return lastUpdated(null);
     }
 
-    public Optional<ZonedDateTime> lastUpdated(String persistenceServiceId) {
-        return JRulePersistenceExtensions.lastUpdate(itemName, persistenceServiceId);
-    }
+    Optional<ZonedDateTime> lastUpdated(String persistenceServiceId);
 
-    public boolean changedSince(ZonedDateTime timestamp) {
+    default boolean changedSince(ZonedDateTime timestamp) {
         return changedSince(timestamp, null);
     }
 
-    public boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.changedSince(itemName, timestamp, persistenceServiceId);
-    }
+    boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public boolean updatedSince(ZonedDateTime timestamp) {
+    default boolean updatedSince(ZonedDateTime timestamp) {
         return updatedSince(timestamp, null);
     }
 
-    public boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.updatedSince(itemName, timestamp, persistenceServiceId);
+    boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId);
+
+    default Optional<T> getHistoricState(ZonedDateTime timestamp) {
+        return getHistoricState(timestamp, null);
     }
+
+    Optional<T> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
 }

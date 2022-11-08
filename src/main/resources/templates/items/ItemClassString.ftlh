@@ -2,7 +2,7 @@
 
 package ${item.package};
 
-import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.internal.items.JRuleStringItem;
 
 <#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleStringItem {

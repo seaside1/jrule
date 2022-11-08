@@ -34,7 +34,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
-import org.openhab.automation.jrule.items.JRulePercentType;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,7 +257,7 @@ public class JRule {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    protected void sendCommand(String itemName, JRulePercentType percentTypeCommand) {
+    protected void sendCommand(String itemName, JRulePercentValue percentTypeCommand) {
         JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand);
     }
 

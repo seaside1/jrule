@@ -17,13 +17,15 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.group.JRuleInternalGroupItem;
+import org.openhab.automation.jrule.internal.items.JRulePersistenceExtensions;
 
 /**
  * The {@link JRuleGroupLocationItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleGroupLocationItem extends JRuleGroupItem {
+public abstract class JRuleGroupLocationItem extends JRuleInternalGroupItem {
 
     protected JRuleGroupLocationItem(String itemName) {
         super(itemName);
@@ -35,11 +37,11 @@ public abstract class JRuleGroupLocationItem extends JRuleGroupItem {
 
     // TODO location support not really present
     public String getState() {
-        return JRuleEventHandler.get().getStringValue(itemName);
+        return JRuleEventHandler.get().getStringValue(name);
     }
 
     // Persistence method
     public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId);
+        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId);
     }
 }

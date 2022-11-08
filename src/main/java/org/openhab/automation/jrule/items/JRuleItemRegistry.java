@@ -19,6 +19,18 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalImageItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalCallItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalLocationItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalNumberItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
+import org.openhab.automation.jrule.internal.items.group.JRuleInternalGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -32,9 +44,9 @@ import org.openhab.core.library.CoreItemFactory;
  */
 
 public class JRuleItemRegistry {
-    private static final Map<String, Class<? extends JRuleItem>> typeMap = new HashMap<>();
-    private static final Map<String, Class<? extends JRuleItem>> groupTypeMap = new HashMap<>();
-    private static final Map<String, JRuleItem> itemRegistry = new HashMap<>();
+    private static final Map<String, Class<? extends JRuleItem<? extends JRuleValue>>> typeMap = new HashMap<>();
+    private static final Map<String, Class<? extends JRuleItem<? extends JRuleValue>>> groupTypeMap = new HashMap<>();
+    private static final Map<String, JRuleItem<? extends JRuleValue>> itemRegistry = new HashMap<>();
 
     public static void clear() {
         itemRegistry.clear();
@@ -42,16 +54,16 @@ public class JRuleItemRegistry {
 
     static {
         typeMap.put(GroupItem.TYPE, JRuleGroupItem.class);
-        typeMap.put(CoreItemFactory.CALL, JRuleCallItem.class);
-        typeMap.put(CoreItemFactory.CONTACT, JRuleContactItem.class);
-        typeMap.put(CoreItemFactory.COLOR, JRuleColorItem.class);
-        typeMap.put(CoreItemFactory.DATETIME, JRuleDateTimeItem.class);
-        typeMap.put(CoreItemFactory.DIMMER, JRuleDimmerItem.class);
-        typeMap.put(CoreItemFactory.IMAGE, JRuleImageItem.class);
-        typeMap.put(CoreItemFactory.LOCATION, JRuleLocationItem.class);
-        typeMap.put(CoreItemFactory.NUMBER, JRuleNumberItem.class);
-        typeMap.put(CoreItemFactory.PLAYER, JRulePlayerItem.class);
-        typeMap.put(CoreItemFactory.ROLLERSHUTTER, JRuleRollershutterItem.class);
+        typeMap.put(CoreItemFactory.CALL, JRuleInternalCallItem.class);
+        typeMap.put(CoreItemFactory.CONTACT, JRuleInternalContactItem.class);
+        typeMap.put(CoreItemFactory.COLOR, JRuleInternalColorItem.class);
+        typeMap.put(CoreItemFactory.DATETIME, JRuleInternalDateTimeItem.class);
+        typeMap.put(CoreItemFactory.DIMMER, JRuleInternalDimmerItem.class);
+        typeMap.put(CoreItemFactory.IMAGE, JRuleInternalImageItem.class);
+        typeMap.put(CoreItemFactory.LOCATION, JRuleInternalLocationItem.class);
+        typeMap.put(CoreItemFactory.NUMBER, JRuleInternalNumberItem.class);
+        typeMap.put(CoreItemFactory.PLAYER, JRuleInternalPlayerItem.class);
+        typeMap.put(CoreItemFactory.ROLLERSHUTTER, JRuleInternalRollershutterItem.class);
         typeMap.put(CoreItemFactory.STRING, JRuleStringItem.class);
         typeMap.put(CoreItemFactory.SWITCH, JRuleSwitchItem.class);
 
@@ -69,13 +81,13 @@ public class JRuleItemRegistry {
         groupTypeMap.put(CoreItemFactory.SWITCH, JRuleGroupSwitchItem.class);
     }
 
-    public static JRuleItem get(String itemName) throws JRuleItemNotFoundException {
-        JRuleItem jruleItem = itemRegistry.get(itemName);
-        if (jruleItem == null) {
+    public static <T extends JRuleValue> JRuleItem<T> get(String itemName) throws JRuleItemNotFoundException {
+        JRuleItem<? extends JRuleValue> jRuleItem = itemRegistry.get(itemName);
+        if (jRuleItem == null) {
             Item item = verifyThatItemExist(itemName);
 
-            Class<? extends JRuleItem> jRuleItemClass = typeMap.get(item.getType());
-            if (jRuleItemClass == JRuleGroupItem.class && item instanceof GroupItem) {
+            Class<? extends JRuleItem<? extends JRuleValue>> jRuleItemClass = typeMap.get(item.getType());
+            if (jRuleItemClass == JRuleInternalGroupItem.class && item instanceof GroupItem) {
                 String baseItemType = Optional.ofNullable(((GroupItem) item).getBaseItem()).map(Item::getType)
                         .orElse(CoreItemFactory.STRING);
 
@@ -85,18 +97,18 @@ public class JRuleItemRegistry {
             try {
                 Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class);
                 constructor.setAccessible(true);
-                jruleItem = constructor.newInstance(itemName);
-                itemRegistry.put(itemName, jruleItem);
+                jRuleItem = constructor.newInstance(itemName);
+                itemRegistry.put(itemName, jRuleItem);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        return jruleItem;
+        return (JRuleItem<T>) jRuleItem;
     }
 
     public static <T> T get(String itemName, Class<? extends JRuleItem> jRuleItemClass)
             throws JRuleItemNotFoundException {
-        JRuleItem jruleItem = itemRegistry.get(itemName);
+        JRuleItem<? extends JRuleValue> jruleItem = itemRegistry.get(itemName);
         if (jruleItem == null) {
             verifyThatItemExist(itemName);
 

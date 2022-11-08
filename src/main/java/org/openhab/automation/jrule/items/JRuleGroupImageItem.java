@@ -17,13 +17,15 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.group.JRuleInternalGroupItem;
+import org.openhab.automation.jrule.internal.items.JRulePersistenceExtensions;
 
 /**
  * The {@link JRuleGroupImageItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleGroupImageItem extends JRuleGroupItem {
+public abstract class JRuleGroupImageItem extends JRuleInternalGroupItem {
 
     protected JRuleGroupImageItem(String itemName) {
         super(itemName);
@@ -34,11 +36,11 @@ public abstract class JRuleGroupImageItem extends JRuleGroupItem {
     }
 
     public String getState() {
-        return JRuleEventHandler.get().getStringValue(itemName);
+        return JRuleEventHandler.get().getStringValue(name);
     }
 
     // Persistence method
     public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId);
+        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId);
     }
 }

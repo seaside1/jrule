@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleXyValue {
+public class JRuleXyValue implements JRuleValue {
 
     private final float x;
     private final float y;

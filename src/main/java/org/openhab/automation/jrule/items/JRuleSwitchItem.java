@@ -1,55 +1,13 @@
-/**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0
- *
- * SPDX-License-Identifier: EPL-2.0
- */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.trigger.JRuleSwitchTrigger;
 
-/**
- * The {@link JRuleSwitchItem} Items
- *
- * @author Joseph (Seaside) Hagberg - Initial contribution
- */
-public abstract class JRuleSwitchItem extends JRuleItem implements JRuleSwitchTrigger {
+public interface JRuleSwitchItem extends JRuleItem<JRuleOnOffValue> {
+    String ON = "ON";
+    String OFF = "OFF";
 
-    protected JRuleSwitchItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleSwitchItem forName(String itemName) throws JRuleItemNotFoundException {
+    static JRuleSwitchItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleSwitchItem.class);
-    }
-
-    public JRuleOnOffValue getState() {
-        return JRuleEventHandler.get().getOnOffValue(itemName);
-    }
-
-    public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
-    }
-
-    public void postUpdate(JRuleOnOffValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
-    }
-
-    // Persistence method
-    public Optional<JRuleOnOffValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(JRuleOnOffValue::getValueFromString);
     }
 }

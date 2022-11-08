@@ -10,26 +10,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items;
+package org.openhab.automation.jrule.rules.value;
+
+import java.math.BigDecimal;
 
 /**
- * The {@link JRulePercentType}
+ * The {@link JRuleDecimalValue}
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePercentType {
+public class JRuleDecimalValue implements JRuleValue {
+    private final BigDecimal value;
 
-    private final int value;
-
-    public JRulePercentType(int value) {
+    public JRuleDecimalValue(BigDecimal value) {
         this.value = value;
     }
 
-    public JRulePercentType(double value) {
-        this.value = (int) Math.round(value + 0.5);
+    public JRuleDecimalValue(String toFullString) {
+
     }
 
-    public int getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 }

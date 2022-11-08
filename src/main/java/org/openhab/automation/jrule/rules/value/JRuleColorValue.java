@@ -19,7 +19,7 @@ import org.openhab.automation.jrule.internal.JRuleItemUtil;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleColorValue {
+public class JRuleColorValue implements JRuleValue {
 
     private final JRuleHsbValue hsbValue;
     private final JRuleXyValue xyValue;
@@ -29,6 +29,10 @@ public class JRuleColorValue {
         this.hsbValue = hsbValue;
         this.xyValue = xyValue;
         this.rgbValue = rgbValue;
+    }
+
+    public JRuleColorValue(String value) {
+        throw new IllegalStateException("not implemented");
     }
 
     public static JRuleColorValue fromHsb(int hue, int saturation, int brightness) {

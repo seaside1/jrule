@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Timo Litzius - Initial contribution
  */
-public enum JRuleIncreaseDecreaseValue {
+public enum JRuleIncreaseDecreaseValue implements JRuleValue {
     INCREASE,
     DECREASE,
     UNDEF;

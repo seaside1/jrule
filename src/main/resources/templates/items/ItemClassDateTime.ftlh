@@ -2,7 +2,7 @@
 
 package ${item.package};
 
-import org.openhab.automation.jrule.items.JRuleDateTimeItem;
+import org.openhab.automation.jrule.internal.items.JRuleDateTimeItem;
 
 <#include "CommonJavadoc.ftlh">
 public class ${item.class} extends JRuleDateTimeItem  {

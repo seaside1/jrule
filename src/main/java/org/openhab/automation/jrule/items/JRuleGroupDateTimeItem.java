@@ -18,13 +18,15 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.group.JRuleInternalGroupItem;
+import org.openhab.automation.jrule.internal.items.JRulePersistenceExtensions;
 
 /**
  * The {@link JRuleGroupDateTimeItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleGroupDateTimeItem extends JRuleGroupItem {
+public abstract class JRuleGroupDateTimeItem extends JRuleInternalGroupItem {
 
     protected JRuleGroupDateTimeItem(String itemName) {
         super(itemName);
@@ -35,22 +37,22 @@ public abstract class JRuleGroupDateTimeItem extends JRuleGroupItem {
     }
 
     public ZonedDateTime getState() {
-        return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
+        return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(name);
     }
 
     public void sendCommand(ZonedDateTime value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(ZonedDateTime value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(itemName);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
     // Persistence method
     public Optional<ZonedDateTime> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
+        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
                 .map(ZonedDateTime::parse);
     }
 }

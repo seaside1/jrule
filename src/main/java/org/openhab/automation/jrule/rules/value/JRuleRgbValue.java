@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleRgbValue {
+public class JRuleRgbValue implements JRuleValue {
 
     @Override
     public String toString() {

@@ -17,7 +17,7 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Timo Litzius- Initial contribution
  */
-public enum JRuleUpDownValue {
+public enum JRuleUpDownValue implements JRuleValue {
     UP,
     DOWN,
     UNDEF;
