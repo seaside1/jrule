@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -504,20 +505,37 @@ public class JRuleHandler implements PropertyChangeListener {
             super(urls, parent);
         }
 
+        public Class<?> loadClass2(String name) throws ClassNotFoundException {
+            try {
+                for (URL url : getURLs()) {
+                    if (url.getProtocol().equals("file")) {
+                        FileInputStream is = new FileInputStream(
+                                url.getFile() + "/" + name.replaceAll("\\.", "/") + JRuleConstants.CLASS_FILE_TYPE);
+                        if (is != null) {
+                            byte[] buf = is.readAllBytes();
+                            is.close();
+                            return defineClass(name, buf, 0, buf.length);
+                        }
+                    }
+                }
+                return super.loadClass(name);
+
+            } catch (IOException e) {
+                JRuleLog.warn(logger, LOG_NAME_HANDLER, e.getMessage());
+                return super.loadClass(name);
+            }
+        }
+
         @Override
         public Class<?> loadClass(String name) throws ClassNotFoundException {
             try {
                 for (URL url : getURLs()) {
                     if (url.getProtocol().equals("file")) {
-                        File classFile = new File(url.getPath(),
+                        File classFile = new File(url.getFile(),
                                 name.replaceAll("\\.", "/") + JRuleConstants.CLASS_FILE_TYPE);
-                        if (classFile.exists()) {
-                            FileInputStream is = new FileInputStream(classFile);
-                            if (is != null) {
-                                byte[] buf = is.readAllBytes();
-                                is.close();
-                                return defineClass(name, buf, 0, buf.length);
-                            }
+                        try (InputStream is = new FileInputStream(classFile)) {
+                            byte[] buf = is.readAllBytes();
+                            return defineClass(name, buf, 0, buf.length);
                         }
                     }
                 }
