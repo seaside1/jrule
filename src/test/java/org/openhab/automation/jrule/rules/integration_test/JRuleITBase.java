@@ -44,7 +44,9 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.ToxiproxyContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import org.testcontainers.utility.MountableFile;
 
@@ -111,8 +113,32 @@ public abstract class JRuleITBase {
             .withExposedPorts(8080).withLogConsumer(outputFrame -> {
                 logLines.add(outputFrame.getUtf8String().strip());
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
-            }).waitingFor(new LogMessageWaitStrategy().withRegEx(".*JRule Engine Rules Reloaded.*")
-                    .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)))
+            }).waitingFor(new WaitAllStrategy(WaitAllStrategy.Mode.WITH_MAXIMUM_OUTER_TIMEOUT)
+                    .withStrategy(new AbstractWaitStrategy() {
+                        @Override
+                        protected void waitUntilReady() {
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
+                                    .pollInterval(2, TimeUnit.SECONDS).await("thing online").until(() -> {
+                                        try {
+                                            return getThingState("mqtt:topic:mqtt:generic");
+                                        } catch (Exception e) {
+                                            return e.getMessage();
+                                        }
+                                    }, s -> s.equals("ONLINE"));
+                        }
+                    }).withStrategy(new AbstractWaitStrategy() {
+                        @Override
+                        protected void waitUntilReady() {
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
+                                    .pollInterval(2, TimeUnit.SECONDS).await("items loaded").until(() -> {
+                                        try {
+                                            return getItemCount();
+                                        } catch (Exception e) {
+                                            return 0;
+                                        }
+                                    }, s -> s > 0);
+                        }
+                    }).withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)))
             .withNetwork(network);
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
@@ -250,6 +276,24 @@ public abstract class JRuleITBase {
             return status;
         }
     }
+
+    protected static int getItemCount() throws IOException, ParseException {
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            HttpGet request = new HttpGet(
+                    String.format("http://%s:%s/rest/items?recursive=false", getOpenhabHost(), getOpenhabPort()));
+            byte[] credentials = Base64.getEncoder().encode(("admin:admin").getBytes(StandardCharsets.UTF_8));
+            request.setHeader("Authorization", "Basic " + new String(credentials, StandardCharsets.UTF_8));
+            CloseableHttpResponse response = client.execute(request);
+            if (isHttp2xx(response)) {
+                // error case
+                return 0;
+            }
+            JsonElement jsonElement = JsonParser.parseString(EntityUtils.toString(response.getEntity()));
+            return jsonElement.getAsJsonArray().size();
+        }
+    }
+
+    // http://192.168.1.200:8080/rest/items?recursive=false
 
     private static boolean isHttp2xx(CloseableHttpResponse response) {
         return 2 != response.getCode() / 100;
