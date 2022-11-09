@@ -117,7 +117,7 @@ public abstract class JRuleITBase {
                     .withStrategy(new AbstractWaitStrategy() {
                         @Override
                         protected void waitUntilReady() {
-                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(60, TimeUnit.SECONDS)
                                     .pollInterval(2, TimeUnit.SECONDS).await("thing online").until(() -> {
                                         try {
                                             return getThingState("mqtt:topic:mqtt:generic");
@@ -129,7 +129,7 @@ public abstract class JRuleITBase {
                     }).withStrategy(new AbstractWaitStrategy() {
                         @Override
                         protected void waitUntilReady() {
-                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(60, TimeUnit.SECONDS)
                                     .pollInterval(2, TimeUnit.SECONDS).await("items loaded").until(() -> {
                                         try {
                                             return getItemCount();
