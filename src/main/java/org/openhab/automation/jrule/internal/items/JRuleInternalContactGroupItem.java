@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleGroupContactItem;
+import org.openhab.automation.jrule.items.JRuleContactGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalContactGroupItem extends JRuleInternalContactItem implements JRuleGroupContactItem {
+public class JRuleInternalContactGroupItem extends JRuleInternalContactItem implements JRuleContactGroupItem {
 
     protected JRuleInternalContactGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);

@@ -13,7 +13,7 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.items.JRuleGroupLocationItem;
+import org.openhab.automation.jrule.items.JRuleLocationGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 /**
@@ -22,7 +22,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
  * @author Arne Seime - Initial contribution
  */
 public abstract class JRuleInternalLocationGroupItem extends JRuleInternalLocationItem
-        implements JRuleGroupLocationItem {
+        implements JRuleLocationGroupItem {
 
     protected JRuleInternalLocationGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);

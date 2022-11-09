@@ -84,7 +84,8 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
         String plainType = item.getType().contains(":") ? item.getType().split(":")[0] : item.getType();
-        itemModel.put("class", "JRuleInternal" + plainType + "Item");
+        itemModel.put("internalClass", "JRuleInternal" + plainType + "Item");
+        itemModel.put("interfaceClass", "JRule" + plainType + "Item");
         if (isQuantityType(item.getType())) {
             itemModel.put("quantityType", getQuantityType(item.getType()));
         }
@@ -96,7 +97,8 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
             Item baseItem = ((GroupItem) item).getBaseItem();
             String plainGroupType = baseItem.getType().contains(":") ? baseItem.getType().split(":")[0]
                     : baseItem.getType();
-            itemModel.put("class", "JRuleInternal" + plainGroupType + "GroupItem");
+            itemModel.put("internalClass", "JRuleInternal" + plainGroupType + "GroupItem");
+            itemModel.put("interfaceClass", "JRule" + plainGroupType + "GroupItem");
         }
 
         return itemModel;

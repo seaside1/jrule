@@ -13,7 +13,7 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.items.JRuleGroupSwitchItem;
+import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 /**
@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalSwitchGroupItem extends JRuleInternalSwitchItem implements JRuleGroupSwitchItem {
+public class JRuleInternalSwitchGroupItem extends JRuleInternalSwitchItem implements JRuleSwitchGroupItem {
 
     protected JRuleInternalSwitchGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);

@@ -17,7 +17,7 @@ import java.util.Set;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleGroupDimmerItem;
+import org.openhab.automation.jrule.items.JRuleDimmerGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implements JRuleGroupDimmerItem {
+public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implements JRuleDimmerGroupItem {
 
     private static final String LOG_NAME = "JRuleGroupDimmerItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleInternalDimmerGroupItem.class);

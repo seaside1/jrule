@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 /**
- * The {@link JRuleGroupCallItem} Items
+ * The {@link JRuleStringGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupCallItem extends JRuleCallItem {
+public interface JRuleStringGroupItem extends JRuleStringItem {
 }

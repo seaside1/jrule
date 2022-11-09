@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleGroupRollershutterItem;
+import org.openhab.automation.jrule.items.JRuleRollershutterGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
@@ -27,7 +27,7 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershutterItem
-        implements JRuleGroupRollershutterItem {
+        implements JRuleRollershutterGroupItem {
 
     protected JRuleInternalRollershutterGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);

@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 /**
- * The {@link JRuleGroupDateTimeItem} Items
+ * The {@link JRuleColorGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupDateTimeItem extends JRuleDateTimeItem {
+public interface JRuleColorGroupItem extends JRuleColorItem {
 }

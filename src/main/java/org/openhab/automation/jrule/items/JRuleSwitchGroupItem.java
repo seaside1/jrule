@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 /**
- * The {@link JRuleGroupLocationItem} Items
+ * The {@link JRuleSwitchGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupLocationItem extends JRuleLocationItem {
+public interface JRuleSwitchGroupItem extends JRuleSwitchItem {
 }

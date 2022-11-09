@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 /**
- * The {@link JRuleGroupPlayerItem} Items
+ * The {@link JRuleNumberGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupPlayerItem extends JRulePlayerItem {
+public interface JRuleNumberGroupItem extends JRuleNumberItem {
 }

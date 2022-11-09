@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 /**
- * The {@link JRuleGroupDimmerItem} Items
+ * The {@link JRuleLocationGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupDimmerItem extends JRuleDimmerItem {
+public interface JRuleLocationGroupItem extends JRuleLocationItem {
 }

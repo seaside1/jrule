@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleGroupDateTimeItem;
+import org.openhab.automation.jrule.items.JRuleDateTimeGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 /**
@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalDateTimeGroupItem extends JRuleInternalDateTimeItem implements JRuleGroupDateTimeItem {
+public class JRuleInternalDateTimeGroupItem extends JRuleInternalDateTimeItem implements JRuleDateTimeGroupItem {
 
     protected JRuleInternalDateTimeGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);

@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleGroupNumberItem;
+import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implements JRuleGroupNumberItem {
+public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implements JRuleNumberGroupItem {
 
     private static final String LOG_NAME = "JRuleGroupNumberItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleInternalNumberGroupItem.class);

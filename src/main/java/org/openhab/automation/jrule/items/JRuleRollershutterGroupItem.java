@@ -13,9 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 /**
- * The {@link JRuleGroupStringItem} Items
+ * The {@link JRuleRollershutterGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupStringItem extends JRuleStringItem {
+public interface JRuleRollershutterGroupItem extends JRuleRollershutterItem {
 }

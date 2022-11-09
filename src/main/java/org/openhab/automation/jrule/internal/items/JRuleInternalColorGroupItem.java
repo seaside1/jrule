@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleGroupColorItem;
+import org.openhab.automation.jrule.items.JRuleColorGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
@@ -28,7 +28,7 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implements JRuleGroupColorItem {
+public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implements JRuleColorGroupItem {
 
     protected JRuleInternalColorGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
