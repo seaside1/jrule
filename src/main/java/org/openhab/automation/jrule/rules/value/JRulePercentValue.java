@@ -17,22 +17,16 @@ package org.openhab.automation.jrule.rules.value;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePercentValue implements JRuleValue {
-    private final int value;
-
+public class JRulePercentValue extends JRuleDecimalValue {
     public JRulePercentValue(int value) {
-        this.value = value;
+        super(value);
     }
 
     public JRulePercentValue(double value) {
-        this.value = (int) Math.round(value + 0.5);
+        super((int) Math.round(value + 0.5));
     }
 
-    public JRulePercentValue(String toFullString) {
-
-    }
-
-    public int getValue() {
-        return value;
+    public JRulePercentValue(String value) {
+        super(value);
     }
 }

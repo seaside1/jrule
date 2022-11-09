@@ -5,13 +5,14 @@ package ${packageName};
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 <#list items as item>
-import org.openhab.automation.jrule.generated.items.${item.class};
+import org.openhab.automation.jrule.internal.items.${item.class};
 </#list>
 
 /**
 * Automatically Generated Class for Items - DO NOT EDIT!
 *
 * @author Arne Seime - Refactoring
+* @author Robert Delbrück - Refactoring
 */
 public class JRuleItems {
 

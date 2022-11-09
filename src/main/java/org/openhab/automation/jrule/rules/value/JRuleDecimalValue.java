@@ -13,6 +13,10 @@
 package org.openhab.automation.jrule.rules.value;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+import java.util.Locale;
 
 /**
  * The {@link JRuleDecimalValue}
@@ -26,8 +30,20 @@ public class JRuleDecimalValue implements JRuleValue {
         this.value = value;
     }
 
-    public JRuleDecimalValue(String toFullString) {
+    public JRuleDecimalValue(String value) {
+        DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
+        df.setParseBigDecimal(true);
+        ParsePosition position = new ParsePosition(0);
+        BigDecimal parsedValue = (BigDecimal) df.parseObject(value, position);
+        if (parsedValue != null && position.getErrorIndex() == -1 && position.getIndex() >= value.length()) {
+            this.value = parsedValue;
+        } else {
+            throw new NumberFormatException("Invalid BigDecimal value: " + value);
+        }
+    }
 
+    public JRuleDecimalValue(int value) {
+        this.value = new BigDecimal(value);
     }
 
     public BigDecimal getValue() {

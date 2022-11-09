@@ -12,9 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
@@ -28,18 +25,15 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
  *
  * @author Timo Litzius - Initial contribution
  */
-public abstract class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePercentValue> implements JRuleRollershutterItem {
+public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePercentValue>
+        implements JRuleRollershutterItem {
 
-    protected JRuleInternalRollershutterItem(String itemName) {
-        super(itemName);
+    protected JRuleInternalRollershutterItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 
     public static JRuleInternalRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalRollershutterItem.class);
-    }
-
-    public int getState() {
-        return JRuleEventHandler.get().getStateFromItemAsInt(name);
     }
 
     public void sendCommand(JRuleUpDownValue command) {
@@ -60,11 +54,5 @@ public abstract class JRuleInternalRollershutterItem extends JRuleInternalItem<J
 
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
-    }
-
-    // Persistence methods
-    public Optional<Integer> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(Integer::parseInt);
     }
 }

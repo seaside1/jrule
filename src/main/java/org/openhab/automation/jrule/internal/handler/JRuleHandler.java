@@ -178,7 +178,6 @@ public class JRuleHandler implements PropertyChangeListener {
 
         // Generate source files for all items and things
         Collection<Item> items = itemRegistry.getItems();
-        items.forEach(itemGenerator::generateItemSource);
         Collection<Thing> things = thingRegistry.getAll();
         things.forEach(thingGenerator::generateThingSource);
         things.stream().filter(thing -> thing.getHandler() != null).filter(
@@ -377,7 +376,6 @@ public class JRuleHandler implements PropertyChangeListener {
                 try {
                     logDebug("Added/updatedType: {}", evt);
                     Item item = itemRegistry.getItem(itemName);
-                    itemGenerator.generateItemSource(item);
                     delayedItemsCompiler.call(this::compileAndReloadGeneratedSources);
                 } catch (ItemNotFoundException e) {
                     logDebug("Could not find new item", e);

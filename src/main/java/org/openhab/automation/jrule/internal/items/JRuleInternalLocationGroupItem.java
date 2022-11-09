@@ -13,22 +13,22 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.items.JRuleImageItem;
+import org.openhab.automation.jrule.items.JRuleGroupLocationItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
-import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
- * The {@link JRuleInternalImageItem} Items
+ * The {@link JRuleInternalLocationGroupItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalImageItem extends JRuleInternalItem<JRuleRawValue> implements JRuleImageItem {
+public abstract class JRuleInternalLocationGroupItem extends JRuleInternalLocationItem
+        implements JRuleGroupLocationItem {
 
-    protected JRuleInternalImageItem(String name, String label, String type, String id) {
+    protected JRuleInternalLocationGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 
-    public static JRuleInternalImageItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalImageItem.class);
+    public static JRuleInternalLocationGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleInternalLocationGroupItem.class);
     }
 }

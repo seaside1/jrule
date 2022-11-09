@@ -14,25 +14,22 @@ package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
-import org.openhab.automation.jrule.items.JRuleDimmerItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
 /**
  * The {@link JRuleInternalDateTimeItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleDateTimeValue> implements JRuleDateTimeItem {
+public class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleDateTimeValue> implements JRuleDateTimeItem {
 
-    protected JRuleInternalDateTimeItem(String itemName) {
-        super(itemName);
+    protected JRuleInternalDateTimeItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 
     public static JRuleInternalDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
@@ -55,16 +52,7 @@ public abstract class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleD
         JRuleEventHandler.get().postUpdate(name, zonedDateTime);
     }
 
-    public Date getState() {
-        return JRuleEventHandler.get().getStateFromItemAsDate(name);
-    }
-
     public ZonedDateTime getZonedDateTimeState() {
         return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(name);
-    }
-
-    public Optional<ZonedDateTime> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(ZonedDateTime::parse);
     }
 }

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.internal.JRuleConfig;
-import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.core.items.GroupItem;
@@ -51,41 +50,6 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     public JRuleItemClassGenerator(JRuleConfig jRuleConfig) {
 
         super(jRuleConfig);
-    }
-
-    public boolean generateItemSource(Item item) {
-        try {
-            String type = item.getType();
-            String templateName = getTemplateFromType(type);
-
-            if (templateName == null) {
-                JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Unsupported item type for item: {} type: {}",
-                        item.getName(), item.getType());
-            } else {
-
-                Map<String, Object> processingModel = new HashMap<>();
-                processingModel.put("item", createItemModel(item));
-
-                File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
-                        .append(File.separator).append(jRuleConfig.getGeneratedItemPrefix()).append(item.getName())
-                        .append(JRuleConstants.JAVA_FILE_TYPE).toString());
-
-                try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
-                    Template template = freemarkerConfiguration.getTemplate("items/" + templateName);
-                    template.process(processingModel, fileWriter);
-                }
-
-                JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}",
-                        targetSourceFile.getAbsolutePath());
-                return true;
-            }
-        } catch (TemplateException | IOException e) {
-            JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for item {}: {}", item, e.toString());
-
-        }
-
-        return false;
     }
 
     public boolean generateItemsSource(Collection<Item> items) {
@@ -119,8 +83,8 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         Map<String, Object> itemModel = new HashMap<>();
         itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
-        itemModel.put("package", jRuleConfig.getGeneratedItemPackage());
-        itemModel.put("class", jRuleConfig.getGeneratedItemPrefix() + item.getName());
+        String plainType = item.getType().contains(":") ? item.getType().split(":")[0] : item.getType();
+        itemModel.put("class", "JRuleInternal" + plainType + "Item");
         if (isQuantityType(item.getType())) {
             itemModel.put("quantityType", getQuantityType(item.getType()));
         }
@@ -130,18 +94,9 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         // Group handling
         if (item.getType().equals(GroupItem.TYPE)) {
             Item baseItem = ((GroupItem) item).getBaseItem();
-
-            String baseItemType = "String"; // Defaulting to a simple string value, can hold any state
-            if (baseItem != null && baseItem.getType() != null) {
-                baseItemType = baseItem.getType();
-            }
-
-            if (isQuantityType(baseItemType)) {
-                itemModel.put("parentClass", "JRuleGroupNumberItem");
-                itemModel.put("quantityType", getQuantityType(baseItemType));
-            } else {
-                itemModel.put("parentClass", "JRuleGroup" + baseItemType + "Item");
-            }
+            String plainGroupType = baseItem.getType().contains(":") ? baseItem.getType().split(":")[0]
+                    : baseItem.getType();
+            itemModel.put("class", "JRuleInternal" + plainGroupType + "GroupItem");
         }
 
         return itemModel;
@@ -154,37 +109,5 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     private boolean isQuantityType(String type) {
         String[] split = type.split(":");
         return split.length > 1 && CoreItemFactory.NUMBER.equals(split[0]);
-    }
-
-    private String getTemplateFromType(String type) {
-
-        if (type.equals(CoreItemFactory.SWITCH)) {
-            return "ItemClassSwitch" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.DIMMER)) {
-            return "ItemClassDimmer" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.NUMBER) || isQuantityType(type)) {
-            return "ItemClassNumber" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.STRING)) {
-            return "ItemClassString" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.IMAGE)) {
-            return "ItemClassImage" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.CALL)) {
-            return "ItemClassCall" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.ROLLERSHUTTER)) {
-            return "ItemClassRollershutter" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.LOCATION)) {
-            return "ItemClassLocation" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.COLOR)) {
-            return "ItemClassColor" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.CONTACT)) {
-            return "ItemClassContact" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.PLAYER)) {
-            return "ItemClassPlayer" + TEMPLATE_SUFFIX;
-        } else if (type.equals(CoreItemFactory.DATETIME)) {
-            return "ItemClassDateTime" + TEMPLATE_SUFFIX;
-        } else if (type.equals(GroupItem.TYPE)) {
-            return "ItemClassGroup" + TEMPLATE_SUFFIX;
-        }
-        return null;
     }
 }

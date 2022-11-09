@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.util.Base64;
+
 /**
  * The {@link JRuleRawValue} JRule Command
  *
@@ -27,8 +29,19 @@ public class JRuleRawValue implements JRuleValue {
         this.data = data;
     }
 
-    public JRuleRawValue(String fullString) {
-
+    public JRuleRawValue(String value) {
+        int idx;
+        if (value.startsWith("data:") && (idx = value.indexOf(",")) >= 0) {
+            int idx2;
+            if ((idx2 = value.indexOf(";")) <= 5) {
+                throw new IllegalArgumentException("Missing MIME type in argument " + value);
+            } else {
+                data = Base64.getDecoder().decode(value.substring(idx + 1));
+                mimeType = value.substring(5, idx2);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid data URI syntax for argument " + value);
+        }
     }
 
     public String getMimeType() {

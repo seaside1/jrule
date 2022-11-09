@@ -12,12 +12,12 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
+import java.time.ZonedDateTime;
+import java.util.Optional;
+
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
-
-import java.time.ZonedDateTime;
-import java.util.Optional;
 
 /**
  * The {@link JRuleInternalItem} Items
@@ -25,13 +25,16 @@ import java.util.Optional;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public abstract class JRuleInternalItem<T extends JRuleValue> implements JRuleItem<T> {
-    protected String name;
-    protected String label;
-    protected String type;
-    protected String id;
+    protected final String name;
+    protected final String label;
+    protected final String type;
+    protected final String id;
 
-    public JRuleInternalItem(String name) {
+    public JRuleInternalItem(String name, String label, String type, String id) {
         this.name = name;
+        this.label = label;
+        this.type = type;
+        this.id = id;
     }
 
     @Override
@@ -72,5 +75,11 @@ public abstract class JRuleInternalItem<T extends JRuleValue> implements JRuleIt
     @Override
     public boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.updatedSince(name, timestamp, persistenceServiceId);
+    }
+
+    @Override
+    public Optional<T> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
+                .map(s -> JRuleEventHandler.get().toValue(s, getDefaultValueClass()));
     }
 }

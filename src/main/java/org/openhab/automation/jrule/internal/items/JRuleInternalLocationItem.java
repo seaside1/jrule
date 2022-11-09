@@ -12,16 +12,8 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleDimmerItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleLocationItem;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
-
-import java.time.ZonedDateTime;
-import java.util.Optional;
 
 /**
  * The {@link JRuleInternalLocationItem} Items
@@ -29,17 +21,7 @@ import java.util.Optional;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalLocationItem extends JRuleInternalItem<JRulePointValue> implements JRuleLocationItem {
-    protected JRuleInternalLocationItem(String itemName) {
-        super(itemName);
-    }
-
-    @Override
-    public JRulePointValue getState() {
-        return new JRulePointValue(JRuleEventHandler.get().getStringValue(getName()));
-    }
-
-    @Override
-    public Optional<JRulePointValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return Optional.empty();
+    protected JRuleInternalLocationItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 }

@@ -12,15 +12,12 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleColorItem;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
  * The {@link JRuleInternalColorItem} Items
@@ -29,13 +26,8 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  */
 public class JRuleInternalColorItem extends JRuleInternalItem<JRuleColorValue> implements JRuleColorItem {
 
-    protected JRuleInternalColorItem(String itemName) {
-        super(itemName);
-    }
-
-    @Override
-    public JRuleColorValue getState() {
-        return JRuleEventHandler.get().getColorValue(name);
+    protected JRuleInternalColorItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 
     public JRuleOnOffValue getOnOffState() {
@@ -68,10 +60,5 @@ public class JRuleInternalColorItem extends JRuleInternalItem<JRuleColorValue> i
 
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
-    }
-
-    public Optional<JRuleColorValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(JRuleColorValue::new);
     }
 }

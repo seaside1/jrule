@@ -13,22 +13,21 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.items.JRuleImageItem;
+import org.openhab.automation.jrule.items.JRuleGroupStringItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
-import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
- * The {@link JRuleInternalImageItem} Items
+ * The {@link JRuleInternalStringGroupItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalImageItem extends JRuleInternalItem<JRuleRawValue> implements JRuleImageItem {
+public abstract class JRuleInternalStringGroupItem extends JRuleInternalStringItem implements JRuleGroupStringItem {
 
-    protected JRuleInternalImageItem(String name, String label, String type, String id) {
+    protected JRuleInternalStringGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 
-    public static JRuleInternalImageItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalImageItem.class);
+    public static JRuleInternalStringGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleInternalStringGroupItem.class);
     }
 }

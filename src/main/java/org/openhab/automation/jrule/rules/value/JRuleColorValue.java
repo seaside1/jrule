@@ -12,8 +12,6 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
-import org.openhab.automation.jrule.internal.JRuleItemUtil;
-
 /**
  * The {@link JRuleColorValue} JRule Command
  *
@@ -33,18 +31,6 @@ public class JRuleColorValue implements JRuleValue {
 
     public JRuleColorValue(String value) {
         throw new IllegalStateException("not implemented");
-    }
-
-    public static JRuleColorValue fromHsb(int hue, int saturation, int brightness) {
-        return JRuleItemUtil.getColorValueHsb(hue, saturation, brightness);
-    }
-
-    public static JRuleColorValue fromRgb(int red, int green, int blue) {
-        return JRuleItemUtil.getColorValueRgb(red, green, blue);
-    }
-
-    public static JRuleColorValue fromXy(float x, float y) {
-        return JRuleItemUtil.getColorValueXy(x, y);
     }
 
     public JRuleHsbValue getHsbValue() {

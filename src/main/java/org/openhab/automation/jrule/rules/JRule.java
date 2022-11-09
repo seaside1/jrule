@@ -34,8 +34,8 @@ import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

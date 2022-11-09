@@ -12,12 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleCallItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
 /**
@@ -27,18 +22,7 @@ import org.openhab.automation.jrule.rules.value.JRuleStringValue;
  */
 public class JRuleInternalCallItem extends JRuleInternalItem<JRuleStringValue> implements JRuleCallItem {
 
-    protected JRuleInternalCallItem(String itemName) {
-        super(itemName);
-    }
-
-    @Override
-    public JRuleStringValue getState() {
-        return JRuleEventHandler.get().getValue(getName(), JRuleStringValue.class);
-    }
-
-    // Persistence methods
-    public Optional<JRuleStringValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(JRuleStringValue::new);
+    protected JRuleInternalCallItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 }

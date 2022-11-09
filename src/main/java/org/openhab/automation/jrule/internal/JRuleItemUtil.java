@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.internal;
 
+import java.math.BigDecimal;
+
 import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
@@ -19,7 +21,6 @@ import org.openhab.automation.jrule.rules.value.JRuleXyValue;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.HSBType;
 import org.openhab.core.library.types.PercentType;
-import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,41 +34,7 @@ public class JRuleItemUtil {
     private static final Logger logger = LoggerFactory.getLogger(JRuleItemUtil.class);
     private static final String LOG_NAME_ITEM_UTIL = "JRuleItemUtil";
 
-    public static JRuleColorValue getColorValueFromHsbType(HSBType hsbValue) {
-        final JRuleHsbValue jRuleHsbValue = new JRuleHsbValue(hsbValue.getHue().intValue(),
-                hsbValue.getSaturation().intValue(), hsbValue.getBrightness().intValue());
-        final JRuleRgbValue jRuleRgbValue = new JRuleRgbValue(hsbValue.getRed().intValue(),
-                hsbValue.getGreen().intValue(), hsbValue.getBlue().intValue());
-        PercentType[] xyY = hsbValue.toXY();
-        final JRuleXyValue jRuleXyValue = new JRuleXyValue(xyY[0].floatValue(), xyY[1].floatValue(),
-                xyY[2].floatValue());
-        return new JRuleColorValue(jRuleHsbValue, jRuleRgbValue, jRuleXyValue);
-    }
-
-    public static JRuleColorValue getColorValueFromState(State state) {
-        HSBType hsbValue = null;
-        try {
-            hsbValue = HSBType.valueOf(state.toFullString());
-        } catch (IllegalArgumentException x) {
-            JRuleLog.error(logger, LOG_NAME_ITEM_UTIL, "Failed to parse state: {}", state.toFullString());
-            return null;
-        }
-        return getColorValueFromHsbType(hsbValue);
-    }
-
-    public static JRuleColorValue getColorValueHsb(int hue, int saturation, int brightness) {
-        return getColorValueFromHsbType(getHsbType(hue, saturation, brightness));
-    }
-
-    public static JRuleColorValue getColorValueXy(float x, float y) {
-        return getColorValueFromHsbType(HSBType.fromXY(x, y));
-    }
-
-    public static JRuleColorValue getColorValueRgb(int red, int green, int blue) {
-        return getColorValueFromHsbType(HSBType.fromRGB(red, green, blue));
-    }
-
-    public static HSBType getHsbType(int hue, int saturation, int brightness) {
+    public static HSBType getHsbType(BigDecimal hue, BigDecimal saturation, BigDecimal brightness) {
         return new HSBType(new DecimalType(hue), new PercentType(saturation), new PercentType(brightness));
     }
 

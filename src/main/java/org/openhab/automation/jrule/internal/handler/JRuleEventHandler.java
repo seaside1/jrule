@@ -29,15 +29,15 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
@@ -66,9 +66,7 @@ import org.openhab.core.library.types.PlayPauseType;
 import org.openhab.core.library.types.PointType;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.RawType;
-import org.openhab.core.library.types.RewindFastforwardType;
 import org.openhab.core.library.types.StopMoveType;
-import org.openhab.core.library.types.StringListType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.Command;
@@ -87,18 +85,18 @@ public class JRuleEventHandler {
     private static final Map<Class<? extends JRuleValue>, Class<? extends State>> stateMapping = new HashMap<>();
 
     static {
-//        stateMapping.put(JRuleStringValue.class, QuantityType.class);
+        // stateMapping.put(JRuleStringValue.class, QuantityType.class);
         stateMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
         stateMapping.put(JRuleStringValue.class, StringType.class);
-//        stateMapping.put(JRuleStringValue.class, UnDefType.class);
+        // stateMapping.put(JRuleStringValue.class, UnDefType.class);
         stateMapping.put(JRuleUpDownValue.class, UpDownType.class);
         stateMapping.put(JRuleOnOffValue.class, OnOffType.class);
         stateMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
         stateMapping.put(JRuleRawValue.class, RawType.class);
-//        stateMapping.put(JRuleRe.class, RewindFastforwardType.class);
+        // stateMapping.put(JRuleRe.class, RewindFastforwardType.class);
         stateMapping.put(JRulePointValue.class, PointType.class);
         stateMapping.put(JRuleHsbValue.class, HSBType.class);
-//        stateMapping.put(JRuleStL.class, StringListType.class);
+        // stateMapping.put(JRuleStL.class, StringListType.class);
         stateMapping.put(JRuleDecimalValue.class, DecimalType.class);
         stateMapping.put(JRulePercentValue.class, PercentType.class);
         stateMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
@@ -291,24 +289,9 @@ public class JRuleEventHandler {
         return getPlayPauseValueFromState(state);
     }
 
-    public JRuleColorValue getColorValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return JRuleItemUtil.getColorValueFromState(state);
-    }
-
     public JRuleOnOffValue getOnOffValue(String itemName) {
         State state = getStateFromItem(itemName);
         return getOnOffValueFromState(state);
-    }
-
-    public JRuleOpenClosedValue getOpenClosedValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return getOpenClosedValueFromState(state);
-    }
-
-    public JRuleUpDownValue getUpDownValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return getUpDownValueFromState(state);
     }
 
     public JRulePlayPauseValue getPlayPauseValueFromState(State state) {
@@ -592,7 +575,7 @@ public class JRuleEventHandler {
         return getGroupMemberItems(groupName).stream().map(JRuleItem::getName).collect(Collectors.toSet());
     }
 
-    public Set<JRuleItem<JRuleValue>> getGroupMemberItems(String groupName) {
+    public Set<JRuleItem<? extends JRuleValue>> getGroupMemberItems(String groupName) {
         try {
             Item item = itemRegistry.getItem(groupName);
             if (item instanceof GroupItem) {
@@ -643,28 +626,32 @@ public class JRuleEventHandler {
         Class<? extends State> castTo = stateMapping.get(valueClass);
         State as = Objects.requireNonNull(state.as(castTo), String.format("no mapping for type: %s", state));
 
+        return toValue(as.toFullString(), valueClass);
+    }
+
+    public <V extends JRuleValue> V toValue(String plain, Class<? extends JRuleValue> valueClass) {
         if (JRuleOpenClosedValue.class.isAssignableFrom(valueClass)) {
-            return (V) JRuleOpenClosedValue.valueOf(as.toFullString());
+            return (V) JRuleOpenClosedValue.valueOf(plain);
         } else if (JRuleStringValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRuleStringValue(as.toFullString());
+            return (V) new JRuleStringValue(plain);
         } else if (JRuleUpDownValue.class.isAssignableFrom(valueClass)) {
-            return (V) JRuleUpDownValue.getValueFromString(as.toFullString());
+            return (V) JRuleUpDownValue.getValueFromString(plain);
         } else if (JRuleOnOffValue.class.isAssignableFrom(valueClass)) {
-            return (V) JRuleOnOffValue.getValueFromString(as.toFullString());
+            return (V) JRuleOnOffValue.getValueFromString(plain);
         } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRuleDateTimeValue(as.toFullString());
+            return (V) new JRuleDateTimeValue(plain);
         } else if (JRuleRawValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRuleRawValue(as.toFullString());
+            return (V) new JRuleRawValue(plain);
         } else if (JRulePointValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRulePointValue(as.toFullString());
+            return (V) new JRulePointValue(plain);
         } else if (JRuleHsbValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRuleHsbValue(as.toFullString());
+            return (V) new JRuleHsbValue(plain);
         } else if (JRuleDecimalValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRuleDecimalValue(as.toFullString());
+            return (V) new JRuleDecimalValue(plain);
         } else if (JRulePercentValue.class.isAssignableFrom(valueClass)) {
-            return (V) new JRulePercentValue(as.toFullString());
+            return (V) new JRulePercentValue(plain);
         } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
-            return (V) JRulePlayPauseValue.valueOf(as.toFullString());
+            return (V) JRulePlayPauseValue.valueOf(plain);
         }
         throw new IllegalStateException(String.format("not implemented type: %s", valueClass));
     }

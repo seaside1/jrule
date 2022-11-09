@@ -12,27 +12,21 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleDimmerItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRulePlayerItem;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
-import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
 
 /**
  * The {@link JRuleInternalPlayerItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePlayPauseValue> implements JRulePlayerItem {
+public class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePlayPauseValue> implements JRulePlayerItem {
 
-    protected JRuleInternalPlayerItem(String itemName) {
-        super(itemName);
+    protected JRuleInternalPlayerItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 
     public static JRuleInternalPlayerItem forName(String itemName) throws JRuleItemNotFoundException {
@@ -49,11 +43,5 @@ public abstract class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePla
 
     public void postUpdate(JRulePlayPauseValue state) {
         JRuleEventHandler.get().postUpdate(name, state);
-    }
-
-    // Persistence method
-    public Optional<JRulePlayPauseValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(JRulePlayPauseValue::valueOf);
     }
 }

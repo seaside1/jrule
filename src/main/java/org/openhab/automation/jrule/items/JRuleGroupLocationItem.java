@@ -12,36 +12,10 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.internal.items.group.JRuleInternalGroupItem;
-import org.openhab.automation.jrule.internal.items.JRulePersistenceExtensions;
-
 /**
  * The {@link JRuleGroupLocationItem} Items
  *
- * @author Arne Seime - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleGroupLocationItem extends JRuleInternalGroupItem {
-
-    protected JRuleGroupLocationItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleGroupLocationItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleGroupLocationItem.class);
-    }
-
-    // TODO location support not really present
-    public String getState() {
-        return JRuleEventHandler.get().getStringValue(name);
-    }
-
-    // Persistence method
-    public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId);
-    }
+public interface JRuleGroupLocationItem extends JRuleLocationItem {
 }
