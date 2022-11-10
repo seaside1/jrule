@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRulePlayerGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.items.JRulePlayerGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**

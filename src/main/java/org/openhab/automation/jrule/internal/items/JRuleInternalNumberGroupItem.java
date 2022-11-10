@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

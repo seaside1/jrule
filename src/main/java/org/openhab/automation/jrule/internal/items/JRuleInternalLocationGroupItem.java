@@ -13,8 +13,8 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.items.JRuleLocationGroupItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.items.JRuleLocationGroupItem;
 
 /**
  * The {@link JRuleInternalLocationGroupItem} Items
