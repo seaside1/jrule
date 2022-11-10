@@ -95,6 +95,7 @@ public abstract class JRuleITBase {
     private static final ToxiproxyContainer toxiproxyContainer = new ToxiproxyContainer(
             "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer);
 
+    public static final int TIMEOUT = 120;
     @SuppressWarnings("resource")
     private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:3.3.0-debian")
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
@@ -117,7 +118,7 @@ public abstract class JRuleITBase {
                     .withStrategy(new AbstractWaitStrategy() {
                         @Override
                         protected void waitUntilReady() {
-                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(60, TimeUnit.SECONDS)
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(TIMEOUT, TimeUnit.SECONDS)
                                     .pollInterval(2, TimeUnit.SECONDS).await("thing online").until(() -> {
                                         try {
                                             return getThingState("mqtt:topic:mqtt:generic");
@@ -129,7 +130,7 @@ public abstract class JRuleITBase {
                     }).withStrategy(new AbstractWaitStrategy() {
                         @Override
                         protected void waitUntilReady() {
-                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(60, TimeUnit.SECONDS)
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(TIMEOUT, TimeUnit.SECONDS)
                                     .pollInterval(2, TimeUnit.SECONDS).await("items loaded").until(() -> {
                                         try {
                                             return getItemCount();
@@ -138,7 +139,7 @@ public abstract class JRuleITBase {
                                         }
                                     }, s -> s > 0);
                         }
-                    }).withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)))
+                    }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS)))
             .withNetwork(network);
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
