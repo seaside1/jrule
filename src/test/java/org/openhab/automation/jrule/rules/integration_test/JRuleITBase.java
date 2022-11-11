@@ -15,6 +15,8 @@ package org.openhab.automation.jrule.rules.integration_test;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -183,6 +186,19 @@ public abstract class JRuleITBase {
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
+        }
+
+        try (Stream<Path> stream = Files.list(Path.of("/"))
+                .filter(path -> path.getFileName().startsWith("ITJRule-tcplocalhost"))) {
+            stream.forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (IOException e) {
+            log.warn("cannot remove temp files", e);
         }
     }
 
