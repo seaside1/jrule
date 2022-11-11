@@ -27,7 +27,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
  */
 public class JRuleInternalDateTimeGroupItem extends JRuleInternalDateTimeItem implements JRuleDateTimeGroupItem {
 
-    protected JRuleInternalDateTimeGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalDateTimeGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

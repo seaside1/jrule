@@ -22,7 +22,7 @@ import org.openhab.automation.jrule.rules.value.JRuleStringValue;
  */
 public class JRuleInternalCallItem extends JRuleInternalItem<JRuleStringValue> implements JRuleCallItem {
 
-    protected JRuleInternalCallItem(String name, String label, String type, String id) {
+    public JRuleInternalCallItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 }

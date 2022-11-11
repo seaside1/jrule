@@ -14,7 +14,6 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -29,6 +28,6 @@ public interface JRuleDimmerItem extends JRuleItem<JRulePercentValue> {
 
     @Override
     default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRulePointValue.class;
+        return JRulePercentValue.class;
     }
 }

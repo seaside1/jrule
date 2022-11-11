@@ -29,7 +29,7 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershutterItem
         implements JRuleRollershutterGroupItem {
 
-    protected JRuleInternalRollershutterGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalRollershutterGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

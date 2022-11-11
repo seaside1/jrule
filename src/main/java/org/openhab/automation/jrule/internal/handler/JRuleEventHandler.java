@@ -100,6 +100,7 @@ public class JRuleEventHandler {
         stateMapping.put(JRuleDecimalValue.class, DecimalType.class);
         stateMapping.put(JRulePercentValue.class, PercentType.class);
         stateMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
+        // stateMapping.put(JRuleColorValue.class, HSBType.class);
     }
 
     private static final String LOG_NAME_EVENT = "JRuleEvent";
@@ -623,8 +624,11 @@ public class JRuleEventHandler {
 
     public <V extends JRuleValue> V getValue(String name, Class<V> valueClass) {
         State state = getStateFromItem(name);
+        Objects.requireNonNull(state, "state must not be null");
         Class<? extends State> castTo = stateMapping.get(valueClass);
-        State as = Objects.requireNonNull(state.as(castTo), String.format("no mapping for type: %s", state));
+        Objects.requireNonNull(castTo, String.format("casting to '%s' for '%s' results in null", valueClass, name));
+        State as = Objects.requireNonNull(state.as(castTo),
+                String.format("no mapping for type: %s", state.getClass().getSimpleName()));
 
         return toValue(as.toFullString(), valueClass);
     }

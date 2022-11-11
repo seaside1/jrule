@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * The {@link JRuleDateTimeValue}
@@ -20,14 +24,36 @@ import java.time.ZonedDateTime;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleDateTimeValue implements JRuleValue {
-    private final ZonedDateTime value;
+    private static final DateTimeFormatter PARSER = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]");
+    private static final DateTimeFormatter PARSER_TZ = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]z");
+    private static final DateTimeFormatter PARSER_TZ_RFC = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]Z");
+    private static final DateTimeFormatter PARSER_TZ_ISO = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]X");
+
+    private ZonedDateTime value;
 
     public JRuleDateTimeValue(ZonedDateTime value) {
         this.value = value;
     }
 
     public JRuleDateTimeValue(String fullString) {
-        this.value = ZonedDateTime.parse(fullString);
+        try {
+            this.value = ZonedDateTime.parse(fullString, PARSER_TZ_RFC);
+        } catch (DateTimeParseException var9) {
+            try {
+                this.value = ZonedDateTime.parse(fullString, PARSER_TZ_ISO);
+            } catch (DateTimeParseException var8) {
+                try {
+                    this.value = ZonedDateTime.parse(fullString, PARSER_TZ);
+                } catch (DateTimeParseException var7) {
+                    LocalDateTime localDateTime = LocalDateTime.parse(fullString, PARSER);
+                    this.value = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+                }
+            }
+        }
     }
 
     public ZonedDateTime getValue() {

@@ -31,7 +31,7 @@ public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implem
     private static final String LOG_NAME = "JRuleGroupNumberItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleInternalNumberGroupItem.class);
 
-    protected JRuleInternalNumberGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalNumberGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

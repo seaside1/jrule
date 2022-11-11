@@ -13,7 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRuleColorValue;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -21,13 +21,13 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleColorItem extends JRuleItem<JRuleColorValue> {
+public interface JRuleColorItem extends JRuleItem<JRuleHsbValue> {
     static JRuleColorItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleColorItem.class);
     }
 
     @Override
     default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleColorValue.class;
+        return JRuleHsbValue.class;
     }
 }

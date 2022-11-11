@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
  */
 public class JRuleInternalCallGroupItem extends JRuleInternalCallItem implements JRuleCallGroupItem {
 
-    protected JRuleInternalCallGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalCallGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

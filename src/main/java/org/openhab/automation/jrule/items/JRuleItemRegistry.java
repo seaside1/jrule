@@ -124,15 +124,16 @@ public class JRuleItemRegistry {
             throws JRuleItemNotFoundException {
         JRuleItem<? extends JRuleValue> jruleItem = itemRegistry.get(itemName);
         if (jruleItem == null) {
-            verifyThatItemExist(itemName);
+            Item item = verifyThatItemExist(itemName);
 
             try {
-                Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class);
-                constructor.setAccessible(true);
-                jruleItem = constructor.newInstance(itemName);
+                Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
+                        String.class, String.class, String.class);
+                jruleItem = constructor.newInstance(item.getName(), item.getLabel(), item.getType(), item.getUID());
                 itemRegistry.put(itemName, jruleItem);
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new RuntimeException(String.format("cannot create item '%s' for type '%s'", itemName,
+                        jRuleItemClass.getSimpleName()), ex);
             }
         }
         return (T) jruleItem;

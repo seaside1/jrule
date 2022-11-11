@@ -22,7 +22,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  */
 public class JRuleInternalContactItem extends JRuleInternalItem<JRuleOpenClosedValue> implements JRuleContactItem {
 
-    protected JRuleInternalContactItem(String name, String label, String type, String id) {
+    public JRuleInternalContactItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 }

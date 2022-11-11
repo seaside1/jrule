@@ -35,7 +35,7 @@ public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implem
     private static final String LOG_NAME = "JRuleGroupDimmerItem";
     private static final Logger logger = LoggerFactory.getLogger(JRuleInternalDimmerGroupItem.class);
 
-    protected JRuleInternalDimmerGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalDimmerGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

@@ -30,7 +30,7 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  */
 public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implements JRuleColorGroupItem {
 
-    protected JRuleInternalColorGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalColorGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

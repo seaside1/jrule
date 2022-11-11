@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.rules.value.JRulePointValue;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalLocationItem extends JRuleInternalItem<JRulePointValue> implements JRuleLocationItem {
-    protected JRuleInternalLocationItem(String name, String label, String type, String id) {
+    public JRuleInternalLocationItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 }

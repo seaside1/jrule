@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
  */
 public class JRuleInternalSwitchGroupItem extends JRuleInternalSwitchItem implements JRuleSwitchGroupItem {
 
-    protected JRuleInternalSwitchGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalSwitchGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

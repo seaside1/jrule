@@ -23,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
  */
 public class JRuleInternalImageGroupItem extends JRuleInternalImageItem implements JRuleImageGroupItem {
 
-    protected JRuleInternalImageGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalImageGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

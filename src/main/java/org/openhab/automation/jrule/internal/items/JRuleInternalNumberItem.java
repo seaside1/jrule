@@ -29,7 +29,7 @@ import org.openhab.core.library.types.DecimalType;
  */
 public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue> implements JRuleNumberItem {
 
-    protected JRuleInternalNumberItem(String name, String label, String type, String id) {
+    public JRuleInternalNumberItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

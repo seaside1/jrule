@@ -22,7 +22,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  */
 public class JRuleInternalSwitchItem extends JRuleInternalItem<JRuleOnOffValue> implements JRuleSwitchItem {
 
-    protected JRuleInternalSwitchItem(String name, String label, String type, String id) {
+    public JRuleInternalSwitchItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 }

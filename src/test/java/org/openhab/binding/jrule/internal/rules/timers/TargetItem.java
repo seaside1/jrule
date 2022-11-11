@@ -21,8 +21,8 @@ import org.openhab.automation.jrule.internal.items.JRuleInternalStringItem;
  */
 public class TargetItem extends JRuleInternalStringItem {
 
-    protected TargetItem(String itemName) {
-        super(itemName, "any", "type", "id");
+    public TargetItem(String itemName, String label, String type, String id) {
+        super(itemName, label, type, id);
     }
 
     @Override

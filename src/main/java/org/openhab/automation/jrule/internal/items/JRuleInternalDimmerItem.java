@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  */
 public class JRuleInternalDimmerItem extends JRuleInternalItem<JRulePercentValue> implements JRuleDimmerItem {
 
-    protected JRuleInternalDimmerItem(String name, String label, String type, String id) {
+    public JRuleInternalDimmerItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

@@ -27,7 +27,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  */
 public class JRuleInternalContactGroupItem extends JRuleInternalContactItem implements JRuleContactGroupItem {
 
-    protected JRuleInternalContactGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalContactGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

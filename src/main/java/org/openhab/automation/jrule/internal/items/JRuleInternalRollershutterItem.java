@@ -28,7 +28,7 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePercentValue>
         implements JRuleRollershutterItem {
 
-    protected JRuleInternalRollershutterItem(String name, String label, String type, String id) {
+    public JRuleInternalRollershutterItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

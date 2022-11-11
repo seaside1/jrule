@@ -25,7 +25,7 @@ import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
  */
 public class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePlayPauseValue> implements JRulePlayerItem {
 
-    protected JRuleInternalPlayerItem(String name, String label, String type, String id) {
+    public JRuleInternalPlayerItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

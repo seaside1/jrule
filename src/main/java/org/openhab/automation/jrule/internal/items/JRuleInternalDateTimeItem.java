@@ -28,7 +28,7 @@ import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
  */
 public class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleDateTimeValue> implements JRuleDateTimeItem {
 
-    protected JRuleInternalDateTimeItem(String name, String label, String type, String id) {
+    public JRuleInternalDateTimeItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

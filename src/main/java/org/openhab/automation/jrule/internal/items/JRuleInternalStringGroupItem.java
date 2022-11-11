@@ -21,9 +21,9 @@ import org.openhab.automation.jrule.items.JRuleStringGroupItem;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleInternalStringGroupItem extends JRuleInternalStringItem implements JRuleStringGroupItem {
+public class JRuleInternalStringGroupItem extends JRuleInternalStringItem implements JRuleStringGroupItem {
 
-    protected JRuleInternalStringGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalStringGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 

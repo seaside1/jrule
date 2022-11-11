@@ -21,10 +21,9 @@ import org.openhab.automation.jrule.items.JRuleLocationGroupItem;
  *
  * @author Arne Seime - Initial contribution
  */
-public abstract class JRuleInternalLocationGroupItem extends JRuleInternalLocationItem
-        implements JRuleLocationGroupItem {
+public class JRuleInternalLocationGroupItem extends JRuleInternalLocationItem implements JRuleLocationGroupItem {
 
-    protected JRuleInternalLocationGroupItem(String name, String label, String type, String id) {
+    public JRuleInternalLocationGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 
