@@ -78,11 +78,11 @@ public class ITJRule extends JRuleITBase {
 
     @Test
     public void mqttThingChangedToOffline() {
-        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(10, TimeUnit.SECONDS)
+        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
                 .pollInterval(200, TimeUnit.MILLISECONDS).await("thing online")
                 .until(() -> getThingState("mqtt:topic:mqtt:generic"), s -> s.equals("ONLINE"));
         mqttProxy.setConnectionCut(true);
-        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
+        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
                 .pollInterval(200, TimeUnit.MILLISECONDS).await("thing offline")
                 .until(() -> getThingState("mqtt:topic:mqtt:generic"), s -> s.equals("OFFLINE"));
         verifyRuleWasExecuted(TestRules.NAME_MQTT_THING_CHANGED_TO_OFFLINE);

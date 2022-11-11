@@ -210,7 +210,7 @@ public abstract class JRuleITBase {
 
     @AfterEach
     void unloadTest() throws MqttException {
-        if (mqttClient.isConnected()) {
+        if (mqttClient != null && mqttClient.isConnected()) {
             mqttClient.disconnect();
         }
     }
