@@ -15,6 +15,7 @@ package org.openhab.binding.jrule.internal.codegenerator;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
+import org.openhab.core.items.ActiveItem;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -99,64 +101,34 @@ public class JRuleItemClassGeneratorTest {
     }
 
     @Test
-    public void testGenerateItemsFile() {
+    public void testGenerateItemsFile() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         List<Item> items = new ArrayList<>();
 
-        ColorItem colorItem = new ColorItem("ColorItem");
-        colorItem.setLabel("ColorLabel");
-        items.add(colorItem);
+        items.add(createItem(ColorItem.class));
+        items.add(createItem(ContactItem.class));
+        items.add(createItem(DateTimeItem.class));
+        items.add(createItem(DimmerItem.class));
+        items.add(createItem(PlayerItem.class));
+        items.add(createItem(SwitchItem.class));
+        items.add(createItem(StringItem.class));
+        items.add(createItem(NumberItem.class));
+        items.add(createItem(RollershutterItem.class));
+        items.add(createItem(LocationItem.class));
+        items.add(createItem(CallItem.class));
+        items.add(createItem(ImageItem.class));
 
-        ContactItem contactItem = new ContactItem("ContactItem");
-        contactItem.setLabel("ContactLabel");
-        items.add(contactItem);
-
-        DateTimeItem dateTimeItem = new DateTimeItem("DateTimeItem");
-        dateTimeItem.setLabel("DateTimeLabel");
-        items.add(dateTimeItem);
-
-        DimmerItem dimmerItem = new DimmerItem("DimmerItem");
-        dimmerItem.setLabel("DimmerLabel");
-        items.add(dimmerItem);
-
-        PlayerItem playerItem = new PlayerItem("PlayerItem");
-        playerItem.setLabel("PlayerLabel");
-        items.add(playerItem);
-
-        SwitchItem switchItem = new SwitchItem("SwitchItem");
-        switchItem.setLabel("SwitchLabel");
-        items.add(switchItem);
-
-        StringItem stringItem = new StringItem("StringItem");
-        stringItem.setLabel("StringLabel");
-        items.add(stringItem);
-
-        NumberItem numberItem = new NumberItem("NumberItem");
-        numberItem.setLabel("NumberLabel");
-        items.add(numberItem);
-
-        RollershutterItem rollershutterItem = new RollershutterItem("RollershutterItem");
-        rollershutterItem.setLabel("RollershutterLabel");
-        items.add(rollershutterItem);
-
-        LocationItem locationItem = new LocationItem("LocationItem");
-        locationItem.setLabel("LocationLabel");
-        items.add(locationItem);
-
-        CallItem callItem = new CallItem("CallItem");
-        callItem.setLabel("CallLabel");
-        items.add(callItem);
-
-        ImageItem imageItem = new ImageItem("ImageItem");
-        imageItem.setLabel("ImageLabel");
-        items.add(imageItem);
-
-        NumberItem quantityItem = new NumberItem("Number:Temperature", "QuantityItem");
-        quantityItem.setLabel("QuantityLabel");
-        items.add(quantityItem);
-
-        GroupItem groupItem = new GroupItem("RollershutterGroup", new RollershutterItem("RollershutterItem"));
-        groupItem.setLabel("RollerShutterGroupLabel");
-        items.add(groupItem);
+        items.add(createGroupItem(ColorItem.class));
+        items.add(createGroupItem(ContactItem.class));
+        items.add(createGroupItem(DateTimeItem.class));
+        items.add(createGroupItem(DimmerItem.class));
+        items.add(createGroupItem(PlayerItem.class));
+        items.add(createGroupItem(SwitchItem.class));
+        items.add(createGroupItem(StringItem.class));
+        items.add(createGroupItem(NumberItem.class));
+        items.add(createGroupItem(RollershutterItem.class));
+        items.add(createGroupItem(LocationItem.class));
+        items.add(createGroupItem(CallItem.class));
+        items.add(createGroupItem(ImageItem.class));
 
         boolean success = sourceFileGenerator.generateItemsSource(items);
         assertTrue(success, "Failed to generate source file for items");
@@ -165,6 +137,18 @@ public class JRuleItemClassGeneratorTest {
 
         File compiledClass = new File(targetFolder, "JRuleItems.class");
         assertTrue(compiledClass.exists());
+    }
+
+    private GroupItem createGroupItem(Class<? extends ActiveItem> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        ActiveItem item = clazz.getConstructor(String.class).newInstance(clazz.getSimpleName());
+        item.setLabel(clazz.getSimpleName() + "Label");
+        return new GroupItem(clazz.getSimpleName() + "Group", new RollershutterItem(clazz.getSimpleName()));
+    }
+
+    private static ActiveItem createItem(Class<? extends ActiveItem> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        ActiveItem item = clazz.getConstructor(String.class).newInstance(clazz.getSimpleName());
+        item.setLabel(clazz.getSimpleName() + "Label");
+        return item;
     }
 
     private void generateAndCompile(Item item) {
