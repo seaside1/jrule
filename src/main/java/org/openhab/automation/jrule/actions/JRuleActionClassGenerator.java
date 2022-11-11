@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
@@ -165,6 +166,8 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                         Arrays.stream(method.getParameters()).forEach(parameter -> {
                             Map<Object, Object> arg = new HashMap<>();
                             arg.put("type", parameter.getType().getTypeName());
+                            arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType()).getTypeName()
+                                    .replaceFirst("java.lang.", ""));
                             arg.put("name", Objects.requireNonNull(parameter.getAnnotation(ActionInput.class),
                                     "ActionInput not set on action method parameter").name());
                             args.add(arg);

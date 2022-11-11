@@ -14,9 +14,7 @@ package org.openhab.automation.jrule.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.IntFunction;
 
 import org.openhab.core.model.script.actions.Things;
 import org.openhab.core.thing.binding.ThingActions;
@@ -38,11 +36,9 @@ public abstract class JRuleAbstractAction {
                 String.format("action for '%s' with uid '%s' could not be found", scope, thingUID));
     }
 
-    protected Object invokeMethod(String methodName, Object... args) {
+    protected Object invokeMethod(String methodName, Class<?>[] classes, Object... args) {
         try {
-            Class<?>[] parameterTypes = Arrays.stream(args).map(Object::getClass)
-                    .toArray((IntFunction<Class<?>[]>) value -> new Class[args.length]);
-            Method method = thingActions.getClass().getDeclaredMethod(methodName, parameterTypes);
+            Method method = thingActions.getClass().getDeclaredMethod(methodName, classes);
             return method.invoke(thingActions, args);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("method not found", e);
