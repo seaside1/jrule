@@ -18,6 +18,7 @@ import org.openhab.core.automation.annotation.RuleAction;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.binding.ThingHandler;
+import org.openhab.core.types.Command;
 
 /**
  * The {@link MyThingActions}
@@ -38,6 +39,11 @@ public class MyThingActions implements ThingActions {
     public int doSomething(@ActionInput(name = "value") String value, @ActionInput(name = "blub") int blub,
             @ActionInput(name = "blabla") Float blabla) {
         return 0;
+    }
+
+    @RuleAction(label = "doSomethingAbstract")
+    public int doSomethingAbstract(@ActionInput(name = "value") Command value) {
+        return 10;
     }
 
     @Override

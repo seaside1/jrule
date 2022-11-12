@@ -17,16 +17,20 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -83,7 +87,7 @@ import org.slf4j.MDC;
 public class JRuleEngine implements PropertyChangeListener {
     private static final String[] EMPTY_LOG_TAGS = new String[0];
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
-    private List<JRuleExecutionContext> contextList = new ArrayList<>();
+    private List<JRuleExecutionContext> contextList = new CopyOnWriteArrayList<>();
     private JRuleTimerExecutor timerExecutor = new JRuleTimerExecutor(this);
     private static final String MDC_KEY_RULE = "rule";
     protected ThreadPoolExecutor ruleExecutorService;
@@ -259,9 +263,15 @@ public class JRuleEngine implements PropertyChangeListener {
     public void fire(AbstractEvent event) {
         JRuleItemExecutionContext.JRuleAdditionalItemCheckData additionalCheckData = getAdditionalCheckData(event);
 
-        contextList.stream().filter(context -> context.match(event, additionalCheckData))
-                .filter(this::matchPrecondition)
-                .forEach(context -> invokeRule(context, context.createJRuleEvent(event)));
+        List<JRuleExecutionContext> matchingExecutionContexts = contextList.stream()
+                .filter(context -> context.match(event, additionalCheckData)).filter(this::matchPrecondition)
+                .filter(distinctByKey(p -> p.getMethod().getName())).collect(Collectors.toList());
+        matchingExecutionContexts.forEach(context -> invokeRule(context, context.createJRuleEvent(event)));
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     private JRuleItemExecutionContext.JRuleAdditionalItemCheckData getAdditionalCheckData(AbstractEvent event) {
