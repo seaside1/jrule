@@ -146,7 +146,7 @@ public abstract class JRuleITBase {
             .withNetwork(network);
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
-    private @NotNull IMqttClient mqttClient;
+    private static @NotNull IMqttClient mqttClient;
 
     @BeforeAll
     static void initClass() throws IOException, MqttException {
@@ -333,12 +333,10 @@ public abstract class JRuleITBase {
     }
 
     protected static void publishMqttMessage(String topic, String message) throws MqttException {
-        IMqttClient publisher = getMqttClient();
-
         MqttMessage msg = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
         msg.setQos(0);
         msg.setRetained(true);
-        publisher.publish(topic, msg);
+        mqttClient.publish(topic, msg);
     }
 
     protected void verifyFileExist() throws IOException, InterruptedException {
