@@ -46,6 +46,7 @@ import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.watch.JRuleRulesWatcher;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
+import org.openhab.automation.jrule.items.JRuleItemNameEnumGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.things.JRuleThingClassGenerator;
 import org.openhab.automation.jrule.things.JRuleThingRegistry;
@@ -96,8 +97,8 @@ public class JRuleHandler implements PropertyChangeListener {
     @Nullable
     private JRuleRulesWatcher directoryWatcher;
 
-    @Nullable
     private final JRuleItemClassGenerator itemGenerator;
+    private final JRuleItemNameEnumGenerator itemNameGenerator;
 
     private JRuleThingClassGenerator thingGenerator;
     private final JRuleActionClassGenerator actionGenerator;
@@ -124,6 +125,7 @@ public class JRuleHandler implements PropertyChangeListener {
         this.delayedItemsCompiler = new JRuleDelayedDebouncingExecutor(config.getItemsRecompilationDelaySeconds(),
                 TimeUnit.SECONDS);
         itemGenerator = new JRuleItemClassGenerator(config);
+        itemNameGenerator = new JRuleItemNameEnumGenerator(config);
         thingGenerator = new JRuleThingClassGenerator(config);
         actionGenerator = new JRuleActionClassGenerator(config);
         compiler = new JRuleCompiler(config);
@@ -305,6 +307,7 @@ public class JRuleHandler implements PropertyChangeListener {
     private synchronized Boolean compileGeneratedSourcesInternal() {
         logInfo("Compiling generated sources");
         itemGenerator.generateItemsSource(itemRegistry.getItems());
+        itemNameGenerator.generateItemNamesSource(itemRegistry.getItems());
         thingGenerator.generateThingsSource(thingRegistry.getAll());
         Set<Thing> filteredThings = thingRegistry.getAll().stream().filter(thing -> {
             boolean b = thing.getHandler() != null;

@@ -16,8 +16,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 
+import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
@@ -33,6 +38,7 @@ import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
 import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 
 /**
@@ -66,6 +72,8 @@ public class TestRules extends JRule {
     public static final String ITEM_PRECONDITION_STRING = "Precondition_String";
     public static final String ITEM_PRECONDITIONED_SWITCH = "Preconditioned_Switch";
     public static final String NAME_PRECONDITION_EXECUTION = "precondition execution";
+    public static final String ITEM_GET_MEMBERS_OF_GROUP_SWITCH = "Get_Members_Of_Group_Switch";
+    public static final String NAME_GET_MEMBERS_OF_GROUP = "get members of group";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -130,26 +138,25 @@ public class TestRules extends JRule {
         logInfo("thing '{}' goes '{}'", event.getThing(), event.getStatus());
     }
 
-    // currently not merged
-    // @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
-    // @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
-    // public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
-    // logInfo("Member of Group ({}) received command", event.getMemberName());
-    // }
-    //
-    // @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
-    // @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
-    // public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
-    // final String memberThatChangedStatus = event.getMemberName();
-    // logInfo("Member of Group ({}) received update", event.getMemberName());
-    // }
-    //
-    // @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
-    // @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
-    // public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
-    // final String memberThatChangedStatus = event.getMemberName();
-    // logInfo("Member of Group ({}) changed", event.getMemberName());
-    // }
+    @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
+    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
+    public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
+        logInfo("Member of Group ({}) received command", event.getMemberName());
+    }
+
+    @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
+    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
+    public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
+        final String memberThatChangedStatus = event.getMemberName();
+        logInfo("Member of Group ({}) received update", event.getMemberName());
+    }
+
+    @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
+    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
+    public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
+        final String memberThatChangedStatus = event.getMemberName();
+        logInfo("Member of Group ({}) changed", event.getMemberName());
+    }
 
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
@@ -168,6 +175,17 @@ public class TestRules extends JRule {
     @JRuleWhenItemReceivedCommand(item = ITEM_PRECONDITIONED_SWITCH)
     public void preconditionExecution(JRuleItemEvent event) {
         logInfo("received command: {}", event.getState().getValue());
+    }
+
+    @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
+    @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
+    public void getMembersOfGroup(JRuleItemEvent event) throws JRuleExecutionException {
+        Set<JRuleItem<? extends JRuleValue>> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        if (members.size() != 2) {
+            throw new JRuleExecutionException("expected 2 childs");
+        }
+        logInfo("contains members: {}", members.stream()
+                .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
     }
 
     private static void invokeAction(String fieldName, String methodName, Object... args) throws ClassNotFoundException,

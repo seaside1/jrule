@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.TestRules;
@@ -88,7 +87,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MQTT_THING_CHANGED_TO_OFFLINE);
     }
 
-    @Disabled("not merged currently")
     @Test
     public void memberOfGroupReceivedCommand() throws IOException {
         sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -104,7 +102,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND);
     }
 
-    @Disabled("not merged currently")
     @Test
     public void memberOfGroupReceivedUpdate() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -120,7 +117,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE);
     }
 
-    @Disabled("not merged currently")
     @Test
     public void memberOfGroupChanged() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -142,6 +138,13 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER);
         sendCommand(TestRules.ITEM_NUMBER_CONDITION, "18");
         verifyRuleWasExecuted(TestRules.NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER);
+    }
+
+    @Test
+    public void membersOfGroup() throws IOException {
+        sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_GET_MEMBERS_OF_GROUP);
+        verifyNoError();
     }
 
     @Test

@@ -223,6 +223,7 @@ public class JRuleCompiler {
                 .forEach(className -> classFiles.get(className).delete());
         // Will trigger compilation of any missing or old item java files
         return compile(List.of(new File(jRuleConfig.getItemsDirectory(), "JRuleItems.java"),
+                new File(jRuleConfig.getItemsDirectory(), "JRuleItemName.java"),
                 new File(jRuleConfig.getThingsDirectory(), "JRuleThings.java"),
                 new File(jRuleConfig.getActionsDirectory(), "JRuleActions.java")), genClassPath);
     }

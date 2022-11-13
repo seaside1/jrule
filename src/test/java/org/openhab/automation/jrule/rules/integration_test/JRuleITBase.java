@@ -166,6 +166,8 @@ public abstract class JRuleITBase {
         openhabContainer.execInContainer("rm", "/openhab/userdata/example.txt");
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER2, JRuleSwitchItem.OFF);
 
         mqttClient = getMqttClient();
         subscribeMqtt("number/state");
@@ -349,6 +351,15 @@ public abstract class JRuleITBase {
     protected void verifyRuleWasExecuted(String ruleLogLine) {
         Awaitility.await().with().timeout(10, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
                 .await("rule executed").until(() -> logLines, v -> containsLine(toMethodCallLogEntry(ruleLogLine), v));
+    }
+
+    protected void verifyNoError() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // no problem here
+        }
+        Assertions.assertTrue(notContainsLine(toMethodCallLogEntry("ERROR"), logLines));
     }
 
     private static String toMethodCallLogEntry(String ruleLogLine) {
