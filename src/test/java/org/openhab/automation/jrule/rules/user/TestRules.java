@@ -107,6 +107,7 @@ public class TestRules extends JRule {
     @JRuleWhenItemChange(item = ITEM_MQTT_ACTION_TRIGGER)
     public void invokeMqttAction(JRuleItemEvent event) throws ClassNotFoundException, NoSuchFieldException,
             IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        logInfo("will invoke mqtt action");
         invokeAction("mqttBrokerMqtt", "publishMQTT", "number/state", "1313131");
         logInfo("mqtt action invoked");
     }
