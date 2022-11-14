@@ -149,26 +149,37 @@ public abstract class JRuleITBase {
     private @NotNull IMqttClient mqttClient;
 
     @BeforeAll
-    static void initClass() throws IOException, MqttException {
+    static void initClass() {
         toxiproxyContainer.start();
         mqttProxy = toxiproxyContainer.getProxy(mqttContainer, 1883);
         System.out.println(mqttProxy.getOriginalProxyPort());
         openhabContainer.start();
-        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
-                .pollInterval(200, TimeUnit.MILLISECONDS).await("thing online")
-                .until(() -> getThingState("mqtt:topic:mqtt:generic"), s -> s.equals("ONLINE"));
     }
 
     @BeforeEach
     void initTest() throws IOException, InterruptedException, MqttException {
         mqttProxy.setConnectionCut(false);
+        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
+                .pollInterval(200, TimeUnit.MILLISECONDS).await("thing online")
+                .until(() -> getThingState("mqtt:topic:mqtt:generic"), s -> s.equals("ONLINE"));
+
         logLines.clear();
         openhabContainer.execInContainer("rm", "/openhab/userdata/example.txt");
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_MQTT_ACTION_TRIGGER, JRuleSwitchItem.OFF);
 
+        receivedMqttMessages.clear();
         mqttClient = getMqttClient();
         subscribeMqtt("number/state");
+        publishMqttMessage("number/state", "0");
+    }
+
+    @AfterEach
+    void unloadTest() throws MqttException {
+        if (mqttClient != null && mqttClient.isConnected()) {
+            mqttClient.disconnect();
+        }
     }
 
     @AfterAll
@@ -222,13 +233,6 @@ public abstract class JRuleITBase {
         options.setCleanSession(true);
         options.setConnectionTimeout(2);
         return options;
-    }
-
-    @AfterEach
-    void unloadTest() throws MqttException {
-        if (mqttClient != null && mqttClient.isConnected()) {
-            mqttClient.disconnect();
-        }
     }
 
     private boolean containsLine(String line, List<String> logLines) {
@@ -332,13 +336,11 @@ public abstract class JRuleITBase {
         return mqttContainer.getHost();
     }
 
-    protected static void publishMqttMessage(String topic, String message) throws MqttException {
-        IMqttClient publisher = getMqttClient();
-
+    protected void publishMqttMessage(String topic, String message) throws MqttException {
         MqttMessage msg = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
         msg.setQos(0);
         msg.setRetained(true);
-        publisher.publish(topic, msg);
+        mqttClient.publish(topic, msg);
     }
 
     protected void verifyFileExist() throws IOException, InterruptedException {
@@ -347,7 +349,7 @@ public abstract class JRuleITBase {
     }
 
     protected void verifyRuleWasExecuted(String ruleLogLine) {
-        Awaitility.await().with().timeout(10, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
+        Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
                 .await("rule executed").until(() -> logLines, v -> containsLine(toMethodCallLogEntry(ruleLogLine), v));
     }
 
