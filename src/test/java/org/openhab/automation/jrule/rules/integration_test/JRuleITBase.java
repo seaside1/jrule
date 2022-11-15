@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -72,7 +73,7 @@ import com.google.gson.JsonParser;
  */
 public abstract class JRuleITBase {
     private static final Network network = Network.newNetwork();
-    protected static final List<String> logLines = new ArrayList<>();
+    protected static final List<String> logLines = new CopyOnWriteArrayList<>();
     private static final Logger log = LoggerFactory.getLogger(ITJRule.class);
     private static final String version;
 
@@ -168,6 +169,8 @@ public abstract class JRuleITBase {
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_MQTT_ACTION_TRIGGER, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_PRECONDITIONED_SWITCH, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_PRECONDITION_STRING, "");
 
         receivedMqttMessages.clear();
         mqttClient = getMqttClient();
