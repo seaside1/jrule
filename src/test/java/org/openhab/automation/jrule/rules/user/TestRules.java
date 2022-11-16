@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.JRule;
@@ -74,6 +75,7 @@ public class TestRules extends JRule {
     public static final String NAME_PRECONDITION_EXECUTION = "precondition execution";
     public static final String ITEM_GET_MEMBERS_OF_GROUP_SWITCH = "Get_Members_Of_Group_Switch";
     public static final String NAME_GET_MEMBERS_OF_GROUP = "get members of group";
+    public static final String NAME_GET_MEMBERS_OF_NUMBER_GROUP = "get members of number group";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -182,6 +184,17 @@ public class TestRules extends JRule {
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfGroup(JRuleItemEvent event) throws JRuleExecutionException {
         Set<JRuleItem<? extends JRuleValue>> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        if (members.size() != 2) {
+            throw new JRuleExecutionException("expected 2 childs");
+        }
+        logInfo("contains members: {}", members.stream()
+                .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
+    }
+
+    @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
+    @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
+    public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
+        Set<JRuleItem<? extends JRuleValue>> members = JRuleNumberGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }

@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+
 /**
  * The {@link JRuleColorGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleColorGroupItem extends JRuleColorItem {
+public interface JRuleColorGroupItem extends JRuleColorItem, JRuleGroupItem<JRuleHsbValue> {
+    static JRuleColorGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleColorGroupItem.class);
+    }
 }

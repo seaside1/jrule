@@ -168,6 +168,7 @@ public abstract class JRuleITBase {
         openhabContainer.execInContainer("rm", "/openhab/userdata/example.txt");
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_MQTT_ACTION_TRIGGER, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITIONED_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, "");
@@ -318,8 +319,6 @@ public abstract class JRuleITBase {
             return jsonElement.getAsJsonArray().size();
         }
     }
-
-    // http://192.168.1.200:8080/rest/items?recursive=false
 
     private static boolean isHttp2xx(CloseableHttpResponse response) {
         return 2 != response.getCode() / 100;

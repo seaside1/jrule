@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+
 /**
  * The {@link JRulePlayerGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRulePlayerGroupItem extends JRulePlayerItem {
+public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem<JRulePlayPauseValue> {
+    static JRulePlayerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRulePlayerGroupItem.class);
+    }
 }

@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleRawValue;
+
 /**
  * The {@link JRuleImageGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleImageGroupItem extends JRuleImageItem {
+public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem<JRuleRawValue> {
+    static JRuleImageGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleImageGroupItem.class);
+    }
 }

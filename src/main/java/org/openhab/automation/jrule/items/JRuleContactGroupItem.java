@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+
 /**
  * The {@link JRuleContactGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleContactGroupItem extends JRuleContactItem {
+public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem<JRuleOpenClosedValue> {
+    static JRuleContactGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleContactGroupItem.class);
+    }
 }

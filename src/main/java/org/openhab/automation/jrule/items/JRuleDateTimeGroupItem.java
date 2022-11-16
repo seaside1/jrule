@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
+
 /**
  * The {@link JRuleDateTimeGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem {
+public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem, JRuleGroupItem<JRuleDateTimeValue> {
+    static JRuleDateTimeGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleDateTimeGroupItem.class);
+    }
 }

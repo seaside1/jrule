@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRulePointValue;
+
 /**
  * The {@link JRuleLocationGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleLocationGroupItem extends JRuleLocationItem {
+public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem<JRulePointValue> {
+    static JRuleLocationGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleLocationGroupItem.class);
+    }
 }

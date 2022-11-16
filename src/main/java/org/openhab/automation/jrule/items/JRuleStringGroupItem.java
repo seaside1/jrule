@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
+
 /**
  * The {@link JRuleStringGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleStringGroupItem extends JRuleStringItem {
+public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem<JRuleStringValue> {
+    static JRuleStringGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleStringGroupItem.class);
+    }
 }

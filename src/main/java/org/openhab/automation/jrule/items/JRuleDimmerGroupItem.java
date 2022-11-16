@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+
 /**
  * The {@link JRuleDimmerGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleDimmerGroupItem extends JRuleDimmerItem {
+public interface JRuleDimmerGroupItem extends JRuleDimmerItem, JRuleGroupItem<JRulePercentValue> {
+    static JRuleDimmerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleDimmerGroupItem.class);
+    }
 }

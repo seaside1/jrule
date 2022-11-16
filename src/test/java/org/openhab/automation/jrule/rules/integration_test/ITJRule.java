@@ -149,6 +149,13 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void membersOfNumberGroup() throws IOException {
+        sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_GET_MEMBERS_OF_NUMBER_GROUP);
+        verifyNoError();
+    }
+
+    @Test
     public void cronEvery5Sec() {
         verifyRuleWasExecuted(TestRules.NAME_CRON_EVERY_5_SEC);
     }

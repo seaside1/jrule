@@ -12,10 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
+
 /**
  * The {@link JRuleNumberGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleNumberGroupItem extends JRuleNumberItem {
+public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem<JRuleDecimalValue> {
+    static JRuleNumberGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleNumberGroupItem.class);
+    }
 }

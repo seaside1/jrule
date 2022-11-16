@@ -1,10 +1,18 @@
 Switch          Receiving_Command_Switch
 Switch          Mqtt_Action_Trigger
 Switch          Commandline_Exec_Trigger
+
 Group           Switch_Group
 Switch          Switch_Group_Member1        (Switch_Group)
 Switch          Switch_Group_Member2        (Switch_Group)
+
 Number          Number_Condition
 String          Precondition_String
 Switch          Preconditioned_Switch
 Switch          Get_Members_Of_Group_Switch
+
+Group           Number_Group
+Group           Number_Group_Member         (Number_Group)
+Number          Number_Group_Member1        (Number_Group)
+Number          Number_Group_Member2        (Number_Group_Member)
+Number          Number_Group_Member3        (Number_Group_Member)
