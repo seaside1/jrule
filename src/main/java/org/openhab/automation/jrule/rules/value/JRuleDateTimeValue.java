@@ -17,6 +17,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * The {@link JRuleDateTimeValue}
@@ -32,11 +34,13 @@ public class JRuleDateTimeValue implements JRuleValue {
             "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]Z");
     private static final DateTimeFormatter PARSER_TZ_ISO = DateTimeFormatter.ofPattern(
             "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]X");
+    private static final DateTimeFormatter FORMATTER_TZ_RFC = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS]]Z");
 
     private ZonedDateTime value;
 
     public JRuleDateTimeValue(ZonedDateTime value) {
-        this.value = value;
+        this.value = value.toOffsetDateTime().toZonedDateTime();
     }
 
     public JRuleDateTimeValue(String fullString) {
@@ -56,7 +60,31 @@ public class JRuleDateTimeValue implements JRuleValue {
         }
     }
 
+    public JRuleDateTimeValue(Date date) {
+        this.value = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+    }
+
     public ZonedDateTime getValue() {
         return value;
+    }
+
+    @Override
+    public String asStringValue() {
+        return this.value.format(FORMATTER_TZ_RFC);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleDateTimeValue that = (JRuleDateTimeValue) o;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

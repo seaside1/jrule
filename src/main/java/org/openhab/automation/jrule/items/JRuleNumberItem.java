@@ -14,8 +14,10 @@ package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
@@ -28,6 +30,18 @@ public interface JRuleNumberItem extends JRuleItem<JRuleDecimalValue> {
     static JRuleNumberItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleNumberItem.class);
     }
+
+    void sendCommand(double value);
+
+    void sendCommand(double value, String unit);
+
+    void sendCommand(int value);
+
+    void postUpdate(double value, String unit);
+
+    void postUpdate(double value);
+
+    void postUpdate(int value);
 
     @Override
     default Class<? extends JRuleValue> getDefaultValueClass() {

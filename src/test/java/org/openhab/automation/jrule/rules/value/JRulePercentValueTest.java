@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRulePercentValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRulePercentValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRulePercentValue value = new JRulePercentValue(23.12);
+        String string = value.asStringValue();
+        JRulePercentValue fromString = new JRulePercentValue(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

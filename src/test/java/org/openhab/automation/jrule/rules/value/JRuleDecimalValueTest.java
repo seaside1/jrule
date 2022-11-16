@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleDecimalValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRuleDecimalValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRuleDecimalValue value = new JRuleDecimalValue(23.12);
+        String string = value.asStringValue();
+        JRuleDecimalValue fromString = new JRuleDecimalValue(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

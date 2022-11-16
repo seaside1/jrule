@@ -31,4 +31,9 @@ public enum JRuleStopMoveValue implements JRuleValue {
         }
         return UNDEF;
     }
+
+    @Override
+    public String asStringValue() {
+        return name();
+    }
 }

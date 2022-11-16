@@ -38,4 +38,12 @@ public interface JRuleGroupItem<T extends JRuleValue> extends JRuleItem<T> {
     default void postUpdate(String value) {
         members().forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
+
+    default void sendCommand(T value) {
+        members().forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
+    }
+
+    default void postUpdate(T value) {
+        members().forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
+    }
 }

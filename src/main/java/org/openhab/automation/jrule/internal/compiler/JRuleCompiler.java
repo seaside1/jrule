@@ -257,7 +257,7 @@ public class JRuleCompiler {
                 return true;
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(),
+                    logError("Error on line {} in {}: {}", diagnostic.getLineNumber(),
                             diagnostic.getSource() == null ? "" : diagnostic.getSource().toUri(),
                             diagnostic.getMessage(Locale.getDefault()));
                 }

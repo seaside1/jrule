@@ -15,14 +15,18 @@ package org.openhab.automation.jrule.rules.value;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * The {@link JRuleColorValue} JRule Command
+ * The {@link JRuleHsbValue} JRule Command
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleHsbValue implements JRuleValue {
+    private final BigDecimal hue;
+    private final BigDecimal saturation;
+    private final BigDecimal brightness;
 
     public JRuleHsbValue(String value) {
         List<String> constituents = Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toList());
@@ -35,19 +39,27 @@ public class JRuleHsbValue implements JRuleValue {
         }
     }
 
-    @Override
-    public String toString() {
-        return "JRuleHsbValue [hue=" + hue + ", saturation=" + saturation + ", brightness=" + brightness + "]";
+    public JRuleHsbValue(float hue, float saturation, float brightness) {
+        this.hue = new BigDecimal(hue);
+        this.saturation = new BigDecimal(saturation);
+        this.brightness = new BigDecimal(brightness);
     }
-
-    private final BigDecimal hue;
-    private final BigDecimal saturation;
-    private final BigDecimal brightness;
 
     public JRuleHsbValue(BigDecimal hue, BigDecimal saturation, BigDecimal brightness) {
         this.hue = hue;
         this.saturation = saturation;
         this.brightness = brightness;
+    }
+
+    @Override
+    public String toString() {
+        return "JRuleHsbValue [hue=" + hue + ", saturation=" + saturation + ", brightness=" + brightness + "]";
+    }
+
+    @Override
+    public String asStringValue() {
+        return String.format("%s,%s,%s", this.hue.intValueExact(), this.saturation.intValueExact(),
+                this.brightness.intValueExact());
     }
 
     public BigDecimal getHue() {
@@ -60,5 +72,20 @@ public class JRuleHsbValue implements JRuleValue {
 
     public BigDecimal getSaturation() {
         return saturation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleHsbValue that = (JRuleHsbValue) o;
+        return hue.equals(that.hue) && saturation.equals(that.saturation) && brightness.equals(that.brightness);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hue, saturation, brightness);
     }
 }

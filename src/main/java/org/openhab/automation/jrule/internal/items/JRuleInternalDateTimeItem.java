@@ -15,10 +15,8 @@ package org.openhab.automation.jrule.internal.items;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 
 /**
@@ -32,27 +30,19 @@ public class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleDateTimeVa
         super(name, label, type, id);
     }
 
-    public static JRuleInternalDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalDateTimeItem.class);
-    }
-
     public void sendCommand(Date date) {
-        JRuleEventHandler.get().sendCommand(name, date);
+        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(date).asStringValue());
     }
 
-    public void sendCommand(ZonedDateTime zonedDateTime) {
-        JRuleEventHandler.get().sendCommand(name, zonedDateTime);
+    public void sendCommand(ZonedDateTime value) {
+        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(value).asStringValue());
     }
 
     public void postUpdate(Date date) {
-        JRuleEventHandler.get().postUpdate(name, date);
+        JRuleEventHandler.get().postUpdate(name, new JRuleDateTimeValue(date).asStringValue());
     }
 
-    public void postUpdate(ZonedDateTime zonedDateTime) {
-        JRuleEventHandler.get().postUpdate(name, zonedDateTime);
-    }
-
-    public ZonedDateTime getZonedDateTimeState() {
-        return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(name);
+    public void postUpdate(ZonedDateTime value) {
+        JRuleEventHandler.get().postUpdate(name, new JRuleDateTimeValue(value).asStringValue());
     }
 }

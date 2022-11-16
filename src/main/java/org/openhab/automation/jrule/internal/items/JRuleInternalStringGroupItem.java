@@ -12,8 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleStringGroupItem;
 
 /**
@@ -25,9 +23,5 @@ public class JRuleInternalStringGroupItem extends JRuleInternalStringItem implem
 
     public JRuleInternalStringGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public static JRuleInternalStringGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalStringGroupItem.class);
     }
 }

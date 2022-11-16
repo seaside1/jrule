@@ -31,4 +31,9 @@ public enum JRuleOpenClosedValue implements JRuleValue {
         }
         return UNDEF;
     }
+
+    @Override
+    public String asStringValue() {
+        return name();
+    }
 }

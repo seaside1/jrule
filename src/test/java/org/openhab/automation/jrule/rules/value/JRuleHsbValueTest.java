@@ -12,13 +12,20 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleHsbValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
-
-    String asStringValue();
+class JRuleHsbValueTest {
+    @Test
+    void asStringValue() {
+        JRuleHsbValue value = new JRuleHsbValue(24, 45, 13);
+        String string = value.asStringValue();
+        JRuleHsbValue fromString = new JRuleHsbValue(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

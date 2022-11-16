@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -39,7 +40,7 @@ public abstract class JRuleInternalItem<T extends JRuleValue> implements JRuleIt
 
     @Override
     public String getStateAsString() {
-        return JRuleEventHandler.get().getStringValue(name);
+        return JRuleEventHandler.get().getValue(name, JRuleStringValue.class).asStringValue();
     }
 
     @Override

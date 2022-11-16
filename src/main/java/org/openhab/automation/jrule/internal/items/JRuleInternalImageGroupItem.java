@@ -12,9 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.items.JRuleImageGroupItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 
 /**
  * The {@link JRuleInternalImageGroupItem} Items
@@ -25,9 +23,5 @@ public class JRuleInternalImageGroupItem extends JRuleInternalImageItem implemen
 
     public JRuleInternalImageGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public static JRuleInternalImageGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalImageGroupItem.class);
     }
 }

@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -25,6 +27,16 @@ public interface JRuleColorItem extends JRuleItem<JRuleHsbValue> {
     static JRuleColorItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleColorItem.class);
     }
+
+    void sendCommand(JRuleOnOffValue command);
+
+    void sendCommand(JRuleIncreaseDecreaseValue command);
+
+    void postUpdate(JRuleHsbValue value);
+
+    void postUpdate(JRuleOnOffValue state);
+
+    void postUpdate(int value);
 
     @Override
     default Class<? extends JRuleValue> getDefaultValueClass() {

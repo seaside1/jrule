@@ -12,9 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleRollershutterItem;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
@@ -32,27 +30,23 @@ public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePerce
         super(name, label, type, id);
     }
 
-    public static JRuleInternalRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalRollershutterItem.class);
-    }
-
     public void sendCommand(JRuleUpDownValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
     public void sendCommand(JRuleStopMoveValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(value));
+        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(value).asStringValue());
     }
 
     public void postUpdate(JRuleUpDownValue state) {
-        JRuleEventHandler.get().postUpdate(name, state);
+        JRuleEventHandler.get().postUpdate(name, state.asStringValue());
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
+        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value).asStringValue());
     }
 }

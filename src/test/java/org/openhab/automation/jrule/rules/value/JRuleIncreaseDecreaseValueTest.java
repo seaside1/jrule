@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleIncreaseDecreaseValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRuleIncreaseDecreaseValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRuleIncreaseDecreaseValue value = JRuleIncreaseDecreaseValue.INCREASE;
+        String string = value.asStringValue();
+        JRuleIncreaseDecreaseValue fromString = JRuleIncreaseDecreaseValue.getValueFromString(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

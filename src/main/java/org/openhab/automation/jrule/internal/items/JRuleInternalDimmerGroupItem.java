@@ -14,11 +14,9 @@ package org.openhab.automation.jrule.internal.items;
 
 import java.util.Set;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDimmerGroupItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
@@ -39,33 +37,33 @@ public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implem
         super(name, label, type, id);
     }
 
-    public static JRuleInternalDimmerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalDimmerGroupItem.class);
-    }
-
     public void sendCommand(double value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value)));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value).asStringValue()));
     }
 
     public void postUpdate(double value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value)));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value).asStringValue()));
     }
 
     public void sendCommand(int value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value)));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value).asStringValue()));
     }
 
     public void postUpdate(int value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value)));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value).asStringValue()));
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
     }
 
     public void postUpdate(JRuleIncreaseDecreaseValue value) {
@@ -75,11 +73,11 @@ public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implem
 
     public void sendCommand(JRuleOnOffValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
     }
 
     public void postUpdate(JRuleOnOffValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 }

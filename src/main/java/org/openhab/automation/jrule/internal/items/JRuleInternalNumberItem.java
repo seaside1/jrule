@@ -15,9 +15,7 @@ package org.openhab.automation.jrule.internal.items;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.core.library.types.DecimalType;
@@ -33,16 +31,20 @@ public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue
         super(name, label, type, id);
     }
 
-    public static JRuleInternalNumberItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalNumberItem.class);
-    }
-
     public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(name, value);
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value).asStringValue());
     }
 
     public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(name, value);
+        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value).asStringValue());
+    }
+
+    public void sendCommand(int value) {
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value).asStringValue());
+    }
+
+    public void postUpdate(int value) {
+        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value).asStringValue());
     }
 
     public void sendCommand(double value, String unit) {

@@ -14,9 +14,7 @@ package org.openhab.automation.jrule.internal.items;
 
 import java.util.Set;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRulePlayerGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
@@ -31,17 +29,13 @@ public class JRuleInternalPlayerGroupItem extends JRuleInternalPlayerItem implem
         super(name, label, type, id);
     }
 
-    public static JRuleInternalPlayerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalPlayerGroupItem.class);
-    }
-
     public void sendCommand(JRulePlayPauseValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 
     public void postUpdate(JRulePlayPauseValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 }

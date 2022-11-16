@@ -34,6 +34,8 @@ import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.slf4j.Logger;
@@ -254,11 +256,11 @@ public class JRule {
     }
 
     protected void sendCommand(String itemName, JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+        JRuleEventHandler.get().sendCommand(itemName, command.asStringValue());
     }
 
     protected void sendCommand(String itemName, JRulePercentValue percentTypeCommand) {
-        JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand);
+        JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand.asStringValue());
     }
 
     protected void sendCommand(String itemName, String command) {
@@ -266,7 +268,7 @@ public class JRule {
     }
 
     protected void sendCommand(String itemName, double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value).asStringValue());
     }
 
     protected void sendCommand(String itemName, double value, String unit) {
@@ -274,19 +276,19 @@ public class JRule {
     }
 
     protected void sendCommand(String itemName, int value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value).asStringValue());
     }
 
     protected void sendCommand(String itemName, Date date) {
-        JRuleEventHandler.get().sendCommand(itemName, date);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDateTimeValue(date).asStringValue());
     }
 
     protected void postUpdate(String itemName, Date date) {
-        JRuleEventHandler.get().postUpdate(itemName, date);
+        JRuleEventHandler.get().postUpdate(itemName, new JRuleDateTimeValue(date).asStringValue());
     }
 
     protected void postUpdate(String itemName, JRuleOnOffValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
+        JRuleEventHandler.get().postUpdate(itemName, state.asStringValue());
     }
 
     protected void postUpdate(String itemName, String value) {
@@ -294,7 +296,7 @@ public class JRule {
     }
 
     protected void postUpdate(String itemName, double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        JRuleEventHandler.get().postUpdate(itemName, new JRuleDecimalValue(value).asStringValue());
     }
 
     protected boolean getTimedLock(String lockName, int seconds) {

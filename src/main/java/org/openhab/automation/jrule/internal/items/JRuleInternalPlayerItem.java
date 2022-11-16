@@ -12,9 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRulePlayerItem;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
@@ -29,19 +27,11 @@ public class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePlayPauseVal
         super(name, label, type, id);
     }
 
-    public static JRuleInternalPlayerItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalPlayerItem.class);
-    }
-
-    public JRulePlayPauseValue getState() {
-        return JRuleEventHandler.get().getPauseValue(name);
-    }
-
     public void sendCommand(JRulePlayPauseValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
     public void postUpdate(JRulePlayPauseValue state) {
-        JRuleEventHandler.get().postUpdate(name, state);
+        JRuleEventHandler.get().postUpdate(name, state.asStringValue());
     }
 }

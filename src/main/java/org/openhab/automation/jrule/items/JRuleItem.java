@@ -47,6 +47,10 @@ public interface JRuleItem<T extends JRuleValue> {
         return (T) JRuleEventHandler.get().getValue(getName(), getDefaultValueClass());
     }
 
+    default <TD extends JRuleValue> TD getStateAs(Class<TD> type) {
+        return (TD) JRuleEventHandler.get().getValue(getName(), type);
+    }
+
     default void sendCommand(T command) {
         JRuleEventHandler.get().sendCommand(getName(), command.toString());
     }

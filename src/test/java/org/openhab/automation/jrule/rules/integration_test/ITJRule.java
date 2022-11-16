@@ -159,4 +159,11 @@ public class ITJRule extends JRuleITBase {
     public void cronEvery5Sec() {
         verifyRuleWasExecuted(TestRules.NAME_CRON_EVERY_5_SEC);
     }
+
+    @Test
+    public void castAllTypes() throws IOException {
+        sendCommand(TestRules.ITEM_CAST_ALL_TYPES_SWITCH, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_CAST_ALL_TYPES);
+        verifyNoError();
+    }
 }

@@ -15,14 +15,25 @@ package org.openhab.automation.jrule.rules.user;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.openhab.automation.jrule.items.JRuleColorItem;
+import org.openhab.automation.jrule.items.JRuleContactItem;
+import org.openhab.automation.jrule.items.JRuleDateTimeItem;
+import org.openhab.automation.jrule.items.JRuleDimmerItem;
+import org.openhab.automation.jrule.items.JRuleImageItem;
 import org.openhab.automation.jrule.items.JRuleItem;
-import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
+import org.openhab.automation.jrule.items.JRuleLocationItem;
+import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRulePlayerItem;
+import org.openhab.automation.jrule.items.JRuleRollershutterItem;
+import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.JRule;
@@ -39,6 +50,14 @@ import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
 import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRulePointValue;
+import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 
@@ -76,6 +95,19 @@ public class TestRules extends JRule {
     public static final String ITEM_GET_MEMBERS_OF_GROUP_SWITCH = "Get_Members_Of_Group_Switch";
     public static final String NAME_GET_MEMBERS_OF_GROUP = "get members of group";
     public static final String NAME_GET_MEMBERS_OF_NUMBER_GROUP = "get members of number group";
+    public static final String ITEM_CAST_ALL_TYPES_SWITCH = "Cast_All_Types_Switch";
+    public static final String NAME_CAST_ALL_TYPES = "cast all types";
+    public static final String ITEM_SWITCH_TO_CAST = "Switch_To_Cast";
+    public static final String ITEM_NUMBER_TO_CAST = "Number_To_Cast";
+    public static final String ITEM_DIMMER_TO_CAST = "Dimmer_To_Cast";
+    public static final String ITEM_COLOR_TO_CAST = "Color_To_Cast";
+    public static final String ITEM_STRING_TO_CAST = "String_To_Cast";
+    public static final String ITEM_DATETIME_TO_CAST = "DateTime_To_Cast";
+    public static final String ITEM_PLAYER_TO_CAST = "Player_To_Cast";
+    public static final String ITEM_CONTACT_TO_CAST = "Contact_To_Cast";
+    public static final String ITEM_IMAGE_TO_CAST = "Image_To_Cast";
+    public static final String ITEM_ROLLERSHUTTER_TO_CAST = "Rollershutter_To_Cast";
+    public static final String ITEM_LOCATION_TO_CAST = "Location_To_Cast";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -194,12 +226,166 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem<? extends JRuleValue>> members = JRuleNumberGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        Set<JRuleItem<? extends JRuleValue>> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
         logInfo("contains members: {}", members.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
+    }
+
+    @JRuleName(NAME_CAST_ALL_TYPES)
+    @JRuleWhenItemReceivedCommand(item = ITEM_CAST_ALL_TYPES_SWITCH)
+    public void castAllTypes(JRuleItemEvent event) throws JRuleExecutionException {
+        castSwitch();
+        castNumber();
+        castString();
+        castDateTime();
+        castPlayer();
+        castContact();
+
+        // TODO: strange error in OH when using this
+        // castImage();
+        castRollershutter();
+        castDimmer();
+        castColor();
+        castLocation();
+    }
+
+    private static void castLocation() {
+        JRuleLocationItem locationItem = JRuleLocationItem.forName(ITEM_LOCATION_TO_CAST);
+
+        locationItem.sendCommand(new JRulePointValue(37.33D, 11.12D));
+        assert locationItem.getState().getLatitude().doubleValue() == 37.33D;
+        assert locationItem.getState().getLongitude().doubleValue() == 11.12D;
+
+        locationItem.sendCommand(new JRulePointValue(78.78D, 55.66D));
+        assert locationItem.getState().getLatitude().doubleValue() == 78.78D;
+        assert locationItem.getState().getLongitude().doubleValue() == 55.66D;
+    }
+
+    private static void castRollershutter() {
+        JRuleRollershutterItem rollershutterItem = JRuleRollershutterItem.forName(ITEM_ROLLERSHUTTER_TO_CAST);
+
+        rollershutterItem.sendCommand(17);
+        assert rollershutterItem.getState().getValueAsDouble() == 17;
+        assert rollershutterItem.getStateAs(JRulePercentValue.class).getValueAsDouble() == 17;
+        assert rollershutterItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+
+        rollershutterItem.sendCommand(0);
+        assert rollershutterItem.getState().getValueAsDouble() == 0;
+        assert rollershutterItem.getStateAs(JRulePercentValue.class).getValueAsDouble() == 0;
+        assert rollershutterItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+    }
+
+    private static void castImage() {
+        JRuleImageItem imageItem = JRuleImageItem.forName(ITEM_IMAGE_TO_CAST);
+
+        imageItem.sendCommand(new JRuleRawValue("jpg", new byte[16]));
+        assert imageItem.getState().getMimeType().equals("jpg");
+        assert Arrays.equals(imageItem.getState().getData(), new byte[16]);
+
+        imageItem.sendCommand(new JRuleRawValue("png", new byte[8]));
+        assert imageItem.getState().getMimeType().equals("png");
+        assert Arrays.equals(imageItem.getState().getData(), new byte[8]);
+    }
+
+    private static void castContact() {
+        JRuleContactItem contactItem = JRuleContactItem.forName(ITEM_CONTACT_TO_CAST);
+
+        contactItem.sendCommand(JRuleOpenClosedValue.OPEN);
+        assert contactItem.getState() == JRuleOpenClosedValue.OPEN;
+        assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+
+        contactItem.sendCommand(JRuleOpenClosedValue.CLOSED);
+        assert contactItem.getState() == JRuleOpenClosedValue.CLOSED;
+        assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+    }
+
+    private static void castPlayer() {
+        JRulePlayerItem playerItem = JRulePlayerItem.forName(ITEM_PLAYER_TO_CAST);
+
+        playerItem.sendCommand(JRulePlayPauseValue.PLAY);
+        assert playerItem.getState() == JRulePlayPauseValue.PLAY;
+        assert playerItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+
+        playerItem.sendCommand(JRulePlayPauseValue.PAUSE);
+        assert playerItem.getState() == JRulePlayPauseValue.PAUSE;
+        assert playerItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+    }
+
+    private static void castDateTime() {
+        JRuleDateTimeItem dateTimeItem = JRuleDateTimeItem.forName(ITEM_DATETIME_TO_CAST);
+
+        ZonedDateTime date = ZonedDateTime.of(2021, 12, 22, 12, 17, 10, 0, ZoneId.systemDefault());
+        dateTimeItem.sendCommand(date);
+        assert dateTimeItem.getState().getValue().equals(date);
+
+        ZonedDateTime date2 = ZonedDateTime.of(2050, 12, 22, 12, 17, 10, 0, ZoneId.systemDefault());
+        dateTimeItem.sendCommand(date2);
+        assert dateTimeItem.getState().getValue().equals(date2);
+    }
+
+    private static void castString() {
+        JRuleStringItem stringItem = JRuleStringItem.forName(ITEM_STRING_TO_CAST);
+
+        stringItem.sendCommand("abc");
+        assert stringItem.getState().getValue().equals("abc");
+
+        stringItem.sendCommand("xyz");
+        assert stringItem.getState().getValue().equals("xyz");
+    }
+
+    private static void castColor() {
+        JRuleColorItem colorItem = JRuleColorItem.forName(ITEM_COLOR_TO_CAST);
+
+        colorItem.sendCommand(new JRuleHsbValue(22, 17, 99));
+        assert colorItem.getState().getHue().intValue() == 22;
+        assert colorItem.getState().getSaturation().intValue() == 17;
+        assert colorItem.getState().getBrightness().intValue() == 99;
+        assert colorItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+
+        colorItem.sendCommand(new JRuleHsbValue(56, 77, 0));
+        assert colorItem.getState().getHue().intValue() == 56;
+        assert colorItem.getState().getSaturation().intValue() == 77;
+        assert colorItem.getState().getBrightness().intValue() == 0;
+        assert colorItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+    }
+
+    private static void castDimmer() {
+        JRuleDimmerItem numberItem = JRuleDimmerItem.forName(ITEM_DIMMER_TO_CAST);
+
+        numberItem.sendCommand(0);
+        assert numberItem.getState().getValueAsDouble() == 0;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        numberItem.sendCommand(22);
+        assert numberItem.getState().getValueAsDouble() == 22;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+    }
+
+    private static void castNumber() {
+        JRuleNumberItem numberItem = JRuleNumberItem.forName(ITEM_NUMBER_TO_CAST);
+
+        numberItem.sendCommand(0);
+        assert numberItem.getState().getValueAsDouble() == 0;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        numberItem.sendCommand(22);
+        assert numberItem.getState().getValueAsDouble() == 22;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+    }
+
+    private static void castSwitch() {
+        JRuleSwitchItem switchItem = JRuleSwitchItem.forName(ITEM_SWITCH_TO_CAST);
+
+        switchItem.sendCommand(JRuleOnOffValue.ON);
+        assert switchItem.getState() == JRuleOnOffValue.ON;
+        assert switchItem.getStateAs(JRuleDecimalValue.class).getValueAsDouble() == 100D;
+
+        switchItem.sendCommand(JRuleOnOffValue.OFF);
+        assert switchItem.getState() == JRuleOnOffValue.OFF;
+        assert switchItem.getStateAs(JRuleDecimalValue.class).getValueAsDouble() == 0D;
     }
 
     private static void invokeAction(String fieldName, String methodName, Object... args) throws ClassNotFoundException,

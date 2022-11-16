@@ -12,9 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.items.JRuleImageItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
@@ -26,9 +24,5 @@ public class JRuleInternalImageItem extends JRuleInternalItem<JRuleRawValue> imp
 
     public JRuleInternalImageItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public static JRuleInternalImageItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalImageItem.class);
     }
 }

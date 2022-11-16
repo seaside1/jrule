@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleStringValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRuleStringValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRuleStringValue value = new JRuleStringValue("hallo");
+        String string = value.asStringValue();
+        JRuleStringValue fromString = new JRuleStringValue(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

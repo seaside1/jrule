@@ -12,13 +12,23 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.math.BigDecimal;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRulePointValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRulePointValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRulePointValue value = new JRulePointValue(new BigDecimal("23.12"), new BigDecimal("37.56"));
+        String string = value.asStringValue();
+        JRulePointValue fromString = new JRulePointValue(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

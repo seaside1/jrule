@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRulePlayPauseValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRulePlayPauseValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRulePlayPauseValue value = JRulePlayPauseValue.PLAY;
+        String string = value.asStringValue();
+        JRulePlayPauseValue fromString = JRulePlayPauseValue.getValueFromString(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

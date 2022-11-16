@@ -14,10 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import java.util.Set;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleContactGroupItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
@@ -31,17 +29,13 @@ public class JRuleInternalContactGroupItem extends JRuleInternalContactItem impl
         super(name, label, type, id);
     }
 
-    public static JRuleInternalContactGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalContactGroupItem.class);
-    }
-
     public void sendCommand(JRuleOpenClosedValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
     }
 
     public void postUpdate(JRuleOpenClosedValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 }

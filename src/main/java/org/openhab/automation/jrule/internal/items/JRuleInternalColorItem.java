@@ -14,7 +14,6 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleColorItem;
-import org.openhab.automation.jrule.rules.value.JRuleColorValue;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -31,35 +30,23 @@ public class JRuleInternalColorItem extends JRuleInternalItem<JRuleHsbValue> imp
         super(name, label, type, id);
     }
 
-    public JRuleOnOffValue getOnOffState() {
-        return JRuleEventHandler.get().getOnOffValue(name);
-    }
-
-    public int getPercentState() {
-        return JRuleEventHandler.get().getStateFromItemAsInt(name);
-    }
-
     public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
-    public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(value));
-    }
-
-    public void postUpdate(JRuleColorValue colorValue) {
-        JRuleEventHandler.get().postUpdate(name, colorValue);
+    public void postUpdate(JRuleHsbValue value) {
+        JRuleEventHandler.get().postUpdate(name, value.asStringValue());
     }
 
     public void postUpdate(JRuleOnOffValue state) {
-        JRuleEventHandler.get().postUpdate(name, state);
+        JRuleEventHandler.get().postUpdate(name, state.asStringValue());
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
+        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value).asStringValue());
     }
 }

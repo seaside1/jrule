@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.rules.value;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -23,10 +24,6 @@ import java.util.stream.Collectors;
  * @author Robert Delbrück - Initial contribution
  */
 public class JRulePointValue implements JRuleValue {
-    private static final BigDecimal CIRCLE = new BigDecimal(360);
-    private static final BigDecimal FLAT = new BigDecimal(180);
-    private static final BigDecimal RIGHT = new BigDecimal(90);
-
     private final BigDecimal latitude;
     private final BigDecimal longitude;
     private final BigDecimal altitude;
@@ -35,6 +32,12 @@ public class JRulePointValue implements JRuleValue {
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;
+    }
+
+    public JRulePointValue(BigDecimal latitude, BigDecimal longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = null;
     }
 
     public JRulePointValue(String value) {
@@ -49,6 +52,18 @@ public class JRulePointValue implements JRuleValue {
         }
     }
 
+    public JRulePointValue(double latitude, double longitude) {
+        this.latitude = new BigDecimal(latitude);
+        this.longitude = new BigDecimal(longitude);
+        this.altitude = null;
+    }
+
+    public JRulePointValue(double latitude, double longitude, double altitude) {
+        this.latitude = new BigDecimal(latitude);
+        this.longitude = new BigDecimal(longitude);
+        this.altitude = new BigDecimal(altitude);
+    }
+
     public BigDecimal getLatitude() {
         return latitude;
     }
@@ -59,5 +74,31 @@ public class JRulePointValue implements JRuleValue {
 
     public BigDecimal getAltitude() {
         return altitude;
+    }
+
+    @Override
+    public String asStringValue() {
+        StringBuilder buffer = new StringBuilder().append(this.latitude.floatValue()).append(",")
+                .append(this.longitude.floatValue());
+        if (this.altitude != null) {
+            buffer.append(",").append(this.altitude.floatValue());
+        }
+        return buffer.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRulePointValue that = (JRulePointValue) o;
+        return latitude.equals(that.latitude) && longitude.equals(that.longitude)
+                && Objects.equals(altitude, that.altitude);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(latitude, longitude, altitude);
     }
 }

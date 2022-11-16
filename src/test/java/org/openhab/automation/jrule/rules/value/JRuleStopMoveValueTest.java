@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleStopMoveValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRuleStopMoveValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRuleStopMoveValue value = JRuleStopMoveValue.MOVE;
+        String string = value.asStringValue();
+        JRuleStopMoveValue fromString = JRuleStopMoveValue.getValueFromString(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

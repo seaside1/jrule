@@ -31,4 +31,9 @@ public enum JRuleUpDownValue implements JRuleValue {
         }
         return UNDEF;
     }
+
+    @Override
+    public String asStringValue() {
+        return name();
+    }
 }

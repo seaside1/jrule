@@ -20,5 +20,20 @@ package org.openhab.automation.jrule.rules.value;
 public enum JRulePlayPauseValue implements JRuleValue {
     PLAY,
     PAUSE,
-    UNDEF
+    UNDEF;
+
+    public static JRulePlayPauseValue getValueFromString(String value) {
+        if (value.equals(PLAY.name())) {
+            return PLAY;
+        }
+        if (value.equals(PAUSE.name())) {
+            return PAUSE;
+        }
+        return UNDEF;
+    }
+
+    @Override
+    public String asStringValue() {
+        return name();
+    }
 }

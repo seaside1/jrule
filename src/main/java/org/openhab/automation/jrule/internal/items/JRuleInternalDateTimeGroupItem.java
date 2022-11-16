@@ -15,10 +15,9 @@ package org.openhab.automation.jrule.internal.items;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDateTimeGroupItem;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 
 /**
  * The {@link JRuleInternalDateTimeGroupItem} Items
@@ -31,17 +30,15 @@ public class JRuleInternalDateTimeGroupItem extends JRuleInternalDateTimeItem im
         super(name, label, type, id);
     }
 
-    public static JRuleInternalDateTimeGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalDateTimeGroupItem.class);
-    }
-
     public void sendCommand(ZonedDateTime value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDateTimeValue(value).asStringValue()));
     }
 
     public void postUpdate(ZonedDateTime value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDateTimeValue(value).asStringValue()));
     }
 }

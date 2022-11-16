@@ -14,12 +14,9 @@ package org.openhab.automation.jrule.internal.items;
 
 import java.util.Set;
 
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 
 /**
  * The {@link JRuleInternalColorGroupItem} Items
@@ -28,34 +25,31 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implements JRuleNumberGroupItem {
 
-    private static final String LOG_NAME = "JRuleGroupNumberItem";
-    private static final Logger logger = LoggerFactory.getLogger(JRuleInternalNumberGroupItem.class);
-
     public JRuleInternalNumberGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 
-    public static JRuleInternalNumberGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalNumberGroupItem.class);
-    }
-
     public void sendCommand(double value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void postUpdate(double value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void sendCommand(int value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void postUpdate(int value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDecimalValue(value).asStringValue()));
     }
 }

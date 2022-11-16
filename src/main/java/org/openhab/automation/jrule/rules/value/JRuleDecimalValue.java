@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * The {@link JRuleDecimalValue}
@@ -42,11 +43,35 @@ public class JRuleDecimalValue implements JRuleValue {
         }
     }
 
-    public JRuleDecimalValue(int value) {
+    public JRuleDecimalValue(double value) {
         this.value = new BigDecimal(value);
     }
 
     public BigDecimal getValue() {
         return value;
+    }
+
+    @Override
+    public String asStringValue() {
+        return this.value.toPlainString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleDecimalValue that = (JRuleDecimalValue) o;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    public double getValueAsDouble() {
+        return this.value.doubleValue();
     }
 }

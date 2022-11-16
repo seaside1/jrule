@@ -37,4 +37,9 @@ public enum JRuleOnOffValue implements JRuleValue {
     public String toString() {
         return name();
     }
+
+    @Override
+    public String asStringValue() {
+        return name();
+    }
 }

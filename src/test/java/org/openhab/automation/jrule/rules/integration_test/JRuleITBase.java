@@ -363,7 +363,7 @@ public abstract class JRuleITBase {
         } catch (InterruptedException e) {
             // no problem here
         }
-        Assertions.assertTrue(notContainsLine(toMethodCallLogEntry("ERROR"), logLines));
+        Assertions.assertTrue(notContainsLine("ERROR", logLines));
     }
 
     private static String toMethodCallLogEntry(String ruleLogLine) {

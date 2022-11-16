@@ -12,13 +12,23 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.time.ZonedDateTime;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleDateTimeValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRuleDateTimeValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRuleDateTimeValue value = new JRuleDateTimeValue(ZonedDateTime.now());
+        String string = value.asStringValue();
+        JRuleDateTimeValue fromString = new JRuleDateTimeValue(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }

@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.util.Objects;
+
 /**
  * The {@link JRuleStringValue} JRule Command
  *
@@ -30,5 +32,25 @@ public class JRuleStringValue implements JRuleValue {
 
     public static JRuleStringValue getValueFromString(String value) {
         return new JRuleStringValue(value);
+    }
+
+    @Override
+    public String asStringValue() {
+        return this.value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleStringValue that = (JRuleStringValue) o;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

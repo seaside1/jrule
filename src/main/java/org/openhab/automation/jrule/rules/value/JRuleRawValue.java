@@ -12,7 +12,9 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Objects;
 
 /**
  * The {@link JRuleRawValue} JRule Command
@@ -50,5 +52,27 @@ public class JRuleRawValue implements JRuleValue {
 
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public String asStringValue() {
+        return String.format("data:%s;base64,%s", this.mimeType, Base64.getEncoder().encodeToString(this.data));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleRawValue that = (JRuleRawValue) o;
+        return mimeType.equals(that.mimeType) && Arrays.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(mimeType);
+        result = 31 * result + Arrays.hashCode(data);
+        return result;
     }
 }

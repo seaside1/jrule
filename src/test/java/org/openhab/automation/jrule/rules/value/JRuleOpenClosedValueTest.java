@@ -12,13 +12,21 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * The {@link JRuleValue} JRule Command
+ * The {@link JRuleOpenClosedValueTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleValue {
-    String toString();
+class JRuleOpenClosedValueTest {
 
-    String asStringValue();
+    @Test
+    void asStringValue() {
+        JRuleOpenClosedValue value = JRuleOpenClosedValue.CLOSED;
+        String string = value.asStringValue();
+        JRuleOpenClosedValue fromString = JRuleOpenClosedValue.getValueFromString(string);
+        Assertions.assertEquals(value, fromString);
+    }
 }
