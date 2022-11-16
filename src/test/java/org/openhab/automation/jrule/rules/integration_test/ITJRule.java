@@ -65,12 +65,13 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
-    public void preconditionExecution() throws IOException {
+    public void preconditionExecution() throws IOException, InterruptedException {
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, "will not match");
         sendCommand(TestRules.ITEM_PRECONDITIONED_SWITCH, JRuleSwitchItem.ON);
         verifyRuleWasNotExecuted(TestRules.NAME_PRECONDITION_EXECUTION);
 
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, "that matches");
+        Thread.sleep(500);
         sendCommand(TestRules.ITEM_PRECONDITIONED_SWITCH, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_PRECONDITION_EXECUTION);
     }
