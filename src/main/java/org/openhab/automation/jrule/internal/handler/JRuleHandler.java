@@ -46,7 +46,7 @@ import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.watch.JRuleRulesWatcher;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
-import org.openhab.automation.jrule.items.JRuleItemNameEnumGenerator;
+import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.things.JRuleThingClassGenerator;
 import org.openhab.automation.jrule.things.JRuleThingRegistry;
@@ -98,7 +98,7 @@ public class JRuleHandler implements PropertyChangeListener {
     private JRuleRulesWatcher directoryWatcher;
 
     private final JRuleItemClassGenerator itemGenerator;
-    private final JRuleItemNameEnumGenerator itemNameGenerator;
+    private final JRuleItemNameClassGenerator itemNameGenerator;
 
     private JRuleThingClassGenerator thingGenerator;
     private final JRuleActionClassGenerator actionGenerator;
@@ -125,7 +125,7 @@ public class JRuleHandler implements PropertyChangeListener {
         this.delayedItemsCompiler = new JRuleDelayedDebouncingExecutor(config.getItemsRecompilationDelaySeconds(),
                 TimeUnit.SECONDS);
         itemGenerator = new JRuleItemClassGenerator(config);
-        itemNameGenerator = new JRuleItemNameEnumGenerator(config);
+        itemNameGenerator = new JRuleItemNameClassGenerator(config);
         thingGenerator = new JRuleThingClassGenerator(config);
         actionGenerator = new JRuleActionClassGenerator(config);
         compiler = new JRuleCompiler(config);

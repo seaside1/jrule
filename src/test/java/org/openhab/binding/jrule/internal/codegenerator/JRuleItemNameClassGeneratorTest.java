@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
-import org.openhab.automation.jrule.items.JRuleItemNameEnumGenerator;
+import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -70,7 +70,7 @@ import org.openhab.core.types.State;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JRuleItemNameClassGeneratorTest {
 
-    private JRuleItemNameEnumGenerator sourceFileGenerator;
+    private JRuleItemNameClassGenerator sourceFileGenerator;
     private File targetFolder;
     private JRuleCompiler compiler;
 
@@ -82,7 +82,7 @@ public class JRuleItemNameClassGeneratorTest {
         Map<String, Object> map = new HashMap<>();
         map.put("org.openhab.automation.jrule.directory", "target");
         JRuleConfig config = new JRuleConfig(map);
-        sourceFileGenerator = new JRuleItemNameEnumGenerator(config);
+        sourceFileGenerator = new JRuleItemNameClassGenerator(config);
         compiler = new JRuleCompiler(config);
     }
 

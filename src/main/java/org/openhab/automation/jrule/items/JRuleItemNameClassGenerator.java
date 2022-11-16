@@ -32,19 +32,19 @@ import org.slf4j.LoggerFactory;
 import freemarker.template.Template;
 
 /**
- * The {@link JRuleItemNameEnumGenerator} Class Generator
+ * The {@link JRuleItemNameClassGenerator} Class Generator
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleItemNameEnumGenerator extends JRuleAbstractClassGenerator {
+public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
 
     private static final String TEMPLATE_SUFFIX = ".ftlh";
 
     protected static final String LOG_NAME_CLASS_GENERATOR = "JRuleItemNameEnumGen";
 
-    private final Logger logger = LoggerFactory.getLogger(JRuleItemNameEnumGenerator.class);
+    private final Logger logger = LoggerFactory.getLogger(JRuleItemNameClassGenerator.class);
 
-    public JRuleItemNameEnumGenerator(JRuleConfig jRuleConfig) {
+    public JRuleItemNameClassGenerator(JRuleConfig jRuleConfig) {
         super(jRuleConfig);
     }
 
