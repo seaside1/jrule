@@ -268,13 +268,13 @@ public class TestRules extends JRule {
         JRuleRollershutterItem rollershutterItem = JRuleRollershutterItem.forName(ITEM_ROLLERSHUTTER_TO_CAST);
 
         rollershutterItem.sendCommand(17);
-        assert rollershutterItem.getState().getValueAsDouble() == 17;
-        assert rollershutterItem.getStateAs(JRulePercentValue.class).getValueAsDouble() == 17;
+        assert rollershutterItem.getState().doubleValue() == 17;
+        assert rollershutterItem.getStateAs(JRulePercentValue.class).doubleValue() == 17;
         assert rollershutterItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
 
         rollershutterItem.sendCommand(0);
-        assert rollershutterItem.getState().getValueAsDouble() == 0;
-        assert rollershutterItem.getStateAs(JRulePercentValue.class).getValueAsDouble() == 0;
+        assert rollershutterItem.getState().doubleValue() == 0;
+        assert rollershutterItem.getStateAs(JRulePercentValue.class).doubleValue() == 0;
         assert rollershutterItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
     }
 
@@ -330,9 +330,11 @@ public class TestRules extends JRule {
         JRuleStringItem stringItem = JRuleStringItem.forName(ITEM_STRING_TO_CAST);
 
         stringItem.sendCommand("abc");
+        assert stringItem.getState().stringValue().equals("abc");
         assert stringItem.getState().getValue().equals("abc");
 
         stringItem.sendCommand("xyz");
+        assert stringItem.getState().stringValue().equals("xyz");
         assert stringItem.getState().getValue().equals("xyz");
     }
 
@@ -356,11 +358,11 @@ public class TestRules extends JRule {
         JRuleDimmerItem numberItem = JRuleDimmerItem.forName(ITEM_DIMMER_TO_CAST);
 
         numberItem.sendCommand(0);
-        assert numberItem.getState().getValueAsDouble() == 0;
+        assert numberItem.getState().doubleValue() == 0;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
 
         numberItem.sendCommand(22);
-        assert numberItem.getState().getValueAsDouble() == 22;
+        assert numberItem.getState().doubleValue() == 22;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
@@ -368,11 +370,15 @@ public class TestRules extends JRule {
         JRuleNumberItem numberItem = JRuleNumberItem.forName(ITEM_NUMBER_TO_CAST);
 
         numberItem.sendCommand(0);
-        assert numberItem.getState().getValueAsDouble() == 0;
+        assert numberItem.getState().doubleValue() == 0;
+        assert numberItem.getState().intValue() == 0;
+        assert numberItem.getState().floatValue() == 0;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
 
         numberItem.sendCommand(22);
-        assert numberItem.getState().getValueAsDouble() == 22;
+        assert numberItem.getState().doubleValue() == 22;
+        assert numberItem.getState().intValue() == 22;
+        assert numberItem.getState().floatValue() == 22;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
@@ -381,11 +387,11 @@ public class TestRules extends JRule {
 
         switchItem.sendCommand(JRuleOnOffValue.ON);
         assert switchItem.getState() == JRuleOnOffValue.ON;
-        assert switchItem.getStateAs(JRuleDecimalValue.class).getValueAsDouble() == 100D;
+        assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 100D;
 
         switchItem.sendCommand(JRuleOnOffValue.OFF);
         assert switchItem.getState() == JRuleOnOffValue.OFF;
-        assert switchItem.getStateAs(JRuleDecimalValue.class).getValueAsDouble() == 0D;
+        assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 0D;
     }
 
     private static void invokeAction(String fieldName, String methodName, Object... args) throws ClassNotFoundException,

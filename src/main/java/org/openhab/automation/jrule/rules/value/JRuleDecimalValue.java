@@ -71,7 +71,15 @@ public class JRuleDecimalValue implements JRuleValue {
         return Objects.hash(value);
     }
 
-    public double getValueAsDouble() {
+    public double doubleValue() {
         return this.value.doubleValue();
+    }
+
+    public float floatValue() {
+        return this.value.floatValue();
+    }
+
+    public int intValue() {
+        return this.value.intValue();
     }
 }

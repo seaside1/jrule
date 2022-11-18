@@ -53,4 +53,8 @@ public class JRuleStringValue implements JRuleValue {
     public int hashCode() {
         return Objects.hash(value);
     }
+
+    public String stringValue() {
+        return this.value;
+    }
 }
