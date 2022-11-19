@@ -31,11 +31,11 @@ public class JRuleInternalColorItem extends JRuleInternalItem<JRuleHsbValue> imp
     }
 
     public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
+        JRuleEventHandler.get().sendCommand(name, command);
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
+        JRuleEventHandler.get().sendCommand(name, command);
     }
 
     public void postUpdate(JRuleHsbValue value) {

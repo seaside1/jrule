@@ -31,8 +31,7 @@ public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implem
 
     public void sendCommand(double value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames
-                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value).asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value)));
     }
 
     public void postUpdate(double value) {
@@ -43,8 +42,7 @@ public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implem
 
     public void sendCommand(int value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames
-                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value).asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value)));
     }
 
     public void postUpdate(int value) {

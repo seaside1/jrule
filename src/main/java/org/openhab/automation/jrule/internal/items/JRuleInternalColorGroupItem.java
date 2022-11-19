@@ -34,12 +34,12 @@ public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implemen
 
     public void sendCommand(JRuleHsbValue colorValue) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, colorValue.asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, colorValue));
     }
 
     public void sendCommand(JRuleOnOffValue command) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command.asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command));
     }
 
     public void postUpdate(JRuleOnOffValue state) {
@@ -49,13 +49,12 @@ public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implemen
 
     public void sendCommand(JRuleIncreaseDecreaseValue command) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command.asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command));
     }
 
     public void sendCommand(int value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames
-                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value).asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value)));
     }
 
     public void postUpdate(JRuleHsbValue colorValue) {

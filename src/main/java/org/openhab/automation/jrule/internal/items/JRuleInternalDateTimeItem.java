@@ -31,11 +31,11 @@ public class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleDateTimeVa
     }
 
     public void sendCommand(Date date) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(date).asStringValue());
+        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(date));
     }
 
     public void sendCommand(ZonedDateTime value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(value).asStringValue());
+        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(value));
     }
 
     public void postUpdate(Date date) {

@@ -38,6 +38,7 @@ import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,19 +257,19 @@ public class JRule {
     }
 
     protected void sendCommand(String itemName, JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command.asStringValue());
-    }
-
-    protected void sendCommand(String itemName, JRulePercentValue percentTypeCommand) {
-        JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand.asStringValue());
-    }
-
-    protected void sendCommand(String itemName, String command) {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
+    protected void sendCommand(String itemName, JRulePercentValue percentTypeCommand) {
+        JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand);
+    }
+
+    protected void sendCommand(String itemName, String command) {
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleStringValue(command));
+    }
+
     protected void sendCommand(String itemName, double value) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value).asStringValue());
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value));
     }
 
     protected void sendCommand(String itemName, double value, String unit) {
@@ -276,11 +277,11 @@ public class JRule {
     }
 
     protected void sendCommand(String itemName, int value) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value).asStringValue());
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value));
     }
 
     protected void sendCommand(String itemName, Date date) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRuleDateTimeValue(date).asStringValue());
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDateTimeValue(date));
     }
 
     protected void postUpdate(String itemName, Date date) {

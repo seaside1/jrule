@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,24 +74,31 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleEventHandler {
     private static final Map<Class<? extends JRuleValue>, Class<? extends State>> stateMapping = new HashMap<>();
+    private static final Map<Class<? extends JRuleValue>, Class<? extends Command>> commandMapping = new HashMap<>();
 
     static {
-        // stateMapping.put(JRuleStringValue.class, QuantityType.class);
         stateMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
         stateMapping.put(JRuleStringValue.class, StringType.class);
-        // stateMapping.put(JRuleStringValue.class, UnDefType.class);
         stateMapping.put(JRuleUpDownValue.class, UpDownType.class);
         stateMapping.put(JRuleOnOffValue.class, OnOffType.class);
         stateMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
         stateMapping.put(JRuleRawValue.class, RawType.class);
-        // stateMapping.put(JRuleRe.class, RewindFastforwardType.class);
         stateMapping.put(JRulePointValue.class, PointType.class);
         stateMapping.put(JRuleHsbValue.class, HSBType.class);
-        // stateMapping.put(JRuleStL.class, StringListType.class);
         stateMapping.put(JRuleDecimalValue.class, DecimalType.class);
         stateMapping.put(JRulePercentValue.class, PercentType.class);
         stateMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
-        // stateMapping.put(JRuleColorValue.class, HSBType.class);
+
+        commandMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
+        commandMapping.put(JRuleStringValue.class, StringType.class);
+        commandMapping.put(JRuleUpDownValue.class, UpDownType.class);
+        commandMapping.put(JRuleOnOffValue.class, OnOffType.class);
+        commandMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
+        commandMapping.put(JRulePointValue.class, PointType.class);
+        commandMapping.put(JRuleHsbValue.class, HSBType.class);
+        commandMapping.put(JRuleDecimalValue.class, DecimalType.class);
+        commandMapping.put(JRulePercentValue.class, PercentType.class);
+        commandMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
     }
 
     private static final String LOG_NAME_EVENT = "JRuleEvent";
@@ -121,8 +129,20 @@ public class JRuleEventHandler {
         this.eventPublisher = eventPublisher;
     }
 
-    public void sendCommand(String itemName, String command) {
-        sendCommand(itemName, new StringType(command));
+    public void sendCommand(String itemName, JRuleValue command) {
+        Class<? extends Command> ohType = commandMapping.get(command.getClass());
+        final Command target;
+        if (command.getClass().isEnum()) {
+            target = (Command) Enum.valueOf((Class<Enum>) ohType, command.asStringValue());
+        } else {
+            try {
+                target = ohType.getConstructor(String.class).newInstance(command.asStringValue());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                    | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        sendCommand(itemName, target);
     }
 
     public void sendCommand(String itemName, double value, String unit) {
