@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.internal.handler;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -134,9 +133,7 @@ public class JRuleEventHandler {
         Class<? extends Command> ohType = commandMapping.get(command.getClass());
         final Command target;
         if (command.getClass().isEnum()) {
-            target = Arrays.stream(ohType.getEnumConstants())
-                    .filter(aValue -> aValue.toString().equals(command.asStringValue())).findFirst().orElseThrow(
-                            () -> new IllegalStateException("cannot find enum value for: " + command.asStringValue()));
+            target = (Command) Enum.valueOf((Class<Enum>) ohType, command.asStringValue());
         } else {
             try {
                 target = ohType.getConstructor(String.class).newInstance(command.asStringValue());
