@@ -30,12 +30,12 @@ public class JRuleInternalPlayerGroupItem extends JRuleInternalPlayerItem implem
     }
 
     public void sendCommand(JRulePlayPauseValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 
     public void postUpdate(JRulePlayPauseValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 }

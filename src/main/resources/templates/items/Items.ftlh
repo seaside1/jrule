@@ -20,17 +20,22 @@ public class JRuleItems {
 
 
 <#list items as item>
- public static final ${item.interfaceClass} ${item.name};
+ public static ${item.interfaceClass} ${item.name};
 
 </#list>
 
  static {
+   loadItems();
+ }
 
-   <#list items as item>
-    ${item.name} = JRuleItemRegistry.get("${item.name}", ${item.internalClass}.class);
+  /**
+  * Need this method for testing
+  */
+ private static void loadItems() {
+    <#list items as item>
+     ${item.name} = JRuleItemRegistry.get("${item.name}", ${item.internalClass}.class);
 
-   </#list>
-
+    </#list>
  }
 
 }

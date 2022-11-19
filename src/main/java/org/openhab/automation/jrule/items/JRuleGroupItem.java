@@ -23,12 +23,17 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRuleGroupItem<T extends JRuleValue> extends JRuleItem<T> {
+    @Deprecated
     default Set<String> members() {
-        return JRuleEventHandler.get().getGroupMemberNames(getName());
+        return JRuleEventHandler.get().getGroupMemberNames(getName(), false);
     }
 
     default Set<JRuleItem<? extends JRuleValue>> memberItems() {
-        return JRuleEventHandler.get().getGroupMemberItems(getName());
+        return memberItems(false);
+    }
+
+    default Set<JRuleItem<? extends JRuleValue>> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive);
     }
 
     default void sendCommand(String value) {
@@ -45,5 +50,10 @@ public interface JRuleGroupItem<T extends JRuleValue> extends JRuleItem<T> {
 
     default void postUpdate(T value) {
         members().forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
+    }
+
+    @Override
+    default boolean isGroup() {
+        return true;
     }
 }

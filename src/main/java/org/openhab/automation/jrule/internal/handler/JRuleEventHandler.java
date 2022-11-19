@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.handler;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -176,17 +177,28 @@ public class JRuleEventHandler {
         this.itemRegistry = itemRegistry;
     }
 
-    public Set<String> getGroupMemberNames(String groupName) {
-        return getGroupMemberItems(groupName).stream().map(JRuleItem::getName).collect(Collectors.toSet());
+    public Set<String> getGroupMemberNames(String groupName, boolean recursive) {
+        return getGroupMemberItems(groupName, recursive).stream().map(JRuleItem::getName).collect(Collectors.toSet());
     }
 
-    public Set<JRuleItem<? extends JRuleValue>> getGroupMemberItems(String groupName) {
+    public Set<JRuleItem<? extends JRuleValue>> getGroupMemberItems(String groupName, boolean recursive) {
         try {
             Item item = itemRegistry.getItem(groupName);
             if (item instanceof GroupItem) {
+                Set<JRuleItem<? extends JRuleValue>> out = new HashSet<>();
                 GroupItem g = (GroupItem) item;
-                return g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
-                        .collect(Collectors.toSet());
+                g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
+                        .forEach(jRuleValueJRuleItem -> {
+                            if (recursive) {
+                                out.add(jRuleValueJRuleItem);
+                                if (jRuleValueJRuleItem.isGroup()) {
+                                    out.addAll(getGroupMemberItems(jRuleValueJRuleItem.getName(), recursive));
+                                }
+                            } else {
+                                out.add(jRuleValueJRuleItem);
+                            }
+                        });
+                return out;
             } else {
                 throw new JRuleRuntimeException(String.format("Given itemname '%s' is not a groupitem", groupName));
             }

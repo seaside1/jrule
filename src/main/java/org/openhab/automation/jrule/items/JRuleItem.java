@@ -90,4 +90,8 @@ public interface JRuleItem<T extends JRuleValue> {
     }
 
     Optional<T> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
+
+    default boolean isGroup() {
+        return false;
+    }
 }

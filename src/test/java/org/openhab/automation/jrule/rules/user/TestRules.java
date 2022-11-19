@@ -30,6 +30,7 @@ import org.openhab.automation.jrule.items.JRuleDimmerItem;
 import org.openhab.automation.jrule.items.JRuleImageItem;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleLocationItem;
+import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRulePlayerItem;
 import org.openhab.automation.jrule.items.JRuleRollershutterItem;
@@ -108,6 +109,7 @@ public class TestRules extends JRule {
     public static final String ITEM_IMAGE_TO_CAST = "Image_To_Cast";
     public static final String ITEM_ROLLERSHUTTER_TO_CAST = "Rollershutter_To_Cast";
     public static final String ITEM_LOCATION_TO_CAST = "Location_To_Cast";
+    private static final String ITEM_NUMBER_GROUP = "Number_Group";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -226,11 +228,26 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem<? extends JRuleValue>> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        Set<JRuleItem<? extends JRuleValue>> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
         logInfo("contains members: {}", members.stream()
+                .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
+
+        Set<JRuleItem<? extends JRuleValue>> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP)
+                .memberItems(true);
+        if (recursiveMembers.size() != 4) {
+            throw new JRuleExecutionException("expected 4 childs");
+        }
+
+        Set<JRuleItem<? extends JRuleValue>> recursiveNonGroupMembers = recursiveMembers.stream()
+                .filter(jRuleItem -> !jRuleItem.isGroup()).collect(Collectors.toSet());
+        if (recursiveNonGroupMembers.size() != 3) {
+            throw new JRuleExecutionException("expected 3 childs");
+        }
+
+        logInfo("contains recursive members: {}", recursiveMembers.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
     }
 

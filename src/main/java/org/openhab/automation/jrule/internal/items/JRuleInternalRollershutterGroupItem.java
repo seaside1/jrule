@@ -33,41 +33,41 @@ public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershut
     }
 
     public void sendCommand(double value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames
                 .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void postUpdate(double value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames
                 .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void sendCommand(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames
                 .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void postUpdate(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames
                 .forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDecimalValue(value).asStringValue()));
     }
 
     public void sendCommand(JRuleUpDownValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
     }
 
     public void postUpdate(JRuleUpDownValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
     }
 
     public void sendCommand(JRuleStopMoveValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name);
+        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
     }
 }
