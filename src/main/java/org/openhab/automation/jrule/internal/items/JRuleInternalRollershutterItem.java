@@ -31,15 +31,15 @@ public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePerce
     }
 
     public void sendCommand(JRuleUpDownValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
     public void sendCommand(JRuleStopMoveValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
+        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(value));
+        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(value).asStringValue());
     }
 
     public void postUpdate(JRuleUpDownValue state) {

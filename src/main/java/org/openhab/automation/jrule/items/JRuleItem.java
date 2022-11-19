@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -53,7 +52,7 @@ public interface JRuleItem<T extends JRuleValue> {
     }
 
     default void sendCommand(T command) {
-        JRuleEventHandler.get().sendCommand(getName(), command);
+        JRuleEventHandler.get().sendCommand(getName(), command.toString());
     }
 
     default void postUpdate(T state) {
@@ -61,7 +60,7 @@ public interface JRuleItem<T extends JRuleValue> {
     }
 
     default void sendCommand(String state) {
-        JRuleEventHandler.get().sendCommand(getName(), new JRuleStringValue(state));
+        JRuleEventHandler.get().sendCommand(getName(), state);
     }
 
     default void postUpdate(String state) {

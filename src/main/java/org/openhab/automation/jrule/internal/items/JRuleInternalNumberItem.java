@@ -32,7 +32,7 @@ public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue
     }
 
     public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value));
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value).asStringValue());
     }
 
     public void postUpdate(double value) {
@@ -40,7 +40,7 @@ public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value));
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value).asStringValue());
     }
 
     public void postUpdate(int value) {

@@ -110,6 +110,11 @@ public class TestRules extends JRule {
     public static final String ITEM_ROLLERSHUTTER_TO_CAST = "Rollershutter_To_Cast";
     public static final String ITEM_LOCATION_TO_CAST = "Location_To_Cast";
     private static final String ITEM_NUMBER_GROUP = "Number_Group";
+    public static final String ITEM_RULE_FROM_RULE = "Rule_From_Rule";
+    public static final String NAME_TRIGGER_RULE_FROM_RULE = "Trigger Rule From Rule";
+    public static final String ITEM_TRIGGER_RULE_FROM_RULE = "Trigger_Rule_From_Rule";
+    public static final String NAME_TRIGGER_ANOTHER_RULE = "Trigger another rule";
+    public static final String COMMAND_TRIGGER_ANOTHER_RULE = "triggerAnotherRule";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -269,6 +274,18 @@ public class TestRules extends JRule {
         castLocation();
     }
 
+    @JRuleName(NAME_TRIGGER_RULE_FROM_RULE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_RULE_FROM_RULE)
+    public void triggerRuleFromRule(JRuleItemEvent event) throws JRuleExecutionException {
+        JRuleStringItem.forName(ITEM_TRIGGER_RULE_FROM_RULE).sendCommand(COMMAND_TRIGGER_ANOTHER_RULE);
+    }
+
+    @JRuleName(NAME_TRIGGER_ANOTHER_RULE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE_FROM_RULE, condition = @JRuleCondition(eq = COMMAND_TRIGGER_ANOTHER_RULE))
+    public void triggerAnotherRule(JRuleItemEvent event) throws JRuleExecutionException {
+        logInfo("another rule was triggered with command: " + event.getState());
+    }
+
     private static void castLocation() {
         JRuleLocationItem locationItem = JRuleLocationItem.forName(ITEM_LOCATION_TO_CAST);
 
@@ -406,7 +423,7 @@ public class TestRules extends JRule {
         assert switchItem.getState() == JRuleOnOffValue.ON;
         assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 100D;
 
-        switchItem.sendCommand(JRuleOnOffValue.OFF);
+        switchItem.sendCommand(JRuleSwitchItem.OFF);
         assert switchItem.getState() == JRuleOnOffValue.OFF;
         assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 0D;
     }

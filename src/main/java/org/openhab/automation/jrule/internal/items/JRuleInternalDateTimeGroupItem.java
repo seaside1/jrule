@@ -32,7 +32,8 @@ public class JRuleInternalDateTimeGroupItem extends JRuleInternalDateTimeItem im
 
     public void sendCommand(ZonedDateTime value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDateTimeValue(value)));
+        groupMemberNames
+                .forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDateTimeValue(value).asStringValue()));
     }
 
     public void postUpdate(ZonedDateTime value) {

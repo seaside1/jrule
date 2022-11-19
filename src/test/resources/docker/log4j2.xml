@@ -82,11 +82,6 @@
 		<Logger level="DEBUG" name="org.openhab.automation.jrule"/>
 		<Logger level="DEBUG" name="openhab.event"/>
 
-		<Logger additivity="false" level="INFO" name="openhab.event">
-			<AppenderRef ref="EVENT"/>
-			<AppenderRef ref="OSGI"/>
-		</Logger>
-
 		<Logger level="ERROR" name="javax.jmdns"/>
 		<Logger level="ERROR" name="org.jupnp"/>
 

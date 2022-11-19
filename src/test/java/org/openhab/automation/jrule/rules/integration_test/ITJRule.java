@@ -166,4 +166,11 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_CAST_ALL_TYPES);
         verifyNoError();
     }
+
+    @Test
+    public void triggerRuleFromRule() throws IOException {
+        sendCommand(TestRules.ITEM_RULE_FROM_RULE, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_RULE_FROM_RULE);
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_ANOTHER_RULE);
+    }
 }
