@@ -164,6 +164,37 @@ public class ITJRule extends JRuleITBase {
     public void castAllTypes() throws IOException {
         sendCommand(TestRules.ITEM_CAST_ALL_TYPES_SWITCH, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_CAST_ALL_TYPES);
+
+        verifyStateChangeEventFor(TestRules.ITEM_SWITCH_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_SWITCH_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_NUMBER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_NUMBER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_DIMMER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_DIMMER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_COLOR_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_COLOR_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_STRING_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_STRING_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_DATETIME_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_DATETIME_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_PLAYER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_PLAYER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_CONTACT_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_CONTACT_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_ROLLERSHUTTER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_ROLLERSHUTTER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_LOCATION_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_LOCATION_TO_CAST);
+
         verifyNoError();
     }
 

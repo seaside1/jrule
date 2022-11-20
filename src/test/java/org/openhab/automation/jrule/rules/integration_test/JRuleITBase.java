@@ -357,6 +357,19 @@ public abstract class JRuleITBase {
                 .await("rule executed").until(() -> logLines, v -> containsLine(toMethodCallLogEntry(ruleLogLine), v));
     }
 
+    protected void verifyLogEntry(String ruleLogLine) {
+        Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
+                .await("rule executed").until(() -> logLines, v -> containsLine(ruleLogLine, v));
+    }
+
+    protected void verifyCommandEventFor(String itemName) {
+        verifyLogEntry(String.format("Item '%s' received command", itemName));
+    }
+
+    protected void verifyStateChangeEventFor(String itemName) {
+        verifyLogEntry(String.format("Item 'Rollershutter_To_Cast' changed", itemName));
+    }
+
     protected void verifyNoError() {
         try {
             Thread.sleep(1000);

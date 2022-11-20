@@ -12,6 +12,10 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRulePercentValue}
  *
@@ -28,5 +32,15 @@ public class JRulePercentValue extends JRuleDecimalValue {
 
     public JRulePercentValue(String value) {
         super(value);
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return new PercentType(this.getValue());
+    }
+
+    @Override
+    public State toOhState() {
+        return new PercentType(this.getValue());
     }
 }

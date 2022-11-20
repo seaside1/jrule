@@ -44,7 +44,6 @@ import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
-import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.DateTimeType;
@@ -135,8 +134,7 @@ public class JRuleEventHandler {
             return;
         }
         logInfo("SendCommand '{}' to '{}'", command, itemName);
-        final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
-        eventPublisher.post(commandEvent);
+        eventPublisher.post(ItemEventFactory.createCommandEvent(itemName, command));
     }
 
     public void postUpdate(String itemName, JRuleValue value) {
