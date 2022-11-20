@@ -105,6 +105,11 @@
       <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit-pioneer</groupId>
+      <artifactId>junit-pioneer</artifactId>
+      <version>1.8.0</version>
+    </dependency>
   </dependencies>
 
   <repositories>
