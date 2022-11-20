@@ -31,11 +31,11 @@ public class JRuleInternalContactGroupItem extends JRuleInternalContactItem impl
 
     public void sendCommand(JRuleOpenClosedValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value.asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
     public void postUpdate(JRuleOpenClosedValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value.asStringValue()));
+        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 }

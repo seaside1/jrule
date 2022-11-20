@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleValue} JRule Command
  *
@@ -21,4 +24,8 @@ public interface JRuleValue {
     String toString();
 
     String asStringValue();
+
+    Command toOhCommand();
+
+    State toOhState();
 }

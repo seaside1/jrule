@@ -18,6 +18,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleHsbValue} JRule Command
  *
@@ -60,6 +66,18 @@ public class JRuleHsbValue implements JRuleValue {
     public String asStringValue() {
         return String.format("%s,%s,%s", this.hue.intValueExact(), this.saturation.intValueExact(),
                 this.brightness.intValueExact());
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return new HSBType(new DecimalType(this.hue), new PercentType(this.saturation),
+                new PercentType(this.brightness));
+    }
+
+    @Override
+    public State toOhState() {
+        return new HSBType(new DecimalType(this.hue), new PercentType(this.saturation),
+                new PercentType(this.brightness));
     }
 
     public BigDecimal getHue() {

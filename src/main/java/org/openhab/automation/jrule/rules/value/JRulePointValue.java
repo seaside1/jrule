@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.PointType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleStringValue} JRule Command
  *
@@ -84,6 +89,18 @@ public class JRulePointValue implements JRuleValue {
             buffer.append(",").append(this.altitude.floatValue());
         }
         return buffer.toString();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return new PointType(new DecimalType(this.latitude), new DecimalType(this.longitude),
+                this.altitude != null ? new DecimalType(this.altitude) : DecimalType.ZERO);
+    }
+
+    @Override
+    public State toOhState() {
+        return new PointType(new DecimalType(this.latitude), new DecimalType(this.longitude),
+                this.altitude != null ? new DecimalType(this.altitude) : DecimalType.ZERO);
     }
 
     @Override

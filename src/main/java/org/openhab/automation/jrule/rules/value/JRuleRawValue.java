@@ -16,6 +16,10 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 
+import org.openhab.core.library.types.RawType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleRawValue} JRule Command
  *
@@ -57,6 +61,16 @@ public class JRuleRawValue implements JRuleValue {
     @Override
     public String asStringValue() {
         return String.format("data:%s;base64,%s", this.mimeType, Base64.getEncoder().encodeToString(this.data));
+    }
+
+    @Override
+    public Command toOhCommand() {
+        throw new IllegalStateException("not a command type");
+    }
+
+    @Override
+    public State toOhState() {
+        return new RawType(this.data, this.mimeType);
     }
 
     @Override

@@ -20,6 +20,10 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Objects;
 
+import org.openhab.core.library.types.DateTimeType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleDateTimeValue}
  *
@@ -71,6 +75,16 @@ public class JRuleDateTimeValue implements JRuleValue {
     @Override
     public String asStringValue() {
         return this.value.format(FORMATTER_TZ_RFC);
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return new DateTimeType(this.value);
+    }
+
+    @Override
+    public State toOhState() {
+        return new DateTimeType(this.value);
     }
 
     @Override

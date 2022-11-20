@@ -12,15 +12,24 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleOnOffValue} JRule Command
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public enum JRuleOnOffValue implements JRuleValue {
-    ON,
-    OFF,
-    UNDEF;
+    ON(OnOffType.ON),
+    OFF(OnOffType.OFF);
+
+    private final OnOffType ohType;
+
+    JRuleOnOffValue(OnOffType ohType) {
+        this.ohType = ohType;
+    }
 
     public static JRuleOnOffValue getValueFromString(String value) {
         switch (value) {
@@ -28,9 +37,8 @@ public enum JRuleOnOffValue implements JRuleValue {
                 return ON;
             case "OFF":
                 return OFF;
-            default:
-                return UNDEF;
         }
+        return null;
     }
 
     @Override
@@ -41,5 +49,15 @@ public enum JRuleOnOffValue implements JRuleValue {
     @Override
     public String asStringValue() {
         return name();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        return this.ohType;
     }
 }

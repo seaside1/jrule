@@ -30,22 +30,22 @@ public class JRuleInternalDimmerItem extends JRuleInternalItem<JRulePercentValue
     }
 
     public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
+        JRuleEventHandler.get().sendCommand(name, command);
     }
 
     public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(name, command.asStringValue());
+        JRuleEventHandler.get().sendCommand(name, command);
     }
 
     public void sendCommand(int command) {
-        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(command).asStringValue());
+        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(command));
     }
 
     public void postUpdate(JRuleOnOffValue value) {
-        JRuleEventHandler.get().postUpdate(name, value.asStringValue());
+        JRuleEventHandler.get().postUpdate(name, value);
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value).asStringValue());
+        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
     }
 }

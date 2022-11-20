@@ -19,6 +19,10 @@ import java.text.ParsePosition;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleDecimalValue}
  *
@@ -54,6 +58,16 @@ public class JRuleDecimalValue implements JRuleValue {
     @Override
     public String asStringValue() {
         return this.value.toPlainString();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return new DecimalType(this.value);
+    }
+
+    @Override
+    public State toOhState() {
+        return new DecimalType(this.value);
     }
 
     @Override

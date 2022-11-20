@@ -32,19 +32,19 @@ public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue
     }
 
     public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value).asStringValue());
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value));
     }
 
     public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value).asStringValue());
+        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value));
     }
 
     public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value).asStringValue());
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value));
     }
 
     public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value).asStringValue());
+        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value));
     }
 
     public void sendCommand(double value, String unit) {

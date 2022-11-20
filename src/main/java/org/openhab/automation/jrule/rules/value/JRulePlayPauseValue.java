@@ -12,15 +12,24 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.PlayPauseType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRulePlayPauseValue} JRule Command
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public enum JRulePlayPauseValue implements JRuleValue {
-    PLAY,
-    PAUSE,
-    UNDEF;
+    PLAY(PlayPauseType.PLAY),
+    PAUSE(PlayPauseType.PAUSE);
+
+    private final PlayPauseType ohType;
+
+    JRulePlayPauseValue(PlayPauseType ohType) {
+        this.ohType = ohType;
+    }
 
     public static JRulePlayPauseValue getValueFromString(String value) {
         if (value.equals(PLAY.name())) {
@@ -29,11 +38,21 @@ public enum JRulePlayPauseValue implements JRuleValue {
         if (value.equals(PAUSE.name())) {
             return PAUSE;
         }
-        return UNDEF;
+        return null;
     }
 
     @Override
     public String asStringValue() {
         return name();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        return this.ohType;
     }
 }

@@ -121,8 +121,8 @@ public class JRuleEventHandler {
         this.eventPublisher = eventPublisher;
     }
 
-    public void sendCommand(String itemName, String command) {
-        sendCommand(itemName, new StringType(command));
+    public void sendCommand(String itemName, JRuleValue command) {
+        sendCommand(itemName, command.toOhCommand());
     }
 
     public void sendCommand(String itemName, double value, String unit) {
@@ -139,8 +139,8 @@ public class JRuleEventHandler {
         eventPublisher.post(commandEvent);
     }
 
-    public void postUpdate(String itemName, String value) {
-        postUpdate(itemName, new StringType(value));
+    public void postUpdate(String itemName, JRuleValue value) {
+        postUpdate(itemName, value.toOhState());
     }
 
     public void postUpdate(String itemName, double value, String unit) {

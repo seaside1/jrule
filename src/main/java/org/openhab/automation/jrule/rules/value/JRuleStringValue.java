@@ -14,6 +14,10 @@ package org.openhab.automation.jrule.rules.value;
 
 import java.util.Objects;
 
+import org.openhab.core.library.types.StringType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleStringValue} JRule Command
  *
@@ -37,6 +41,16 @@ public class JRuleStringValue implements JRuleValue {
     @Override
     public String asStringValue() {
         return this.value;
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return new StringType(this.value);
+    }
+
+    @Override
+    public State toOhState() {
+        return new StringType(this.value);
     }
 
     @Override
