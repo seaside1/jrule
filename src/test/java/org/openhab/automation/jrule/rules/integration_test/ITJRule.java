@@ -172,5 +172,13 @@ public class ITJRule extends JRuleITBase {
         sendCommand(TestRules.ITEM_RULE_FROM_RULE, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_TRIGGER_RULE_FROM_RULE);
         verifyRuleWasExecuted(TestRules.NAME_TRIGGER_ANOTHER_RULE);
+        verifyNoError();
+    }
+
+    @Test
+    public void nullTesting() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_NULL_TESTING);
+        verifyRuleWasExecuted(TestRules.NAME_NULL_TESTING);
+        verifyNoError();
     }
 }

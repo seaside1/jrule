@@ -59,6 +59,7 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 
@@ -115,6 +116,10 @@ public class TestRules extends JRule {
     public static final String ITEM_TRIGGER_RULE_FROM_RULE = "Trigger_Rule_From_Rule";
     public static final String NAME_TRIGGER_ANOTHER_RULE = "Trigger another rule";
     public static final String COMMAND_TRIGGER_ANOTHER_RULE = "triggerAnotherRule";
+    public static final String ITEM_TRIGGER_RULE = "Trigger_Rule";
+    public static final String COMMAND_NULL_TESTING = "null testing";
+    public static final String NAME_NULL_TESTING = "Null testing";
+    public static final String ITEM_NULL_TESTING = "Null_Testing";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -284,6 +289,18 @@ public class TestRules extends JRule {
     @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE_FROM_RULE, condition = @JRuleCondition(eq = COMMAND_TRIGGER_ANOTHER_RULE))
     public void triggerAnotherRule(JRuleItemEvent event) throws JRuleExecutionException {
         logInfo("another rule was triggered with command: " + event.getState());
+    }
+
+    @JRuleName(NAME_NULL_TESTING)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_NULL_TESTING))
+    public void nullTesting(JRuleItemEvent event) throws JRuleExecutionException {
+        JRuleStringItem stringItem = JRuleStringItem.forName(ITEM_NULL_TESTING);
+        stringItem.postUpdate((JRuleStringValue) null);
+        assert stringItem.getState() == null;
+        stringItem.postUpdate("abc");
+        assert stringItem.getState().stringValue().equals("abc");
+        stringItem.postUpdate((JRuleStringValue) null);
+        assert stringItem.getState() == null;
     }
 
     private static void castLocation() {

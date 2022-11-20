@@ -140,7 +140,11 @@ public class JRuleEventHandler {
     }
 
     public void postUpdate(String itemName, JRuleValue value) {
-        postUpdate(itemName, value.toOhState());
+        if (value == null) {
+            postUpdate(itemName, UnDefType.NULL);
+        } else {
+            postUpdate(itemName, value.toOhState());
+        }
     }
 
     public void postUpdate(String itemName, double value, String unit) {
@@ -240,6 +244,9 @@ public class JRuleEventHandler {
 
     public <V extends JRuleValue> V getValue(String name, Class<V> valueClass) {
         State state = getStateFromItem(name);
+        if (state.getClass().equals(UnDefType.class)) {
+            return null;
+        }
         Objects.requireNonNull(state, "state must not be null");
         Class<? extends State> castTo = stateMapping.get(valueClass);
         Objects.requireNonNull(castTo, String.format("casting to '%s' for '%s' results in null", valueClass, name));

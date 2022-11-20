@@ -32,3 +32,6 @@ Location        Location_To_Cast
 
 Switch          Rule_From_Rule
 String          Trigger_Rule_From_Rule
+
+String          Trigger_Rule
+String          Null_Testing
