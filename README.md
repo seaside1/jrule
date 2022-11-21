@@ -678,15 +678,15 @@ public void startTrackingNonOnlineThing(JRuleEvent event) {
 
 ## Example 34
 
-Use case: Thing actions, send message with pushover and other services
+Use case: Thing actions, send message with pushover and other services.
+Note that you will have to set up a pusheover account as thing in openHAB.
 
 ```java
 @JRuleName("PushOverTest")
-@JRuleWhenItemChange(item = _MyTestSendPushOverButton.ITEM, to = JRuleSwitchItem.ON)
-public void sendPushover(JRuleEvent event) {
+@JRuleWhenItemChange(item = _MyTestSendPushOverButton.ITEM, to = _MyTestSendPushOverButton.ON)
+public void testPower(JRuleEvent event) {
        logInfo("Sending Test message using pushover via actions");
-       JRuleAddonActionHandler action = getAction("pushover", "pushover:pushover-account:myaccount");
-       action.doAction("sendMessage",  "MyMessage", "MyTitle");
+       JRuleActions.pushoverPushoverAccountXYZ.sendMessage("MyMessage", "MyTitle");
 }
 ```
 
