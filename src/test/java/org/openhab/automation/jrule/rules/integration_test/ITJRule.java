@@ -12,14 +12,14 @@
  */
 package org.openhab.automation.jrule.rules.integration_test;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junitpioneer.jupiter.RetryingTest;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.TestRules;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The {@link ITJRule}
