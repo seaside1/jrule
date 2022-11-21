@@ -367,7 +367,7 @@ public abstract class JRuleITBase {
     }
 
     protected void verifyStateChangeEventFor(String itemName) {
-        verifyLogEntry(String.format("Item 'Rollershutter_To_Cast' changed", itemName));
+        verifyLogEntry(String.format("Item '%s' changed", itemName));
     }
 
     protected void verifyNoError() {
