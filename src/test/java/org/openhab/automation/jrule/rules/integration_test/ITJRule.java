@@ -12,15 +12,14 @@
  */
 package org.openhab.automation.jrule.rules.integration_test;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.RetryingTest;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.TestRules;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The {@link ITJRule}
@@ -31,7 +30,6 @@ import org.openhab.automation.jrule.rules.user.TestRules;
 // RetryingTest is used because sometimes the container log output splits a logline into 2 lines and therefor the
 // verifyRuleExectuted will not work.
 public class ITJRule extends JRuleITBase {
-    @Test
     @RetryingTest(2)
     public void switchItemReceiveCommand() throws IOException {
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.ON);
@@ -40,7 +38,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_SWITCH_ITEM_CHANGED);
     }
 
-    @Test
     @RetryingTest(2)
     public void switchItemReceiveOnCommand() throws IOException {
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.ON);
@@ -49,7 +46,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_SWITCH_ITEM_CHANGED_TO_ON);
     }
 
-    @Test
     @RetryingTest(2)
     public void invokeMqttAction() throws IOException {
         sendCommand(TestRules.ITEM_MQTT_ACTION_TRIGGER, JRuleSwitchItem.ON);
@@ -57,7 +53,6 @@ public class ITJRule extends JRuleITBase {
         verifyMqttMessageReceived("1313131");
     }
 
-    @Test
     @RetryingTest(2)
     public void executeCommandLine() throws IOException, InterruptedException {
         sendCommand(TestRules.ITEM_COMMANDLINE_EXEC_TRIGGER, JRuleSwitchItem.ON);
@@ -65,14 +60,12 @@ public class ITJRule extends JRuleITBase {
         verifyFileExist();
     }
 
-    @Test
     @RetryingTest(2)
     public void mqttChannelTriggered() throws MqttException {
         publishMqttMessage("number/state", "123");
         verifyRuleWasExecuted(TestRules.NAME_MQTT_CHANNEL_TRIGGERED);
     }
 
-    @Test
     @RetryingTest(2)
     public void preconditionExecution() throws IOException, InterruptedException {
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, "will not match");
@@ -85,7 +78,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_PRECONDITION_EXECUTION);
     }
 
-    @Test
     @RetryingTest(2)
     public void mqttThingChangedToOffline() {
         Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
@@ -98,7 +90,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MQTT_THING_CHANGED_TO_OFFLINE);
     }
 
-    @Test
     @RetryingTest(2)
     public void memberOfGroupReceivedCommand() throws IOException {
         sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -114,7 +105,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND);
     }
 
-    @Test
     @RetryingTest(2)
     public void memberOfGroupReceivedUpdate() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -130,7 +120,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE);
     }
 
-    @Test
     @RetryingTest(2)
     public void memberOfGroupChanged() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -140,7 +129,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_CHANGED);
     }
 
-    @Test
     @RetryingTest(2)
     public void conditionLteAndGteForNumber() throws IOException {
         sendCommand(TestRules.ITEM_NUMBER_CONDITION, "21");
@@ -155,7 +143,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER);
     }
 
-    @Test
     @RetryingTest(2)
     public void membersOfGroup() throws IOException {
         sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
@@ -163,7 +150,6 @@ public class ITJRule extends JRuleITBase {
         verifyNoError();
     }
 
-    @Test
     @RetryingTest(2)
     public void membersOfNumberGroup() throws IOException {
         sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
@@ -171,13 +157,11 @@ public class ITJRule extends JRuleITBase {
         verifyNoError();
     }
 
-    @Test
     @RetryingTest(2)
     public void cronEvery5Sec() {
         verifyRuleWasExecuted(TestRules.NAME_CRON_EVERY_5_SEC);
     }
 
-    @Test
     @RetryingTest(2)
     public void castAllTypes() throws IOException {
         sendCommand(TestRules.ITEM_CAST_ALL_TYPES_SWITCH, JRuleSwitchItem.ON);
@@ -216,7 +200,6 @@ public class ITJRule extends JRuleITBase {
         verifyNoError();
     }
 
-    @Test
     @RetryingTest(2)
     public void triggerRuleFromRule() throws IOException {
         sendCommand(TestRules.ITEM_RULE_FROM_RULE, JRuleSwitchItem.ON);
@@ -225,7 +208,6 @@ public class ITJRule extends JRuleITBase {
         verifyNoError();
     }
 
-    @Test
     @RetryingTest(2)
     public void nullTesting() throws IOException {
         sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_NULL_TESTING);
