@@ -41,6 +41,10 @@ public enum JRuleUpDownValue implements JRuleValue {
         return null;
     }
 
+    public static JRuleValue valueOf(boolean command) {
+        return command ? UP : DOWN;
+    }
+
     @Override
     public String asStringValue() {
         return name();

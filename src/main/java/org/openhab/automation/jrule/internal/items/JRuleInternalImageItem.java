@@ -21,7 +21,6 @@ import org.openhab.automation.jrule.rules.value.JRuleRawValue;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalImageItem extends JRuleInternalItem<JRuleRawValue> implements JRuleImageItem {
-
     public JRuleInternalImageItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }

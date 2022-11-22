@@ -33,4 +33,8 @@ public interface JRuleSwitchItem extends JRuleItem<JRuleOnOffValue> {
     default Class<? extends JRuleValue> getDefaultValueClass() {
         return JRuleOnOffValue.class;
     }
+
+    void sendCommand(boolean command);
+
+    void postUpdate(boolean command);
 }

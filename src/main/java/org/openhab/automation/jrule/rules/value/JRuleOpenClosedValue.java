@@ -41,6 +41,10 @@ public enum JRuleOpenClosedValue implements JRuleValue {
         return null;
     }
 
+    public static JRuleValue valueOf(boolean command) {
+        return command ? OPEN : CLOSED;
+    }
+
     @Override
     public String asStringValue() {
         return name();

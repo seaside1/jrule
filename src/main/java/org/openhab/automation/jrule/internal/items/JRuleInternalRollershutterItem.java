@@ -49,4 +49,12 @@ public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePerce
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
     }
+
+    public void sendCommand(boolean command) {
+        JRuleEventHandler.get().sendCommand(getName(), JRuleUpDownValue.valueOf(command));
+    }
+
+    public void postUpdate(boolean command) {
+        JRuleEventHandler.get().postUpdate(getName(), JRuleUpDownValue.valueOf(command));
+    }
 }

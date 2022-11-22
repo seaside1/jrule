@@ -32,6 +32,10 @@ public interface JRuleColorItem extends JRuleItem<JRuleHsbValue> {
 
     void sendCommand(JRuleIncreaseDecreaseValue command);
 
+    void sendCommand(boolean command);
+
+    void postUpdate(boolean command);
+
     void postUpdate(JRuleHsbValue value);
 
     void postUpdate(JRuleOnOffValue state);

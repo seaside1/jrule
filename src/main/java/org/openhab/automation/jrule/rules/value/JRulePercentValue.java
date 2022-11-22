@@ -34,6 +34,10 @@ public class JRulePercentValue extends JRuleDecimalValue {
         super(value);
     }
 
+    public JRulePercentValue(boolean value) {
+        super(value ? 100 : 0);
+    }
+
     @Override
     public Command toOhCommand() {
         return new PercentType(this.getValue());

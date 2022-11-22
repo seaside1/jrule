@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleContactGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
@@ -37,5 +38,15 @@ public class JRuleInternalContactGroupItem extends JRuleInternalContactItem impl
     public void postUpdate(JRuleOpenClosedValue value) {
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+    }
+
+    public void sendCommand(boolean command) {
+        JRuleEventHandler.get().getGroupMemberNames(name, false)
+                .forEach(s -> JRuleEventHandler.get().sendCommand(s, JRuleOnOffValue.valueOf(command)));
+    }
+
+    public void postUpdate(boolean command) {
+        JRuleEventHandler.get().getGroupMemberNames(name, false)
+                .forEach(s -> JRuleEventHandler.get().postUpdate(s, JRuleOnOffValue.valueOf(command)));
     }
 }

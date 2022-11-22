@@ -49,4 +49,12 @@ public class JRuleInternalColorItem extends JRuleInternalItem<JRuleHsbValue> imp
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
     }
+
+    public void sendCommand(boolean command) {
+        JRuleEventHandler.get().sendCommand(getName(), JRuleOnOffValue.valueOf(command));
+    }
+
+    public void postUpdate(boolean command) {
+        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(command));
+    }
 }

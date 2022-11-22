@@ -66,4 +66,14 @@ public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershut
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
+
+    public void sendCommand(boolean command) {
+        JRuleEventHandler.get().getGroupMemberNames(name, false)
+                .forEach(s -> JRuleEventHandler.get().sendCommand(s, JRuleUpDownValue.valueOf(command)));
+    }
+
+    public void postUpdate(boolean command) {
+        JRuleEventHandler.get().getGroupMemberNames(name, false)
+                .forEach(s -> JRuleEventHandler.get().postUpdate(s, JRuleUpDownValue.valueOf(command)));
+    }
 }

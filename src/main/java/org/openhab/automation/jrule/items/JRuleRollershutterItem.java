@@ -34,6 +34,10 @@ public interface JRuleRollershutterItem extends JRuleItem<JRulePercentValue> {
 
     void sendCommand(int value);
 
+    void sendCommand(boolean command);
+
+    void postUpdate(boolean command);
+
     void postUpdate(JRuleUpDownValue state);
 
     void postUpdate(int value);

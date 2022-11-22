@@ -327,6 +327,11 @@ public class TestRules extends JRule {
         assert rollershutterItem.getState().doubleValue() == 0;
         assert rollershutterItem.getStateAs(JRulePercentValue.class).doubleValue() == 0;
         assert rollershutterItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        rollershutterItem.sendCommand(true);
+        assert rollershutterItem.getState().doubleValue() == 100;
+        assert rollershutterItem.getStateAs(JRulePercentValue.class).doubleValue() == 100;
+        assert rollershutterItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
     private static void castImage() {
@@ -351,6 +356,10 @@ public class TestRules extends JRule {
         contactItem.sendCommand(JRuleOpenClosedValue.CLOSED);
         assert contactItem.getState() == JRuleOpenClosedValue.CLOSED;
         assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        contactItem.sendCommand(true);
+        assert contactItem.getState() == JRuleOpenClosedValue.OPEN;
+        assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
     private static void castPlayer() {
@@ -363,6 +372,10 @@ public class TestRules extends JRule {
         playerItem.sendCommand(JRulePlayPauseValue.PAUSE);
         assert playerItem.getState() == JRulePlayPauseValue.PAUSE;
         assert playerItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        playerItem.sendCommand(true);
+        assert playerItem.getState() == JRulePlayPauseValue.PLAY;
+        assert playerItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
     private static void castDateTime() {
@@ -403,6 +416,10 @@ public class TestRules extends JRule {
         assert colorItem.getState().getSaturation().intValue() == 77;
         assert colorItem.getState().getBrightness().intValue() == 0;
         assert colorItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        colorItem.sendCommand(true);
+        assert colorItem.getState().getBrightness().intValue() == 100;
+        assert colorItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
     private static void castDimmer() {
@@ -415,6 +432,10 @@ public class TestRules extends JRule {
         numberItem.sendCommand(22);
         assert numberItem.getState().doubleValue() == 22;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+
+        numberItem.sendCommand(false);
+        assert numberItem.getState().doubleValue() == 0;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
     }
 
     private static void castNumber() {
@@ -443,6 +464,10 @@ public class TestRules extends JRule {
         switchItem.sendCommand(JRuleSwitchItem.OFF);
         assert switchItem.getState() == JRuleOnOffValue.OFF;
         assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 0D;
+
+        switchItem.sendCommand(true);
+        assert switchItem.getState() == JRuleOnOffValue.ON;
+        assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 100D;
     }
 
     private static void invokeAction(String fieldName, String methodName, Object... args) throws ClassNotFoundException,

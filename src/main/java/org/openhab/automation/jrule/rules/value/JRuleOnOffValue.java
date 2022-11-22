@@ -41,6 +41,10 @@ public enum JRuleOnOffValue implements JRuleValue {
         return null;
     }
 
+    public static JRuleValue valueOf(boolean command) {
+        return command ? ON : OFF;
+    }
+
     @Override
     public String toString() {
         return name();

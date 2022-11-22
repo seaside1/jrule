@@ -30,4 +30,8 @@ public interface JRuleContactItem extends JRuleItem<JRuleOpenClosedValue> {
     default Class<? extends JRuleValue> getDefaultValueClass() {
         return JRuleOpenClosedValue.class;
     }
+
+    void sendCommand(boolean command);
+
+    void postUpdate(boolean command);
 }

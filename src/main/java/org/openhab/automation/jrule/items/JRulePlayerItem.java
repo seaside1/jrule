@@ -30,4 +30,8 @@ public interface JRulePlayerItem extends JRuleItem<JRulePlayPauseValue> {
     default Class<? extends JRuleValue> getDefaultValueClass() {
         return JRulePlayPauseValue.class;
     }
+
+    void sendCommand(boolean command);
+
+    void postUpdate(boolean command);
 }

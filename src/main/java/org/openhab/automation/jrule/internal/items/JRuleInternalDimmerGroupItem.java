@@ -76,4 +76,14 @@ public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implem
         final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
         groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
+
+    public void sendCommand(boolean command) {
+        JRuleEventHandler.get().getGroupMemberNames(name, false)
+                .forEach(s -> JRuleEventHandler.get().sendCommand(s, new JRulePercentValue(command)));
+    }
+
+    public void postUpdate(boolean command) {
+        JRuleEventHandler.get().getGroupMemberNames(name, false)
+                .forEach(s -> JRuleEventHandler.get().postUpdate(s, new JRulePercentValue(command)));
+    }
 }

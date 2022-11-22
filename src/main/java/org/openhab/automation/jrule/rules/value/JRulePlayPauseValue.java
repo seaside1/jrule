@@ -41,6 +41,10 @@ public enum JRulePlayPauseValue implements JRuleValue {
         return null;
     }
 
+    public static JRuleValue valueOf(boolean command) {
+        return command ? PLAY : PAUSE;
+    }
+
     @Override
     public String asStringValue() {
         return name();

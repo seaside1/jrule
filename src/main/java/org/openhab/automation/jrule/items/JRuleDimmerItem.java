@@ -39,6 +39,10 @@ public interface JRuleDimmerItem extends JRuleItem<JRulePercentValue> {
 
     void sendCommand(JRuleIncreaseDecreaseValue command);
 
+    void sendCommand(boolean command);
+
+    void postUpdate(boolean command);
+
     void postUpdate(JRuleOnOffValue value);
 
     void postUpdate(int value);
