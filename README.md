@@ -703,10 +703,27 @@ Use case: Want to listen on all Item events of a group (without the groupstate m
     }
 ```
 
-
 # Changelog
-## NEXT
-
+## BETA15
+- BREAKING: All JRuleWhen has to be change to corresponding JRuleWhenItemChanged (as an example, look at JRule Examples documentation)
+- JRule When refactoring by [querdenker2k](https://github.com/querdenker2k) pr https://github.com/seaside1/jrule/pull/61
+- Thing Channel triggers by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/62
+- Generate Actions by [querdenker2k](https://github.com/querdenker2k) https://github.com/seaside1/jrule/pull/63
+- Add option to get groupMembers as Items by [querdenker2k](https://github.com/querdenker2k)  https://github.com/seaside1/jrule/pull/65
+- Memberof Trigger by [querdenker2k](https://github.com/querdenker2k)  https://github.com/seaside1/jrule/pull/66
+- Fix buffer being read twice and breaking classloading by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/67
+- Fix missing precondition support for timer rules by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/68
+- Fix timer trigger by [querdenker2k](https://github.com/querdenker2k) https://github.com/seaside1/jrule/pull/70
+- Initial tests for JRuleWhenItemChange triggers by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/73
+- Threadlocal logging - some improvements by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/79
+- Junit test for duplicate rule invocations by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/75
+- Add docker integration test by [querdenker2k](https://github.com/querdenker2k) https://github.com/seaside1/jrule/pull/77
+- Include old thing status in event by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/80
+- Use thread safe list instead of arraylist by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/81
+- Defer to parent classloader if file not found by [seime](https://github.com/seime) https://github.com/seaside1/jrule/pull/83
+- Fix inheritance in actions by [querdenker2k](https://github.com/querdenker2k) https://github.com/seaside1/jrule/pull/87
+- Fix mqtt for tests by [querdenker2k](https://github.com/querdenker2k) https://github.com/seaside1/jrule/pull/91
+- Fix ConcurrentModificationException in test by [querdenker2k](https://github.com/querdenker2k) https://github.com/seaside1/jrule/pull/92
 - Added typing for thing channel triggers, ie `JRuleWhen(channel = binding_thing.triggerChannel)` instead of typing the channel id string
 
 ## BETA14
