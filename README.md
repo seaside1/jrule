@@ -1,17 +1,17 @@
-# OpenHAB Rules using Java
+# openHAB Rules using Java
 
-This automation package aims to enable Java development of OpenHAB Rules. The addon will allow the user to create custom OpenHAB rules
-in one or several .java-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers
-are very similar to the triggers in Rules DSL but expressed using java annotations. In order to execute rules based on items defined in OpenHAB either in .items-files or the GUI. The addon needs to know about these items and this is realized by the Rule Engine where it generates a .java and a .class file for each item in the system. The class files are then packaged in a .jar-file which the user can use as dependency when doing Rules Development.
-For the addon to be able to pick up rules, they first need to be compiled by the addon. The source .java rules-files are placed in a specific rules folder and
-will be automatically compiled and loaded into OpenHAB when the addon is started. The syntax for rules as well as the design and thinking behind the addon is to provide something that is similar to Rules DSL but more powerful and customizable.
+The JRule Automation Addon aims to enable Java development of openHAB Rules. The automation addon will allow the user to create custom openHAB rules
+in one or several .java- or jar-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers are very similar to the triggers in Rules DSL but expressed using java annotations. Rules tend to be written to trigger on changes to either items or things. The addon is compatible with items and things added either in the openHAB GUI or defined in plain .items and .thing files.
+JRule will generate java-source files for items and things as well as compiling and package them into a jrule-generated.jar file. The jrule-generated.jar file should be used when the user is developing openHAB rules. In order for the JRule-engine to be able to pick up the user defined rules, they need to be compiled by the engine if the are supplied as plain java-files. The source .java rules-files are in that case placed in a specific rules folder and
+will be automatically compiled and loaded into openHAB when JRule is started by openHAB runtime. If the rules are packaged into a jar-file, they need to be placed in a specific jrule-jar folder. 
+
+The syntax for rules as well as the design and thinking behind the automation addon is to provide something that is similar to Rules DSL but more powerful, customizable and flexible. JRule relies on strict typing where you are less likely to construct rules that are not working due to syntax error.
+
 
 # Limitations
-
 - Not supporting OH3 GUI rules, script conditions 
 
 # Why
-
  - You will be able to use a standard Java IDE to develop your rules. 
  - Full auto-completion (Shift space) for all items, less chance of errors and typos
  - Take full advantage of all java design patters
@@ -20,10 +20,15 @@ will be automatically compiled and loaded into OpenHAB when the addon is started
  - Possibility to write junit-tests to test your rules
  - Use any 3rd party dependencies and libraries in your rules
  - You will be able to use JRule in parallel with any other Rules engine if you want to give it a try
+ - Compile and build your rules with tools such as maven, or provide rules in plain-java files
+ - Utilize thing actions and trigger on thing statuses 
+ - Reuse you methods and code for many different purposes, reducing the amount of code you have to write.
+ - Advanced logging can be used with for instance logstash using MDC-tags
 
 # Who
 
 This addon is not for beginners, you should have knowledge in writing java-programs or a desire to do so.
+As you can see in the examples below, rules will become short and readable making it easy to understand once you learn how to write the rules.
 
 # Maturity
 
@@ -35,8 +40,7 @@ Prebuilt jar file is available under https://github.com/seaside1/jrule/releases
 
 # Java Rule Engine
 
-Input rules files
-will be placed under:
+Input plain java-rules files under:
 /etc/automation/jrule/rules/org/openhab/automation/jrule/rules/user/
 
 It is also possible to add rules as pre-compiled jar files under:
@@ -44,6 +48,10 @@ It is also possible to add rules as pre-compiled jar files under:
 
 Output jar files to be added by the user as dependencies when doing rule development will be located under:
 /etc/openhab/automation/jrule/jar
+
+Add external dependencies as jar-files under:
+/etc/openhab/automation/jrule/ext-lib 
+
 
 The following jar files can be found under the jrule/jar-folder:
 
@@ -118,6 +126,11 @@ Built in Core Actions that can be used
 | -------------------------------------- | --------------------------------------------------------------------------------------------- |
 | say                                    | Will use VoiceManager to say action see Example 13                        |
 | commandLineExecute                     | See Example 14                               |
+
+
+# Thing actions
+Thing actions are supported. JRule will generate a file that contains all available thing actions.
+See example #34
 
 # Logging from rules
 Logging from rule can be done in 3 different ways
