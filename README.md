@@ -2,8 +2,7 @@
 
 The JRule Automation Addon aims to enable Java development of openHAB Rules. The automation addon will allow the user to create custom openHAB rules
 in one or several .java- or jar-files. The Java Rules will need defined triggers in order for the engine to know how and when to execute them. The triggers are very similar to the triggers in Rules DSL but expressed using java annotations. Rules tend to be written to trigger on changes to either items or things. The addon is compatible with items and things added either in the openHAB GUI or defined in plain .items and .thing files.
-JRule will generate java-source files for items and things as well as compiling and package them into a jrule-generated.jar file. The jrule-generated.jar file should be used when the user is developing openHAB rules. In order for the JRule-engine to be able to pick up the user defined rules, they need to be compiled by the engine if the are supplied as plain java-files. The source .java rules-files are in that case placed in a specific rules folder and
-will be automatically compiled and loaded into openHAB when JRule is started by openHAB runtime. If the rules are packaged into a jar-file, they need to be placed in a specific jrule-jar folder. 
+JRule will generate java-source files for items and things as well as compiling and package them into a jrule-generated.jar file. The jrule-generated.jar file should be used when the user is developing openHAB rules.
 
 The syntax for rules as well as the design and thinking behind the automation addon is to provide something that is similar to Rules DSL but more powerful, customizable and flexible. JRule relies on strict typing where you are less likely to construct rules that are not working due to syntax error.
 
