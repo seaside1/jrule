@@ -121,13 +121,15 @@ public abstract class JRuleITBase {
                 logLines.add(line);
                 if (!line.matches(LOG_REGEX_START)) {
                     // this line was splitted
-                    int index = logLines.size() - 1;
-                    String prevLine = logLines.get(index - 1);
-                    if (prevLine.matches(LOG_REGEX_START)) {
-                        logLines.remove(index);
-                        String newLine = prevLine + line;
-                        log.warn("merged to lines: {}", newLine);
-                        logLines.add(newLine);
+                    int index = logLines.size() - 2;
+                    if (logLines.size() > 2) {
+                        String prevLine = logLines.get(index);
+                        if (prevLine.matches(LOG_REGEX_START)) {
+                            logLines.remove(index);
+                            String newLine = prevLine + line;
+                            log.warn("merged two lines: {}", newLine);
+                            logLines.add(newLine);
+                        }
                     }
                 }
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
