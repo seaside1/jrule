@@ -100,6 +100,7 @@ public abstract class JRuleITBase {
             "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer);
 
     public static final int TIMEOUT = 180;
+    public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
     private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:3.3.0-debian")
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
@@ -116,7 +117,19 @@ public abstract class JRuleITBase {
                     MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user", 0777),
                     "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user")
             .withExposedPorts(8080).withLogConsumer(outputFrame -> {
-                logLines.add(outputFrame.getUtf8String().strip());
+                String line = outputFrame.getUtf8String().strip();
+                logLines.add(line);
+                if (!line.matches(LOG_REGEX_START)) {
+                    // this line was splitted
+                    int index = logLines.size() - 1;
+                    String prevLine = logLines.get(index);
+                    if (prevLine.matches(LOG_REGEX_START)) {
+                        logLines.remove(index);
+                        String newLine = prevLine + line;
+                        log.warn("merged to lines: {}", newLine);
+                        logLines.add(newLine);
+                    }
+                }
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
             }).waitingFor(new WaitAllStrategy(WaitAllStrategy.Mode.WITH_MAXIMUM_OUTER_TIMEOUT)
                     .withStrategy(new AbstractWaitStrategy() {
