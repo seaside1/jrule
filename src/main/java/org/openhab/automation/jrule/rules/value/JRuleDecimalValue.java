@@ -96,4 +96,8 @@ public class JRuleDecimalValue implements JRuleValue {
     public int intValue() {
         return this.value.intValue();
     }
+
+    public long longValue() {
+        return this.value.longValue();
+    }
 }

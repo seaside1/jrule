@@ -126,7 +126,7 @@ public abstract class JRuleITBase {
                         String prevLine = logLines.get(index);
                         if (prevLine.matches(LOG_REGEX_START)) {
                             logLines.remove(index);
-                            String newLine = prevLine + line;
+                            String newLine = prevLine + " " + line;
                             log.warn("merged two lines: {}", newLine);
                             logLines.add(newLine);
                         }

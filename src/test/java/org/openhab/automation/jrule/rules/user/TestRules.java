@@ -445,12 +445,14 @@ public class TestRules extends JRule {
         assert numberItem.getState().doubleValue() == 0;
         assert numberItem.getState().intValue() == 0;
         assert numberItem.getState().floatValue() == 0;
+        assert numberItem.getState().doubleValue() == 0;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
 
         numberItem.sendCommand(22);
         assert numberItem.getState().doubleValue() == 22;
         assert numberItem.getState().intValue() == 22;
         assert numberItem.getState().floatValue() == 22;
+        assert numberItem.getState().doubleValue() == 22;
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
