@@ -122,7 +122,7 @@ public abstract class JRuleITBase {
                 if (!line.matches(LOG_REGEX_START)) {
                     // this line was splitted
                     int index = logLines.size() - 1;
-                    String prevLine = logLines.get(index);
+                    String prevLine = logLines.get(index - 1);
                     if (prevLine.matches(LOG_REGEX_START)) {
                         logLines.remove(index);
                         String newLine = prevLine + line;

@@ -22,6 +22,9 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRulePlayerItem extends JRuleItem<JRulePlayPauseValue> {
+    String PLAY = "PLAY";
+    String PAUSE = "PAUSE";
+
     static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
     }

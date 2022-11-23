@@ -22,6 +22,9 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRuleContactItem extends JRuleItem<JRuleOpenClosedValue> {
+    String OPEN = "OPEN";
+    String CLOSED = "CLOSED";
+
     static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
     }
