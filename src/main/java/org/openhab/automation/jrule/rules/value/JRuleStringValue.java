@@ -24,33 +24,29 @@ import org.openhab.core.types.State;
  * @author Robert Delbrück - Initial contribution
  */
 public class JRuleStringValue implements JRuleValue {
-    private final String value;
+    private final StringType ohType;
 
     public JRuleStringValue(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public static JRuleStringValue getValueFromString(String value) {
-        return new JRuleStringValue(value);
+        this.ohType = new StringType(value);
     }
 
     @Override
     public String asStringValue() {
-        return this.value;
+        return this.ohType.toFullString();
     }
 
     @Override
     public Command toOhCommand() {
-        return new StringType(this.value);
+        return this.ohType;
     }
 
     @Override
     public State toOhState() {
-        return new StringType(this.value);
+        return this.ohType;
+    }
+
+    public String stringValue() {
+        return this.ohType.toFullString();
     }
 
     @Override
@@ -60,15 +56,11 @@ public class JRuleStringValue implements JRuleValue {
         if (o == null || getClass() != o.getClass())
             return false;
         JRuleStringValue that = (JRuleStringValue) o;
-        return value.equals(that.value);
+        return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    public String stringValue() {
-        return this.value;
+        return Objects.hash(ohType);
     }
 }

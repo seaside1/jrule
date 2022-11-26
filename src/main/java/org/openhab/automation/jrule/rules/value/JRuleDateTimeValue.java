@@ -12,11 +12,8 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Objects;
 
@@ -30,61 +27,37 @@ import org.openhab.core.types.State;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleDateTimeValue implements JRuleValue {
-    private static final DateTimeFormatter PARSER = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]");
-    private static final DateTimeFormatter PARSER_TZ = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]z");
-    private static final DateTimeFormatter PARSER_TZ_RFC = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]Z");
-    private static final DateTimeFormatter PARSER_TZ_ISO = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS][.SSSSSSSS][.SSSSSSS][.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]]X");
-    private static final DateTimeFormatter FORMATTER_TZ_RFC = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd'T'HH:mm[:ss[.SSSSSSSSS]]Z");
-
-    private ZonedDateTime value;
+    private final DateTimeType ohType;
 
     public JRuleDateTimeValue(ZonedDateTime value) {
-        this.value = value.toOffsetDateTime().toZonedDateTime();
+        this.ohType = new DateTimeType(value);
     }
 
     public JRuleDateTimeValue(String fullString) {
-        try {
-            this.value = ZonedDateTime.parse(fullString, PARSER_TZ_RFC);
-        } catch (DateTimeParseException var9) {
-            try {
-                this.value = ZonedDateTime.parse(fullString, PARSER_TZ_ISO);
-            } catch (DateTimeParseException var8) {
-                try {
-                    this.value = ZonedDateTime.parse(fullString, PARSER_TZ);
-                } catch (DateTimeParseException var7) {
-                    LocalDateTime localDateTime = LocalDateTime.parse(fullString, PARSER);
-                    this.value = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
-                }
-            }
-        }
+        this.ohType = new DateTimeType(fullString);
     }
 
     public JRuleDateTimeValue(Date date) {
-        this.value = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        this.ohType = new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
     }
 
     public ZonedDateTime getValue() {
-        return value;
+        return ohType.getZonedDateTime();
     }
 
     @Override
     public String asStringValue() {
-        return this.value.format(FORMATTER_TZ_RFC);
+        return this.ohType.toFullString();
     }
 
     @Override
     public Command toOhCommand() {
-        return new DateTimeType(this.value);
+        return this.ohType;
     }
 
     @Override
     public State toOhState() {
-        return new DateTimeType(this.value);
+        return this.ohType;
     }
 
     @Override
@@ -94,11 +67,11 @@ public class JRuleDateTimeValue implements JRuleValue {
         if (o == null || getClass() != o.getClass())
             return false;
         JRuleDateTimeValue that = (JRuleDateTimeValue) o;
-        return value.equals(that.value);
+        return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hash(ohType);
     }
 }

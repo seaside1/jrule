@@ -397,11 +397,9 @@ public class TestRules extends JRule {
 
         stringItem.sendCommand("abc");
         assert stringItem.getState().stringValue().equals("abc");
-        assert stringItem.getState().getValue().equals("abc");
 
         stringItem.sendCommand("xyz");
         assert stringItem.getState().stringValue().equals("xyz");
-        assert stringItem.getState().getValue().equals("xyz");
     }
 
     private static void castColor() {

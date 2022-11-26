@@ -13,10 +13,7 @@
 package org.openhab.automation.jrule.rules.value;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PointType;
@@ -29,78 +26,53 @@ import org.openhab.core.types.State;
  * @author Robert Delbrück - Initial contribution
  */
 public class JRulePointValue implements JRuleValue {
-    private final BigDecimal latitude;
-    private final BigDecimal longitude;
-    private final BigDecimal altitude;
+    private final PointType ohType;
 
     public JRulePointValue(BigDecimal latitude, BigDecimal longitude, BigDecimal altitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.altitude = altitude;
+        this.ohType = new PointType(new DecimalType(latitude), new DecimalType(longitude), new DecimalType(altitude));
     }
 
     public JRulePointValue(BigDecimal latitude, BigDecimal longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.altitude = null;
+        this.ohType = new PointType(new DecimalType(latitude), new DecimalType(longitude));
     }
 
     public JRulePointValue(String value) {
-        List<BigDecimal> elements = Arrays.stream(value.split(",")).map(String::trim).map(BigDecimal::new)
-                .collect(Collectors.toList());
-        this.latitude = elements.get(0);
-        this.longitude = elements.get(1);
-        if (elements.size() == 3) {
-            this.altitude = elements.get(2);
-        } else {
-            this.altitude = null;
-        }
+        this.ohType = new PointType(value);
     }
 
     public JRulePointValue(double latitude, double longitude) {
-        this.latitude = new BigDecimal(latitude);
-        this.longitude = new BigDecimal(longitude);
-        this.altitude = null;
+        this.ohType = new PointType(new DecimalType(latitude), new DecimalType(longitude));
     }
 
     public JRulePointValue(double latitude, double longitude, double altitude) {
-        this.latitude = new BigDecimal(latitude);
-        this.longitude = new BigDecimal(longitude);
-        this.altitude = new BigDecimal(altitude);
+        this.ohType = new PointType(new DecimalType(latitude), new DecimalType(longitude), new DecimalType(altitude));
     }
 
     public BigDecimal getLatitude() {
-        return latitude;
+        return this.ohType.getLatitude().toBigDecimal();
     }
 
     public BigDecimal getLongitude() {
-        return longitude;
+        return this.ohType.getLongitude().toBigDecimal();
     }
 
     public BigDecimal getAltitude() {
-        return altitude;
+        return this.ohType.getAltitude().toBigDecimal();
     }
 
     @Override
     public String asStringValue() {
-        StringBuilder buffer = new StringBuilder().append(this.latitude.floatValue()).append(",")
-                .append(this.longitude.floatValue());
-        if (this.altitude != null) {
-            buffer.append(",").append(this.altitude.floatValue());
-        }
-        return buffer.toString();
+        return this.ohType.toFullString();
     }
 
     @Override
     public Command toOhCommand() {
-        return new PointType(new DecimalType(this.latitude), new DecimalType(this.longitude),
-                this.altitude != null ? new DecimalType(this.altitude) : DecimalType.ZERO);
+        return this.ohType;
     }
 
     @Override
     public State toOhState() {
-        return new PointType(new DecimalType(this.latitude), new DecimalType(this.longitude),
-                this.altitude != null ? new DecimalType(this.altitude) : DecimalType.ZERO);
+        return this.ohType;
     }
 
     @Override
@@ -110,12 +82,11 @@ public class JRulePointValue implements JRuleValue {
         if (o == null || getClass() != o.getClass())
             return false;
         JRulePointValue that = (JRulePointValue) o;
-        return latitude.equals(that.latitude) && longitude.equals(that.longitude)
-                && Objects.equals(altitude, that.altitude);
+        return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(latitude, longitude, altitude);
+        return Objects.hash(ohType);
     }
 }

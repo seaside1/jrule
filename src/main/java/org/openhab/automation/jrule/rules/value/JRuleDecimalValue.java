@@ -13,10 +13,6 @@
 package org.openhab.automation.jrule.rules.value;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Locale;
 import java.util.Objects;
 
 import org.openhab.core.library.types.DecimalType;
@@ -29,45 +25,37 @@ import org.openhab.core.types.State;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleDecimalValue implements JRuleValue {
-    private final BigDecimal value;
+    private final DecimalType ohType;
 
     public JRuleDecimalValue(BigDecimal value) {
-        this.value = value;
+        this.ohType = new DecimalType(value);
     }
 
     public JRuleDecimalValue(String value) {
-        DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
-        df.setParseBigDecimal(true);
-        ParsePosition position = new ParsePosition(0);
-        BigDecimal parsedValue = (BigDecimal) df.parseObject(value, position);
-        if (parsedValue != null && position.getErrorIndex() == -1 && position.getIndex() >= value.length()) {
-            this.value = parsedValue;
-        } else {
-            throw new NumberFormatException("Invalid BigDecimal value: " + value);
-        }
+        this.ohType = new DecimalType(value);
     }
 
     public JRuleDecimalValue(double value) {
-        this.value = new BigDecimal(value);
+        this.ohType = new DecimalType(value);
     }
 
     public BigDecimal getValue() {
-        return value;
+        return this.ohType.toBigDecimal();
     }
 
     @Override
     public String asStringValue() {
-        return this.value.toPlainString();
+        return this.ohType.toFullString();
     }
 
     @Override
     public Command toOhCommand() {
-        return new DecimalType(this.value);
+        return this.ohType;
     }
 
     @Override
     public State toOhState() {
-        return new DecimalType(this.value);
+        return this.ohType;
     }
 
     @Override
@@ -77,27 +65,27 @@ public class JRuleDecimalValue implements JRuleValue {
         if (o == null || getClass() != o.getClass())
             return false;
         JRuleDecimalValue that = (JRuleDecimalValue) o;
-        return value.equals(that.value);
+        return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hash(ohType);
     }
 
     public double doubleValue() {
-        return this.value.doubleValue();
+        return this.ohType.doubleValue();
     }
 
     public float floatValue() {
-        return this.value.floatValue();
+        return this.ohType.floatValue();
     }
 
     public int intValue() {
-        return this.value.intValue();
+        return this.ohType.intValue();
     }
 
     public long longValue() {
-        return this.value.longValue();
+        return this.ohType.longValue();
     }
 }

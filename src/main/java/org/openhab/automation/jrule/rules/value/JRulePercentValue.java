@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -21,30 +24,68 @@ import org.openhab.core.types.State;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePercentValue extends JRuleDecimalValue {
+public class JRulePercentValue implements JRuleValue {
+    private final PercentType ohType;
+
     public JRulePercentValue(int value) {
-        super(value);
+        this.ohType = new PercentType(value);
     }
 
     public JRulePercentValue(double value) {
-        super((int) Math.round(value + 0.5));
+        this.ohType = new PercentType(new BigDecimal(value));
     }
 
     public JRulePercentValue(String value) {
-        super(value);
+        this.ohType = new PercentType(value);
     }
 
     public JRulePercentValue(boolean value) {
-        super(value ? 100 : 0);
+        this.ohType = new PercentType(value ? 100 : 0);
+    }
+
+    @Override
+    public String asStringValue() {
+        return this.ohType.toFullString();
     }
 
     @Override
     public Command toOhCommand() {
-        return new PercentType(this.getValue());
+        return this.ohType;
     }
 
     @Override
     public State toOhState() {
-        return new PercentType(this.getValue());
+        return this.ohType;
+    }
+
+    public double doubleValue() {
+        return this.ohType.doubleValue();
+    }
+
+    public float floatValue() {
+        return this.ohType.floatValue();
+    }
+
+    public int intValue() {
+        return this.ohType.intValue();
+    }
+
+    public long longValue() {
+        return this.ohType.longValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRulePercentValue that = (JRulePercentValue) o;
+        return ohType.equals(that.ohType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ohType);
     }
 }
