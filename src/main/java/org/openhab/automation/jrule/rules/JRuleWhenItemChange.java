@@ -33,7 +33,7 @@ public @interface JRuleWhenItemChange {
 
     String to() default "";
 
-    boolean memberOf() default false;
+    JRuleMemberOf memberOf() default JRuleMemberOf.None;
 
     JRuleCondition condition() default @JRuleCondition;
 }

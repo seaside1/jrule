@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
@@ -55,6 +56,7 @@ import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
 import org.openhab.automation.jrule.rules.JRuleLogName;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 import org.openhab.automation.jrule.rules.JRuleTag;
@@ -68,6 +70,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
+import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
@@ -275,14 +278,19 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private JRuleItemExecutionContext.JRuleAdditionalItemCheckData getAdditionalCheckData(AbstractEvent event) {
-        return Optional.ofNullable(event instanceof ItemEvent ? ((ItemEvent) event).getItemName() : null).map(s -> {
-            try {
-                return itemRegistry.getItem(s);
-            } catch (ItemNotFoundException e) {
-                throw new IllegalStateException("this can never occur", e);
-            }
-        }).map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getGroupNames()))
-                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(List.of()));
+        return Optional.ofNullable(event instanceof ItemEvent ? ((ItemEvent) event).getItemName() : null)
+                .map(s -> getItem(s))
+                .map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getGroupNames().stream()
+                        .collect(Collectors.toMap(name -> name, name -> getItem(name) instanceof GroupItem))))
+                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(Map.of()));
+    }
+
+    private Item getItem(String name) {
+        try {
+            return itemRegistry.getItem(name);
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException(String.format("cannot find item: %s", name), e);
+        }
     }
 
     public boolean matchPrecondition(JRuleExecutionContext jRuleExecutionContext) {
@@ -356,18 +364,14 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
-        List<String> belongingGroups = Optional.of(itemName).map(s -> {
-            try {
-                return itemRegistry.getItem(s);
-            } catch (ItemNotFoundException e) {
-                throw new IllegalStateException("this can never occur", e);
-            }
-        }).map(Item::getGroupNames).orElse(List.of());
+        List<String> parentGroups = Optional.of(itemName).map(this::getItem).map(Item::getGroupNames).orElse(List.of());
 
         boolean b = this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
                 .map(context -> ((JRuleItemExecutionContext) context))
-                .anyMatch(context -> (context.getItemName().equals(itemName) && !context.isMemberOf())
-                        || (belongingGroups.contains(context.getItemName()) && context.isMemberOf()));
+                .anyMatch(context -> (context.getItemName().equals(itemName)
+                        && context.getMemberOf() == JRuleMemberOf.None)
+                        || (parentGroups.contains(context.getItemName())
+                                && context.getMemberOf() != JRuleMemberOf.None));
         logDebug("watching for item: '{}'? -> {}", itemName, b);
         return b;
     }

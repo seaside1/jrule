@@ -14,10 +14,12 @@ package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.core.library.types.QuantityType;
 
 /**
@@ -27,7 +29,7 @@ import org.openhab.core.library.types.QuantityType;
  */
 public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final String itemName;
-    protected final boolean memberOf;
+    protected final JRuleMemberOf memberOf;
     protected final Optional<Double> gt;
     protected final Optional<Double> gte;
     protected final Optional<Double> lt;
@@ -36,8 +38,9 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final Optional<String> neq;
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
-            boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
-            Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList) {
+            JRuleMemberOf memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
+            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
+            List<JRulePreconditionContext> preconditionContextList) {
         super(jRule, logName, loggingTags, method, preconditionContextList);
         this.itemName = itemName;
         this.memberOf = memberOf;
@@ -103,18 +106,21 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
         return neq;
     }
 
-    public boolean isMemberOf() {
+    public JRuleMemberOf getMemberOf() {
         return memberOf;
     }
 
     public static class JRuleAdditionalItemCheckData extends JRuleAdditionalCheckData {
-        private final List<String> belongingGroups;
+        /**
+         * Itemname, IsGroup
+         */
+        private final Map<String, Boolean> belongingGroups;
 
-        public JRuleAdditionalItemCheckData(List<String> belongingGroups) {
+        public JRuleAdditionalItemCheckData(Map<String, Boolean> belongingGroups) {
             this.belongingGroups = belongingGroups;
         }
 
-        public List<String> getBelongingGroups() {
+        public Map<String, Boolean> getBelongingGroups() {
             return belongingGroups;
         }
 
