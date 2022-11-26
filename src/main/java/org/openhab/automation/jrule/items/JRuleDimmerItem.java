@@ -13,8 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
@@ -35,15 +33,9 @@ public interface JRuleDimmerItem extends JRuleItem<JRulePercentValue> {
 
     void sendCommand(int command);
 
-    void sendCommand(JRuleOnOffValue command);
-
-    void sendCommand(JRuleIncreaseDecreaseValue command);
-
     void sendCommand(boolean command);
 
     void postUpdate(boolean command);
-
-    void postUpdate(JRuleOnOffValue value);
 
     void postUpdate(int value);
 }

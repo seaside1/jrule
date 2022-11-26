@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.internal.items;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
@@ -28,22 +27,6 @@ public class JRuleInternalColorItem extends JRuleInternalItem<JRuleHsbValue> imp
 
     public JRuleInternalColorItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
-    }
-
-    public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
-    }
-
-    public void postUpdate(JRuleHsbValue value) {
-        JRuleEventHandler.get().postUpdate(name, value);
-    }
-
-    public void postUpdate(JRuleOnOffValue state) {
-        JRuleEventHandler.get().postUpdate(name, state);
     }
 
     public void postUpdate(int value) {

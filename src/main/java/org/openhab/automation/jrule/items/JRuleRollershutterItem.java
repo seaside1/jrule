@@ -14,8 +14,6 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
-import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -28,17 +26,11 @@ public interface JRuleRollershutterItem extends JRuleItem<JRulePercentValue> {
         return JRuleItemRegistry.get(itemName, JRuleRollershutterItem.class);
     }
 
-    void sendCommand(JRuleUpDownValue command);
-
-    void sendCommand(JRuleStopMoveValue command);
-
     void sendCommand(int value);
 
     void sendCommand(boolean command);
 
     void postUpdate(boolean command);
-
-    void postUpdate(JRuleUpDownValue state);
 
     void postUpdate(int value);
 

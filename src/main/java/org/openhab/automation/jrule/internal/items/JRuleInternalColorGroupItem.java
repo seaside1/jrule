@@ -12,12 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.util.Set;
-
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleColorGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
@@ -32,48 +27,19 @@ public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implemen
         super(name, label, type, id);
     }
 
-    public void sendCommand(JRuleHsbValue colorValue) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, colorValue));
-    }
-
-    public void sendCommand(JRuleOnOffValue command) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command));
-    }
-
-    public void postUpdate(JRuleOnOffValue state) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, state));
-    }
-
-    public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, command));
-    }
-
     public void sendCommand(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value)));
-    }
-
-    public void postUpdate(JRuleHsbValue colorValue) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, colorValue));
+        memberItems().forEach(i -> i.sendCommand(new JRulePercentValue(value)));
     }
 
     public void postUpdate(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value)));
+        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(value)));
     }
 
     public void sendCommand(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().sendCommand(s, JRuleOnOffValue.valueOf(command)));
+        memberItems().forEach(i -> i.sendCommand(JRuleOnOffValue.valueOf(command)));
     }
 
     public void postUpdate(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().postUpdate(s, JRuleOnOffValue.valueOf(command)));
+        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(command)));
     }
 }

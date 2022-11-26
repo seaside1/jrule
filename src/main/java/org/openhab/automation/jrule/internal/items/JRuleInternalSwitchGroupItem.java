@@ -12,7 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
@@ -27,12 +26,10 @@ public class JRuleInternalSwitchGroupItem extends JRuleInternalSwitchItem implem
     }
 
     public void sendCommand(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().sendCommand(s, JRuleOnOffValue.valueOf(command)));
+        memberItems().forEach(i -> i.sendCommand(JRuleOnOffValue.valueOf(command)));
     }
 
     public void postUpdate(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().postUpdate(s, JRuleOnOffValue.valueOf(command)));
+        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(command)));
     }
 }

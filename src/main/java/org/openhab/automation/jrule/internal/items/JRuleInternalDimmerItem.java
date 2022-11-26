@@ -14,8 +14,6 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDimmerItem;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
@@ -29,20 +27,8 @@ public class JRuleInternalDimmerItem extends JRuleInternalItem<JRulePercentValue
         super(name, label, type, id);
     }
 
-    public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
-    }
-
-    public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(name, command);
-    }
-
     public void sendCommand(int command) {
         JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(command));
-    }
-
-    public void postUpdate(JRuleOnOffValue value) {
-        JRuleEventHandler.get().postUpdate(name, value);
     }
 
     public void postUpdate(int value) {

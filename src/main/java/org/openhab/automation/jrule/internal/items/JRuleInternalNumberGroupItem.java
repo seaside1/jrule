@@ -12,9 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.util.Set;
-
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 
@@ -30,22 +27,18 @@ public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implem
     }
 
     public void sendCommand(double value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value)));
+        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(value)));
     }
 
     public void postUpdate(double value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDecimalValue(value)));
+        memberItems().forEach(i -> i.postUpdate(new JRuleDecimalValue(value)));
     }
 
     public void sendCommand(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleDecimalValue(value)));
+        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(value)));
     }
 
     public void postUpdate(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleDecimalValue(value)));
+        memberItems().forEach(i -> i.postUpdate(new JRuleDecimalValue(value)));
     }
 }

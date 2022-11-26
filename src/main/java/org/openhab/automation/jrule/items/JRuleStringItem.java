@@ -30,4 +30,8 @@ public interface JRuleStringItem extends JRuleItem<JRuleStringValue> {
     default Class<? extends JRuleValue> getDefaultValueClass() {
         return JRuleStringValue.class;
     }
+
+    void sendCommand(String state);
+
+    void postUpdate(String state);
 }

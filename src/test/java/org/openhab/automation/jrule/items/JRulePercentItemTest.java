@@ -33,7 +33,7 @@ class JRulePercentItemTest {
     @Test
     public void testSendCommand() throws ItemNotFoundException {
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        DimmerItem ohItem = new DimmerItem("Any");
+        DimmerItem ohItem = new DimmerItem("Name");
         ohItem.setState(new PercentType(75));
         Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenReturn(ohItem);
 
@@ -42,7 +42,6 @@ class JRulePercentItemTest {
         JRuleDimmerItem item = new JRuleInternalDimmerItem("Name", "Label", "Type", "Id");
         JRuleOnOffValue command = JRuleOnOffValue.ON;
         item.sendCommand(command);
-        item.sendCommand(command.asStringValue());
         JRulePercentValue state = item.getState();
         Assertions.assertNotNull(state);
         JRuleOnOffValue asOnOffValue = item.getStateAs(JRuleOnOffValue.class);

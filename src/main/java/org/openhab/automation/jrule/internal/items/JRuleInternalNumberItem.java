@@ -67,7 +67,7 @@ public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue
 
     public Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.varianceSince(name, timestamp, persistenceServiceId)
-                .map(decimalType -> decimalType.doubleValue());
+                .map(DecimalType::doubleValue);
     }
 
     public Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {

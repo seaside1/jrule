@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.items;
 import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -37,19 +36,11 @@ public interface JRuleGroupItem<T extends JRuleValue> extends JRuleItem<T> {
         return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive);
     }
 
-    default void sendCommand(String value) {
-        members().forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRuleStringValue(value)));
-    }
-
-    default void postUpdate(String value) {
-        members().forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRuleStringValue(value)));
-    }
-
-    default void sendCommand(T value) {
+    default void sendCommand(JRuleValue value) {
         members().forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
     }
 
-    default void postUpdate(T value) {
+    default void postUpdate(JRuleValue value) {
         members().forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
     }
 
