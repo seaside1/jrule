@@ -12,8 +12,10 @@
  */
 package org.openhab.automation.jrule.rules;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
@@ -245,8 +248,114 @@ public class JRule {
         JRuleActionHandler.get().executeCommandLine(commandLine);
     }
 
-    protected String executeCommandLineAndAwaitResponse(long delayInSeconds, String... commandLine) {
-        return JRuleActionHandler.get().executeCommandAndAwaitResponse(delayInSeconds, commandLine);
+    @Deprecated
+    protected String executeCommandLineAndAwaitResponse(long timeout, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(Duration.of(timeout, ChronoUnit.SECONDS),
+                commandLine);
+    }
+
+    protected String executeCommandLineAndAwaitResponse(Duration timeout, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(timeout, commandLine);
+    }
+
+    /**
+     * Sends a GET-HTTP request and returns the result as a String
+     * 
+     * @param url Target URL
+     * @return Result as String
+     */
+    protected String sendHttpGetRequest(String url, Duration timeout) {
+        return JRuleActionHandler.get().sendHttpGetRequest(url, null, timeout);
+    }
+
+    /**
+     * Sends a GET-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
+     * 
+     * @param url Target URL
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpGetRequest(String url, @Nullable Map<String, String> headers, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpGetRequest(url, headers, timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request and returns the result as a String
+     * 
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, null, null, null, timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     * 
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, String contentType, String content, Map<String, String> headers,
+            Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, contentType, content, headers, timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request and returns the result as a String
+     * 
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, null, null, null, timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     * <br/>
+     * 
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, String contentType, String content, Map<String, String> headers,
+            Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, contentType, content, headers, timeout);
+    }
+
+    /**
+     * Sends a DELETE-HTTP request and returns the result as a String
+     * 
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpDeleteRequest(String url, Duration timeout) {
+        return JRuleActionHandler.get().sendHttpDeleteRequest(url, null, timeout);
+    }
+
+    /**
+     * Sends a DELETE-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
+     * 
+     * @param url Target URL
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled
+     * @return Result as String
+     */
+    protected String sendHttpDeleteRequest(String url, Map<String, String> headers, Duration timeout) {
+        return JRuleActionHandler.get().sendHttpDeleteRequest(url, headers, timeout);
     }
 
     protected void say(String text, String voiceId, String sinkId) {

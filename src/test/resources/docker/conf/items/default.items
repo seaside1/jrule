@@ -7,3 +7,5 @@ Switch          Switch_Group_Member2        (MySwitchGroup)
 Number          Number_Condition
 String          Precondition_String
 Switch          Preconditioned_Switch
+
+String          Trigger_HttpAction
