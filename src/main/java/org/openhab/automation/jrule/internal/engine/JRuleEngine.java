@@ -470,7 +470,7 @@ public class JRuleEngine implements PropertyChangeListener {
                 method.invoke(rule);
             }
         } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
-            JRuleLog.error(logger, context.getMethod().getName(), "Error {}", e);
+            JRuleLog.error(logger, context.getMethod().getName(), "Error calling rule method: {}", ExceptionUtils.getStackTrace(e));
         } catch (InvocationTargetException e) {
             Throwable ex = e.getCause() != null ? e.getCause() : null;
             JRuleLog.error(logger, context.getMethod().getName(), "Error message", ex);
