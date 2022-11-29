@@ -127,8 +127,8 @@ public class JRule {
         return future.thenAccept(s -> {
             try {
                 JRule.JRULE_EXECUTION_CONTEXT.set(context);
-                JRuleLog.info(logger, context.getLogName(), "Timer has finsihed");
-                JRuleLog.debug(logger, context.getLogName(), "Timer has finsihed hashCode: {}", future.hashCode());
+                JRuleLog.info(logger, context.getLogName(), "Timer has finished");
+                JRuleLog.debug(logger, context.getLogName(), "Timer has finished hashCode: {}", future.hashCode());
                 timerNameToTimerFuture.remove(timerName);
                 fn.accept(null);
             } finally {
@@ -210,7 +210,7 @@ public class JRule {
                     JRULE_EXECUTION_CONTEXT.remove();
                 }
 
-                JRuleLog.info(logger, context.getLogName(), "Repeating Timer has finsihed");
+                JRuleLog.info(logger, context.getLogName(), "Repeating Timer has finished");
                 List<CompletableFuture<Void>> finishedList = timerNameToTimerFutureList.remove(timerName);
                 if (finishedList != null) {
                     finishedList.clear();
