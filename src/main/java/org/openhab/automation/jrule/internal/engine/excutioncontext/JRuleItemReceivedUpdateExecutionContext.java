@@ -78,13 +78,16 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
         final String itemName;
+        final String memberName;
         if (getMemberOf() != JRuleMemberOf.None) {
+            memberName = ((ItemEvent) event).getItemName();
             itemName = ((ItemEvent) event).getItemName();
         } else {
+            memberName = null;
             itemName = this.getItemName();
         }
 
-        return new JRuleItemEvent(itemName, null,
+        return new JRuleItemEvent(itemName, memberName,
                 new JRuleEventState(((ItemStateEvent) event).getItemState().toString()), null);
     }
 

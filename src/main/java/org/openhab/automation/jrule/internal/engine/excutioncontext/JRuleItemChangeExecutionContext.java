@@ -85,7 +85,7 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
         final String memberName;
         if (getMemberOf() != JRuleMemberOf.None) {
             itemName = ((ItemEvent) event).getItemName();
-            memberName = null;
+            memberName = ((ItemEvent) event).getItemName();
         } else {
             itemName = this.getItemName();
             memberName = event instanceof GroupItemStateChangedEvent
