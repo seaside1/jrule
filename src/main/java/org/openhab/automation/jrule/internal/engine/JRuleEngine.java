@@ -89,7 +89,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private List<JRuleExecutionContext> contextList = new CopyOnWriteArrayList<>();
     private JRuleTimerExecutor timerExecutor = new JRuleTimerExecutor(this);
-    private static final String MDC_KEY_RULE = "rule";
+    public static final String MDC_KEY_RULE = "rule";
     protected ThreadPoolExecutor ruleExecutorService;
     protected JRuleConfig config;
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
@@ -459,7 +459,6 @@ public class JRuleEngine implements PropertyChangeListener {
         final Method method = context.getMethod();
 
         try {
-
             JRule.JRULE_EXECUTION_CONTEXT.set(context);
             JRuleLog.debug(logger, context.getMethod().getName(), "setting mdc tags: {}", context.getLoggingTags());
             MDC.put(MDC_KEY_RULE, context.getMethod().getName());
@@ -479,7 +478,6 @@ public class JRuleEngine implements PropertyChangeListener {
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
-            logger.debug("Removing thread local after rule completion");
             JRule.JRULE_EXECUTION_CONTEXT.remove();
         }
     }

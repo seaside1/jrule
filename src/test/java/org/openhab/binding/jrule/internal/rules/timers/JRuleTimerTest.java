@@ -36,7 +36,7 @@ import org.openhab.core.types.UnDefType;
 public class JRuleTimerTest extends JRuleAbstractTest {
 
     @Test
-    public void testOneOffTimerWithNestedtimer() throws ItemNotFoundException, InterruptedException {
+    public void testOneOffTimerWithNestedTimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
@@ -48,6 +48,8 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "command"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timedCommand"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "nestedTimedCommand"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "unique timer"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "repeating-10"));
     }
 
     private Event itemChangeEvent(String item, String from, String to) {
