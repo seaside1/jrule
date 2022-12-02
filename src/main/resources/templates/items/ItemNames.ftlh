@@ -7,7 +7,7 @@ package ${packageName};
 *
 * @author Robert Delbrück - Initial
 */
-public class JRuleItemName {
+public class JRuleItemNames {
 <#list itemNames as itemName>
  public static final String ${itemName.name} = "${itemName.name}";
 </#list>

@@ -151,7 +151,7 @@ public class JRuleItemNameClassGeneratorTest {
         boolean success = sourceFileGenerator.generateItemNamesSource(items);
         assertTrue(success, "Failed to generate source file for items");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleItemName.java")), "target/classes:target/gen");
+        compiler.compile(List.of(new File(targetFolder, "JRuleItemNames.java")), "target/classes:target/gen");
 
         // ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
         // Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {

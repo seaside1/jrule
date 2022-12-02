@@ -56,11 +56,11 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
         processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
 
         File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
-                .append(File.separator).append("JRuleItemName.java").toString());
+                .append(File.separator).append("JRuleItemNames.java").toString());
 
         try {
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
-                Template template = freemarkerConfiguration.getTemplate("items/ItemName" + TEMPLATE_SUFFIX);
+                Template template = freemarkerConfiguration.getTemplate("items/ItemNames" + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
             }
 
@@ -69,7 +69,7 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
             return true;
         } catch (Exception e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for JRuleItemName.java: {}",
+                    "Internal error when generating java source for JRuleItemNames.java: {}",
                     ExceptionUtils.getStackTrace(e));
 
         }
