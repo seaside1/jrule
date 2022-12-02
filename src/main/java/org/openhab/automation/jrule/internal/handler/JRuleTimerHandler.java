@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.internal.handler;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -88,10 +89,10 @@ public class JRuleTimerHandler {
         }
     }
 
-    public JRuleTimer createTimer(String timerName, Duration delay, Runnable function,
+    public JRuleTimer createTimer(@Nullable final String timerName, Duration delay, Runnable function,
             @Nullable JRuleExecutionContext context) {
         final String newTimerName = Optional.ofNullable(timerName).orElse(UUID.randomUUID().toString());
-        Optional<JRuleTimer> any = timers.stream().filter(timer -> timer.name.equals(newTimerName)).findAny();
+        Optional<JRuleTimer> any = timers.stream().filter(timer -> Objects.equals(timer.name, newTimerName)).findAny();
         if (any.isPresent()) {
             JRuleLog.debug(logger, any.get().getLogName(), "Timer '{}' already running", newTimerName);
             return any.get();
