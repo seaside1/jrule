@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.jrule.internal.rules.timers;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,14 +43,33 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "2", "1")));
-        verify(rule, times(1)).testSendCommand();
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers")));
+        verify(rule, times(1)).testTimers();
         Thread.sleep(3000); // Wait for timer inside rule to execute
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "command"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timedCommand"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "nestedTimedCommand"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "unique timer"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "repeating-10"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "after the other one 3"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timer2 running true"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timer2 done false"));
+        assertFalse(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "canceled timer"));
+    }
+
+    @Test
+    public void testGetTimedLock() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "locks")));
+        verify(rule, times(1)).testLocks();
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "first: true"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "second: false"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "third: true"));
     }
 
     private Event itemChangeEvent(String item, String from, String to) {

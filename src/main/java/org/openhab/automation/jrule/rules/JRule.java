@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -76,7 +75,7 @@ public class JRule {
     }
 
     protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(String timerName, Duration delay, Runnable function) {
-        return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function);
+        return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function, null);
     }
 
     protected boolean cancelTimer(String timerName) {
@@ -84,17 +83,21 @@ public class JRule {
     }
 
     protected JRuleTimerHandler.JRuleTimer createTimer(String timerName, Duration delay, Runnable function) {
-        return JRuleTimerHandler.get().createTimer(timerName, delay, function);
+        return JRuleTimerHandler.get().createTimer(timerName, delay, function, null);
     }
 
-    protected List<JRuleTimerHandler.JRuleTimer> createOrReplaceRepeatingTimer(String timerName, Duration delay,
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(String timerName, Duration delay,
             int numberOfRepeats, Runnable function) {
-        return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(timerName, delay, numberOfRepeats, function);
+        return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
     }
 
-    protected List<JRuleTimerHandler.JRuleTimer> createRepeatingTimer(String timerName, Duration delay,
-            int numberOfRepeats, Runnable function) {
-        return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function);
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(String timerName, Duration delay, int numberOfRepeats,
+            Runnable function) {
+        return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
+    }
+
+    protected boolean getTimedLock(String lockName, Duration duration) {
+        return JRuleTimerHandler.get().getTimedLock(lockName, duration);
     }
 
     protected void say(String text, String voiceId, String sinkId) {
