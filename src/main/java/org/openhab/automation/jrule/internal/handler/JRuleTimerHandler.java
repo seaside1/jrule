@@ -124,7 +124,8 @@ public class JRuleTimerHandler {
 
         List<CompletableFuture<?>> newTimers = Stream.iterate(0, i -> i + 1).limit(numberOfRepeats)
                 .map(i -> delayedExecution(delay.multipliedBy(i).plus(delay))).collect(Collectors.toList());
-        JRuleTimer timer = new JRuleTimer(timerName, newTimers, context != null ? context : getCurrentContext(), delay);
+        JRuleTimer timer = new JRuleTimer(newTimerName, newTimers, context != null ? context : getCurrentContext(),
+                delay);
         timers.add(timer);
 
         newTimers.forEach(future -> executorService.submit(() -> invokeTimerInternal(timer, function)));
