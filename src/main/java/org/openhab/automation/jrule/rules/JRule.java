@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
@@ -70,33 +71,75 @@ public class JRule {
         return JRuleActionHandler.get().executeCommandAndAwaitResponse(delayInSeconds, commandLine);
     }
 
-    protected boolean isTimerRunning(String timerName) {
+    protected boolean isTimerRunning(@Nullable String timerName) {
         return JRuleTimerHandler.get().isTimerRunning(timerName);
     }
 
-    protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(String timerName, Duration delay, Runnable function) {
+    /**
+     * Creates or replaces a timer.
+     * 
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(@Nullable String timerName, Duration delay,
+            Runnable function) {
         return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function, null);
     }
 
-    protected boolean cancelTimer(String timerName) {
+    protected boolean cancelTimer(@Nullable String timerName) {
         return JRuleTimerHandler.get().cancelTimer(timerName);
     }
 
-    protected JRuleTimerHandler.JRuleTimer createTimer(String timerName, Duration delay, Runnable function) {
+    /**
+     * Creates a timer.
+     * 
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createTimer(@Nullable String timerName, Duration delay, Runnable function) {
         return JRuleTimerHandler.get().createTimer(timerName, delay, function, null);
     }
 
-    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(String timerName, Duration delay,
+    /**
+     * Creates or replace a repeating timer. All timers will have a delay to the previous one.
+     * 
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(@Nullable String timerName, Duration delay,
             int numberOfRepeats, Runnable function) {
         return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
     }
 
-    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(String timerName, Duration delay, int numberOfRepeats,
-            Runnable function) {
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     * 
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(@Nullable String timerName, Duration delay,
+            int numberOfRepeats, Runnable function) {
         return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
     }
 
-    protected boolean getTimedLock(String lockName, Duration duration) {
+    /**
+     * Creating a timed look.
+     * 
+     * @param lockName Name of the lock. Must be unique over all rules.
+     * @param duration Duration until the lock is held.
+     * @return Returns true if the lock for this name is not held. false if the lock is held.
+     */
+    protected boolean getTimedLock(@Nullable String lockName, Duration duration) {
         return JRuleTimerHandler.get().getTimedLock(lockName, duration);
     }
 
