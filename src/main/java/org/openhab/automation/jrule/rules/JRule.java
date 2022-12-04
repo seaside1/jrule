@@ -85,17 +85,6 @@ public class JRule {
     }
 
     /**
-     * Creates or replaces a timer.
-     *
-     * @param delay Initial delay and delay between the timers.
-     * @param function Code to execute.
-     * @return A handle for the timer.
-     */
-    protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(Duration delay, Runnable function) {
-        return JRuleTimerHandler.get().createOrReplaceTimer(null, delay, function, null);
-    }
-
-    /**
      * Creates a timer.
      * 
      * @param timerName Name of the timer or null.
@@ -133,19 +122,6 @@ public class JRule {
     }
 
     /**
-     * Creates or replace a repeating timer. All timers will have a delay to the previous one.
-     * 
-     * @param delay Initial delay and delay between the timers.
-     * @param numberOfRepeats Number of repetitions.
-     * @param function Code to execute.
-     * @return A handle for the timer.
-     */
-    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(Duration delay, int numberOfRepeats,
-            Runnable function) {
-        return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(null, delay, numberOfRepeats, function, null);
-    }
-
-    /**
      * Creates a repeating timer. All timers will have a delay to the previous one.
      *
      * @param timerName Name of the timer or null.
@@ -161,7 +137,7 @@ public class JRule {
 
     /**
      * Creates a repeating timer. All timers will have a delay to the previous one.
-     * 
+     *
      * @param delay Initial delay and delay between the timers.
      * @param numberOfRepeats Number of repetitions.
      * @param function Code to execute.

@@ -232,20 +232,10 @@ public class JRuleTimerHandler {
             return JRuleTimerHandler.this.createOrReplaceTimer(timerName, delay.plus(this.delay), function, context);
         }
 
-        public JRuleTimerHandler.JRuleTimer createOrReplaceTimerAfter(Duration delay, Runnable function) {
-            return JRuleTimerHandler.this.createOrReplaceTimer(null, delay.plus(this.delay), function, context);
-        }
-
         public JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimerAfter(@Nullable String timerName,
                 Duration delay, int numberOfRepeats, Runnable function) {
             return JRuleTimerHandler.this.createOrReplaceRepeatingTimer(timerName, delay.plus(this.delay),
                     numberOfRepeats, function, context);
-        }
-
-        public JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimerAfter(Duration delay, int numberOfRepeats,
-                Runnable function) {
-            return JRuleTimerHandler.this.createOrReplaceRepeatingTimer(null, delay.plus(this.delay), numberOfRepeats,
-                    function, context);
         }
 
         public JRuleTimerHandler.JRuleTimer createRepeatingTimerAfter(@Nullable String timerName, Duration delay,
