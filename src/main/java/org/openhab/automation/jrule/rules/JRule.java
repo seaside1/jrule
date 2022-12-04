@@ -71,10 +71,6 @@ public class JRule {
         return JRuleActionHandler.get().executeCommandAndAwaitResponse(delayInSeconds, commandLine);
     }
 
-    protected boolean isTimerRunning(@Nullable String timerName) {
-        return JRuleTimerHandler.get().isTimerRunning(timerName);
-    }
-
     /**
      * Creates or replaces a timer.
      * 
@@ -88,8 +84,15 @@ public class JRule {
         return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function, null);
     }
 
-    protected boolean cancelTimer(@Nullable String timerName) {
-        return JRuleTimerHandler.get().cancelTimer(timerName);
+    /**
+     * Creates or replaces a timer.
+     *
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(Duration delay, Runnable function) {
+        return JRuleTimerHandler.get().createOrReplaceTimer(null, delay, function, null);
     }
 
     /**
@@ -105,8 +108,19 @@ public class JRule {
     }
 
     /**
+     * Creates a timer.
+     *
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createTimer(Duration delay, Runnable function) {
+        return JRuleTimerHandler.get().createTimer(null, delay, function, null);
+    }
+
+    /**
      * Creates or replace a repeating timer. All timers will have a delay to the previous one.
-     * 
+     *
      * @param timerName Name of the timer or null.
      * @param delay Initial delay and delay between the timers.
      * @param numberOfRepeats Number of repetitions.
@@ -119,8 +133,21 @@ public class JRule {
     }
 
     /**
-     * Creates a repeating timer. All timers will have a delay to the previous one.
+     * Creates or replace a repeating timer. All timers will have a delay to the previous one.
      * 
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(Duration delay, int numberOfRepeats,
+            Runnable function) {
+        return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(null, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     *
      * @param timerName Name of the timer or null.
      * @param delay Initial delay and delay between the timers.
      * @param numberOfRepeats Number of repetitions.
@@ -130,6 +157,39 @@ public class JRule {
     protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(@Nullable String timerName, Duration delay,
             int numberOfRepeats, Runnable function) {
         return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     * 
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(Duration delay, int numberOfRepeats,
+            Runnable function) {
+        return JRuleTimerHandler.get().createRepeatingTimer(null, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Cancels the timer with the given name.
+     * 
+     * @param timerName Name of the timer or null.
+     * @return true if canceled, false if not.
+     */
+    protected boolean cancelTimer(String timerName) {
+        return JRuleTimerHandler.get().cancelTimer(timerName);
+    }
+
+    /**
+     * Checks if the timer with the given name is still running.
+     * 
+     * @param timerName Name of the timer or null.
+     * @return true if running, false if not.
+     */
+    protected boolean isTimerRunning(String timerName) {
+        return JRuleTimerHandler.get().isTimerRunning(timerName);
     }
 
     /**

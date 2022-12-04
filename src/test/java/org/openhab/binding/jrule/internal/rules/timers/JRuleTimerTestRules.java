@@ -43,7 +43,10 @@ public class JRuleTimerTestRules extends JRule {
         createRepeatingTimer("REPEATING_TIMER", Duration.ofSeconds(1), 1, () -> logInfo("Repeating timer completed"));
         createOrReplaceTimer("CREATE_OR_REPLACE_TIMER", Duration.ofSeconds(1),
                 () -> logInfo("Replaced timer completed"));
-        createTimer(null, Duration.ofSeconds(1), () -> stringItem.sendCommand("unique timer"));
+        createTimer(null, Duration.ofSeconds(1), () -> {
+            logInfo("log something");
+            stringItem.sendCommand("unique timer");
+        });
         createRepeatingTimer(null, Duration.ofMillis(10), 10,
                 () -> stringItem.sendCommand("repeating-" + String.valueOf(repeatingCounter.incrementAndGet())));
 

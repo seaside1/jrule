@@ -85,6 +85,7 @@ import org.slf4j.MDC;
  * @author Robert Delbrück - Refactoring
  */
 public class JRuleEngine implements PropertyChangeListener {
+    public static final String MDC_KEY_TIMER = "timer";
     private static final String[] EMPTY_LOG_TAGS = new String[0];
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private List<JRuleExecutionContext> contextList = new CopyOnWriteArrayList<>();
