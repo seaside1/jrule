@@ -127,7 +127,8 @@ public class JRuleTimerHandler {
                 delay);
         timers.add(timer);
 
-        newTimers.forEach(future -> executorService.submit(() -> invokeTimerInternal(timer, function)));
+        newTimers.forEach(
+                future -> future.thenAccept(s -> executorService.submit(() -> invokeTimerInternal(timer, function))));
         return timer;
     }
 

@@ -31,24 +31,23 @@ public class JRuleTimerTestRules extends JRule {
 
     public static final String TRIGGER_ITEM = "triggerItem";
     public static final String TARGET_ITEM = "targetItem";
+    public static final String TARGET_ITEM_REPEATING = "repeating";
+    public static final String TARGET_ITEM_REPEATING_WITH_NAME = "repeating-with-name";
+    public static final String TARGET_ITEM_REPEATING_WITH_NAME_REPLACED = "repeating-with-name-replaced";
 
     @JRuleName("Rule name")
     @JRuleLogName("Rule log name")
     @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "timers")
     public void testTimers() {
-        final AtomicInteger repeatingCounter = new AtomicInteger(0);
         JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
         stringItem.sendCommand("command");
         cancelTimer("NON_EXISTING_TIMER");
-        createRepeatingTimer("REPEATING_TIMER", Duration.ofSeconds(1), 1, () -> logInfo("Repeating timer completed"));
         createOrReplaceTimer("CREATE_OR_REPLACE_TIMER", Duration.ofSeconds(1),
                 () -> logInfo("Replaced timer completed"));
         createTimer(null, Duration.ofSeconds(1), () -> {
             logInfo("log something");
             stringItem.sendCommand("unique timer");
         });
-        createRepeatingTimer(null, Duration.ofMillis(10), 10,
-                () -> stringItem.sendCommand("repeating-" + String.valueOf(repeatingCounter.incrementAndGet())));
 
         JRuleTimerHandler.JRuleTimer timer = createTimer("TimerName", Duration.ofMillis(500), () -> {
             stringItem.sendCommand("timedCommand");
@@ -74,6 +73,29 @@ public class JRuleTimerTestRules extends JRule {
         JRuleTimerHandler.JRuleTimer canceledTimer = createTimer(null, Duration.ofSeconds(1),
                 () -> stringItem.sendCommand("canceled timer"));
         canceledTimer.cancel();
+    }
+
+    @JRuleName("Repeating Timers")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "timers-repeating")
+    public void testRepeatingTimers() {
+        JRuleStringItem repeatingItem = JRuleStringItem.forName(TARGET_ITEM_REPEATING);
+        JRuleStringItem repeatingWithNameItem = JRuleStringItem.forName(TARGET_ITEM_REPEATING_WITH_NAME);
+        JRuleStringItem repeatingWithNameReplacedItem = JRuleStringItem
+                .forName(TARGET_ITEM_REPEATING_WITH_NAME_REPLACED);
+
+        // with name
+        final AtomicInteger repeatingWithNameCounter = new AtomicInteger(0);
+        createRepeatingTimer("repeating-with-name", Duration.ofMillis(500), 2, () -> repeatingWithNameItem
+                .sendCommand("repeating-with-name-" + repeatingWithNameCounter.incrementAndGet()));
+        final AtomicInteger repeatingWithNameReplacedCounter = new AtomicInteger(0);
+        createOrReplaceRepeatingTimer("repeating-with-name-replaced", Duration.ofMillis(200), 5,
+                () -> repeatingWithNameReplacedItem.sendCommand(
+                        "repeating-with-name-replaced-" + repeatingWithNameReplacedCounter.incrementAndGet()));
+
+        // without name
+        final AtomicInteger repeatingCounter = new AtomicInteger(0);
+        createRepeatingTimer(Duration.ofMillis(100), 10,
+                () -> repeatingItem.sendCommand("repeating-" + repeatingCounter.incrementAndGet()));
     }
 
     @JRuleName("Rule name")

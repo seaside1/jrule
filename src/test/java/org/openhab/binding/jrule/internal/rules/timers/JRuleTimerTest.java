@@ -37,7 +37,7 @@ import org.openhab.core.types.UnDefType;
 public class JRuleTimerTest extends JRuleAbstractTest {
 
     @Test
-    public void testOneOffTimerWithNestedTimer() throws ItemNotFoundException, InterruptedException {
+    public void testTimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
@@ -50,11 +50,31 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timedCommand"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "nestedTimedCommand"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "unique timer"));
-        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "repeating-10"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "after the other one 3"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timer2 running true"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timer2 done false"));
         assertFalse(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "canceled timer"));
+    }
+
+    @Test
+    public void testRepeatingTimer() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING), UnDefType.UNDEF);
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME), UnDefType.UNDEF);
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING, TargetItem.class);
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME, TargetItem.class);
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED, TargetItem.class);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers-repeating")));
+        verify(rule, times(1)).testRepeatingTimers();
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME,
+                "repeating-with-name-2"));
+        assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED,
+                "repeating-with-name-replaced-5"));
+        assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING, "repeating-10"));
     }
 
     @Test
