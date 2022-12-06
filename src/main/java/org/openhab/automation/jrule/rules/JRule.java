@@ -264,7 +264,7 @@ public class JRule {
      * @param url Target URL
      * @return Result as String
      */
-    protected String sendHttpGetRequest(String url, Duration timeout) {
+    protected String sendHttpGetRequest(String url, @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpGetRequest(url, null, timeout);
     }
 
@@ -273,7 +273,7 @@ public class JRule {
      * 
      * @param url Target URL
      * @param headers Header parameters for the request
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
     protected String sendHttpGetRequest(String url, @Nullable Map<String, String> headers, @Nullable Duration timeout) {
@@ -284,10 +284,10 @@ public class JRule {
      * Sends a PUT-HTTP request and returns the result as a String
      * 
      * @param url Target URL
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
-    protected String sendHttpPutRequest(String url, Duration timeout) {
+    protected String sendHttpPutRequest(String url, @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpPutRequest(url, null, null, null, timeout);
     }
 
@@ -299,11 +299,11 @@ public class JRule {
      * @param contentType @see javax.ws.rs.core.MediaType
      * @param content Request content
      * @param headers Header parameters for the request
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
     protected String sendHttpPutRequest(String url, String contentType, String content, Map<String, String> headers,
-            Duration timeout) {
+            @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpPutRequest(url, contentType, content, headers, timeout);
     }
 
@@ -311,10 +311,10 @@ public class JRule {
      * Sends a POST-HTTP request and returns the result as a String
      * 
      * @param url Target URL
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
-    protected String sendHttpPostRequest(String url, Duration timeout) {
+    protected String sendHttpPostRequest(String url, @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpPostRequest(url, null, null, null, timeout);
     }
 
@@ -327,11 +327,11 @@ public class JRule {
      * @param contentType @see javax.ws.rs.core.MediaType
      * @param content Request content
      * @param headers Header parameters for the request
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
     protected String sendHttpPostRequest(String url, String contentType, String content, Map<String, String> headers,
-            Duration timeout) {
+            @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpPostRequest(url, contentType, content, headers, timeout);
     }
 
@@ -339,10 +339,10 @@ public class JRule {
      * Sends a DELETE-HTTP request and returns the result as a String
      * 
      * @param url Target URL
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
-    protected String sendHttpDeleteRequest(String url, Duration timeout) {
+    protected String sendHttpDeleteRequest(String url, @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpDeleteRequest(url, null, timeout);
     }
 
@@ -351,10 +351,10 @@ public class JRule {
      * 
      * @param url Target URL
      * @param headers Header parameters for the request
-     * @param timeout Time after the request will be canceled
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
      */
-    protected String sendHttpDeleteRequest(String url, Map<String, String> headers, Duration timeout) {
+    protected String sendHttpDeleteRequest(String url, Map<String, String> headers, @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpDeleteRequest(url, headers, timeout);
     }
 

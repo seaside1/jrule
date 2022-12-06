@@ -87,7 +87,7 @@ public class JRuleActionHandler {
      * @return Result as String
      */
     public String sendHttpPutRequest(String url, String contentType, @Nullable String content,
-            Map<String, String> headers, Duration timeout) {
+            Map<String, String> headers, @Nullable Duration timeout) {
         try {
             return HttpUtil.executeUrl(HttpMethod.PUT, url, mapToProperties(headers),
                     content != null ? new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)) : null,
@@ -110,7 +110,7 @@ public class JRuleActionHandler {
      * @return Result as String
      */
     public String sendHttpPostRequest(String url, String contentType, @Nullable String content,
-            Map<String, String> headers, Duration timeout) {
+            Map<String, String> headers, @Nullable Duration timeout) {
         try {
             return HttpUtil.executeUrl(HttpMethod.POST, url, mapToProperties(headers),
                     content != null ? new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)) : null,
@@ -128,7 +128,7 @@ public class JRuleActionHandler {
      * @param timeout Time after the request will be canceled
      * @return Result as String
      */
-    public String sendHttpDeleteRequest(String url, Map<String, String> headers, Duration timeout) {
+    public String sendHttpDeleteRequest(String url, Map<String, String> headers, @Nullable Duration timeout) {
         try {
             return HttpUtil.executeUrl(HttpMethod.DELETE, url, mapToProperties(headers), null, null,
                     getTimeoutAsInt(timeout));
