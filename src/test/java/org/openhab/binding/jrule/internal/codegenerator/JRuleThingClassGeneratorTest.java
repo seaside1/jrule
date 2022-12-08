@@ -77,10 +77,13 @@ public class JRuleThingClassGeneratorTest {
                 .withKind(ChannelKind.TRIGGER).build();
         Channel triggerChannelWithType = ChannelBuilder.create(new ChannelUID(thing.getUID(), "triggerChannel#start"))
                 .withKind(ChannelKind.TRIGGER).build();
+        Channel triggerChannelWithNumber = ChannelBuilder.create(new ChannelUID(thing.getUID(), "1#BUTTON"))
+                .withKind(ChannelKind.TRIGGER).build();
         Channel stateChannel = ChannelBuilder.create(new ChannelUID(thing.getUID(), "stateChannel"))
                 .withKind(ChannelKind.STATE).build();
         thing.addChannel(triggerChannel);
         thing.addChannel(triggerChannelWithType);
+        thing.addChannel(triggerChannelWithNumber);
         thing.addChannel(stateChannel);
 
         generateAndCompile(thing);

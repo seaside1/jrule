@@ -139,8 +139,43 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     private List<JRuleTriggerChannel> extractTriggerChannels(Thing thing) {
-        return thing.getChannels().stream().filter(e -> e.getKind() == ChannelKind.TRIGGER).map(e -> e.getUID().getId())
-                .map(e -> new JRuleTriggerChannel(e, e.replace("#", "_"))).collect(Collectors.toList());
+        return thing.getChannels().stream().filter(channel -> channel.getKind() == ChannelKind.TRIGGER)
+                .map(channel -> channel.getUID().getId())
+                .map(channelName -> new JRuleTriggerChannel(channelName, createFieldName(thing, channelName)))
+                .collect(Collectors.toList());
+    }
+
+    public static String createFieldName(Thing thing, String channelName) {
+        String fieldName = channelName.replace("#", "_");
+
+        if (!isValidJavaIdentifier(fieldName)) {
+            // Try prefix with '_'
+            fieldName = "_" + fieldName;
+        }
+
+        // Check again, throw error
+        if (!isValidJavaIdentifier(fieldName)) {
+            throw new IllegalArgumentException(
+                    String.format("Unable to create a valid Java field name for channel name '%s' in thing '%s'",
+                            channelName, thing.getUID()));
+        }
+
+        return fieldName;
+    }
+
+    public static boolean isValidJavaIdentifier(String s) {
+        if (s.isEmpty()) {
+            return false;
+        }
+        if (!Character.isJavaIdentifierStart(s.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < s.length(); i++) {
+            if (!Character.isJavaIdentifierPart(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String getThingFriendlyName(Thing thing) {
