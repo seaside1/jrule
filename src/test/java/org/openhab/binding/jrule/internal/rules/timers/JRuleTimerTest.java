@@ -12,8 +12,7 @@
  */
 package org.openhab.binding.jrule.internal.rules.timers;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -90,6 +89,23 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "first: true"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "second: false"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "third: true"));
+    }
+
+    @Test
+    public void testDebounce() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        Thread.sleep(600);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        Thread.sleep(600);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        verify(rule, times(1)).testDebounce();
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "no debounce"));
     }
 
     private Event itemChangeEvent(String item, String from, String to) {

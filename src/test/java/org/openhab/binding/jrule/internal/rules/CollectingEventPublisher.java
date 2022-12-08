@@ -42,6 +42,13 @@ public class CollectingEventPublisher implements EventPublisher {
                         && e.getItemCommand().toString().equals(command.toString()));
     }
 
+    public long countCommandEvent(String itemName, Object command) {
+        return events.stream().filter(e -> e.event instanceof ItemCommandEvent).map(e -> (ItemCommandEvent) e.event)
+                .filter(e -> e.getTopic().equals(createTopic(itemName, "command"))
+                        && e.getItemCommand().toString().equals(command.toString()))
+                .count();
+    }
+
     public boolean hasUpdateEvent(String itemName, Object update) {
         return events.stream().filter(e -> e.event instanceof ItemStateEvent).map(e -> (ItemStateEvent) e.event)
                 .anyMatch(e -> e.getTopic().equals(createTopic(itemName, "state"))

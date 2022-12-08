@@ -731,6 +731,19 @@ public void chainSomeTimers() {
 }
 ```
 
+## Example 37
+
+Use case: Do not execute a rule too often
+
+```java
+@JRuleDebounce(10)
+@JRuleName("Notify if thing stays offline")
+@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+public void debounceMethod() {
+    // super critical stuff which shouldn't be called too often
+}
+```
+
 # Changelog
 ## BETA15
 - BREAKING: All JRuleWhen has to be change to corresponding JRuleWhenItemChanged (as an example, look at JRule Examples documentation)

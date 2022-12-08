@@ -17,10 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.items.JRuleStringItem;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleLogName;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.*;
 
 /**
  * Rule used in testcase JRuleTimerTest
@@ -114,5 +111,13 @@ public class JRuleTimerTestRules extends JRule {
 
         boolean third = getTimedLock("MyLock", Duration.ofSeconds(1));
         stringItem.sendCommand("third: " + third);
+    }
+
+    @JRuleDebounce(1.5f)
+    @JRuleName("Rule name")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "debounce")
+    public void testDebounce() throws InterruptedException {
+        JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
+        stringItem.sendCommand("no debounce");
     }
 }
