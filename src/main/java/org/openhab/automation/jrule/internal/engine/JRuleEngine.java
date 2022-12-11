@@ -153,7 +153,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         Duration timedLock = Optional.ofNullable(method.getDeclaredAnnotation(JRuleDebounce.class))
                 .filter(jRuleDebounce -> jRuleDebounce.value() > 0)
-                .map(jRuleDebounce -> Duration.ofMillis((long) (jRuleDebounce.value() / 1000))).orElse(null);
+                .map(jRuleDebounce -> Duration.of(jRuleDebounce.value(), jRuleDebounce.unit())).orElse(null);
 
         ruleLoadingStatistics.addRuleMethod();
         AtomicBoolean addedToContext = new AtomicBoolean(false);

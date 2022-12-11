@@ -16,14 +16,28 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.time.temporal.ChronoUnit;
 
 /**
- * The {@link JRuleDebounce}
+ * The {@link JRuleDebounce} type.
+ * Default value unit is Seconds.
  *
  * @author Robert Delbrück - Initial contribution
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
 public @interface JRuleDebounce {
-    float value() default 0;
+    /**
+     * Default is seconds. Can be changed via unit().
+     * 
+     * @return value as long
+     */
+    long value() default 0;
+
+    /**
+     * Time unit. Default is seconds.
+     * 
+     * @return time unit.
+     */
+    ChronoUnit unit() default ChronoUnit.SECONDS;
 }

@@ -13,6 +13,7 @@
 package org.openhab.binding.jrule.internal.rules.timers;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
@@ -113,7 +114,7 @@ public class JRuleTimerTestRules extends JRule {
         stringItem.sendCommand("third: " + third);
     }
 
-    @JRuleDebounce(1.5f)
+    @JRuleDebounce(value = 1500, unit = ChronoUnit.MILLIS)
     @JRuleName("Rule name")
     @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "debounce")
     public void testDebounce() throws InterruptedException {
