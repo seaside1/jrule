@@ -101,6 +101,7 @@ public class TestRules extends JRule {
     public static final String NAME_CAST_ALL_TYPES = "cast all types";
     public static final String ITEM_SWITCH_TO_CAST = "Switch_To_Cast";
     public static final String ITEM_NUMBER_TO_CAST = "Number_To_Cast";
+    public static final String ITEM_QUANTITY_TO_CAST = "Quantity_To_Cast";
     public static final String ITEM_DIMMER_TO_CAST = "Dimmer_To_Cast";
     public static final String ITEM_COLOR_TO_CAST = "Color_To_Cast";
     public static final String ITEM_STRING_TO_CAST = "String_To_Cast";
@@ -124,37 +125,37 @@ public class TestRules extends JRule {
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedCommand(JRuleItemEvent event) {
-        logInfo("received command: {}", event.getState().getValue());
+        logInfo("received command: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ON_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH, command = JRuleSwitchItem.ON)
     public void switchReceivedOnCommand(JRuleItemEvent event) {
-        logInfo("received command: {}", event.getState().getValue());
+        logInfo("received command: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().getValue());
+        logInfo("received update: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ON_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH, state = JRuleSwitchItem.ON)
     public void switchReceivedOnUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().getValue());
+        logInfo("received update: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemChanged(JRuleItemEvent event) {
-        logInfo("changed from '{}' to '{}'", event.getOldState().getValue(), event.getState().getValue());
+        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getState());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED_TO_ON)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void switchReceivedChangedToOn(JRuleItemEvent event) {
-        logInfo("changed: {}", event.getState().getValue());
+        logInfo("changed: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_INVOKE_MQTT_ACTION)
@@ -208,7 +209,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
     public synchronized void conditionLteAndGteForNumber(JRuleItemEvent event) {
-        logInfo("trigger when between 18 and 20, current: {}", event.getState().getValue());
+        logInfo("trigger when between 18 and 20, current: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_CRON_EVERY_5_SEC)
@@ -221,7 +222,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_PRECONDITION_EXECUTION)
     @JRuleWhenItemReceivedCommand(item = ITEM_PRECONDITIONED_SWITCH)
     public void preconditionExecution(JRuleItemEvent event) {
-        logInfo("received command: {}", event.getState().getValue());
+        logInfo("received command: {}", event.getState().asStringValue());
     }
 
     @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
@@ -266,6 +267,7 @@ public class TestRules extends JRule {
     public void castAllTypes(JRuleItemEvent event) throws JRuleExecutionException {
         castSwitch();
         castNumber();
+        castQuantity();
         castString();
         castDateTime();
         castPlayer();
@@ -349,15 +351,15 @@ public class TestRules extends JRule {
     private static void castContact() {
         JRuleContactItem contactItem = JRuleContactItem.forName(ITEM_CONTACT_TO_CAST);
 
-        contactItem.sendCommand(JRuleOpenClosedValue.OPEN);
+        contactItem.postUpdate(JRuleOpenClosedValue.OPEN);
         assert contactItem.getState() == JRuleOpenClosedValue.OPEN;
         assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
 
-        contactItem.sendCommand(JRuleOpenClosedValue.CLOSED);
+        contactItem.postUpdate(JRuleOpenClosedValue.CLOSED);
         assert contactItem.getState() == JRuleOpenClosedValue.CLOSED;
         assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
 
-        contactItem.sendCommand(true);
+        contactItem.postUpdate(true);
         assert contactItem.getState() == JRuleOpenClosedValue.OPEN;
         assert contactItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
@@ -395,11 +397,9 @@ public class TestRules extends JRule {
 
         stringItem.sendCommand("abc");
         assert stringItem.getState().stringValue().equals("abc");
-        assert stringItem.getState().getValue().equals("abc");
 
         stringItem.sendCommand("xyz");
         assert stringItem.getState().stringValue().equals("xyz");
-        assert stringItem.getState().getValue().equals("xyz");
     }
 
     private static void castColor() {
@@ -456,6 +456,24 @@ public class TestRules extends JRule {
         assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
     }
 
+    private static void castQuantity() {
+        JRuleNumberItem numberItem = JRuleNumberItem.forName(ITEM_QUANTITY_TO_CAST);
+
+        numberItem.sendCommand(0);
+        assert numberItem.getState().doubleValue() == 0;
+        assert numberItem.getState().intValue() == 0;
+        assert numberItem.getState().floatValue() == 0;
+        assert numberItem.getState().doubleValue() == 0;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+
+        numberItem.sendCommand(22);
+        assert numberItem.getState().doubleValue() == 22;
+        assert numberItem.getState().intValue() == 22;
+        assert numberItem.getState().floatValue() == 22;
+        assert numberItem.getState().doubleValue() == 22;
+        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+    }
+
     private static void castSwitch() {
         JRuleSwitchItem switchItem = JRuleSwitchItem.forName(ITEM_SWITCH_TO_CAST);
 
@@ -463,7 +481,7 @@ public class TestRules extends JRule {
         assert switchItem.getState() == JRuleOnOffValue.ON;
         assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 100D;
 
-        switchItem.sendCommand(JRuleSwitchItem.OFF);
+        switchItem.sendCommand(JRuleOnOffValue.OFF);
         assert switchItem.getState() == JRuleOnOffValue.OFF;
         assert switchItem.getStateAs(JRuleDecimalValue.class).doubleValue() == 0D;
 

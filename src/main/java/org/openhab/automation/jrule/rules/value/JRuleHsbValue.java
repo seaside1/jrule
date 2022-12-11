@@ -13,10 +13,7 @@
 package org.openhab.automation.jrule.rules.value;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.HSBType;
@@ -30,66 +27,45 @@ import org.openhab.core.types.State;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleHsbValue implements JRuleValue {
-    private final BigDecimal hue;
-    private final BigDecimal saturation;
-    private final BigDecimal brightness;
+    private final HSBType ohType;
 
     public JRuleHsbValue(String value) {
-        List<String> constituents = Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toList());
-        if (constituents.size() == 3) {
-            this.hue = new BigDecimal(constituents.get(0));
-            this.saturation = new BigDecimal(constituents.get(1));
-            this.brightness = new BigDecimal(constituents.get(2));
-        } else {
-            throw new IllegalArgumentException(value + " is not a valid HSBType syntax");
-        }
+        this.ohType = new HSBType(value);
     }
 
-    public JRuleHsbValue(float hue, float saturation, float brightness) {
-        this.hue = new BigDecimal(hue);
-        this.saturation = new BigDecimal(saturation);
-        this.brightness = new BigDecimal(brightness);
+    public JRuleHsbValue(float hue, int saturation, int brightness) {
+        this.ohType = new HSBType(new DecimalType(hue), new PercentType(saturation), new PercentType(brightness));
     }
 
     public JRuleHsbValue(BigDecimal hue, BigDecimal saturation, BigDecimal brightness) {
-        this.hue = hue;
-        this.saturation = saturation;
-        this.brightness = brightness;
-    }
-
-    @Override
-    public String toString() {
-        return "JRuleHsbValue [hue=" + hue + ", saturation=" + saturation + ", brightness=" + brightness + "]";
+        this.ohType = new HSBType(new DecimalType(hue), new PercentType(saturation), new PercentType(brightness));
     }
 
     @Override
     public String asStringValue() {
-        return String.format("%s,%s,%s", this.hue.intValueExact(), this.saturation.intValueExact(),
-                this.brightness.intValueExact());
+        return this.ohType.toFullString();
     }
 
     @Override
     public Command toOhCommand() {
-        return new HSBType(new DecimalType(this.hue), new PercentType(this.saturation),
-                new PercentType(this.brightness));
+        return this.ohType;
     }
 
     @Override
     public State toOhState() {
-        return new HSBType(new DecimalType(this.hue), new PercentType(this.saturation),
-                new PercentType(this.brightness));
+        return this.ohType;
     }
 
     public BigDecimal getHue() {
-        return hue;
+        return this.ohType.getHue().toBigDecimal();
     }
 
     public BigDecimal getBrightness() {
-        return brightness;
+        return this.ohType.getSaturation().toBigDecimal();
     }
 
     public BigDecimal getSaturation() {
-        return saturation;
+        return this.ohType.getBrightness().toBigDecimal();
     }
 
     @Override
@@ -99,11 +75,11 @@ public class JRuleHsbValue implements JRuleValue {
         if (o == null || getClass() != o.getClass())
             return false;
         JRuleHsbValue that = (JRuleHsbValue) o;
-        return hue.equals(that.hue) && saturation.equals(that.saturation) && brightness.equals(that.brightness);
+        return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hue, saturation, brightness);
+        return Objects.hash(ohType);
     }
 }

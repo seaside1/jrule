@@ -12,35 +12,22 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
-import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
- * The {@link JRulePercentValue}
+ * The {@link JRuleQuantityValue}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public class JRulePercentValue implements JRuleValue {
-    private final PercentType ohType;
+public class JRuleQuantityValue implements JRuleValue {
+    private final QuantityType<?> ohType;
 
-    public JRulePercentValue(int value) {
-        this.ohType = new PercentType(value);
-    }
-
-    public JRulePercentValue(double value) {
-        this.ohType = new PercentType(new BigDecimal(value));
-    }
-
-    public JRulePercentValue(String value) {
-        this.ohType = new PercentType(value);
-    }
-
-    public JRulePercentValue(boolean value) {
-        this.ohType = new PercentType(value ? 100 : 0);
+    public JRuleQuantityValue(String value) {
+        this.ohType = new QuantityType<>(value);
     }
 
     @Override
@@ -55,7 +42,7 @@ public class JRulePercentValue implements JRuleValue {
 
     @Override
     public State toOhState() {
-        return this.ohType;
+        return ohType;
     }
 
     public double doubleValue() {
@@ -80,12 +67,16 @@ public class JRulePercentValue implements JRuleValue {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        JRulePercentValue that = (JRulePercentValue) o;
+        JRuleQuantityValue that = (JRuleQuantityValue) o;
         return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(ohType);
+    }
+
+    public String unit() {
+        return this.ohType.getUnit().toString();
     }
 }

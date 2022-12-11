@@ -35,7 +35,9 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
+import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -56,6 +58,7 @@ import org.openhab.core.library.types.PlayPauseType;
 import org.openhab.core.library.types.PointType;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.RawType;
+import org.openhab.core.library.types.StopMoveType;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.types.Command;
@@ -72,24 +75,34 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleEventHandler {
     private static final Map<Class<? extends JRuleValue>, Class<? extends State>> stateMapping = new HashMap<>();
+    private static final Map<Class<? extends JRuleValue>, Class<? extends Command>> commandMapping = new HashMap<>();
 
     static {
-        // stateMapping.put(JRuleStringValue.class, QuantityType.class);
+        commandMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
+        commandMapping.put(JRuleStringValue.class, StringType.class);
+        commandMapping.put(JRuleUpDownValue.class, UpDownType.class);
+        commandMapping.put(JRuleOnOffValue.class, OnOffType.class);
+        commandMapping.put(JRuleStopMoveValue.class, StopMoveType.class);
+        commandMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
+        commandMapping.put(JRulePointValue.class, PointType.class);
+        commandMapping.put(JRuleDecimalValue.class, DecimalType.class);
+        commandMapping.put(JRulePercentValue.class, PercentType.class);
+        commandMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
+        commandMapping.put(JRuleHsbValue.class, HSBType.class);
+        commandMapping.put(JRuleQuantityValue.class, QuantityType.class);
+
         stateMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
         stateMapping.put(JRuleStringValue.class, StringType.class);
-        // stateMapping.put(JRuleStringValue.class, UnDefType.class);
         stateMapping.put(JRuleUpDownValue.class, UpDownType.class);
         stateMapping.put(JRuleOnOffValue.class, OnOffType.class);
         stateMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
         stateMapping.put(JRuleRawValue.class, RawType.class);
-        // stateMapping.put(JRuleRe.class, RewindFastforwardType.class);
         stateMapping.put(JRulePointValue.class, PointType.class);
         stateMapping.put(JRuleHsbValue.class, HSBType.class);
-        // stateMapping.put(JRuleStL.class, StringListType.class);
         stateMapping.put(JRuleDecimalValue.class, DecimalType.class);
         stateMapping.put(JRulePercentValue.class, PercentType.class);
         stateMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
-        // stateMapping.put(JRuleColorValue.class, HSBType.class);
+        stateMapping.put(JRuleQuantityValue.class, QuantityType.class);
     }
 
     private static final String LOG_NAME_EVENT = "JRuleEvent";
@@ -134,6 +147,14 @@ public class JRuleEventHandler {
             return;
         }
         logInfo("SendCommand '{}' to '{}'", command, itemName);
+        try {
+            if (!itemRegistry.getItem(itemName).getAcceptedCommandTypes().contains(command.getClass())) {
+                throw new JRuleRuntimeException(
+                        String.format("unacceptable command type '%s' for item '%s'", command.getClass(), itemName));
+            }
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException("cannot resolve item: " + itemName, e);
+        }
         eventPublisher.post(ItemEventFactory.createCommandEvent(itemName, command));
     }
 
@@ -155,6 +176,14 @@ public class JRuleEventHandler {
             return;
         }
         logInfo("PostUpdate '{}' to '{}'", state, itemName);
+        try {
+            if (!itemRegistry.getItem(itemName).getAcceptedDataTypes().contains(state.getClass())) {
+                throw new JRuleRuntimeException(
+                        String.format("unacceptable command type '%s' for item '%s'", state.getClass(), itemName));
+            }
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException("cannot resolve item: " + itemName, e);
+        }
         final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state);
         eventPublisher.post(itemEvent);
     }
@@ -254,6 +283,29 @@ public class JRuleEventHandler {
         return toValue(as.toFullString(), valueClass);
     }
 
+    public JRuleValue toValue(Command itemCommand) {
+        Class<? extends JRuleValue> valueClass = commandMapping.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(itemCommand.getClass())).findFirst()
+                .map((Map.Entry<Class<? extends JRuleValue>, Class<? extends Command>> classClassEntry) -> Objects
+                        .requireNonNull(classClassEntry.getKey()))
+                .orElseThrow(
+                        () -> new IllegalStateException("cannot find mapping for oh type: " + itemCommand.getClass()));
+        return toValue(itemCommand.toFullString(), valueClass);
+    }
+
+    public JRuleValue toValue(State itemState) {
+        if (itemState instanceof UnDefType) {
+            return null;
+        }
+        Class<? extends JRuleValue> valueClass = stateMapping.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(itemState.getClass())).findFirst()
+                .map((Map.Entry<Class<? extends JRuleValue>, Class<? extends State>> classClassEntry) -> Objects
+                        .requireNonNull(classClassEntry.getKey()))
+                .orElseThrow(
+                        () -> new IllegalStateException("cannot find mapping for oh type: " + itemState.getClass()));
+        return toValue(itemState.toFullString(), valueClass);
+    }
+
     public <V extends JRuleValue> V toValue(String plain, Class<? extends JRuleValue> valueClass) {
         if (JRuleOpenClosedValue.class.isAssignableFrom(valueClass)) {
             return (V) JRuleOpenClosedValue.valueOf(plain);
@@ -277,8 +329,12 @@ public class JRuleEventHandler {
             return (V) new JRulePercentValue(plain);
         } else if (JRuleDecimalValue.class.isAssignableFrom(valueClass)) {
             return (V) new JRuleDecimalValue(plain);
+        } else if (JRuleQuantityValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleQuantityValue(plain);
         } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
             return (V) JRulePlayPauseValue.valueOf(plain);
+        } else if (JRuleStopMoveValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleStopMoveValue.valueOf(plain);
         }
         throw new IllegalStateException(String.format("not implemented type: %s", valueClass));
     }

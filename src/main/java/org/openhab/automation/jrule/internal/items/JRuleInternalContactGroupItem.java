@@ -12,9 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.util.Set;
-
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleContactGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
@@ -31,22 +28,14 @@ public class JRuleInternalContactGroupItem extends JRuleInternalContactItem impl
     }
 
     public void sendCommand(JRuleOpenClosedValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+        memberItems().forEach(i -> i.sendCommand(value));
     }
 
     public void postUpdate(JRuleOpenClosedValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
-    }
-
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().sendCommand(s, JRuleOnOffValue.valueOf(command)));
+        memberItems().forEach(i -> i.postUpdate(value));
     }
 
     public void postUpdate(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().postUpdate(s, JRuleOnOffValue.valueOf(command)));
+        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(command)));
     }
 }

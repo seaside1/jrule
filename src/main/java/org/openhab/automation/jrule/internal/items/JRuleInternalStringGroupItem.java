@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleStringGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
 /**
  * The {@link JRuleInternalStringGroupItem} Items
@@ -23,5 +24,13 @@ public class JRuleInternalStringGroupItem extends JRuleInternalStringItem implem
 
     public JRuleInternalStringGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
+    }
+
+    public void sendCommand(String value) {
+        memberItems().forEach(m -> m.sendCommand(new JRuleStringValue(value)));
+    }
+
+    public void postUpdate(String value) {
+        memberItems().forEach(m -> m.sendCommand(new JRuleStringValue(value)));
     }
 }

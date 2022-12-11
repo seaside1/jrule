@@ -27,10 +27,6 @@ public class JRuleInternalContactItem extends JRuleInternalItem<JRuleOpenClosedV
         super(name, label, type, id);
     }
 
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().sendCommand(getName(), JRuleOpenClosedValue.valueOf(command));
-    }
-
     public void postUpdate(boolean command) {
         JRuleEventHandler.get().postUpdate(getName(), JRuleOpenClosedValue.valueOf(command));
     }

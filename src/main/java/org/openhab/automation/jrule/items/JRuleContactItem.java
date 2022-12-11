@@ -34,7 +34,5 @@ public interface JRuleContactItem extends JRuleItem<JRuleOpenClosedValue> {
         return JRuleOpenClosedValue.class;
     }
 
-    void sendCommand(boolean command);
-
     void postUpdate(boolean command);
 }

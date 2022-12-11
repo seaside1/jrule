@@ -29,9 +29,24 @@ Rollershutter   Rollershutter_To_Cast
 Dimmer          Dimmer_To_Cast
 Color           Color_To_Cast
 Location        Location_To_Cast
+Number:Power    Quantity_To_Cast
 
 Switch          Rule_From_Rule
 String          Trigger_Rule_From_Rule
 
 String          Trigger_Rule
 String          Null_Testing
+
+// Receive Commands or Updates
+Switch          Switch_Event
+Number          Number_Event
+String          String_Event
+DateTime        DateTime_Event
+Player          Player_Event
+Contact         Contact_Event
+Image           Image_Event
+Rollershutter   Rollershutter_Event
+Dimmer          Dimmer_Event
+Color           Color_Event
+Location        Location_Event
+Number:Power    Quantity_Event

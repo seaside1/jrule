@@ -35,7 +35,7 @@ class JRuleColorItemTest {
     @Test
     public void testSendCommand() throws ItemNotFoundException {
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        ColorItem ohItem = new ColorItem("Any");
+        ColorItem ohItem = new ColorItem("Name");
         ohItem.setState(new HSBType(new DecimalType(1), new PercentType(2), new PercentType(3)));
         Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenReturn(ohItem);
 
@@ -44,7 +44,6 @@ class JRuleColorItemTest {
         JRuleColorItem item = new JRuleInternalColorItem("Name", "Label", "Type", "Id");
         JRuleHsbValue command = new JRuleHsbValue(1, 2, 3);
         item.sendCommand(command);
-        item.sendCommand(command.asStringValue());
         JRuleHsbValue state = item.getState();
         Assertions.assertNotNull(state);
         JRuleOnOffValue asOnOffValue = item.getStateAs(JRuleOnOffValue.class);

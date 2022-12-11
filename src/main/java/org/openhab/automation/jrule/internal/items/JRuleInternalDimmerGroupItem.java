@@ -12,13 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.util.Set;
-
-import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDimmerGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,52 +32,26 @@ public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implem
     }
 
     public void sendCommand(double value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value)));
+        memberItems().forEach(i -> i.sendCommand(new JRulePercentValue(value)));
     }
 
     public void postUpdate(double value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value)));
+        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(value)));
     }
 
     public void sendCommand(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, new JRulePercentValue(value)));
+        memberItems().forEach(i -> i.sendCommand(new JRulePercentValue(value)));
     }
 
     public void postUpdate(int value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, new JRulePercentValue(value)));
-    }
-
-    public void sendCommand(JRuleIncreaseDecreaseValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
-    }
-
-    public void postUpdate(JRuleIncreaseDecreaseValue value) {
-        JRuleLog.error(logger, LOG_NAME, "PostUpdate on IncreaseDecrease not supported by openHab Core: {}",
-                value.name().toString());
-    }
-
-    public void sendCommand(JRuleOnOffValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
-    }
-
-    public void postUpdate(JRuleOnOffValue value) {
-        final Set<String> groupMemberNames = JRuleEventHandler.get().getGroupMemberNames(name, false);
-        groupMemberNames.forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(value)));
     }
 
     public void sendCommand(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().sendCommand(s, new JRulePercentValue(command)));
+        memberItems().forEach(i -> i.sendCommand(new JRulePercentValue(command)));
     }
 
     public void postUpdate(boolean command) {
-        JRuleEventHandler.get().getGroupMemberNames(name, false)
-                .forEach(s -> JRuleEventHandler.get().postUpdate(s, new JRulePercentValue(command)));
+        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(command)));
     }
 }

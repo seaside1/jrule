@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
@@ -24,5 +25,13 @@ public class JRuleInternalStringItem extends JRuleInternalItem<JRuleStringValue>
 
     public JRuleInternalStringItem(String name, String label, String type, String id) {
         super(name, label, type, id);
+    }
+
+    public void sendCommand(String command) {
+        JRuleEventHandler.get().sendCommand(getName(), new JRuleStringValue(command));
+    }
+
+    public void postUpdate(String state) {
+        JRuleEventHandler.get().postUpdate(getName(), new JRuleStringValue(state));
     }
 }

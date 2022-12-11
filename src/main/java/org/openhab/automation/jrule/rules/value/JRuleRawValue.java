@@ -12,8 +12,6 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Objects;
 
 import org.openhab.core.library.types.RawType;
@@ -26,41 +24,27 @@ import org.openhab.core.types.State;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleRawValue implements JRuleValue {
-
-    private final String mimeType;
-    private final byte[] data;
+    private final RawType ohType;
 
     public JRuleRawValue(String mimeType, byte[] data) {
-        this.mimeType = mimeType;
-        this.data = data;
+        this.ohType = new RawType(data, mimeType);
     }
 
     public JRuleRawValue(String value) {
-        int idx;
-        if (value.startsWith("data:") && (idx = value.indexOf(",")) >= 0) {
-            int idx2;
-            if ((idx2 = value.indexOf(";")) <= 5) {
-                throw new IllegalArgumentException("Missing MIME type in argument " + value);
-            } else {
-                data = Base64.getDecoder().decode(value.substring(idx + 1));
-                mimeType = value.substring(5, idx2);
-            }
-        } else {
-            throw new IllegalArgumentException("Invalid data URI syntax for argument " + value);
-        }
+        this.ohType = RawType.valueOf(value);
     }
 
     public String getMimeType() {
-        return mimeType;
+        return this.ohType.getMimeType();
     }
 
     public byte[] getData() {
-        return data;
+        return this.ohType.getBytes();
     }
 
     @Override
     public String asStringValue() {
-        return String.format("data:%s;base64,%s", this.mimeType, Base64.getEncoder().encodeToString(this.data));
+        return this.ohType.toFullString();
     }
 
     @Override
@@ -70,7 +54,7 @@ public class JRuleRawValue implements JRuleValue {
 
     @Override
     public State toOhState() {
-        return new RawType(this.data, this.mimeType);
+        return this.ohType;
     }
 
     @Override
@@ -80,13 +64,11 @@ public class JRuleRawValue implements JRuleValue {
         if (o == null || getClass() != o.getClass())
             return false;
         JRuleRawValue that = (JRuleRawValue) o;
-        return mimeType.equals(that.mimeType) && Arrays.equals(data, that.data);
+        return ohType.equals(that.ohType);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(mimeType);
-        result = 31 * result + Arrays.hashCode(data);
-        return result;
+        return Objects.hash(ohType);
     }
 }
