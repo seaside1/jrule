@@ -13,7 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.rules.value.JRuleNextPreviousValue;
 import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleRewindFastforwardValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -22,8 +24,12 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRulePlayerItem extends JRuleItem<JRulePlayPauseValue> {
-    String PLAY = "PLAY";
-    String PAUSE = "PAUSE";
+    String PLAY = JRulePlayPauseValue.PLAY.asStringValue();
+    String PAUSE = JRulePlayPauseValue.PAUSE.asStringValue();
+    String NEXT = JRuleNextPreviousValue.NEXT.asStringValue();
+    String PREVIOUS = JRuleNextPreviousValue.PREVIOUS.asStringValue();
+    String REWIND = JRuleRewindFastforwardValue.REWIND.asStringValue();
+    String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.asStringValue();
 
     static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
