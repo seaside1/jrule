@@ -26,16 +26,16 @@ public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implem
         super(name, label, type, id);
     }
 
-    public void sendCommand(double value) {
-        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(value)));
+    public void sendCommand(double command) {
+        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(command)));
     }
 
     public void postUpdate(double value) {
         memberItems().forEach(i -> i.postUpdate(new JRuleDecimalValue(value)));
     }
 
-    public void sendCommand(int value) {
-        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(value)));
+    public void sendCommand(int command) {
+        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(command)));
     }
 
     public void postUpdate(int value) {

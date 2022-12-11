@@ -39,7 +39,7 @@ public class JRuleInternalDimmerItem extends JRuleInternalItem<JRulePercentValue
         JRuleEventHandler.get().sendCommand(getName(), new JRulePercentValue(command));
     }
 
-    public void postUpdate(boolean command) {
-        JRuleEventHandler.get().postUpdate(getName(), new JRulePercentValue(command));
+    public void postUpdate(boolean value) {
+        JRuleEventHandler.get().postUpdate(getName(), new JRulePercentValue(value));
     }
 }

@@ -35,7 +35,7 @@ public class JRuleInternalContactGroupItem extends JRuleInternalContactItem impl
         memberItems().forEach(i -> i.postUpdate(value));
     }
 
-    public void postUpdate(boolean command) {
-        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(command)));
+    public void postUpdate(boolean value) {
+        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(value)));
     }
 }

@@ -51,7 +51,7 @@ public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implem
         memberItems().forEach(i -> i.sendCommand(new JRulePercentValue(command)));
     }
 
-    public void postUpdate(boolean command) {
-        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(command)));
+    public void postUpdate(boolean value) {
+        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(value)));
     }
 }

@@ -31,7 +31,7 @@ public class JRuleInternalStringItem extends JRuleInternalItem<JRuleStringValue>
         JRuleEventHandler.get().sendCommand(getName(), new JRuleStringValue(command));
     }
 
-    public void postUpdate(String state) {
-        JRuleEventHandler.get().postUpdate(getName(), new JRuleStringValue(state));
+    public void postUpdate(String value) {
+        JRuleEventHandler.get().postUpdate(getName(), new JRuleStringValue(value));
     }
 }

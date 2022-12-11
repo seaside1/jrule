@@ -31,24 +31,24 @@ public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue
         super(name, label, type, id);
     }
 
-    public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value));
+    public void sendCommand(double command) {
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(command));
     }
 
     public void postUpdate(double value) {
         JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value));
     }
 
-    public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(value));
+    public void sendCommand(int command) {
+        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(command));
     }
 
     public void postUpdate(int value) {
         JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value));
     }
 
-    public void sendCommand(double value, String unit) {
-        JRuleEventHandler.get().sendCommand(name, value, unit);
+    public void sendCommand(double command, String unit) {
+        JRuleEventHandler.get().sendCommand(name, command, unit);
     }
 
     public void postUpdate(double value, String unit) {

@@ -29,8 +29,8 @@ public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePerce
         super(name, label, type, id);
     }
 
-    public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(value));
+    public void sendCommand(int command) {
+        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(command));
     }
 
     public void postUpdate(int value) {
@@ -41,7 +41,7 @@ public class JRuleInternalRollershutterItem extends JRuleInternalItem<JRulePerce
         JRuleEventHandler.get().sendCommand(getName(), JRuleUpDownValue.valueOf(command));
     }
 
-    public void postUpdate(boolean command) {
-        JRuleEventHandler.get().postUpdate(getName(), JRuleUpDownValue.valueOf(command));
+    public void postUpdate(boolean value) {
+        JRuleEventHandler.get().postUpdate(getName(), JRuleUpDownValue.valueOf(value));
     }
 }

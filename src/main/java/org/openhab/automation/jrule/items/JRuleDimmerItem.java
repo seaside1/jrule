@@ -35,11 +35,31 @@ public interface JRuleDimmerItem extends JRuleItem<JRulePercentValue> {
         return JRulePercentValue.class;
     }
 
+    /**
+     * Sends a command in percent.
+     * 
+     * @param command in percent via JRulePercentValue will be send.
+     */
     void sendCommand(int command);
 
+    /**
+     * Sends 0 or 100
+     * 
+     * @param command true=100 or false=0 via JRulePercentValue will be send.
+     */
     void sendCommand(boolean command);
 
-    void postUpdate(boolean command);
+    /**
+     * Sends 0 or 100
+     * 
+     * @param value update true=100 or false=0 via JRulePercentValue will be send.
+     */
+    void postUpdate(boolean value);
 
+    /**
+     * Sends an update in percent.
+     * 
+     * @param value update in percent via JRulePercentValue will be send.
+     */
     void postUpdate(int value);
 }

@@ -39,7 +39,7 @@ public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implemen
         memberItems().forEach(i -> i.sendCommand(JRuleOnOffValue.valueOf(command)));
     }
 
-    public void postUpdate(boolean command) {
-        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(command)));
+    public void postUpdate(boolean value) {
+        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(value)));
     }
 }

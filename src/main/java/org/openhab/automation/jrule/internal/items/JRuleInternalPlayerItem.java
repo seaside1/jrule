@@ -31,7 +31,7 @@ public class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePlayPauseVal
         JRuleEventHandler.get().sendCommand(getName(), JRulePlayPauseValue.valueOf(command));
     }
 
-    public void postUpdate(boolean command) {
-        JRuleEventHandler.get().postUpdate(getName(), JRulePlayPauseValue.valueOf(command));
+    public void postUpdate(boolean value) {
+        JRuleEventHandler.get().postUpdate(getName(), JRulePlayPauseValue.valueOf(value));
     }
 }

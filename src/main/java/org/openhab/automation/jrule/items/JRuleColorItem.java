@@ -26,10 +26,25 @@ public interface JRuleColorItem extends JRuleItem<JRuleHsbValue> {
         return JRuleItemRegistry.get(itemName, JRuleColorItem.class);
     }
 
+    /**
+     * Sends an ON or OFF
+     * 
+     * @param command true will send an JRuleOnOffValue.ON, false an OFF
+     */
     void sendCommand(boolean command);
 
-    void postUpdate(boolean command);
+    /**
+     * Sends an ON or OFF
+     * 
+     * @param value true will send an JRuleOnOffValue.ON, false an OFF.
+     */
+    void postUpdate(boolean value);
 
+    /**
+     * Sends an update in percent.
+     * 
+     * @param value update in percent via JRulePercentValue will be send.
+     */
     void postUpdate(int value);
 
     @Override

@@ -34,5 +34,10 @@ public interface JRuleContactItem extends JRuleItem<JRuleOpenClosedValue> {
         return JRuleOpenClosedValue.class;
     }
 
-    void postUpdate(boolean command);
+    /**
+     * Sends an ON or OFF
+     * 
+     * @param value true will send an JRuleOpenClosedValue.OPEN, false an CLOSED.
+     */
+    void postUpdate(boolean value);
 }

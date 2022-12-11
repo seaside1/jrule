@@ -26,8 +26,8 @@ public class JRuleInternalStringGroupItem extends JRuleInternalStringItem implem
         super(name, label, type, id);
     }
 
-    public void sendCommand(String value) {
-        memberItems().forEach(m -> m.sendCommand(new JRuleStringValue(value)));
+    public void sendCommand(String command) {
+        memberItems().forEach(m -> m.sendCommand(new JRuleStringValue(command)));
     }
 
     public void postUpdate(String value) {

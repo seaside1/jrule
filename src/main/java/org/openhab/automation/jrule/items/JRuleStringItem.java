@@ -31,7 +31,17 @@ public interface JRuleStringItem extends JRuleItem<JRuleStringValue> {
         return JRuleStringValue.class;
     }
 
-    void sendCommand(String state);
+    /**
+     * Sends an string command
+     * 
+     * @param command string command
+     */
+    void sendCommand(String command);
 
-    void postUpdate(String state);
+    /**
+     * Sends an string update
+     * 
+     * @param value string command
+     */
+    void postUpdate(String value);
 }

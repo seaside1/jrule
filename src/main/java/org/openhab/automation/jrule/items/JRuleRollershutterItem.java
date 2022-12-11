@@ -33,12 +33,32 @@ public interface JRuleRollershutterItem extends JRuleItem<JRulePercentValue> {
         return JRuleItemRegistry.get(itemName, JRuleRollershutterItem.class);
     }
 
-    void sendCommand(int value);
+    /**
+     * Sends a percent command.
+     * 
+     * @param command as number via JRulePercentValue will be send.
+     */
+    void sendCommand(int command);
 
+    /**
+     * Sends an UP or DOWN
+     * 
+     * @param command true will send an JRuleUpDownValue.UP, false an DOWN.
+     */
     void sendCommand(boolean command);
 
-    void postUpdate(boolean command);
+    /**
+     * Sends an UP or DOWN
+     * 
+     * @param value true will send an JRuleUpDownValue.UP, false an DOWN.
+     */
+    void postUpdate(boolean value);
 
+    /**
+     * Sends a percent update.
+     * 
+     * @param value as number via JRulePercentValue will be send.
+     */
     void postUpdate(int value);
 
     @Override

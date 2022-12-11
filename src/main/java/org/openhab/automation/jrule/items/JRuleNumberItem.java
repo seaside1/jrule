@@ -29,16 +29,48 @@ public interface JRuleNumberItem extends JRuleItem<JRuleDecimalValue> {
         return JRuleItemRegistry.get(itemName, JRuleNumberItem.class);
     }
 
-    void sendCommand(double value);
+    /**
+     * Sends a number command.
+     * 
+     * @param command as number via JRuleDecimalValue will be send.
+     */
+    void sendCommand(double command);
 
-    void sendCommand(double value, String unit);
+    /**
+     * Sends a number command with the given unit.
+     * 
+     * @param command as number via JRuleDecimalValue will be send.
+     * @param unit unit as string
+     */
+    void sendCommand(double command, String unit);
 
-    void sendCommand(int value);
+    /**
+     * Sends a number command.
+     * 
+     * @param command as number via JRuleDecimalValue will be send.
+     */
+    void sendCommand(int command);
 
+    /**
+     * Sends a number command with the given unit.
+     * 
+     * @param value as number via JRuleDecimalValue will be send.
+     * @param unit unit as string
+     */
     void postUpdate(double value, String unit);
 
+    /**
+     * Sends a number update.
+     * 
+     * @param value as number via JRuleDecimalValue will be send.
+     */
     void postUpdate(double value);
 
+    /**
+     * Sends a number update.
+     * 
+     * @param value as number via JRuleDecimalValue will be send.
+     */
     void postUpdate(int value);
 
     @Override

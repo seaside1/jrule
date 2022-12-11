@@ -36,8 +36,8 @@ public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershut
         memberItems().forEach(i -> i.postUpdate(new JRuleDecimalValue(value)));
     }
 
-    public void sendCommand(int value) {
-        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(value)));
+    public void sendCommand(int command) {
+        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(command)));
     }
 
     public void postUpdate(int value) {
@@ -48,7 +48,7 @@ public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershut
         memberItems().forEach(i -> i.sendCommand(JRuleUpDownValue.valueOf(command)));
     }
 
-    public void postUpdate(boolean command) {
-        memberItems().forEach(i -> i.postUpdate(JRuleUpDownValue.valueOf(command)));
+    public void postUpdate(boolean value) {
+        memberItems().forEach(i -> i.postUpdate(JRuleUpDownValue.valueOf(value)));
     }
 }

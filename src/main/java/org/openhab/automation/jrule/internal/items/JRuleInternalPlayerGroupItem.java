@@ -30,7 +30,7 @@ public class JRuleInternalPlayerGroupItem extends JRuleInternalPlayerItem implem
         memberItems().forEach(i -> i.sendCommand(JRulePlayPauseValue.valueOf(command)));
     }
 
-    public void postUpdate(boolean command) {
-        memberItems().forEach(i -> i.postUpdate(JRulePlayPauseValue.valueOf(command)));
+    public void postUpdate(boolean value) {
+        memberItems().forEach(i -> i.postUpdate(JRulePlayPauseValue.valueOf(value)));
     }
 }

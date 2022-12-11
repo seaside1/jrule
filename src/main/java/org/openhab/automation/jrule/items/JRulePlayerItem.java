@@ -40,7 +40,17 @@ public interface JRulePlayerItem extends JRuleItem<JRulePlayPauseValue> {
         return JRulePlayPauseValue.class;
     }
 
+    /**
+     * Sends an PLAY or PAUSE
+     * 
+     * @param command true will send an JRulePlayPauseValue.PLAY, false an PAUSE.
+     */
     void sendCommand(boolean command);
 
-    void postUpdate(boolean command);
+    /**
+     * Sends an PLAY or PAUSE
+     * 
+     * @param value true will send an JRulePlayPauseValue.PLAY, false an PAUSE.
+     */
+    void postUpdate(boolean value);
 }
