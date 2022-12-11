@@ -703,6 +703,20 @@ Use case: Want to listen on all Item events of a group (without the groupstate m
     }
 ```
 
+## Example 36
+
+Use case: Send some requests to http endpoints
+
+```java
+    @JRuleName("send http methods")
+    @JRuleWhenItemReceivedCommand(item = _MyHttpTrigger.ITEM, command = "send http calls")
+    public void sendHttpCalls() {
+        String responseGet = sendHttpGetRequest("http://http-mock:8080" + HTTP_GET_SOMETHING, null);
+        logInfo("send Http: {}", responseGet);
+        sendHttpDeleteRequest("http://http-mock:8080" + HTTP_DELETE_SOMETHING, Duration.ofSeconds(5));
+    }
+```
+
 
 # Changelog
 ## NEXT
