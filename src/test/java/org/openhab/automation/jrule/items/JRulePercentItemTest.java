@@ -14,38 +14,81 @@ package org.openhab.automation.jrule.items;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.DimmerItem;
-import org.openhab.core.library.types.PercentType;
 
 /**
  * The {@link JRulePercentItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRulePercentItemTest {
+class JRulePercentItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() throws ItemNotFoundException {
-        ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        DimmerItem ohItem = new DimmerItem("Name");
-        ohItem.setState(new PercentType(75));
-        Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenReturn(ohItem);
+    public void testSendCommand() {
+        JRuleDimmerItem item = (JRuleDimmerItem) getJRuleItem();
+        item.sendCommand(17);
 
-        JRuleEventHandler.get().setItemRegistry(itemRegistry);
+        // percent
+        Assertions.assertEquals(17, item.getStateAsPercent().intValue());
 
-        JRuleDimmerItem item = new JRuleInternalDimmerItem("Name", "Label", "Type", "Id");
-        JRuleOnOffValue command = JRuleOnOffValue.ON;
-        item.sendCommand(command);
-        JRulePercentValue state = item.getState();
-        Assertions.assertNotNull(state);
-        JRuleOnOffValue asOnOffValue = item.getStateAs(JRuleOnOffValue.class);
-        Assertions.assertNotNull(asOnOffValue);
-        Assertions.assertEquals(JRuleOnOffValue.ON, asOnOffValue);
+        // on/off
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
+
+        // send off
+        item.sendCommand(false);
+        Assertions.assertEquals(0, item.getStateAsPercent().intValue());
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAs(JRuleOnOffValue.class));
+
+        // send percent
+        item.sendCommand(new JRulePercentValue(22));
+        Assertions.assertEquals(22, item.getStateAsPercent().intValue());
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
+
+        // verify event calls
+        verifyEventTypes(0, 3);
+    }
+
+    @Test
+    public void testPostUpdate() {
+        JRuleDimmerItem item = (JRuleDimmerItem) getJRuleItem();
+        item.postUpdate(17);
+
+        // percent
+        Assertions.assertEquals(17, item.getStateAsPercent().intValue());
+
+        // on/off
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
+
+        // send off
+        item.postUpdate(false);
+        Assertions.assertEquals(0, item.getStateAsPercent().intValue());
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAs(JRuleOnOffValue.class));
+
+        // send percent
+        item.postUpdate(new JRulePercentValue(22));
+        Assertions.assertEquals(22, item.getStateAsPercent().intValue());
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
+
+        // verify event calls
+        verifyEventTypes(3, 0);
+    }
+
+    @Override
+    protected JRuleItem getJRuleItem() {
+        return new JRuleInternalDimmerItem("Name", "Label", "Type", "Id");
+    }
+
+    @Override
+    protected JRuleValue getDefaultCommand() {
+        return new JRulePercentValue(75);
+    }
+
+    @Override
+    protected GenericItem getOhItem() {
+        return new DimmerItem("Name");
     }
 }

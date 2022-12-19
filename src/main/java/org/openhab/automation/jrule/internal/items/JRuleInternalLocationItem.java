@@ -13,14 +13,13 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleLocationItem;
-import org.openhab.automation.jrule.rules.value.JRulePointValue;
 
 /**
  * The {@link JRuleInternalLocationItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalLocationItem extends JRuleInternalItem<JRulePointValue> implements JRuleLocationItem {
+public class JRuleInternalLocationItem extends JRuleInternalItem implements JRuleLocationItem {
     public JRuleInternalLocationItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }

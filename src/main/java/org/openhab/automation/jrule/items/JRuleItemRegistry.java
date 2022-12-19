@@ -57,9 +57,9 @@ import org.openhab.core.library.CoreItemFactory;
  */
 
 public class JRuleItemRegistry {
-    private static final Map<String, Class<? extends JRuleItem<? extends JRuleValue>>> typeMap = new HashMap<>();
-    private static final Map<String, Class<? extends JRuleItem<? extends JRuleValue>>> groupTypeMap = new HashMap<>();
-    private static final Map<String, JRuleItem<? extends JRuleValue>> itemRegistry = new HashMap<>();
+    private static final Map<String, Class<? extends JRuleItem>> typeMap = new HashMap<>();
+    private static final Map<String, Class<? extends JRuleItem>> groupTypeMap = new HashMap<>();
+    private static final Map<String, JRuleItem> itemRegistry = new HashMap<>();
 
     public static void clear() {
         itemRegistry.clear();
@@ -94,12 +94,12 @@ public class JRuleItemRegistry {
         groupTypeMap.put(CoreItemFactory.SWITCH, JRuleInternalSwitchGroupItem.class);
     }
 
-    public static <T extends JRuleValue> JRuleItem<T> get(String itemName) throws JRuleItemNotFoundException {
-        JRuleItem<? extends JRuleValue> jRuleItem = itemRegistry.get(itemName);
+    public static <T extends JRuleValue> JRuleItem get(String itemName) throws JRuleItemNotFoundException {
+        JRuleItem jRuleItem = itemRegistry.get(itemName);
         if (jRuleItem == null) {
             Item item = verifyThatItemExist(itemName);
 
-            Class<? extends JRuleItem<? extends JRuleValue>> jRuleItemClass = typeMap.get(item.getType());
+            Class<? extends JRuleItem> jRuleItemClass = typeMap.get(item.getType());
             if (item instanceof GroupItem) {
                 String baseItemType = Optional.ofNullable(((GroupItem) item).getBaseItem()).map(Item::getType)
                         .orElse(CoreItemFactory.STRING);
@@ -108,7 +108,7 @@ public class JRuleItemRegistry {
             }
 
             try {
-                Constructor<? extends JRuleItem<?>> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
+                Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
                         String.class, String.class, String.class);
                 constructor.setAccessible(true);
                 jRuleItem = constructor.newInstance(itemName, item.getLabel(), item.getType(), item.getUID());
@@ -117,12 +117,12 @@ public class JRuleItemRegistry {
                 throw new RuntimeException(ex);
             }
         }
-        return (JRuleItem<T>) jRuleItem;
+        return jRuleItem;
     }
 
     public static <T> T get(String itemName, Class<? extends JRuleItem> jRuleItemClass)
             throws JRuleItemNotFoundException {
-        JRuleItem<? extends JRuleValue> jruleItem = itemRegistry.get(itemName);
+        JRuleItem jruleItem = itemRegistry.get(itemName);
         if (jruleItem == null) {
             Item item = verifyThatItemExist(itemName);
 

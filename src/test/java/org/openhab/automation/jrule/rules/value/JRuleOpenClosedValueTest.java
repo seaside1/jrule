@@ -25,7 +25,7 @@ class JRuleOpenClosedValueTest {
     @Test
     void asStringValue() {
         JRuleOpenClosedValue value = JRuleOpenClosedValue.CLOSED;
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleOpenClosedValue fromString = JRuleOpenClosedValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
     }

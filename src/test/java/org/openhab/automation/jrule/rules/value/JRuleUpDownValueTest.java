@@ -25,7 +25,7 @@ class JRuleUpDownValueTest {
     @Test
     void asStringValue() {
         JRuleUpDownValue value = JRuleUpDownValue.DOWN;
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleUpDownValue fromString = JRuleUpDownValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
     }

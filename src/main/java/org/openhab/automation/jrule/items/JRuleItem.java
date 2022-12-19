@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -24,8 +25,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleItem<T extends JRuleValue> {
-    static <T extends JRuleValue> JRuleItem<T> forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleItem {
+    static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName);
     }
 
@@ -37,26 +38,32 @@ public interface JRuleItem<T extends JRuleValue> {
 
     String getId();
 
-    Class<? extends JRuleValue> getDefaultValueClass();
-
     default String getStateAsString() {
         return getState().toString();
     }
 
-    default T getState() {
-        return (T) JRuleEventHandler.get().getValue(getName(), getDefaultValueClass());
+    default JRuleValue getState() {
+        return JRuleEventHandler.get().getValue(getName());
     }
 
     default <TD extends JRuleValue> TD getStateAs(Class<TD> type) {
-        return (TD) JRuleEventHandler.get().getValue(getName(), type);
+        return JRuleEventHandler.get().getValue(getName(), type);
     }
 
-    default void sendCommand(JRuleValue command) {
+    default void sendUncheckedCommand(JRuleValue command) {
         JRuleEventHandler.get().sendCommand(getName(), command);
     }
 
-    default void postUpdate(JRuleValue state) {
+    default void postUncheckedUpdate(JRuleValue state) {
         JRuleEventHandler.get().postUpdate(getName(), state);
+    }
+
+    default void postUpdate(JRuleRefreshValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    default void postNullUpdate() {
+        JRuleEventHandler.get().postUpdate(getName(), null);
     }
 
     default Optional<ZonedDateTime> lastUpdated() {
@@ -77,11 +84,11 @@ public interface JRuleItem<T extends JRuleValue> {
 
     boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    default Optional<T> getHistoricState(ZonedDateTime timestamp) {
+    default Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp) {
         return getHistoricState(timestamp, null);
     }
 
-    Optional<T> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
+    Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
 
     default boolean isGroup() {
         return false;

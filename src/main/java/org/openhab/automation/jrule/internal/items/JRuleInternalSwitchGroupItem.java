@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * The {@link JRuleInternalSwitchGroupItem} Items
@@ -23,13 +22,5 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 public class JRuleInternalSwitchGroupItem extends JRuleInternalSwitchItem implements JRuleSwitchGroupItem {
     public JRuleInternalSwitchGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(boolean command) {
-        memberItems().forEach(i -> i.sendCommand(JRuleOnOffValue.valueOf(command)));
-    }
-
-    public void postUpdate(boolean command) {
-        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(command)));
     }
 }

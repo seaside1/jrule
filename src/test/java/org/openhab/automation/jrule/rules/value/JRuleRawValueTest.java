@@ -25,7 +25,7 @@ class JRuleRawValueTest {
     @Test
     void asStringValue() {
         JRuleRawValue value = new JRuleRawValue("jpg", new byte[16]);
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleRawValue fromString = new JRuleRawValue(string);
         Assertions.assertEquals(value, fromString);
     }

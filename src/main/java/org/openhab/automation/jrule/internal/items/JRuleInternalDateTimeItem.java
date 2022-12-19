@@ -12,37 +12,16 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.time.ZonedDateTime;
-import java.util.Date;
-
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
-import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 
 /**
  * The {@link JRuleInternalDateTimeItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleInternalDateTimeItem extends JRuleInternalItem<JRuleDateTimeValue> implements JRuleDateTimeItem {
+public class JRuleInternalDateTimeItem extends JRuleInternalItem implements JRuleDateTimeItem {
 
     public JRuleInternalDateTimeItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(Date date) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(date));
-    }
-
-    public void sendCommand(ZonedDateTime value) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDateTimeValue(value));
-    }
-
-    public void postUpdate(Date date) {
-        JRuleEventHandler.get().postUpdate(name, new JRuleDateTimeValue(date));
-    }
-
-    public void postUpdate(ZonedDateTime value) {
-        JRuleEventHandler.get().postUpdate(name, new JRuleDateTimeValue(value));
     }
 }

@@ -13,15 +13,31 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
  * The {@link JRulePlayerGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem<JRulePlayPauseValue> {
+public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem {
     static JRulePlayerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRulePlayerGroupItem.class);
+    }
+
+    default void sendCommand(JRulePlayPauseValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void postUpdate(JRulePlayPauseValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+    }
+
+    default void sendCommand(JRuleRewindFastforwardValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void sendCommand(JRuleNextPreviousValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 }

@@ -13,15 +13,19 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
+import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 
 /**
  * The {@link JRuleCallGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem<JRuleStringValue> {
+public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem {
     static JRuleCallGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleCallGroupItem.class);
+    }
+
+    default void postUpdate(JRuleStringListValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

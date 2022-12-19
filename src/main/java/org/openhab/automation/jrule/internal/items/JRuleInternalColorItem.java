@@ -12,32 +12,16 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleColorItem;
-import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
  * The {@link JRuleInternalColorItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleInternalColorItem extends JRuleInternalItem<JRuleHsbValue> implements JRuleColorItem {
+public class JRuleInternalColorItem extends JRuleInternalDimmerItem implements JRuleColorItem {
 
     public JRuleInternalColorItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
-    }
-
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().sendCommand(getName(), JRuleOnOffValue.valueOf(command));
-    }
-
-    public void postUpdate(boolean value) {
-        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(value));
     }
 }

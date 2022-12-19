@@ -13,8 +13,6 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleColorGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
  * The {@link JRuleInternalColorGroupItem} Items
@@ -25,21 +23,5 @@ public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implemen
 
     public JRuleInternalColorGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(int value) {
-        memberItems().forEach(i -> i.sendCommand(new JRulePercentValue(value)));
-    }
-
-    public void postUpdate(int value) {
-        memberItems().forEach(i -> i.postUpdate(new JRulePercentValue(value)));
-    }
-
-    public void sendCommand(boolean command) {
-        memberItems().forEach(i -> i.sendCommand(JRuleOnOffValue.valueOf(command)));
-    }
-
-    public void postUpdate(boolean value) {
-        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(value)));
     }
 }

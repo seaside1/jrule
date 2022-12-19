@@ -46,7 +46,7 @@ public enum JRuleUpDownValue implements JRuleValue {
     }
 
     @Override
-    public String asStringValue() {
+    public String stringValue() {
         return name();
     }
 
@@ -57,6 +57,6 @@ public enum JRuleUpDownValue implements JRuleValue {
 
     @Override
     public State toOhState() {
-        throw new IllegalStateException("not a state type");
+        return this.ohType;
     }
 }

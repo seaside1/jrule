@@ -12,22 +12,16 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleContactItem;
-import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
  * The {@link JRuleInternalContactItem} Items
  *
  * @author Timo Litzius - Initial contribution
  */
-public class JRuleInternalContactItem extends JRuleInternalItem<JRuleOpenClosedValue> implements JRuleContactItem {
+public class JRuleInternalContactItem extends JRuleInternalItem implements JRuleContactItem {
 
     public JRuleInternalContactItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void postUpdate(boolean value) {
-        JRuleEventHandler.get().postUpdate(getName(), JRuleOpenClosedValue.valueOf(value));
     }
 }

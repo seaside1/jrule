@@ -25,7 +25,7 @@ class JRulePercentValueTest {
     @Test
     void asStringValue() {
         JRulePercentValue value = new JRulePercentValue(23.12);
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRulePercentValue fromString = new JRulePercentValue(string);
         Assertions.assertEquals(value, fromString);
     }

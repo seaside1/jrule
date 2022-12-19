@@ -13,24 +13,40 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
-import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
  * The {@link JRuleRollershutterItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleRollershutterItem extends JRuleItem<JRulePercentValue> {
-    String STOP = JRuleStopMoveValue.STOP.asStringValue();
-    String MOVE = JRuleStopMoveValue.MOVE.asStringValue();
-    String UP = JRuleUpDownValue.UP.asStringValue();
-    String DOWN = JRuleUpDownValue.DOWN.asStringValue();
+public interface JRuleRollershutterItem extends JRuleItem {
+    String STOP = JRuleStopMoveValue.STOP.stringValue();
+    String MOVE = JRuleStopMoveValue.MOVE.stringValue();
+    String UP = JRuleUpDownValue.UP.stringValue();
+    String DOWN = JRuleUpDownValue.DOWN.stringValue();
 
     static JRuleRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleRollershutterItem.class);
+    }
+
+    /**
+     * Sends a percent command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRulePercentValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    /**
+     * Sends a percent update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRulePercentValue state) {
+        postUncheckedUpdate(state);
     }
 
     /**
@@ -38,31 +54,47 @@ public interface JRuleRollershutterItem extends JRuleItem<JRulePercentValue> {
      * 
      * @param command as number via JRulePercentValue will be send.
      */
-    void sendCommand(int command);
+    default void sendCommand(int command) {
+        sendUncheckedCommand(new JRulePercentValue(command));
+    }
 
     /**
-     * Sends an UP or DOWN
-     * 
-     * @param command true will send an JRuleUpDownValue.UP, false an DOWN.
+     * Sends a up/down command.
+     *
+     * @param command command to send.
      */
-    void sendCommand(boolean command);
+    default void sendCommand(JRuleUpDownValue command) {
+        sendUncheckedCommand(command);
+    }
 
     /**
-     * Sends an UP or DOWN
-     * 
-     * @param value true will send an JRuleUpDownValue.UP, false an DOWN.
+     * Sends a up/down update.
+     *
+     * @param state state to send.
      */
-    void postUpdate(boolean value);
+    default void postUpdate(JRuleUpDownValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    /**
+     * Sends a stop/move command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleStopMoveValue command) {
+        sendUncheckedCommand(command);
+    }
 
     /**
      * Sends a percent update.
      * 
-     * @param value as number via JRulePercentValue will be send.
+     * @param state as number via JRulePercentValue will be send.
      */
-    void postUpdate(int value);
+    default void postUpdate(int state) {
+        postUncheckedUpdate(new JRulePercentValue(state));
+    }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRulePercentValue.class;
+    default JRulePercentValue getStateAsPercent() {
+        return JRuleEventHandler.get().getValue(getName(), JRulePercentValue.class);
     }
 }

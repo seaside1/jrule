@@ -13,15 +13,15 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
  * The {@link JRuleSwitchItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleSwitchItem extends JRuleItem<JRuleOnOffValue> {
+public interface JRuleSwitchItem extends JRuleItem {
     String ON = "ON";
     String OFF = "OFF";
 
@@ -29,12 +29,43 @@ public interface JRuleSwitchItem extends JRuleItem<JRuleOnOffValue> {
         return JRuleItemRegistry.get(itemName, JRuleSwitchItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleOnOffValue.class;
+    /**
+     * Sends a on/off command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleOnOffValue command) {
+        sendUncheckedCommand(command);
     }
 
-    void sendCommand(boolean command);
+    /**
+     * Sends a on/off update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleOnOffValue state) {
+        postUncheckedUpdate(state);
+    }
 
-    void postUpdate(boolean command);
+    /**
+     * Sends a on/off command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(boolean command) {
+        sendUncheckedCommand(JRuleOnOffValue.valueOf(command));
+    }
+
+    /**
+     * Sends a on/off update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(boolean state) {
+        postUncheckedUpdate(JRuleOnOffValue.valueOf(state));
+    }
+
+    default JRuleOnOffValue getStateAsOnOff() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleOnOffValue.class);
+    }
 }

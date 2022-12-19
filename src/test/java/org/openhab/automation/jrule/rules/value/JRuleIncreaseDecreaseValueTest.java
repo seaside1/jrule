@@ -25,7 +25,7 @@ class JRuleIncreaseDecreaseValueTest {
     @Test
     void asStringValue() {
         JRuleIncreaseDecreaseValue value = JRuleIncreaseDecreaseValue.INCREASE;
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleIncreaseDecreaseValue fromString = JRuleIncreaseDecreaseValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
     }

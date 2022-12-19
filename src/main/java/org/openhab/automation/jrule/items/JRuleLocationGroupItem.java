@@ -20,8 +20,16 @@ import org.openhab.automation.jrule.rules.value.JRulePointValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem<JRulePointValue> {
+public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem {
     static JRuleLocationGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleLocationGroupItem.class);
+    }
+
+    default void sendCommand(JRulePointValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void postUpdate(JRulePointValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

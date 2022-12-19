@@ -13,31 +13,32 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
  * The {@link JRuleContactItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleContactItem extends JRuleItem<JRuleOpenClosedValue> {
-    String OPEN = JRuleOpenClosedValue.OPEN.asStringValue();
-    String CLOSED = JRuleOpenClosedValue.CLOSED.asStringValue();
+public interface JRuleContactItem extends JRuleItem {
+    String OPEN = JRuleOpenClosedValue.OPEN.stringValue();
+    String CLOSED = JRuleOpenClosedValue.CLOSED.stringValue();
 
     static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleOpenClosedValue.class;
+    /**
+     * Sends a open/close update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleOpenClosedValue state) {
+        postUncheckedUpdate(state);
     }
 
-    /**
-     * Sends an ON or OFF
-     * 
-     * @param value true will send an JRuleOpenClosedValue.OPEN, false an CLOSED.
-     */
-    void postUpdate(boolean value);
+    default JRuleOpenClosedValue getStateAsOpenClose() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleOpenClosedValue.class);
+    }
 }

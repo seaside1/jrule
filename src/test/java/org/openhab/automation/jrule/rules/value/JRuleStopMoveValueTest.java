@@ -25,7 +25,7 @@ class JRuleStopMoveValueTest {
     @Test
     void asStringValue() {
         JRuleStopMoveValue value = JRuleStopMoveValue.MOVE;
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleStopMoveValue fromString = JRuleStopMoveValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
     }

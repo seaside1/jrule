@@ -12,34 +12,15 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleDimmerItem;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
  * The {@link JRuleInternalDimmerItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleInternalDimmerItem extends JRuleInternalItem<JRulePercentValue> implements JRuleDimmerItem {
-
+public class JRuleInternalDimmerItem extends JRuleInternalSwitchItem implements JRuleDimmerItem {
     public JRuleInternalDimmerItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(int command) {
-        JRuleEventHandler.get().sendCommand(name, new JRulePercentValue(command));
-    }
-
-    public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRulePercentValue(value));
-    }
-
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().sendCommand(getName(), new JRulePercentValue(command));
-    }
-
-    public void postUpdate(boolean value) {
-        JRuleEventHandler.get().postUpdate(getName(), new JRulePercentValue(value));
     }
 }

@@ -25,7 +25,7 @@ class JRuleDecimalValueTest {
     @Test
     void asStringValue() {
         JRuleDecimalValue value = new JRuleDecimalValue(23.12);
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleDecimalValue fromString = new JRuleDecimalValue(string);
         Assertions.assertEquals(value, fromString);
     }

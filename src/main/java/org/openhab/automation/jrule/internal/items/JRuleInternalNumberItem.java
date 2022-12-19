@@ -15,9 +15,7 @@ package org.openhab.automation.jrule.internal.items;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
-import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.core.library.types.DecimalType;
 
 /**
@@ -25,34 +23,10 @@ import org.openhab.core.library.types.DecimalType;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleInternalNumberItem extends JRuleInternalItem<JRuleDecimalValue> implements JRuleNumberItem {
+public class JRuleInternalNumberItem extends JRuleInternalItem implements JRuleNumberItem {
 
     public JRuleInternalNumberItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(double command) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(command));
-    }
-
-    public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value));
-    }
-
-    public void sendCommand(int command) {
-        JRuleEventHandler.get().sendCommand(name, new JRuleDecimalValue(command));
-    }
-
-    public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(name, new JRuleDecimalValue(value));
-    }
-
-    public void sendCommand(double command, String unit) {
-        JRuleEventHandler.get().sendCommand(name, command, unit);
-    }
-
-    public void postUpdate(double value, String unit) {
-        JRuleEventHandler.get().postUpdate(name, value, unit);
     }
 
     public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {

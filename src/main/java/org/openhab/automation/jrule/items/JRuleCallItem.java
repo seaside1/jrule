@@ -13,21 +13,29 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 
 /**
  * The {@link JRuleCallItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleCallItem extends JRuleItem<JRuleStringValue> {
+public interface JRuleCallItem extends JRuleItem {
     static JRuleCallItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleCallItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleStringValue.class;
+    /**
+     * Sends a string-list update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleStringListValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    default JRuleStringListValue getStateAsStringList() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleStringListValue.class);
     }
 }

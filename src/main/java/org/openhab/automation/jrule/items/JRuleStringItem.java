@@ -14,34 +14,50 @@ package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
  * The {@link JRuleStringItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleStringItem extends JRuleItem<JRuleStringValue> {
+public interface JRuleStringItem extends JRuleItem {
     static JRuleStringItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleStringItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleStringValue.class;
+    /**
+     * Sends a string command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleStringValue command) {
+        sendUncheckedCommand(command);
     }
 
     /**
-     * Sends an string command
+     * Sends a string update
      * 
-     * @param command string command
+     * @param state update to send
      */
-    void sendCommand(String command);
+    default void postUpdate(JRuleStringValue state) {
+        postUncheckedUpdate(state);
+    }
 
     /**
-     * Sends an string update
-     * 
-     * @param value string command
+     * Sends a string command
+     *
+     * @param command string command
      */
-    void postUpdate(String value);
+    default void sendCommand(String command) {
+        sendUncheckedCommand(new JRuleStringValue(command));
+    }
+
+    /**
+     * Sends a string update
+     *
+     * @param state string command
+     */
+    default void postUpdate(String state) {
+        postUncheckedUpdate(new JRuleStringValue(state));
+    }
 }

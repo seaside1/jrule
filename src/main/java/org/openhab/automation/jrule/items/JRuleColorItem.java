@@ -13,42 +13,38 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
  * The {@link JRuleColorItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleColorItem extends JRuleItem<JRuleHsbValue> {
+public interface JRuleColorItem extends JRuleDimmerItem {
     static JRuleColorItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleColorItem.class);
     }
 
     /**
-     * Sends an ON or OFF
+     * Sends a hsb command
      * 
-     * @param command true will send an JRuleOnOffValue.ON, false an OFF
+     * @param command command to send.
      */
-    void sendCommand(boolean command);
+    default void sendCommand(JRuleHsbValue command) {
+        sendUncheckedCommand(command);
+    }
 
     /**
-     * Sends an ON or OFF
+     * Sends a hsb update
      * 
-     * @param value true will send an JRuleOnOffValue.ON, false an OFF.
+     * @param state update to send
      */
-    void postUpdate(boolean value);
+    default void postUpdate(JRuleHsbValue state) {
+        postUncheckedUpdate(state);
+    }
 
-    /**
-     * Sends an update in percent.
-     * 
-     * @param value update in percent via JRulePercentValue will be send.
-     */
-    void postUpdate(int value);
-
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleHsbValue.class;
+    default JRuleHsbValue getStateAsHsb() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleHsbValue.class);
     }
 }

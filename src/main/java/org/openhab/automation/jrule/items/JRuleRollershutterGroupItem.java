@@ -13,15 +13,39 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
  * The {@link JRuleRollershutterGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleRollershutterGroupItem extends JRuleRollershutterItem, JRuleGroupItem<JRulePercentValue> {
+public interface JRuleRollershutterGroupItem extends JRuleRollershutterItem, JRuleGroupItem {
     static JRuleRollershutterGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleRollershutterGroupItem.class);
+    }
+
+    default void sendCommand(JRulePercentValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void postUpdate(JRulePercentValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+    }
+
+    default void sendCommand(int command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
+    }
+
+    default void sendCommand(JRuleUpDownValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void sendCommand(JRuleStopMoveValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void postUpdate(int state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
     }
 }

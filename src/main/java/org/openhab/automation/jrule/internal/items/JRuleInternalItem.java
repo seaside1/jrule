@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
@@ -25,7 +26,7 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public abstract class JRuleInternalItem<T extends JRuleValue> implements JRuleItem<T> {
+public abstract class JRuleInternalItem implements JRuleItem {
     protected final String name;
     protected final String label;
     protected final String type;
@@ -40,7 +41,11 @@ public abstract class JRuleInternalItem<T extends JRuleValue> implements JRuleIt
 
     @Override
     public String getStateAsString() {
-        return JRuleEventHandler.get().getValue(name, JRuleStringValue.class).asStringValue();
+        JRuleStringValue value = JRuleEventHandler.get().getValue(name, JRuleStringValue.class);
+        if (value == null) {
+            return null;
+        }
+        return value.stringValue();
     }
 
     @Override
@@ -79,8 +84,24 @@ public abstract class JRuleInternalItem<T extends JRuleValue> implements JRuleIt
     }
 
     @Override
-    public Optional<T> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
+    public Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(s -> JRuleEventHandler.get().toValue(s, getDefaultValueClass()));
+                .map(s -> JRuleEventHandler.get().toValue(s, getState().getClass()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleInternalItem that = (JRuleInternalItem) o;
+        return name.equals(that.name) && Objects.equals(label, that.label) && type.equals(that.type)
+                && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, label, type, id);
     }
 }

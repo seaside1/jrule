@@ -42,7 +42,7 @@ public enum JRuleNextPreviousValue implements JRuleValue {
     }
 
     @Override
-    public String asStringValue() {
+    public String stringValue() {
         return name();
     }
 

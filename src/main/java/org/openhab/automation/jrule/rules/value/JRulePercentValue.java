@@ -44,7 +44,7 @@ public class JRulePercentValue implements JRuleValue {
     }
 
     @Override
-    public String asStringValue() {
+    public String stringValue() {
         return this.ohType.toFullString();
     }
 

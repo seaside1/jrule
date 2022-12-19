@@ -13,21 +13,29 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
  * The {@link JRuleImageItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleImageItem extends JRuleItem<JRuleRawValue> {
+public interface JRuleImageItem extends JRuleItem {
     static JRuleImageItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleImageItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRuleRawValue.class;
+    /**
+     * Sends a on/off update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleRawValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    default JRuleRawValue getStateAsRaw() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleRawValue.class);
     }
 }

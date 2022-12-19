@@ -13,14 +13,13 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleImageItem;
-import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
  * The {@link JRuleInternalImageItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalImageItem extends JRuleInternalItem<JRuleRawValue> implements JRuleImageItem {
+public class JRuleInternalImageItem extends JRuleInternalItem implements JRuleImageItem {
     public JRuleInternalImageItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }

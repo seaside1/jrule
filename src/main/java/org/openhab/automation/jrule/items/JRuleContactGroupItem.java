@@ -20,8 +20,12 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem<JRuleOpenClosedValue> {
+public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem {
     static JRuleContactGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleContactGroupItem.class);
+    }
+
+    default void postUpdate(JRuleOpenClosedValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

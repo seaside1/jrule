@@ -14,40 +14,100 @@ package org.openhab.automation.jrule.items;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.ColorItem;
-import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.HSBType;
-import org.openhab.core.library.types.PercentType;
 
 /**
  * The {@link JRuleColorItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRuleColorItemTest {
+class JRuleColorItemTest extends JRuleItemTestBase {
+
     @Test
-    public void testSendCommand() throws ItemNotFoundException {
-        ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        ColorItem ohItem = new ColorItem("Name");
-        ohItem.setState(new HSBType(new DecimalType(1), new PercentType(2), new PercentType(3)));
-        Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenReturn(ohItem);
+    public void testSendCommand() {
+        JRuleColorItem item = (JRuleColorItem) getJRuleItem();
+        item.sendCommand(new JRuleHsbValue(1, 2, 3));
 
-        JRuleEventHandler.get().setItemRegistry(itemRegistry);
+        // hsb
+        Assertions.assertEquals(1, item.getStateAsHsb().getHue().intValue());
+        Assertions.assertEquals(2, item.getStateAsHsb().getSaturation().intValue());
+        Assertions.assertEquals(3, item.getStateAsHsb().getBrightness().intValue());
 
-        JRuleColorItem item = new JRuleInternalColorItem("Name", "Label", "Type", "Id");
-        JRuleHsbValue command = new JRuleHsbValue(1, 2, 3);
-        item.sendCommand(command);
-        JRuleHsbValue state = item.getState();
-        Assertions.assertNotNull(state);
-        JRuleOnOffValue asOnOffValue = item.getStateAs(JRuleOnOffValue.class);
-        Assertions.assertNotNull(asOnOffValue);
-        Assertions.assertEquals(JRuleOnOffValue.ON, asOnOffValue);
+        // on/off
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
+
+        // percent
+        Assertions.assertEquals(3, item.getStateAsPercent().intValue());
+
+        // send percent
+        item.sendCommand(12);
+        Assertions.assertEquals(12, item.getStateAsHsb().getBrightness().intValue());
+
+        // send off
+        item.sendCommand(false);
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAsOnOff());
+
+        // send hsb
+        item.sendCommand(new JRuleHsbValue(5, 6, 7));
+        Assertions.assertEquals(5, item.getStateAsHsb().getHue().intValue());
+        Assertions.assertEquals(6, item.getStateAsHsb().getSaturation().intValue());
+        Assertions.assertEquals(7, item.getStateAsHsb().getBrightness().intValue());
+
+        // verify event calls
+        verifyEventTypes(0, 4);
+    }
+
+    @Test
+    public void testPostUpdate() {
+        JRuleColorItem item = (JRuleColorItem) getJRuleItem();
+        item.postUpdate(new JRuleHsbValue(1, 2, 3));
+
+        // hsb
+        Assertions.assertEquals(1, item.getStateAsHsb().getHue().intValue());
+        Assertions.assertEquals(2, item.getStateAsHsb().getSaturation().intValue());
+        Assertions.assertEquals(3, item.getStateAsHsb().getBrightness().intValue());
+
+        // on/off
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
+
+        // percent
+        Assertions.assertEquals(3, item.getStateAsPercent().intValue());
+
+        // send percent
+        item.postUpdate(12);
+        Assertions.assertEquals(12, item.getStateAsHsb().getBrightness().intValue());
+
+        // send off
+        item.postUpdate(false);
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAsOnOff());
+
+        // send hsb
+        item.postUpdate(new JRuleHsbValue(5, 6, 7));
+        Assertions.assertEquals(5, item.getStateAsHsb().getHue().intValue());
+        Assertions.assertEquals(6, item.getStateAsHsb().getSaturation().intValue());
+        Assertions.assertEquals(7, item.getStateAsHsb().getBrightness().intValue());
+
+        // verify event calls
+        verifyEventTypes(4, 0);
+    }
+
+    @Override
+    protected JRuleItem getJRuleItem() {
+        return new JRuleInternalColorItem("Name", "Label", "Type", "Id");
+    }
+
+    @Override
+    protected JRuleValue getDefaultCommand() {
+        return new JRuleHsbValue(1, 2, 3);
+    }
+
+    @Override
+    protected GenericItem getOhItem() {
+        return new ColorItem("Name");
     }
 }

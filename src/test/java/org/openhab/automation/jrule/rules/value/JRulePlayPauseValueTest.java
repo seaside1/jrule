@@ -25,7 +25,7 @@ class JRulePlayPauseValueTest {
     @Test
     void asStringValue() {
         JRulePlayPauseValue value = JRulePlayPauseValue.PLAY;
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRulePlayPauseValue fromString = JRulePlayPauseValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
     }

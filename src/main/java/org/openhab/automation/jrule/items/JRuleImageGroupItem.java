@@ -20,8 +20,12 @@ import org.openhab.automation.jrule.rules.value.JRuleRawValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem<JRuleRawValue> {
+public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem {
     static JRuleImageGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleImageGroupItem.class);
+    }
+
+    default void postUpdate(JRuleRawValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

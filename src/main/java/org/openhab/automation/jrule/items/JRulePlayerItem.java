@@ -13,44 +13,76 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.rules.value.JRuleNextPreviousValue;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.rules.value.JRuleRewindFastforwardValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
  * The {@link JRulePlayerItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRulePlayerItem extends JRuleItem<JRulePlayPauseValue> {
-    String PLAY = JRulePlayPauseValue.PLAY.asStringValue();
-    String PAUSE = JRulePlayPauseValue.PAUSE.asStringValue();
-    String NEXT = JRuleNextPreviousValue.NEXT.asStringValue();
-    String PREVIOUS = JRuleNextPreviousValue.PREVIOUS.asStringValue();
-    String REWIND = JRuleRewindFastforwardValue.REWIND.asStringValue();
-    String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.asStringValue();
+public interface JRulePlayerItem extends JRuleItem {
+    String PLAY = JRulePlayPauseValue.PLAY.stringValue();
+    String PAUSE = JRulePlayPauseValue.PAUSE.stringValue();
+    String NEXT = JRuleNextPreviousValue.NEXT.stringValue();
+    String PREVIOUS = JRuleNextPreviousValue.PREVIOUS.stringValue();
+    String REWIND = JRuleRewindFastforwardValue.REWIND.stringValue();
+    String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.stringValue();
 
     static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRulePlayPauseValue.class;
+    /**
+     * Sends a play/pause command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRulePlayPauseValue command) {
+        sendUncheckedCommand(command);
     }
 
     /**
-     * Sends an PLAY or PAUSE
+     * Sends a play/pause update
      * 
-     * @param command true will send an JRulePlayPauseValue.PLAY, false an PAUSE.
+     * @param state update to send
      */
-    void sendCommand(boolean command);
+    default void postUpdate(JRulePlayPauseValue state) {
+        postUncheckedUpdate(state);
+    }
 
     /**
-     * Sends an PLAY or PAUSE
-     * 
-     * @param value true will send an JRulePlayPauseValue.PLAY, false an PAUSE.
+     * Sends a rewind/fastforward update
+     *
+     * @param state update to send
      */
-    void postUpdate(boolean value);
+    default void postUpdate(JRuleRewindFastforwardValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    /**
+     * Sends a rewind/fastforward command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleRewindFastforwardValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    /**
+     * Sends a next/previous command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleNextPreviousValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    default JRulePlayPauseValue getStateAsPlayPause() {
+        return JRuleEventHandler.get().getValue(getName(), JRulePlayPauseValue.class);
+    }
+
+    default JRuleRewindFastforwardValue getStateAsRewindFastforward() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleRewindFastforwardValue.class);
+    }
 }

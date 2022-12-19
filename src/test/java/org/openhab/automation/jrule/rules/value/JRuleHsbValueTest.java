@@ -24,7 +24,7 @@ class JRuleHsbValueTest {
     @Test
     void asStringValue() {
         JRuleHsbValue value = new JRuleHsbValue(24, 45, 13);
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleHsbValue fromString = new JRuleHsbValue(string);
         Assertions.assertEquals(value, fromString);
     }

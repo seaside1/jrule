@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRulePlayerGroupItem;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**
  * The {@link JRuleInternalPlayerGroupItem} Items
@@ -24,13 +23,5 @@ public class JRuleInternalPlayerGroupItem extends JRuleInternalPlayerItem implem
 
     public JRuleInternalPlayerGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(boolean command) {
-        memberItems().forEach(i -> i.sendCommand(JRulePlayPauseValue.valueOf(command)));
-    }
-
-    public void postUpdate(boolean value) {
-        memberItems().forEach(i -> i.postUpdate(JRulePlayPauseValue.valueOf(value)));
     }
 }

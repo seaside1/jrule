@@ -20,8 +20,24 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleSwitchGroupItem extends JRuleSwitchItem, JRuleGroupItem<JRuleOnOffValue> {
+public interface JRuleSwitchGroupItem extends JRuleSwitchItem, JRuleGroupItem {
     static JRuleSwitchGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleSwitchGroupItem.class);
+    }
+
+    default void sendCommand(JRuleOnOffValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+    }
+
+    default void postUpdate(JRuleOnOffValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+    }
+
+    default void sendCommand(boolean command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(JRuleOnOffValue.valueOf(command)));
+    }
+
+    default void postUpdate(boolean state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(JRuleOnOffValue.valueOf(state)));
     }
 }

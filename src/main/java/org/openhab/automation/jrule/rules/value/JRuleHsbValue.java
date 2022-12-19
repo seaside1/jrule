@@ -42,7 +42,7 @@ public class JRuleHsbValue implements JRuleValue {
     }
 
     @Override
-    public String asStringValue() {
+    public String stringValue() {
         return this.ohType.toFullString();
     }
 
@@ -61,11 +61,11 @@ public class JRuleHsbValue implements JRuleValue {
     }
 
     public BigDecimal getBrightness() {
-        return this.ohType.getSaturation().toBigDecimal();
+        return this.ohType.getBrightness().toBigDecimal();
     }
 
     public BigDecimal getSaturation() {
-        return this.ohType.getBrightness().toBigDecimal();
+        return this.ohType.getSaturation().toBigDecimal();
     }
 
     @Override

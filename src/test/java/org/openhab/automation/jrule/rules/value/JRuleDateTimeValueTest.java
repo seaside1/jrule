@@ -27,7 +27,7 @@ class JRuleDateTimeValueTest {
     @Test
     void asStringValue() {
         JRuleDateTimeValue value = new JRuleDateTimeValue(ZonedDateTime.now());
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleDateTimeValue fromString = new JRuleDateTimeValue(string);
         Assertions.assertEquals(value, fromString);
     }

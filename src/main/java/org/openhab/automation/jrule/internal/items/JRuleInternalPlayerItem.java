@@ -12,26 +12,16 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRulePlayerItem;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**
  * The {@link JRuleInternalPlayerItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleInternalPlayerItem extends JRuleInternalItem<JRulePlayPauseValue> implements JRulePlayerItem {
+public class JRuleInternalPlayerItem extends JRuleInternalItem implements JRulePlayerItem {
 
     public JRuleInternalPlayerItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().sendCommand(getName(), JRulePlayPauseValue.valueOf(command));
-    }
-
-    public void postUpdate(boolean value) {
-        JRuleEventHandler.get().postUpdate(getName(), JRulePlayPauseValue.valueOf(value));
     }
 }

@@ -21,7 +21,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleInternalSwitchItem extends JRuleInternalItem<JRuleOnOffValue> implements JRuleSwitchItem {
+public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
     public JRuleInternalSwitchItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
@@ -30,7 +30,12 @@ public class JRuleInternalSwitchItem extends JRuleInternalItem<JRuleOnOffValue> 
         JRuleEventHandler.get().sendCommand(getName(), JRuleOnOffValue.valueOf(command));
     }
 
-    public void postUpdate(boolean command) {
-        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(command));
+    public void postUpdate(boolean state) {
+        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(state));
+    }
+
+    @Override
+    public JRuleOnOffValue getState() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleOnOffValue.class);
     }
 }

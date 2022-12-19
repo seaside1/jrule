@@ -27,7 +27,7 @@ class JRuleQuantityValueTest {
     @Test
     void asStringValue() {
         JRuleQuantityValue value = new JRuleQuantityValue("23.12 kW");
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleQuantityValue fromString = new JRuleQuantityValue(string);
         Assertions.assertEquals(value, fromString);
     }

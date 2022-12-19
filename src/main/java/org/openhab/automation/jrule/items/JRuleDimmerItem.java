@@ -13,26 +13,39 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
  * The {@link JRuleDimmerItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleDimmerItem extends JRuleItem<JRulePercentValue> {
-    String INCREASE = JRuleIncreaseDecreaseValue.INCREASE.asStringValue();
-    String DECREASE = JRuleIncreaseDecreaseValue.DECREASE.asStringValue();
+public interface JRuleDimmerItem extends JRuleSwitchItem {
+    String INCREASE = JRuleIncreaseDecreaseValue.INCREASE.stringValue();
+    String DECREASE = JRuleIncreaseDecreaseValue.DECREASE.stringValue();
 
     static JRuleDimmerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleDimmerItem.class);
     }
 
-    @Override
-    default Class<? extends JRuleValue> getDefaultValueClass() {
-        return JRulePercentValue.class;
+    /**
+     * Sends a percent command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRulePercentValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    /**
+     * Sends a percent update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRulePercentValue state) {
+        postUncheckedUpdate(state);
     }
 
     /**
@@ -40,26 +53,38 @@ public interface JRuleDimmerItem extends JRuleItem<JRulePercentValue> {
      * 
      * @param command in percent via JRulePercentValue will be send.
      */
-    void sendCommand(int command);
+    default void sendCommand(int command) {
+        sendUncheckedCommand(new JRulePercentValue(command));
+    }
 
     /**
-     * Sends 0 or 100
-     * 
-     * @param command true=100 or false=0 via JRulePercentValue will be send.
+     * Sends a increase/decrease command.
+     *
+     * @param command command to send.
      */
-    void sendCommand(boolean command);
+    default void sendCommand(JRuleIncreaseDecreaseValue command) {
+        sendUncheckedCommand(command);
+    }
 
     /**
-     * Sends 0 or 100
-     * 
-     * @param value update true=100 or false=0 via JRulePercentValue will be send.
+     * Sends an increase/decrease.
+     *
+     * @param state update to send.
      */
-    void postUpdate(boolean value);
+    default void postUpdate(JRuleIncreaseDecreaseValue state) {
+        postUncheckedUpdate(state);
+    }
 
     /**
      * Sends an update in percent.
      * 
-     * @param value update in percent via JRulePercentValue will be send.
+     * @param state update in percent via JRulePercentValue will be send.
      */
-    void postUpdate(int value);
+    default void postUpdate(int state) {
+        postUncheckedUpdate(new JRulePercentValue(state));
+    }
+
+    default JRulePercentValue getStateAsPercent() {
+        return JRuleEventHandler.get().getValue(getName(), JRulePercentValue.class);
+    }
 }

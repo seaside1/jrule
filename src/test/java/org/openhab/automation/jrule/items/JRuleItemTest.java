@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -35,7 +34,7 @@ public class JRuleItemTest {
     @Test
     public void testForName() throws ItemNotFoundException, InvocationTargetException, NoSuchMethodException,
             InstantiationException, IllegalAccessException {
-        Map<Item, Class<? extends JRuleItem<?>>> items = JRuleItemTestUtils.getAllDummyItems();
+        Map<Item, Class<? extends JRuleItem>> items = JRuleItemTestUtils.getAllDummyItems();
 
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
         Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {
@@ -45,7 +44,7 @@ public class JRuleItemTest {
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
 
         items.forEach((ohItem, value) -> {
-            JRuleItem<JRuleValue> item = JRuleItem.forName(ohItem.getName());
+            JRuleItem item = JRuleItem.forName(ohItem.getName());
             Assertions.assertNotNull(item);
             Assertions.assertEquals(ohItem.getName(), item.getName());
             Assertions.assertTrue(value.isAssignableFrom(item.getClass()));

@@ -31,11 +31,6 @@ public class JRuleStringValue implements JRuleValue {
     }
 
     @Override
-    public String asStringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
     public Command toOhCommand() {
         return this.ohType;
     }

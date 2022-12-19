@@ -27,7 +27,7 @@ class JRulePointValueTest {
     @Test
     void asStringValue() {
         JRulePointValue value = new JRulePointValue(new BigDecimal("23.12"), new BigDecimal("37.56"));
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRulePointValue fromString = new JRulePointValue(string);
         Assertions.assertEquals(value, fromString);
     }

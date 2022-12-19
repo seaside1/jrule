@@ -23,7 +23,7 @@ import org.openhab.core.types.State;
 public interface JRuleValue {
     String toString();
 
-    String asStringValue();
+    String stringValue();
 
     Command toOhCommand();
 

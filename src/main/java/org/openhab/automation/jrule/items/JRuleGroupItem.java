@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.items;
 import java.util.Set;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
@@ -22,26 +23,34 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupItem<T extends JRuleValue> extends JRuleItem<T> {
+public interface JRuleGroupItem extends JRuleItem {
     @Deprecated
     default Set<String> members() {
         return JRuleEventHandler.get().getGroupMemberNames(getName(), false);
     }
 
-    default Set<JRuleItem<? extends JRuleValue>> memberItems() {
+    default Set<JRuleItem> memberItems() {
         return memberItems(false);
     }
 
-    default Set<JRuleItem<? extends JRuleValue>> memberItems(boolean recursive) {
+    default Set<JRuleItem> memberItems(boolean recursive) {
         return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive);
     }
 
-    default void sendCommand(JRuleValue value) {
-        members().forEach(m -> JRuleEventHandler.get().sendCommand(m, value));
+    default void sendUncheckedCommand(JRuleValue command) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
-    default void postUpdate(JRuleValue value) {
-        members().forEach(m -> JRuleEventHandler.get().postUpdate(m, value));
+    default void postUncheckedUpdate(JRuleValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+    }
+
+    default void postUpdate(JRuleRefreshValue state) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+    }
+
+    default void postNullUpdate() {
+        memberItems().forEach(i -> i.postUpdate(null));
     }
 
     @Override

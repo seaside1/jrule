@@ -13,14 +13,13 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleCallItem;
-import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
 /**
  * The {@link JRuleInternalCallItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleInternalCallItem extends JRuleInternalItem<JRuleStringValue> implements JRuleCallItem {
+public class JRuleInternalCallItem extends JRuleInternalItem implements JRuleCallItem {
 
     public JRuleInternalCallItem(String name, String label, String type, String id) {
         super(name, label, type, id);

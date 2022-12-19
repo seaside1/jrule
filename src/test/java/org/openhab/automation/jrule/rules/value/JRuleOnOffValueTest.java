@@ -25,7 +25,7 @@ class JRuleOnOffValueTest {
     @Test
     void asStringValue() {
         JRuleOnOffValue value = JRuleOnOffValue.OFF;
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleOnOffValue fromString = JRuleOnOffValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
     }

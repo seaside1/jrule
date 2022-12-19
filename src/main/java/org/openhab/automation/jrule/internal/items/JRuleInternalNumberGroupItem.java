@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 
 /**
  * The {@link JRuleInternalColorGroupItem} Items
@@ -24,21 +23,5 @@ public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implem
 
     public JRuleInternalNumberGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(double command) {
-        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(command)));
-    }
-
-    public void postUpdate(double value) {
-        memberItems().forEach(i -> i.postUpdate(new JRuleDecimalValue(value)));
-    }
-
-    public void sendCommand(int command) {
-        memberItems().forEach(i -> i.sendCommand(new JRuleDecimalValue(command)));
-    }
-
-    public void postUpdate(int value) {
-        memberItems().forEach(i -> i.postUpdate(new JRuleDecimalValue(value)));
     }
 }

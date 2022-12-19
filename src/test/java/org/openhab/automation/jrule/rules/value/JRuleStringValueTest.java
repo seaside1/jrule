@@ -25,7 +25,7 @@ class JRuleStringValueTest {
     @Test
     void asStringValue() {
         JRuleStringValue value = new JRuleStringValue("hallo");
-        String string = value.asStringValue();
+        String string = value.stringValue();
         JRuleStringValue fromString = new JRuleStringValue(string);
         Assertions.assertEquals(value, fromString);
     }

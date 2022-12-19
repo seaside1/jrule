@@ -13,8 +13,6 @@
 package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleContactGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
  * The {@link JRuleInternalContactGroupItem} Items
@@ -25,17 +23,5 @@ public class JRuleInternalContactGroupItem extends JRuleInternalContactItem impl
 
     public JRuleInternalContactGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(JRuleOpenClosedValue value) {
-        memberItems().forEach(i -> i.sendCommand(value));
-    }
-
-    public void postUpdate(JRuleOpenClosedValue value) {
-        memberItems().forEach(i -> i.postUpdate(value));
-    }
-
-    public void postUpdate(boolean value) {
-        memberItems().forEach(i -> i.postUpdate(JRuleOnOffValue.valueOf(value)));
     }
 }
