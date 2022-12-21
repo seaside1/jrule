@@ -16,14 +16,16 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalSwitchItem} Items
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
-    public JRuleInternalSwitchItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalSwitchItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata, tags);
     }
 
     public void sendCommand(boolean command) {

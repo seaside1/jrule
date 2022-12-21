@@ -20,6 +20,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.SwitchItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleSwitchItemTest}
  *
@@ -62,7 +64,7 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalSwitchItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalSwitchItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

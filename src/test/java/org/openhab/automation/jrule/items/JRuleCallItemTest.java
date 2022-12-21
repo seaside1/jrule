@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class JRuleCallItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalCallItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalCallItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

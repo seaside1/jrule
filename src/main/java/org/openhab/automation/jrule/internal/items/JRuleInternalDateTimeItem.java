@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalDateTimeItem} Items
  *
@@ -21,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleDateTimeItem;
  */
 public class JRuleInternalDateTimeItem extends JRuleInternalItem implements JRuleDateTimeItem {
 
-    public JRuleInternalDateTimeItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalDateTimeItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata, tags);
     }
 }

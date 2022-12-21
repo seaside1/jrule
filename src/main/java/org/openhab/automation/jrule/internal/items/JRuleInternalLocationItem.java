@@ -14,13 +14,15 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleLocationItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalLocationItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalLocationItem extends JRuleInternalItem implements JRuleLocationItem {
-    public JRuleInternalLocationItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalLocationItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata, tags);
     }
 }

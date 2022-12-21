@@ -14,13 +14,15 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleDimmerGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalDimmerGroupItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalDimmerGroupItem extends JRuleInternalDimmerItem implements JRuleDimmerGroupItem {
-    public JRuleInternalDimmerGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalDimmerGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

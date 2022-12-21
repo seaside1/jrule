@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
+import java.util.Map;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
@@ -28,7 +29,7 @@ import org.openhab.core.library.items.CallItem;
 class JRuleCallGroupItemTest extends JRuleCallItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id", Map.of());
     }
 
     @Override

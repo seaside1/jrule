@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
@@ -25,8 +26,8 @@ import org.openhab.core.library.types.DecimalType;
  */
 public class JRuleInternalNumberItem extends JRuleInternalItem implements JRuleNumberItem {
 
-    public JRuleInternalNumberItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalNumberItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata, tags);
     }
 
     public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {

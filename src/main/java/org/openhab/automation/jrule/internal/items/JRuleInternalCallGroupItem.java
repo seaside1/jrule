@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleCallGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalCallGroupItem} Items
  *
@@ -21,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleCallGroupItem;
  */
 public class JRuleInternalCallGroupItem extends JRuleInternalCallItem implements JRuleCallGroupItem {
 
-    public JRuleInternalCallGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalCallGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

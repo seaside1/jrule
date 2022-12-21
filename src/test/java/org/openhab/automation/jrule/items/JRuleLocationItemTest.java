@@ -20,6 +20,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.LocationItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleLocationItemTest}
  *
@@ -66,7 +68,7 @@ class JRuleLocationItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalLocationItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalLocationItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

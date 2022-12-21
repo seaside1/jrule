@@ -22,6 +22,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.NumberItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleQuantityItemTest}
  *
@@ -74,7 +76,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalNumberItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalNumberItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

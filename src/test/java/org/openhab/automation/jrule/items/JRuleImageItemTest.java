@@ -20,6 +20,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.ImageItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleImageItemTest}
  *
@@ -41,7 +43,7 @@ class JRuleImageItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalImageItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalImageItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

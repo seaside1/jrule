@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleContactGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalContactGroupItem} Items
  *
@@ -21,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleContactGroupItem;
  */
 public class JRuleInternalContactGroupItem extends JRuleInternalContactItem implements JRuleContactGroupItem {
 
-    public JRuleInternalContactGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalContactGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

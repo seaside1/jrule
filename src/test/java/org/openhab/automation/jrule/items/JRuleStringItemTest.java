@@ -20,6 +20,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.StringItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleStringItemTest}
  *
@@ -60,7 +62,7 @@ class JRuleStringItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalStringItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalStringItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

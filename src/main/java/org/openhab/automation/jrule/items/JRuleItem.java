@@ -13,8 +13,11 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
@@ -37,6 +40,12 @@ public interface JRuleItem {
     String getType();
 
     String getId();
+
+    @NonNullByDefault
+    Map<String, String> getMetadata();
+
+    @NonNullByDefault
+    List<String> getTags();
 
     default String getStateAsString() {
         return getState().toString();

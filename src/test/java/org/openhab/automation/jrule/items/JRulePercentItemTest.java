@@ -21,6 +21,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.DimmerItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRulePercentItemTest}
  *
@@ -79,7 +81,7 @@ class JRulePercentItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDimmerItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalDimmerItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override
