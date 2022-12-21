@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2010-2022 Contributors to the openHAB project
- *
+ * <p>
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- *
+ * <p>
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- *
+ * <p>
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.automation.jrule.internal.handler;
 
-import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.core.transform.TransformationException;
 import org.openhab.core.transform.TransformationHelper;
 import org.osgi.framework.BundleContext;
@@ -50,11 +50,19 @@ public class JRuleTransformationHandler {
         this.bundleContext = bundleContext;
     }
 
-    public String transform(String stateDescPattern, String state) throws JRuleExecutionException {
+    /**
+     * Transforms the given state with the transformation pattern.
+     * 
+     * @param stateDescPattern The transformation pattern
+     * @param state State which should be converted
+     * @return The transformation result
+     * @throws JRuleRuntimeException In case a transformation exception occur
+     */
+    public String transform(String stateDescPattern, String state) throws JRuleRuntimeException {
         try {
             return TransformationHelper.transform(bundleContext, stateDescPattern, state);
         } catch (TransformationException e) {
-            throw new JRuleExecutionException(
+            throw new JRuleRuntimeException(
                     String.format("Transformation of %s using %s failed: %s", state, stateDescPattern, e));
         }
     }
