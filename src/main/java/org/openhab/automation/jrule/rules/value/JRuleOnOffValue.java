@@ -12,23 +12,56 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleOnOffValue} JRule Command
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public enum JRuleOnOffValue {
-    ON,
-    OFF,
-    UNDEF;
+public enum JRuleOnOffValue implements JRuleValue {
+    ON(OnOffType.ON),
+    OFF(OnOffType.OFF);
+
+    private final OnOffType ohType;
+
+    JRuleOnOffValue(OnOffType ohType) {
+        this.ohType = ohType;
+    }
 
     public static JRuleOnOffValue getValueFromString(String value) {
-        if (value.equals("ON")) {
-            return ON;
+        switch (value) {
+            case "ON":
+                return ON;
+            case "OFF":
+                return OFF;
         }
-        if (value.equals("OFF")) {
-            return OFF;
-        }
-        return UNDEF;
+        return null;
+    }
+
+    public static JRuleValue valueOf(boolean command) {
+        return command ? ON : OFF;
+    }
+
+    @Override
+    public String toString() {
+        return name();
+    }
+
+    @Override
+    public String stringValue() {
+        return name();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        return this.ohType;
     }
 }

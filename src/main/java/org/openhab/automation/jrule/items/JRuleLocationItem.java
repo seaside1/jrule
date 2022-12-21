@@ -13,21 +13,38 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRulePointValue;
 
 /**
- * The {@link JRuleLocationItem} Items
+ * The {@link JRuleLocationItem} JRule Item
  *
- * @author Arne Seime - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleLocationItem extends JRuleItem {
-
-    protected JRuleLocationItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleLocationItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleLocationItem extends JRuleItem {
+    static JRuleLocationItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleLocationItem.class);
     }
 
-    // Empty for now, waiting for PR #40
+    /**
+     * Sends a point command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRulePointValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    /**
+     * Sends a point update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRulePointValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    default JRulePointValue getStateAsPoint() {
+        return JRuleEventHandler.get().getValue(getName(), JRulePointValue.class);
+    }
 }

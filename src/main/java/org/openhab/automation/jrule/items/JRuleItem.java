@@ -17,59 +17,80 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
- * The {@link JRuleItem} Items
+ * The {@link JRuleItem} JRule Item
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleItem {
-
-    protected String itemName;
-
-    public JRuleItem(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleItem {
+    static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName);
     }
 
-    public String getStateAsString() {
-        return JRuleEventHandler.get().getStringValue(itemName);
+    String getName();
+
+    String getLabel();
+
+    String getType();
+
+    String getId();
+
+    default String getStateAsString() {
+        return getState().toString();
     }
 
-    public String getName() {
-        return itemName;
+    default JRuleValue getState() {
+        return JRuleEventHandler.get().getValue(getName());
     }
 
-    public abstract String getLabel();
+    default <TD extends JRuleValue> TD getStateAs(Class<TD> type) {
+        return JRuleEventHandler.get().getValue(getName(), type);
+    }
 
-    public abstract String getType();
+    default void sendUncheckedCommand(JRuleValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
+    }
 
-    public abstract String getId();
+    default void postUncheckedUpdate(JRuleValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
+    }
 
-    public Optional<ZonedDateTime> lastUpdated() {
+    default void postUpdate(JRuleRefreshValue state) {
+        postUncheckedUpdate(state);
+    }
+
+    default void postNullUpdate() {
+        JRuleEventHandler.get().postUpdate(getName(), null);
+    }
+
+    default Optional<ZonedDateTime> lastUpdated() {
         return lastUpdated(null);
     }
 
-    public Optional<ZonedDateTime> lastUpdated(String persistenceServiceId) {
-        return JRulePersistenceExtensions.lastUpdate(itemName, persistenceServiceId);
-    }
+    Optional<ZonedDateTime> lastUpdated(String persistenceServiceId);
 
-    public boolean changedSince(ZonedDateTime timestamp) {
+    default boolean changedSince(ZonedDateTime timestamp) {
         return changedSince(timestamp, null);
     }
 
-    public boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.changedSince(itemName, timestamp, persistenceServiceId);
-    }
+    boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public boolean updatedSince(ZonedDateTime timestamp) {
+    default boolean updatedSince(ZonedDateTime timestamp) {
         return updatedSince(timestamp, null);
     }
 
-    public boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.updatedSince(itemName, timestamp, persistenceServiceId);
+    boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId);
+
+    default Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp) {
+        return getHistoricState(timestamp, null);
+    }
+
+    Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
+
+    default boolean isGroup() {
+        return false;
     }
 }

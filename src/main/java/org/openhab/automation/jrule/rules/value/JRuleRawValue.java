@@ -12,26 +12,63 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.util.Objects;
+
+import org.openhab.core.library.types.RawType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleRawValue} JRule Command
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleRawValue {
-
-    private final String mimeType;
-    private final byte[] data;
+public class JRuleRawValue implements JRuleValue {
+    private final RawType ohType;
 
     public JRuleRawValue(String mimeType, byte[] data) {
-        this.mimeType = mimeType;
-        this.data = data;
+        this.ohType = new RawType(data, mimeType);
+    }
+
+    public JRuleRawValue(String value) {
+        this.ohType = RawType.valueOf(value);
     }
 
     public String getMimeType() {
-        return mimeType;
+        return this.ohType.getMimeType();
     }
 
     public byte[] getData() {
-        return data;
+        return this.ohType.getBytes();
+    }
+
+    @Override
+    public String stringValue() {
+        return this.ohType.toFullString();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        throw new IllegalStateException("not a command type");
+    }
+
+    @Override
+    public State toOhState() {
+        return this.ohType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleRawValue that = (JRuleRawValue) o;
+        return ohType.equals(that.ohType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ohType);
     }
 }

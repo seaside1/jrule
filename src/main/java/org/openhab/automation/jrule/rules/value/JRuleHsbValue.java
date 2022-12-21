@@ -12,37 +12,74 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.HSBType;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
- * The {@link JRuleColorValue} JRule Command
+ * The {@link JRuleHsbValue} JRule Command
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleHsbValue {
+public class JRuleHsbValue implements JRuleValue {
+    private final HSBType ohType;
+
+    public JRuleHsbValue(String value) {
+        this.ohType = new HSBType(value);
+    }
+
+    public JRuleHsbValue(float hue, int saturation, int brightness) {
+        this.ohType = new HSBType(new DecimalType(hue), new PercentType(saturation), new PercentType(brightness));
+    }
+
+    public JRuleHsbValue(BigDecimal hue, BigDecimal saturation, BigDecimal brightness) {
+        this.ohType = new HSBType(new DecimalType(hue), new PercentType(saturation), new PercentType(brightness));
+    }
 
     @Override
-    public String toString() {
-        return "JRuleHsbValue [hue=" + hue + ", saturation=" + saturation + ", brightness=" + brightness + "]";
+    public String stringValue() {
+        return this.ohType.toFullString();
     }
 
-    private final int hue;
-    private final int saturation;
-    private final int brightness;
-
-    public JRuleHsbValue(int hue, int saturation, int brightness) {
-        this.hue = hue;
-        this.saturation = saturation;
-        this.brightness = brightness;
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
     }
 
-    public int getHue() {
-        return hue;
+    @Override
+    public State toOhState() {
+        return this.ohType;
     }
 
-    public int getBrightness() {
-        return brightness;
+    public BigDecimal getHue() {
+        return this.ohType.getHue().toBigDecimal();
     }
 
-    public int getSaturation() {
-        return saturation;
+    public BigDecimal getBrightness() {
+        return this.ohType.getBrightness().toBigDecimal();
+    }
+
+    public BigDecimal getSaturation() {
+        return this.ohType.getSaturation().toBigDecimal();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleHsbValue that = (JRuleHsbValue) o;
+        return ohType.equals(that.ohType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ohType);
     }
 }
