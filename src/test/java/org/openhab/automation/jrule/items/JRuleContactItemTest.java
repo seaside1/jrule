@@ -20,6 +20,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.ContactItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleContactItemTest}
  *
@@ -44,7 +46,7 @@ class JRuleContactItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalContactItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalContactItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

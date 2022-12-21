@@ -13,6 +13,8 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -31,12 +33,16 @@ public abstract class JRuleInternalItem implements JRuleItem {
     protected final String label;
     protected final String type;
     protected final String id;
+    protected final Map<String, String> metadata;
+    protected final List<String> tags;
 
-    public JRuleInternalItem(String name, String label, String type, String id) {
+    public JRuleInternalItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
         this.name = name;
         this.label = label;
         this.type = type;
         this.id = id;
+        this.metadata = metadata;
+        this.tags = tags;
     }
 
     @Override
@@ -66,6 +72,16 @@ public abstract class JRuleInternalItem implements JRuleItem {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public List<String> getTags() {
+        return tags;
     }
 
     @Override

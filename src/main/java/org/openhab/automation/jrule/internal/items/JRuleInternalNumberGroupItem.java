@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalColorGroupItem} Items
  *
@@ -21,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
  */
 public class JRuleInternalNumberGroupItem extends JRuleInternalNumberItem implements JRuleNumberGroupItem {
 
-    public JRuleInternalNumberGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalNumberGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

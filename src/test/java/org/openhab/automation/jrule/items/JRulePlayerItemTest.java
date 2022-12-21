@@ -19,6 +19,8 @@ import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.PlayerItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRulePlayerItemTest}
  *
@@ -68,7 +70,7 @@ class JRulePlayerItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalPlayerItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalPlayerItem("Name", "Label", "Type", "Id", Map.of());
     }
 
     @Override

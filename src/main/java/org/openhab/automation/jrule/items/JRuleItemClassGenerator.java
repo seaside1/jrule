@@ -21,12 +21,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
+import org.openhab.core.items.Metadata;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.CoreItemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +50,13 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
     public JRuleItemClassGenerator(JRuleConfig jRuleConfig) {
-
         super(jRuleConfig);
     }
 
-    public boolean generateItemsSource(Collection<Item> items) {
+    public boolean generateItemsSource(Collection<Item> items, MetadataRegistry metadataRegistry) {
         try {
             List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
-                    .map(this::createItemModel).collect(Collectors.toList());
+                    .map(item -> createItemModel(item, JRuleItemRegistry.getAllMetadata(item, metadataRegistry))).collect(Collectors.toList());
             Map<String, Object> processingModel = new HashMap<>();
             processingModel.put("items", model);
             processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
@@ -78,7 +80,9 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         }
     }
 
-    private Map<String, Object> createItemModel(Item item) {
+
+
+    private Map<String, Object> createItemModel(Item item, Map<String, String> metadata) {
         Map<String, Object> itemModel = new HashMap<>();
         itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
@@ -90,6 +94,8 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         }
         itemModel.put("label", item.getLabel());
         itemModel.put("type", item.getType());
+        itemModel.put("metadata", metadata.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue()).collect(Collectors.joining(", ")));
+        itemModel.put("tags", StringUtils.join(item.getTags(), ", "));
 
         // Group handling
         if (item.getType().equals(GroupItem.TYPE)) {

@@ -18,6 +18,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.PlayerItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRulePlayerGroupItemTest}
  *
@@ -26,7 +28,7 @@ import org.openhab.core.library.items.PlayerItem;
 class JRulePlayerGroupItemTest extends JRulePlayerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalPlayerGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalPlayerGroupItem("Group", "Label", "Type", "Id", Map.of());
     }
 
     @Override

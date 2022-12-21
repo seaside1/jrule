@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleRollershutterGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalRollershutterGroupItem} Items
  *
@@ -22,7 +24,7 @@ import org.openhab.automation.jrule.items.JRuleRollershutterGroupItem;
 public class JRuleInternalRollershutterGroupItem extends JRuleInternalRollershutterItem
         implements JRuleRollershutterGroupItem {
 
-    public JRuleInternalRollershutterGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalRollershutterGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

@@ -18,6 +18,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.SwitchItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleSwitchGroupItemTest}
  *
@@ -26,7 +28,7 @@ import org.openhab.core.library.items.SwitchItem;
 class JRuleSwitchGroupItemTest extends JRuleSwitchItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalSwitchGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalSwitchGroupItem("Group", "Label", "Type", "Id", Map.of());
     }
 
     @Override

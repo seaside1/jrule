@@ -14,13 +14,15 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalSwitchGroupItem} Items
  *
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalSwitchGroupItem extends JRuleInternalSwitchItem implements JRuleSwitchGroupItem {
-    public JRuleInternalSwitchGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalSwitchGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

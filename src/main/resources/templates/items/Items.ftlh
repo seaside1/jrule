@@ -20,6 +20,17 @@ public class JRuleItems {
 
 
 <#list items as item>
+    /**
+     * Name: ${item.name}
+     *
+     * Type: ${item.type}
+     *
+     * Label: ${(item.label)!}
+     *
+     * Tags: ${item.tags}
+     *
+     * Metadata: ${item.metadata}
+     */
  public static ${item.interfaceClass} ${item.name};
 
 </#list>

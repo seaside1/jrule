@@ -86,6 +86,8 @@ public class JRuleItemTestUtils {
         GenericItem item = clazz.getConstructor(String.class).newInstance(clazz.getSimpleName());
         item.setLabel(clazz.getSimpleName() + "Label");
         item.setState(initialState);
+        item.addTag("Tag1");
+        item.addTag("Tag2");
         return item;
     }
 }

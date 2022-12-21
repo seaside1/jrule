@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleColorItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalColorItem} Items
  *
@@ -21,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleColorItem;
  */
 public class JRuleInternalColorItem extends JRuleInternalDimmerItem implements JRuleColorItem {
 
-    public JRuleInternalColorItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalColorItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }

@@ -18,6 +18,8 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.ImageItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleImageGroupItemTest}
  *
@@ -26,7 +28,7 @@ import org.openhab.core.library.items.ImageItem;
 class JRuleImageGroupItemTest extends JRuleImageItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalImageGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalImageGroupItem("Group", "Label", "Type", "Id", Map.of());
     }
 
     @Override

@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleImageGroupItem;
 
+import java.util.Map;
+
 /**
  * The {@link JRuleInternalImageGroupItem} Items
  *
@@ -21,7 +23,7 @@ import org.openhab.automation.jrule.items.JRuleImageGroupItem;
  */
 public class JRuleInternalImageGroupItem extends JRuleInternalImageItem implements JRuleImageGroupItem {
 
-    public JRuleInternalImageGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalImageGroupItem(String name, String label, String type, String id, Map<String, String> metadata) {
+        super(name, label, type, id, metadata);
     }
 }
