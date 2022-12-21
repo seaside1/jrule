@@ -21,6 +21,7 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.ColorItem;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -100,7 +101,7 @@ class JRuleColorItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalColorItem("Name", "Label", "Type", "Id", Map.of());
+        return new JRuleInternalColorItem("Name", "Label", "Type", "Id", Map.of(), List.of());
     }
 
     @Override

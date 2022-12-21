@@ -16,6 +16,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Map;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
-    public JRuleInternalSwitchItem(String name, String label, String type, String id, Map<String, String> metadata) {
+    public JRuleInternalSwitchItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 

@@ -14,6 +14,7 @@ package org.openhab.binding.jrule.internal.rules.timers;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalStringItem;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,8 +24,8 @@ import java.util.Map;
  */
 public class TargetItem extends JRuleInternalStringItem {
 
-    public TargetItem(String itemName, String label, String type, String id, Map<String, String> metadata) {
-        super(itemName, label, type, id, metadata);
+    public TargetItem(String itemName, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+        super(itemName, label, type, id, metadata, tags);
     }
 
     @Override

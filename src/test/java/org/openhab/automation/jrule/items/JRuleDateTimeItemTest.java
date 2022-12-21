@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -65,7 +66,7 @@ class JRuleDateTimeItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDateTimeItem("Name", "Label", "Type", "Id", Map.of());
+        return new JRuleInternalDateTimeItem("Name", "Label", "Type", "Id", Map.of(), List.of());
     }
 
     @Override

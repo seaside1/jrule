@@ -29,7 +29,7 @@ import org.openhab.core.library.items.CallItem;
 class JRuleCallGroupItemTest extends JRuleCallItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id", Map.of());
+        return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
     }
 
     @Override

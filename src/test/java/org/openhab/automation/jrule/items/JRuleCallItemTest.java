@@ -48,7 +48,7 @@ class JRuleCallItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalCallItem("Name", "Label", "Type", "Id", Map.of());
+        return new JRuleInternalCallItem("Name", "Label", "Type", "Id", Map.of(), List.of());
     }
 
     @Override

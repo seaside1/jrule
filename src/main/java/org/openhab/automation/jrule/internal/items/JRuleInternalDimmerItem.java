@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.internal.items;
 
 import org.openhab.automation.jrule.items.JRuleDimmerItem;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +23,7 @@ import java.util.Map;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleInternalDimmerItem extends JRuleInternalSwitchItem implements JRuleDimmerItem {
-    public JRuleInternalDimmerItem(String name, String label, String type, String id, Map<String, String> metadata) {
-        super(name, label, type, id, metadata);
+    public JRuleInternalDimmerItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+        super(name, label, type, id, metadata, tags);
     }
 }

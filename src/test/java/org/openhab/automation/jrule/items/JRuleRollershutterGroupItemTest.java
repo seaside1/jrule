@@ -18,6 +18,7 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.RollershutterItem;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ import java.util.Map;
 class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id", Map.of());
+        return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
     }
 
     @Override
