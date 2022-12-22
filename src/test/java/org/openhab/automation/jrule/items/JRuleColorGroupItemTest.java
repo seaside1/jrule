@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -37,5 +40,13 @@ class JRuleColorGroupItemTest extends JRuleColorItemTest {
     @Override
     protected GenericItem getOhItem() {
         return new ColorItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleColorGroupItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleColorGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleColorGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleColorGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

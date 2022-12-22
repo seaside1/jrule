@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -37,5 +40,14 @@ class JRuleNumberGroupItemTest extends JRuleNumberItemTest {
     @Override
     protected GenericItem getOhItem() {
         return new NumberItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleNumberGroupItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class,
+                () -> JRuleNumberGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleNumberGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleNumberGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerGroupItem;
 import org.openhab.automation.jrule.rules.value.*;
 
 /**
@@ -22,7 +26,11 @@ import org.openhab.automation.jrule.rules.value.*;
  */
 public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem {
     static JRulePlayerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRulePlayerGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalPlayerGroupItem.class);
+    }
+
+    static Optional<JRulePlayerGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRulePlayPauseValue command) {

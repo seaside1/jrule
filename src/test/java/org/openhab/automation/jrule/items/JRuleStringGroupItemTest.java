@@ -15,39 +15,39 @@ package org.openhab.automation.jrule.items;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerGroupItem;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.PlayerItem;
+import org.openhab.core.library.items.StringItem;
 
 /**
- * The {@link JRulePlayerGroupItemTest}
+ * The {@link JRuleStringGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRulePlayerGroupItemTest extends JRulePlayerItemTest {
+class JRuleStringGroupItemTest extends JRuleStringItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalPlayerGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalStringGroupItem("Group", "Label", "Type", "Id");
     }
 
     @Override
     protected JRuleValue getDefaultCommand() {
-        return JRulePlayPauseValue.PLAY;
+        return new JRuleStringValue("abc");
     }
 
     @Override
     protected GenericItem getOhItem() {
-        return new PlayerItem("Name");
+        return new StringItem("Name");
     }
 
     @Test
     public void testForName() {
-        Assertions.assertNotNull(JRulePlayerGroupItem.forName(ITEM_NAME));
+        Assertions.assertNotNull(JRuleStringGroupItem.forName(ITEM_NAME));
         Assertions.assertThrows(JRuleItemNotFoundException.class,
-                () -> JRulePlayerGroupItem.forName(ITEM_NON_EXISTING));
-        Assertions.assertTrue(JRulePlayerGroupItem.forNameOptional(ITEM_NAME).isPresent());
-        Assertions.assertFalse(JRulePlayerGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+                () -> JRuleStringGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleStringGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleStringGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -19,11 +22,11 @@ import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.DimmerItem;
 
 /**
- * The {@link JRulePercentGroupItemTest}
+ * The {@link JRuleDimmerGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRulePercentGroupItemTest extends JRulePercentItemTest {
+class JRuleDimmerGroupItemTest extends JRuleDimmerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalDimmerGroupItem("Group", "Label", "Type", "Id");
@@ -37,5 +40,14 @@ class JRulePercentGroupItemTest extends JRulePercentItemTest {
     @Override
     protected GenericItem getOhItem() {
         return new DimmerItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleDimmerGroupItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class,
+                () -> JRuleDimmerGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleDimmerGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleDimmerGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

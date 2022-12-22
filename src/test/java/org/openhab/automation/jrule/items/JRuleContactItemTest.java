@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalContactItem;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -55,5 +56,13 @@ class JRuleContactItemTest extends JRuleItemTestBase {
     @Override
     protected GenericItem getOhItem() {
         return new ContactItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleContactItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleContactItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleContactItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleContactItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

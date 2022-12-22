@@ -27,7 +27,6 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
-import org.openhab.core.library.CoreItemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,12 +81,9 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         Map<String, Object> itemModel = new HashMap<>();
         itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
-        String plainType = getPlainGroupType(null, item);
+        String plainType = getPlainType(item);
         itemModel.put("internalClass", "JRuleInternal" + plainType + "Item");
         itemModel.put("interfaceClass", "JRule" + plainType + "Item");
-        if (isQuantityType(item.getType())) {
-            itemModel.put("quantityType", getQuantityType(item.getType()));
-        }
         itemModel.put("label", item.getLabel());
         itemModel.put("type", item.getType());
 
@@ -100,6 +96,13 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         }
 
         return itemModel;
+    }
+
+    private static String getPlainType(Item baseItem) {
+        if (baseItem.getType().contains(":")) {
+            return "Quantity";
+        }
+        return baseItem.getType();
     }
 
     private static String getPlainGroupType(GroupItem item, Item baseItem) {
@@ -116,18 +119,6 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
                 return "String";
             }
         }
-        if (baseItem.getType().contains(":")) {
-            return baseItem.getType().split(":")[0];
-        }
         return baseItem.getType();
-    }
-
-    private String getQuantityType(String type) {
-        return type.split(":")[1];
-    }
-
-    private boolean isQuantityType(String type) {
-        String[] split = type.split(":");
-        return split.length > 1 && CoreItemFactory.NUMBER.equals(split[0]);
     }
 }

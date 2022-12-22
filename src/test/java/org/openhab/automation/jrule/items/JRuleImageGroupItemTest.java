@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalImageGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -37,5 +40,13 @@ class JRuleImageGroupItemTest extends JRuleImageItemTest {
     @Override
     protected GenericItem getOhItem() {
         return new ImageItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleImageGroupItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleImageGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleImageGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleImageGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

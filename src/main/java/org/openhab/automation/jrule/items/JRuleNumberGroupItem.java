@@ -12,11 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
-import javax.measure.Unit;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
-import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 
 /**
  * The {@link JRuleNumberGroupItem} Items
@@ -25,7 +26,11 @@ import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
  */
 public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
     static JRuleNumberGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleNumberGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalNumberGroupItem.class);
+    }
+
+    static Optional<JRuleNumberGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRuleDecimalValue command) {
@@ -36,10 +41,6 @@ public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
         memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
-    default void sendCommand(JRuleQuantityValue<?> command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
-    }
-
     default void sendCommand(double command) {
         memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
@@ -48,23 +49,11 @@ public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
         memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
-    default void sendCommand(double command, Unit<?> unit) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue<>(command, unit)));
-    }
-
-    default void postUpdate(JRuleQuantityValue<?> state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
-    }
-
     default void postUpdate(double state) {
         memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 
     default void postUpdate(int state) {
         memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
-    }
-
-    default void postUpdate(double state, Unit<?> unit) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue<>(state, unit)));
     }
 }

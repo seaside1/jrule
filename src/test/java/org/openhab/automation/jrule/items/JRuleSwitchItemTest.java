@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -73,5 +74,13 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
     @Override
     protected GenericItem getOhItem() {
         return new SwitchItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleSwitchItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleSwitchItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleSwitchItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.events.Event;
@@ -37,17 +38,22 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class JRuleItemTestBase {
     private static final Logger LOG = LoggerFactory.getLogger(JRuleItemTestBase.class);
+    public static final String ITEM_NON_EXISTING = "NonExisting";
+    public static final String ITEM_NAME = "Name";
 
     protected EventPublisher eventPublisher;
 
     @BeforeEach
     public void init() throws ItemNotFoundException {
+        JRuleItemRegistry.clear();
+
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
         GenericItem ohItem = getOhItem();
         GroupItem ohGroupItem = new GroupItem("Group", ohItem);
         ohGroupItem.addMember(ohItem);
-        Mockito.when(itemRegistry.getItem("Name")).thenReturn(ohItem);
+        Mockito.when(itemRegistry.getItem(ITEM_NAME)).thenReturn(ohItem);
         Mockito.when(itemRegistry.getItem("Group")).thenReturn(ohGroupItem);
+        Mockito.when(itemRegistry.getItem(ITEM_NON_EXISTING)).thenThrow(JRuleItemNotFoundException.class);
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
 
         eventPublisher = Mockito.mock(EventPublisher.class);

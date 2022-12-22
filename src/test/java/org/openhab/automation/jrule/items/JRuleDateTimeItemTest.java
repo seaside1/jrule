@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeItem;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -75,5 +76,13 @@ class JRuleDateTimeItemTest extends JRuleItemTestBase {
     @Override
     protected GenericItem getOhItem() {
         return new DateTimeItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleDateTimeItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleDateTimeItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleDateTimeItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleDateTimeItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

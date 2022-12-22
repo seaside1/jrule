@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
@@ -22,11 +23,11 @@ import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.DimmerItem;
 
 /**
- * The {@link JRulePercentItemTest}
+ * The {@link JRuleDimmerItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRulePercentItemTest extends JRuleItemTestBase {
+class JRuleDimmerItemTest extends JRuleItemTestBase {
     @Test
     public void testSendCommand() {
         JRuleDimmerItem item = (JRuleDimmerItem) getJRuleItem();
@@ -90,5 +91,27 @@ class JRulePercentItemTest extends JRuleItemTestBase {
     @Override
     protected GenericItem getOhItem() {
         return new DimmerItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleDimmerItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleDimmerItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleDimmerItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleDimmerItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    @Test
+    public void testForNameAsSwitch() {
+        Assertions.assertNotNull(JRuleSwitchItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleSwitchItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleSwitchItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+
+        JRuleSwitchItem item = JRuleSwitchItem.forName(ITEM_NAME);
+        item.sendCommand(false);
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAsOnOff());
+        item.sendCommand(true);
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAsOnOff());
     }
 }

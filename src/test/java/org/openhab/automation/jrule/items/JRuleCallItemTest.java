@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -58,5 +59,13 @@ class JRuleCallItemTest extends JRuleItemTestBase {
     @Override
     protected GenericItem getOhItem() {
         return new CallItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleCallItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleCallItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleCallItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleCallItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

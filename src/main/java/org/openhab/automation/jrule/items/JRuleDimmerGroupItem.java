@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
@@ -23,7 +27,11 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  */
 public interface JRuleDimmerGroupItem extends JRuleDimmerItem, JRuleSwitchGroupItem {
     static JRuleDimmerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleDimmerGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalDimmerGroupItem.class);
+    }
+
+    static Optional<JRuleDimmerGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRulePercentValue command) {

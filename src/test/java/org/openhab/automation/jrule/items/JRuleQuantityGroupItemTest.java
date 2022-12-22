@@ -12,7 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
@@ -26,7 +26,7 @@ import org.openhab.core.library.items.NumberItem;
 class JRuleQuantityGroupItemTest extends JRuleQuantityItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalNumberGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalQuantityGroupItem("Group", "Label", "Type", "Id");
     }
 
     @Override

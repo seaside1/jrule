@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -37,5 +40,14 @@ class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
     @Override
     protected GenericItem getOhItem() {
         return new RollershutterItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleRollershutterGroupItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class,
+                () -> JRuleRollershutterGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleRollershutterGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleRollershutterGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

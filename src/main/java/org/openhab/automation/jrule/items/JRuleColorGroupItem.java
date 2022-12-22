@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 
 /**
@@ -22,7 +26,11 @@ import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
  */
 public interface JRuleColorGroupItem extends JRuleColorItem, JRuleDimmerGroupItem {
     static JRuleColorGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleColorGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalColorGroupItem.class);
+    }
+
+    static Optional<JRuleColorGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRuleHsbValue command) {

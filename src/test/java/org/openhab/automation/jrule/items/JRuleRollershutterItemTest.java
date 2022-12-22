@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -90,5 +91,14 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
     @Override
     protected GenericItem getOhItem() {
         return new RollershutterItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleRollershutterItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class,
+                () -> JRuleRollershutterItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleRollershutterItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleRollershutterItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

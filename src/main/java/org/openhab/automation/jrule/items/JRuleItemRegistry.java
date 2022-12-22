@@ -99,7 +99,8 @@ public class JRuleItemRegistry {
         if (jRuleItem == null) {
             Item item = verifyThatItemExist(itemName);
 
-            Class<? extends JRuleItem> jRuleItemClass = typeMap.get(item.getType());
+            Class<? extends JRuleItem> jRuleItemClass = typeMap
+                    .get(item.getType().contains(":") ? "Number" : item.getType());
             if (item instanceof GroupItem) {
                 String baseItemType = Optional.ofNullable(((GroupItem) item).getBaseItem()).map(Item::getType)
                         .orElse(CoreItemFactory.STRING);

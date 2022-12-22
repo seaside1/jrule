@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalLocationGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -37,5 +40,14 @@ class JRuleLocationGroupItemTest extends JRuleLocationItemTest {
     @Override
     protected GenericItem getOhItem() {
         return new LocationItem("Name");
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleLocationGroupItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class,
+                () -> JRuleLocationGroupItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleLocationGroupItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleLocationGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

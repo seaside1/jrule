@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
@@ -22,7 +26,11 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  */
 public interface JRuleSwitchGroupItem extends JRuleSwitchItem, JRuleGroupItem {
     static JRuleSwitchGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleSwitchGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalSwitchGroupItem.class);
+    }
+
+    static Optional<JRuleSwitchGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRuleOnOffValue command) {
