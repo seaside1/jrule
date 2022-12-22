@@ -14,8 +14,6 @@ package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
 
-import javax.measure.Unit;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
@@ -42,7 +40,7 @@ public interface JRuleQuantityItem extends JRuleItem {
      *
      * @param command command to send
      */
-    default void sendCommand(JRuleQuantityValue<?> command) {
+    default void sendCommand(JRuleQuantityValue command) {
         sendUncheckedCommand(command);
     }
 
@@ -51,7 +49,7 @@ public interface JRuleQuantityItem extends JRuleItem {
      *
      * @param state state to send.
      */
-    default void postUpdate(JRuleQuantityValue<?> state) {
+    default void postUpdate(JRuleQuantityValue state) {
         postUncheckedUpdate(state);
     }
 
@@ -61,8 +59,8 @@ public interface JRuleQuantityItem extends JRuleItem {
      * @param command as number via JRuleDecimalValue will be send.
      * @param unit unit as string
      */
-    default void sendCommand(double command, Unit<?> unit) {
-        sendUncheckedCommand(new JRuleQuantityValue<>(command, unit));
+    default void sendCommand(double command, String unit) {
+        sendUncheckedCommand(new JRuleQuantityValue(command, unit));
     }
 
     /**
@@ -71,15 +69,15 @@ public interface JRuleQuantityItem extends JRuleItem {
      * @param state as number via JRuleDecimalValue will be send.
      * @param unit unit as string
      */
-    default void postUpdate(double state, Unit<?> unit) {
-        postUncheckedUpdate(new JRuleQuantityValue<>(state, unit));
+    default void postUpdate(double state, String unit) {
+        postUncheckedUpdate(new JRuleQuantityValue(state, unit));
     }
 
     default JRuleDecimalValue getStateAsDecimal() {
         return JRuleEventHandler.get().getValue(getName(), JRuleDecimalValue.class);
     }
 
-    default JRuleQuantityValue<?> getStateAsQuantity() {
+    default JRuleQuantityValue getStateAsQuantity() {
         return JRuleEventHandler.get().getValue(getName(), JRuleQuantityValue.class);
     }
 }

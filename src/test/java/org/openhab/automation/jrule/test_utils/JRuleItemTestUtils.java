@@ -73,13 +73,20 @@ public class JRuleItemTestUtils {
         items.put(createGroupItem(CallItem.class, new StringListType(List.of("+4930123456"))),
                 JRuleCallGroupItem.class);
         items.put(createGroupItem(ImageItem.class, new RawType(new byte[0], "jpeg")), JRuleImageGroupItem.class);
+        items.put(createGroupItem(null, null), JRuleUnspecifiedGroupItem.class);
         return items;
     }
 
     private static GroupItem createGroupItem(Class<? extends GenericItem> clazz, State initialState)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        GenericItem baseItem = createItem(clazz, initialState);
-        GroupItem groupItem = new GroupItem(clazz.getSimpleName() + "Group", baseItem);
+        GenericItem baseItem = clazz != null ? createItem(clazz, initialState) : null;
+        String name;
+        if (initialState instanceof QuantityType) {
+            name = "Quantity";
+        } else {
+            name = (clazz != null ? clazz.getSimpleName() : "");
+        }
+        GroupItem groupItem = new GroupItem(name + "Group", baseItem);
         groupItem.setState(initialState);
         return groupItem;
     }

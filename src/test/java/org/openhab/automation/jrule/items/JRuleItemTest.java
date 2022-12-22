@@ -47,7 +47,8 @@ public class JRuleItemTest {
             JRuleItem item = JRuleItem.forName(ohItem.getName());
             Assertions.assertNotNull(item);
             Assertions.assertEquals(ohItem.getName(), item.getName());
-            Assertions.assertTrue(value.isAssignableFrom(item.getClass()));
+            Assertions.assertTrue(value.isAssignableFrom(item.getClass()),
+                    String.format("value '%s' is assignable from '%s'", value, item.getClass()));
         });
     }
 }

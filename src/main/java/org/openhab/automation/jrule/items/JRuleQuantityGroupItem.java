@@ -14,8 +14,6 @@ package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
 
-import javax.measure.Unit;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityGroupItem;
@@ -35,19 +33,19 @@ public interface JRuleQuantityGroupItem extends JRuleQuantityItem, JRuleGroupIte
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
-    default void sendCommand(JRuleQuantityValue<?> command) {
+    default void sendCommand(JRuleQuantityValue command) {
         memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
-    default void sendCommand(double command, Unit<?> unit) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue<>(command, unit)));
+    default void sendCommand(double command, String unit) {
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
     }
 
-    default void postUpdate(JRuleQuantityValue<?> state) {
+    default void postUpdate(JRuleQuantityValue state) {
         memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
-    default void postUpdate(double state, Unit<?> unit) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue<>(state, unit)));
+    default void postUpdate(double state, String unit) {
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
     }
 }

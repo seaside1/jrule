@@ -19,7 +19,6 @@ import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.NumberItem;
-import org.openhab.core.library.unit.Units;
 
 /**
  * The {@link JRuleQuantityItemTest}
@@ -30,7 +29,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
     @Test
     public void testSendCommand() {
         JRuleQuantityItem item = (JRuleQuantityItem) getJRuleItem();
-        item.sendCommand(17, Units.VOLT);
+        item.sendCommand(17, "V");
 
         // decimal
         Assertions.assertEquals(17, item.getStateAsDecimal().intValue());
@@ -38,7 +37,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
         Assertions.assertEquals("V", item.getStateAsQuantity().unit());
 
         // send quantity
-        item.sendCommand(new JRuleQuantityValue<>("12mV"));
+        item.sendCommand(new JRuleQuantityValue("12mV"));
         Assertions.assertEquals(12, item.getStateAsDecimal().intValue());
         Assertions.assertEquals("mV", item.getStateAsQuantity().unit());
 
@@ -49,7 +48,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
     @Test
     public void testPostUpdate() {
         JRuleQuantityItem item = (JRuleQuantityItem) getJRuleItem();
-        item.postUpdate(17, Units.VOLT);
+        item.postUpdate(17, "V");
 
         // decimal
         Assertions.assertEquals(17, item.getStateAsDecimal().intValue());
@@ -57,7 +56,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
         Assertions.assertEquals("V", item.getStateAsQuantity().unit());
 
         // send quantity
-        item.postUpdate(new JRuleQuantityValue<>("12mV"));
+        item.postUpdate(new JRuleQuantityValue("12mV"));
         Assertions.assertEquals(12, item.getStateAsDecimal().intValue());
         Assertions.assertEquals("mV", item.getStateAsQuantity().unit());
 
@@ -72,7 +71,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleValue getDefaultCommand() {
-        return new JRuleQuantityValue<>(10, Units.AMPERE);
+        return new JRuleQuantityValue(10, "A");
     }
 
     @Override

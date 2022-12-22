@@ -270,7 +270,7 @@ public class JRuleEventHandler {
     }
 
     public JRuleValue toValue(State itemState) {
-        if (itemState instanceof UnDefType) {
+        if (itemState == null || itemState instanceof UnDefType) {
             return null;
         }
         Class<? extends JRuleValue> valueClass = stateMapping.entrySet().stream()

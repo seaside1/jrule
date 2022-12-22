@@ -23,30 +23,8 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
-import org.openhab.automation.jrule.items.JRuleColorItem;
-import org.openhab.automation.jrule.items.JRuleContactItem;
-import org.openhab.automation.jrule.items.JRuleDateTimeItem;
-import org.openhab.automation.jrule.items.JRuleDimmerItem;
-import org.openhab.automation.jrule.items.JRuleImageItem;
-import org.openhab.automation.jrule.items.JRuleItem;
-import org.openhab.automation.jrule.items.JRuleLocationItem;
-import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
-import org.openhab.automation.jrule.items.JRuleNumberItem;
-import org.openhab.automation.jrule.items.JRulePlayerItem;
-import org.openhab.automation.jrule.items.JRuleRollershutterItem;
-import org.openhab.automation.jrule.items.JRuleStringItem;
-import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleCondition;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
-import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
-import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.items.*;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
@@ -443,21 +421,21 @@ public class TestRules extends JRule {
     }
 
     private static void castQuantity() {
-        JRuleNumberItem numberItem = JRuleNumberItem.forName(ITEM_QUANTITY_TO_CAST);
+        JRuleQuantityItem numberItem = JRuleQuantityItem.forName(ITEM_QUANTITY_TO_CAST);
 
-        numberItem.sendCommand(0);
-        assert numberItem.getStateAsDecimal().doubleValue() == 0;
-        assert numberItem.getStateAsDecimal().intValue() == 0;
-        assert numberItem.getStateAsDecimal().floatValue() == 0;
-        assert numberItem.getStateAsDecimal().doubleValue() == 0;
-        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+        numberItem.sendCommand(new JRuleQuantityValue("0 W"));
+        assert numberItem.getStateAsQuantity().doubleValue() == 0;
+        assert numberItem.getStateAsQuantity().intValue() == 0;
+        assert numberItem.getStateAsQuantity().floatValue() == 0;
+        assert numberItem.getStateAsQuantity().doubleValue() == 0;
+        assert numberItem.getStateAsQuantity().unit().equals("W");
 
-        numberItem.sendCommand(22);
-        assert numberItem.getStateAsDecimal().doubleValue() == 22;
-        assert numberItem.getStateAsDecimal().intValue() == 22;
-        assert numberItem.getStateAsDecimal().floatValue() == 22;
-        assert numberItem.getStateAsDecimal().doubleValue() == 22;
-        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+        numberItem.sendCommand(new JRuleQuantityValue("22 W"));
+        assert numberItem.getStateAsQuantity().doubleValue() == 22;
+        assert numberItem.getStateAsQuantity().intValue() == 22;
+        assert numberItem.getStateAsQuantity().floatValue() == 22;
+        assert numberItem.getStateAsQuantity().doubleValue() == 22;
+        assert numberItem.getStateAsQuantity().unit().equals("W");
     }
 
     private static void castSwitch() {

@@ -14,9 +14,6 @@ package org.openhab.automation.jrule.rules.value;
 
 import java.util.Objects;
 
-import javax.measure.Quantity;
-import javax.measure.Unit;
-
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
@@ -26,15 +23,15 @@ import org.openhab.core.types.State;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public class JRuleQuantityValue<T extends Quantity<T>> implements JRuleValue {
-    private final QuantityType<T> ohType;
+public class JRuleQuantityValue implements JRuleValue {
+    private final QuantityType<?> ohType;
 
     public JRuleQuantityValue(String value) {
-        this.ohType = new QuantityType<T>(value);
+        this.ohType = new QuantityType<>(value);
     }
 
-    public JRuleQuantityValue(Number value, Unit<T> unit) {
-        this.ohType = new QuantityType<T>(value, unit);
+    public JRuleQuantityValue(Number value, String unit) {
+        this.ohType = new QuantityType<>(value + unit);
     }
 
     @Override

@@ -42,6 +42,7 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     private static final String TEMPLATE_SUFFIX = ".ftlh";
 
     protected static final String LOG_NAME_CLASS_GENERATOR = "JRuleItemClassGen";
+    public static final String ITEM_GROUP_TYPE_UNSPECIFIED = "Unspecified";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
@@ -108,17 +109,16 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     private static String getPlainGroupType(GroupItem item, Item baseItem) {
         if (baseItem == null) {
             if (item == null) {
-                return "String";
+                return ITEM_GROUP_TYPE_UNSPECIFIED;
             }
             List<String> childItemTypes = item.getAllMembers().stream().map(Item::getType).distinct()
                     .collect(Collectors.toList());
             if (childItemTypes.size() == 1) {
                 return childItemTypes.get(0);
             } else {
-                // TODO: have to create an unspecified GroupItem
-                return "String";
+                return ITEM_GROUP_TYPE_UNSPECIFIED;
             }
         }
-        return baseItem.getType();
+        return getPlainType(baseItem);
     }
 }
