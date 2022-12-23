@@ -35,26 +35,26 @@ public interface JRuleDimmerGroupItem extends JRuleDimmerItem, JRuleSwitchGroupI
     }
 
     default void sendCommand(JRulePercentValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePercentValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(int command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
     }
 
     default void sendCommand(JRuleIncreaseDecreaseValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleIncreaseDecreaseValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(int state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
     }
 }

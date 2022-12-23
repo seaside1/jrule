@@ -34,6 +34,6 @@ public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem 
     }
 
     default void postUpdate(JRuleOpenClosedValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

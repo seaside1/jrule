@@ -12,9 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * The {@link JRuleInternalSwitchItem} Items
@@ -24,18 +22,5 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
     public JRuleInternalSwitchItem(String name, String label, String type, String id) {
         super(name, label, type, id);
-    }
-
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().sendCommand(getName(), JRuleOnOffValue.valueOf(command));
-    }
-
-    public void postUpdate(boolean state) {
-        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(state));
-    }
-
-    @Override
-    public JRuleOnOffValue getState() {
-        return JRuleEventHandler.get().getValue(getName(), JRuleOnOffValue.class);
     }
 }

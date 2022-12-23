@@ -34,6 +34,6 @@ public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem {
     }
 
     default void postUpdate(JRuleRawValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

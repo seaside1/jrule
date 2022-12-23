@@ -12,16 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactGroupItem;
 
 /**
- * The {@link JRuleDimmerGroupItemTest}
+ * The {@link JRuleContactGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRuleDimmerGroupItemTest extends JRuleDimmerItemTest {
+class JRuleContactGroupItemTest extends JRuleContactItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDimmerGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalContactGroupItem("Group", "Label", "Type", "Id");
     }
 }

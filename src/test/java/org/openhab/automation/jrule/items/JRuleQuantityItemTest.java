@@ -12,8 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityItem;
 import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -27,7 +30,7 @@ import org.openhab.core.library.items.NumberItem;
  */
 class JRuleQuantityItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleQuantityItem item = (JRuleQuantityItem) getJRuleItem();
         item.sendCommand(17, "V");
 
@@ -42,11 +45,11 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
         Assertions.assertEquals("mV", item.getStateAsQuantity().unit());
 
         // verify event calls
-        verifyEventTypes(0, 2);
+        verifyEventTypes(testInfo, 0, 2);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleQuantityItem item = (JRuleQuantityItem) getJRuleItem();
         item.postUpdate(17, "V");
 
@@ -61,7 +64,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
         Assertions.assertEquals("mV", item.getStateAsQuantity().unit());
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
@@ -75,7 +78,15 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new NumberItem("Number:ElectricPotential", "Name");
+    protected GenericItem getOhItem(String name) {
+        return new NumberItem("Number:ElectricPotential", name);
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleQuantityGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleQuantityGroupItem.forNameOptional(name);
     }
 }

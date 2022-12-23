@@ -12,9 +12,9 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import java.util.Optional;
+
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
@@ -40,6 +40,10 @@ public abstract class JRuleItemTestBase {
     private static final Logger LOG = LoggerFactory.getLogger(JRuleItemTestBase.class);
     public static final String ITEM_NON_EXISTING = "NonExisting";
     public static final String ITEM_NAME = "Name";
+    public static final String GROUP_NAME = "Group";
+    public static final String ITEM_NAME_2 = "Name2";
+    public static final String GROUP_NAME_2 = "Group2";
+    public static final String SUB_ITEM_NAME = "NameSub";
 
     protected EventPublisher eventPublisher;
 
@@ -48,11 +52,20 @@ public abstract class JRuleItemTestBase {
         JRuleItemRegistry.clear();
 
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        GenericItem ohItem = getOhItem();
-        GroupItem ohGroupItem = new GroupItem("Group", ohItem);
+        GenericItem ohItem = getOhItem(ITEM_NAME);
+        GenericItem ohItem2 = getOhItem(ITEM_NAME_2);
+        GroupItem ohGroupItem = new GroupItem(GROUP_NAME, getOhItem(null));
         ohGroupItem.addMember(ohItem);
+        ohGroupItem.addMember(ohItem2);
+        GroupItem ohSubGroupItem = new GroupItem(GROUP_NAME_2, getOhItem(null));
+        GenericItem ohItem3 = getOhItem(SUB_ITEM_NAME);
+        ohSubGroupItem.addMember(ohItem3);
+        ohGroupItem.addMember(ohSubGroupItem);
         Mockito.when(itemRegistry.getItem(ITEM_NAME)).thenReturn(ohItem);
-        Mockito.when(itemRegistry.getItem("Group")).thenReturn(ohGroupItem);
+        Mockito.when(itemRegistry.getItem(ITEM_NAME_2)).thenReturn(ohItem2);
+        Mockito.when(itemRegistry.getItem(SUB_ITEM_NAME)).thenReturn(ohItem3);
+        Mockito.when(itemRegistry.getItem(GROUP_NAME)).thenReturn(ohGroupItem);
+        Mockito.when(itemRegistry.getItem(GROUP_NAME_2)).thenReturn(ohSubGroupItem);
         Mockito.when(itemRegistry.getItem(ITEM_NON_EXISTING)).thenThrow(JRuleItemNotFoundException.class);
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
 
@@ -98,10 +111,39 @@ public abstract class JRuleItemTestBase {
 
     protected abstract JRuleValue getDefaultCommand();
 
-    protected abstract GenericItem getOhItem();
+    protected abstract GenericItem getOhItem(String name);
 
-    protected void verifyEventTypes(int wantedStateCalls, int wantedCommandCalls) {
-        Mockito.verify(eventPublisher, Mockito.times(wantedStateCalls)).post(Mockito.any(ItemStateEvent.class));
-        Mockito.verify(eventPublisher, Mockito.times(wantedCommandCalls)).post(Mockito.any(ItemCommandEvent.class));
+    protected void verifyEventTypes(TestInfo testInfo, int wantedStateCalls, int wantedCommandCalls) {
+        if (testInfo.getTestClass().orElseThrow().getSimpleName().contains("GroupItem")) {
+            Mockito.verify(eventPublisher, Mockito.times(wantedStateCalls * 3)).post(Mockito.any(ItemStateEvent.class));
+            Mockito.verify(eventPublisher, Mockito.times(wantedCommandCalls * 3))
+                    .post(Mockito.any(ItemCommandEvent.class));
+        } else {
+            Mockito.verify(eventPublisher, Mockito.times(wantedStateCalls)).post(Mockito.any(ItemStateEvent.class));
+            Mockito.verify(eventPublisher, Mockito.times(wantedCommandCalls)).post(Mockito.any(ItemCommandEvent.class));
+        }
+    }
+
+    @Test
+    public void testForName(TestInfo testInfo) {
+        Assumptions.assumeTrue(testInfo.getTestClass().orElseThrow().getSimpleName().contains("GroupItem"),
+                "not a GroupItem test");
+        Assertions.assertNotNull(groupForNameMethod(GROUP_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> groupForNameMethod(ITEM_NON_EXISTING));
+        Assertions.assertTrue(groupForNameOptionalMethod(GROUP_NAME).isPresent());
+        Assertions.assertFalse(groupForNameOptionalMethod(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected abstract <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name);
+
+    protected abstract <T extends JRuleGroupItem> T groupForNameMethod(String name);
+
+    @Test
+    public void testMemberItems(TestInfo testInfo) {
+        Assumptions.assumeTrue(testInfo.getTestClass().orElseThrow().getSimpleName().contains("GroupItem"),
+                "not a GroupItem test");
+        Assertions.assertEquals(3, groupForNameMethod(GROUP_NAME).memberItems().size());
+        Assertions.assertEquals(3, groupForNameMethod(GROUP_NAME).memberItems(false).size());
+        Assertions.assertEquals(4, groupForNameMethod(GROUP_NAME).memberItems(true).size());
     }
 }

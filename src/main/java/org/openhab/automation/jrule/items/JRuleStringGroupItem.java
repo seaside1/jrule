@@ -34,18 +34,18 @@ public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem {
     }
 
     default void sendCommand(JRuleStringValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleStringValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(String command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
     }
 
     default void postUpdate(String state) {
-        memberItems().forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
+        memberItemsGeneric().forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
     }
 }

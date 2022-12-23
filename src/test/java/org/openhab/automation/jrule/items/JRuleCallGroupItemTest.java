@@ -12,16 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.CallItem;
 
 /**
  * The {@link JRuleCallGroupItemTest}
@@ -32,23 +23,5 @@ class JRuleCallGroupItemTest extends JRuleCallItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleStringListValue(List.of("123"));
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new CallItem(ITEM_NAME);
-    }
-
-    @Test
-    public void testForName() {
-        Assertions.assertNotNull(JRuleCallGroupItem.forName(ITEM_NAME));
-        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleCallGroupItem.forName(ITEM_NON_EXISTING));
-        Assertions.assertTrue(JRuleCallGroupItem.forNameOptional(ITEM_NAME).isPresent());
-        Assertions.assertFalse(JRuleCallGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

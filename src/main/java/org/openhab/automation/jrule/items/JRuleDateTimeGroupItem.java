@@ -36,26 +36,26 @@ public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem, JRuleGroupIte
     }
 
     default void sendCommand(JRuleDateTimeValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleDateTimeValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(Date command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
     }
 
     default void sendCommand(ZonedDateTime command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
     }
 
     default void postUpdate(Date state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
     }
 
     default void postUpdate(ZonedDateTime state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
     }
 }

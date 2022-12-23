@@ -12,14 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.SwitchItem;
 
 /**
  * The {@link JRuleSwitchGroupItemTest}
@@ -30,24 +23,5 @@ class JRuleSwitchGroupItemTest extends JRuleSwitchItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalSwitchGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return JRuleOnOffValue.ON;
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new SwitchItem("Name");
-    }
-
-    @Test
-    public void testForName() {
-        Assertions.assertNotNull(JRuleSwitchGroupItem.forName(ITEM_NAME));
-        Assertions.assertThrows(JRuleItemNotFoundException.class,
-                () -> JRuleSwitchGroupItem.forName(ITEM_NON_EXISTING));
-        Assertions.assertTrue(JRuleSwitchGroupItem.forNameOptional(ITEM_NAME).isPresent());
-        Assertions.assertFalse(JRuleSwitchGroupItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 }

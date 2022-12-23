@@ -34,26 +34,26 @@ public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
     }
 
     default void sendCommand(JRuleDecimalValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleDecimalValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(double command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
     default void sendCommand(int command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
     default void postUpdate(double state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 
     default void postUpdate(int state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 }

@@ -13,9 +13,11 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeItem;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
@@ -30,7 +32,7 @@ import org.openhab.core.library.items.DateTimeItem;
  */
 class JRuleDateTimeItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleDateTimeItem item = (JRuleDateTimeItem) getJRuleItem();
         ZonedDateTime now = ZonedDateTime.now();
         item.sendCommand(new JRuleDateTimeValue(now));
@@ -43,11 +45,11 @@ class JRuleDateTimeItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(now.withFixedOffsetZone(), item.getStateAsDateTime().getValue().withFixedOffsetZone());
 
         // verify event calls
-        verifyEventTypes(0, 2);
+        verifyEventTypes(testInfo, 0, 2);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleDateTimeItem item = (JRuleDateTimeItem) getJRuleItem();
         ZonedDateTime now = ZonedDateTime.now();
         item.postUpdate(new JRuleDateTimeValue(now));
@@ -60,7 +62,7 @@ class JRuleDateTimeItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(now.withFixedOffsetZone(), item.getStateAsDateTime().getValue().withFixedOffsetZone());
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
@@ -74,8 +76,8 @@ class JRuleDateTimeItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new DateTimeItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new DateTimeItem(name);
     }
 
     @Test
@@ -84,5 +86,13 @@ class JRuleDateTimeItemTest extends JRuleItemTestBase {
         Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleDateTimeItem.forName(ITEM_NON_EXISTING));
         Assertions.assertTrue(JRuleDateTimeItem.forNameOptional(ITEM_NAME).isPresent());
         Assertions.assertFalse(JRuleDateTimeItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleDateTimeGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleDateTimeGroupItem.forNameOptional(name);
     }
 }

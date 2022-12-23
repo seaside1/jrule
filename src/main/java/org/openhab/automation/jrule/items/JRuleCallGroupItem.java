@@ -34,6 +34,6 @@ public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem {
     }
 
     default void postUpdate(JRuleStringListValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

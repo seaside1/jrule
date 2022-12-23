@@ -34,10 +34,10 @@ public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupIte
     }
 
     default void sendCommand(JRulePointValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePointValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

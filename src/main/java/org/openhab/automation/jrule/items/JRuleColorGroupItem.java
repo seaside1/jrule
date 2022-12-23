@@ -34,10 +34,10 @@ public interface JRuleColorGroupItem extends JRuleColorItem, JRuleDimmerGroupIte
     }
 
     default void sendCommand(JRuleHsbValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleHsbValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

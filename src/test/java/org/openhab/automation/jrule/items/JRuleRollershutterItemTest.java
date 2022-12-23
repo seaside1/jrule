@@ -12,8 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
@@ -31,7 +34,7 @@ import org.openhab.core.library.items.RollershutterItem;
  */
 class JRuleRollershutterItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleRollershutterItem item = (JRuleRollershutterItem) getJRuleItem();
         item.sendCommand(0);
 
@@ -52,11 +55,11 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
         Assertions.assertThrows(JRuleRuntimeException.class, () -> item.getStateAs(JRuleUpDownValue.class));
 
         // verify event calls
-        verifyEventTypes(0, 3);
+        verifyEventTypes(testInfo, 0, 3);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleRollershutterItem item = (JRuleRollershutterItem) getJRuleItem();
         item.postUpdate(17);
 
@@ -75,7 +78,7 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(22, item.getStateAsPercent().intValue());
 
         // verify event calls
-        verifyEventTypes(3, 0);
+        verifyEventTypes(testInfo, 3, 0);
     }
 
     @Override
@@ -89,8 +92,8 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new RollershutterItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new RollershutterItem(name);
     }
 
     @Test
@@ -100,5 +103,13 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
                 () -> JRuleRollershutterItem.forName(ITEM_NON_EXISTING));
         Assertions.assertTrue(JRuleRollershutterItem.forNameOptional(ITEM_NAME).isPresent());
         Assertions.assertFalse(JRuleRollershutterItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleRollershutterGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleRollershutterGroupItem.forNameOptional(name);
     }
 }

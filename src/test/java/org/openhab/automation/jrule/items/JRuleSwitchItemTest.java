@@ -12,8 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -28,7 +31,7 @@ import org.openhab.core.library.items.SwitchItem;
  */
 class JRuleSwitchItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleSwitchItem item = (JRuleSwitchItem) getJRuleItem();
         item.sendCommand(true);
 
@@ -41,11 +44,11 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAs(JRuleOnOffValue.class));
 
         // verify event calls
-        verifyEventTypes(0, 2);
+        verifyEventTypes(testInfo, 0, 2);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleSwitchItem item = (JRuleSwitchItem) getJRuleItem();
         item.postUpdate(true);
 
@@ -58,7 +61,7 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAs(JRuleOnOffValue.class));
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
@@ -72,8 +75,8 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new SwitchItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new SwitchItem(name);
     }
 
     @Test
@@ -82,5 +85,13 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
         Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleSwitchItem.forName(ITEM_NON_EXISTING));
         Assertions.assertTrue(JRuleSwitchItem.forNameOptional(ITEM_NAME).isPresent());
         Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleSwitchGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleSwitchGroupItem.forNameOptional(name);
     }
 }
