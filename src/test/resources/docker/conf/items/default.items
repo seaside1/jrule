@@ -1,9 +1,52 @@
 Switch          Receiving_Command_Switch
 Switch          Mqtt_Action_Trigger
 Switch          Commandline_Exec_Trigger
+
 Group           Switch_Group
-Switch          Switch_Group_Member1        (MySwitchGroup)
-Switch          Switch_Group_Member2        (MySwitchGroup)
+Switch          Switch_Group_Member1        (Switch_Group)
+Switch          Switch_Group_Member2        (Switch_Group)
+
 Number          Number_Condition
 String          Precondition_String
 Switch          Preconditioned_Switch
+Switch          Get_Members_Of_Group_Switch
+
+Group           Number_Group
+Group           Number_Group_Member         (Number_Group)
+Number          Number_Group_Member1        (Number_Group)
+Number          Number_Group_Member2        (Number_Group_Member)
+Number          Number_Group_Member3        (Number_Group_Member)
+
+Switch          Cast_All_Types_Switch
+Switch          Switch_To_Cast
+Number          Number_To_Cast
+String          String_To_Cast
+DateTime        DateTime_To_Cast
+Player          Player_To_Cast
+Contact         Contact_To_Cast
+Image           Image_To_Cast
+Rollershutter   Rollershutter_To_Cast
+Dimmer          Dimmer_To_Cast
+Color           Color_To_Cast
+Location        Location_To_Cast
+Number:Power    Quantity_To_Cast
+
+Switch          Rule_From_Rule
+String          Trigger_Rule_From_Rule
+
+String          Trigger_Rule
+String          Null_Testing
+
+// Receive Commands or Updates
+Switch          Switch_Event
+Number          Number_Event
+String          String_Event
+DateTime        DateTime_Event
+Player          Player_Event
+Contact         Contact_Event
+Image           Image_Event
+Rollershutter   Rollershutter_Event
+Dimmer          Dimmer_Event
+Color           Color_Event
+Location        Location_Event
+Number:Power    Quantity_Event

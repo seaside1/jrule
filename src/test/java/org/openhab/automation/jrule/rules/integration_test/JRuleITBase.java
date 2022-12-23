@@ -100,6 +100,7 @@ public abstract class JRuleITBase {
             "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer);
 
     public static final int TIMEOUT = 180;
+    public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
     private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:3.3.0-debian")
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
@@ -116,7 +117,21 @@ public abstract class JRuleITBase {
                     MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user", 0777),
                     "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user")
             .withExposedPorts(8080).withLogConsumer(outputFrame -> {
-                logLines.add(outputFrame.getUtf8String().strip());
+                String line = outputFrame.getUtf8String().strip();
+                logLines.add(line);
+                if (!line.matches(LOG_REGEX_START)) {
+                    // this line was splitted
+                    int index = logLines.size() - 2;
+                    if (logLines.size() > 2) {
+                        String prevLine = logLines.get(index);
+                        if (prevLine.matches(LOG_REGEX_START)) {
+                            logLines.remove(index);
+                            String newLine = prevLine + " " + line;
+                            log.warn("merged two lines: {}", newLine);
+                            logLines.add(newLine);
+                        }
+                    }
+                }
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
             }).waitingFor(new WaitAllStrategy(WaitAllStrategy.Mode.WITH_MAXIMUM_OUTER_TIMEOUT)
                     .withStrategy(new AbstractWaitStrategy() {
@@ -168,9 +183,12 @@ public abstract class JRuleITBase {
         openhabContainer.execInContainer("rm", "/openhab/userdata/example.txt");
         sendCommand(TestRules.ITEM_RECEIVING_COMMAND_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_MQTT_ACTION_TRIGGER, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITIONED_SWITCH, JRuleSwitchItem.OFF);
         sendCommand(TestRules.ITEM_PRECONDITION_STRING, "");
+        sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.OFF);
+        sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER2, JRuleSwitchItem.OFF);
 
         receivedMqttMessages.clear();
         mqttClient = getMqttClient();
@@ -317,8 +335,6 @@ public abstract class JRuleITBase {
         }
     }
 
-    // http://192.168.1.200:8080/rest/items?recursive=false
-
     private static boolean isHttp2xx(CloseableHttpResponse response) {
         return 2 != response.getCode() / 100;
     }
@@ -354,6 +370,28 @@ public abstract class JRuleITBase {
     protected void verifyRuleWasExecuted(String ruleLogLine) {
         Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
                 .await("rule executed").until(() -> logLines, v -> containsLine(toMethodCallLogEntry(ruleLogLine), v));
+    }
+
+    protected void verifyLogEntry(String ruleLogLine) {
+        Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
+                .await("rule executed").until(() -> logLines, v -> containsLine(ruleLogLine, v));
+    }
+
+    protected void verifyCommandEventFor(String itemName) {
+        verifyLogEntry(String.format("Item '%s' received command", itemName));
+    }
+
+    protected void verifyStateChangeEventFor(String itemName) {
+        verifyLogEntry(String.format("Item '%s' changed", itemName));
+    }
+
+    protected void verifyNoError() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // no problem here
+        }
+        Assertions.assertTrue(notContainsLine("ERROR", logLines));
     }
 
     private static String toMethodCallLogEntry(String ruleLogLine) {

@@ -12,38 +12,30 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
- * The {@link JRuleImageItem} Items
+ * The {@link JRuleImageItem} JRule Item
  *
- * @author Arne Seime - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleImageItem extends JRuleItem {
-
-    protected JRuleImageItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleImageItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleImageItem extends JRuleItem {
+    static JRuleImageItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleImageItem.class);
     }
 
-    public JRuleRawValue getState() {
-        return JRuleEventHandler.get().getRawValue(itemName);
+    /**
+     * Sends a on/off update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleRawValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void postUpdate(JRuleRawValue value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    // Persistence methods
-    public Optional<JRuleRawValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicStateAsRawValue(itemName, timestamp, persistenceServiceId);
+    default JRuleRawValue getStateAsRaw() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleRawValue.class);
     }
 }

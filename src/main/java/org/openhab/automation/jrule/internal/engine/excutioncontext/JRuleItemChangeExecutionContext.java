@@ -18,9 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -53,7 +52,6 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
 
     @Override
     public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
-        JRuleLog.debug(log, "JRuleItemChangeExecutionContext", "does it match?: {}, {}, {}", this, event, checkData);
         if (!(event instanceof ItemStateChangedEvent
                 && super.matchCondition(((ItemStateChangedEvent) event).getItemState().toString())
                 && from.map(s -> ((ItemStateChangedEvent) event).getOldItemState().toString().equals(s)).orElse(true)
@@ -82,8 +80,8 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
         }
 
         return new JRuleItemEvent(this.getItemName(), memberName,
-                new JRuleEventState(((ItemStateChangedEvent) event).getItemState().toString()),
-                new JRuleEventState(((ItemStateChangedEvent) event).getOldItemState().toString()));
+                JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getItemState()),
+                JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getOldItemState()));
     }
 
     @Override

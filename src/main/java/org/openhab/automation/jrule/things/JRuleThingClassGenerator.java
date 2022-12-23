@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -85,16 +86,16 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     public boolean generateThingsSource(Collection<Thing> things) {
-        List<Map<String, Object>> model = things.stream().sorted(Comparator.comparing(e -> getThingFriendlyName(e)))
-                .map(this::createThingModel).collect(Collectors.toList());
-        Map<String, Object> processingModel = new HashMap<>();
-        processingModel.put("things", model);
-        processingModel.put("packageName", jRuleConfig.getGeneratedThingPackage());
-
-        File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getThingsDirectory())
-                .append(File.separator).append("JRuleThings.java").toString());
-
         try {
+            List<Map<String, Object>> model = things.stream().sorted(Comparator.comparing(e -> getThingFriendlyName(e)))
+                    .map(this::createThingModel).collect(Collectors.toList());
+            Map<String, Object> processingModel = new HashMap<>();
+            processingModel.put("things", model);
+            processingModel.put("packageName", jRuleConfig.getGeneratedThingPackage());
+
+            File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getThingsDirectory())
+                    .append(File.separator).append("JRuleThings.java").toString());
+
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
                 Template template = freemarkerConfiguration.getTemplate("things/Things" + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
@@ -103,9 +104,10 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
             JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}",
                     targetSourceFile.getAbsolutePath());
             return true;
-        } catch (TemplateException | IOException e) {
+        } catch (Exception e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for JRuleThings.java: {}", e.toString());
+                    "Internal error when generating java source for JRuleThings.java: {}",
+                    ExceptionUtils.getStackTrace(e));
 
         }
         return false;

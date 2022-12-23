@@ -12,41 +12,52 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
 /**
- * The {@link JRuleStringItem} Items
+ * The {@link JRuleStringItem} JRule Item
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleStringItem extends JRuleItem {
-
-    protected JRuleStringItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleStringItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleStringItem extends JRuleItem {
+    static JRuleStringItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleStringItem.class);
     }
 
-    public String getState() {
-        return JRuleEventHandler.get().getStringValue(itemName);
+    /**
+     * Sends a string command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleStringValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public void sendCommand(String value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+    /**
+     * Sends a string update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleStringValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void postUpdate(String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+    /**
+     * Sends a string command
+     *
+     * @param command string command
+     */
+    default void sendCommand(String command) {
+        sendUncheckedCommand(new JRuleStringValue(command));
     }
 
-    // Persistence methods
-    public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId);
+    /**
+     * Sends a string update
+     *
+     * @param state string command
+     */
+    default void postUpdate(String state) {
+        postUncheckedUpdate(new JRuleStringValue(state));
     }
 }

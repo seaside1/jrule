@@ -12,41 +12,30 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 
 /**
- * The {@link JRuleCallItem} Items
+ * The {@link JRuleCallItem} JRule Item
  *
- * @author Arne Seime - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleCallItem extends JRuleItem {
-
-    protected JRuleCallItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleCallItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleCallItem extends JRuleItem {
+    static JRuleCallItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleCallItem.class);
     }
 
-    public String getState() {
-        return JRuleEventHandler.get().getStringValue(itemName);
+    /**
+     * Sends a string-list update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleStringListValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void sendCommand(String value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
-    }
-
-    public void postUpdate(String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
-    }
-
-    // Persistence methods
-    public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId);
+    default JRuleStringListValue getStateAsStringList() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleStringListValue.class);
     }
 }

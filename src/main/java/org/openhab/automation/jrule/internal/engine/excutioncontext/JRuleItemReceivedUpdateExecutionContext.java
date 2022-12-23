@@ -18,9 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -49,8 +48,6 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
 
     @Override
     public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
-        JRuleLog.debug(log, "JRuleItemReceivedUpdateExecutionContext", "does it match?: {}, {}, {}", this, event,
-                checkData);
         if (!(event instanceof ItemStateEvent
                 && super.matchCondition(((ItemStateEvent) event).getItemState().toString())
                 && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true))) {
@@ -76,7 +73,7 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
         }
 
         return new JRuleItemEvent(this.getItemName(), memberName,
-                new JRuleEventState(((ItemStateEvent) event).getItemState().toString()), null);
+                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null);
     }
 
     @Override
