@@ -32,10 +32,10 @@ import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.types.StringType;
 
 /**
- * The {@link JRuleItemChangeConditionRules} contains tests for @JRuleWhenItemChange trigger
+ * The {@link JRuleItemChangeConditionRules} contains tests for @JRuleWhenItemChange#previousCondition
  *
  *
- * @author Arne Seime - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

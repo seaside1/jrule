@@ -19,10 +19,10 @@ import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 
 /**
- * The {@link JRuleItemChangeConditionRules} contains rules for testing @JRuleWhenItemChange trigger
+ * The {@link JRuleItemChangeConditionRules} contains rules for testing @JRuleWhenItemChange#previousCondition
  *
  *
- * @author Arne Seime - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
 public class JRuleItemChangeConditionRules extends JRule {
     public static final String ITEM_FROM_TO = "item_from_to";
