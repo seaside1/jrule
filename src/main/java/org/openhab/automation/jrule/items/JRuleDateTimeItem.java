@@ -14,52 +14,76 @@ package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 
 /**
- * The {@link JRuleDateTimeItem} Items
+ * The {@link JRuleDateTimeItem} JRule Item
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleDateTimeItem extends JRuleItem {
-
-    protected JRuleDateTimeItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleDateTimeItem extends JRuleItem {
+    static JRuleDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleDateTimeItem.class);
     }
 
-    public void sendCommand(Date date) {
-        JRuleEventHandler.get().sendCommand(itemName, date);
+    /**
+     * Sends a date-time command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleDateTimeValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public void sendCommand(ZonedDateTime zonedDateTime) {
-        JRuleEventHandler.get().sendCommand(itemName, zonedDateTime);
+    /**
+     * Sends a date-time update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleDateTimeValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void postUpdate(Date date) {
-        JRuleEventHandler.get().postUpdate(itemName, date);
+    /**
+     * sends a date-time command
+     * 
+     * @param command date to send
+     */
+    default void sendCommand(Date command) {
+        sendUncheckedCommand(new JRuleDateTimeValue(command));
     }
 
-    public void postUpdate(ZonedDateTime zonedDateTime) {
-        JRuleEventHandler.get().postUpdate(itemName, zonedDateTime);
+    /**
+     * sends a date-time command
+     * 
+     * @param command date to send
+     */
+    default void sendCommand(ZonedDateTime command) {
+        sendUncheckedCommand(new JRuleDateTimeValue(command));
     }
 
-    public Date getState() {
-        return JRuleEventHandler.get().getStateFromItemAsDate(itemName);
+    /**
+     * sends a date-time update
+     * 
+     * @param state date to send
+     */
+    default void postUpdate(Date state) {
+        postUncheckedUpdate(new JRuleDateTimeValue(state));
     }
 
-    public ZonedDateTime getZonedDateTimeState() {
-        return JRuleEventHandler.get().getStateFromItemAsZonedDateTime(itemName);
+    /**
+     * sends a date-time update
+     * 
+     * @param state date to send
+     */
+    default void postUpdate(ZonedDateTime state) {
+        postUncheckedUpdate(new JRuleDateTimeValue(state));
     }
 
-    public Optional<ZonedDateTime> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(ZonedDateTime::parse);
+    default JRuleDateTimeValue getStateAsDateTime() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleDateTimeValue.class);
     }
 }

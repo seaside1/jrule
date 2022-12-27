@@ -1,0 +1,89 @@
+/**
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package org.openhab.automation.jrule.rules.value;
+
+import java.util.Objects;
+
+import javax.measure.Quantity;
+import javax.measure.Unit;
+
+import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
+/**
+ * The {@link JRuleQuantityValue}
+ *
+ * @author Robert Delbrück - Initial contribution
+ */
+public class JRuleQuantityValue<T extends Quantity<T>> implements JRuleValue {
+    private final QuantityType<T> ohType;
+
+    public JRuleQuantityValue(String value) {
+        this.ohType = new QuantityType<T>(value);
+    }
+
+    public JRuleQuantityValue(Number value, Unit<T> unit) {
+        this.ohType = new QuantityType<T>(value, unit);
+    }
+
+    @Override
+    public String stringValue() {
+        return this.ohType.toFullString();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        return ohType;
+    }
+
+    public double doubleValue() {
+        return this.ohType.doubleValue();
+    }
+
+    public float floatValue() {
+        return this.ohType.floatValue();
+    }
+
+    public int intValue() {
+        return this.ohType.intValue();
+    }
+
+    public long longValue() {
+        return this.ohType.longValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JRuleQuantityValue that = (JRuleQuantityValue) o;
+        return ohType.equals(that.ohType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ohType);
+    }
+
+    public String unit() {
+        return this.ohType.getUnit().toString();
+    }
+}

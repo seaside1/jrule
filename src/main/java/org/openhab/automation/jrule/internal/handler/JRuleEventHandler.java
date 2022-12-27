@@ -12,53 +12,26 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
-import org.openhab.automation.jrule.internal.JRuleItemUtil;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
-import org.openhab.automation.jrule.items.JRulePercentType;
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.value.JRuleColorValue;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.rules.value.JRuleRawValue;
-import org.openhab.automation.jrule.rules.value.JRuleRgbValue;
-import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
-import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
-import org.openhab.automation.jrule.rules.value.JRuleXyValue;
+import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
-import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemEventFactory;
-import org.openhab.core.library.types.DateTimeType;
-import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.HSBType;
-import org.openhab.core.library.types.IncreaseDecreaseType;
-import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.OpenClosedType;
-import org.openhab.core.library.types.PercentType;
-import org.openhab.core.library.types.PlayPauseType;
-import org.openhab.core.library.types.QuantityType;
-import org.openhab.core.library.types.RawType;
-import org.openhab.core.library.types.StopMoveType;
-import org.openhab.core.library.types.StringType;
-import org.openhab.core.library.types.UpDownType;
+import org.openhab.core.library.types.*;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.openhab.core.types.UnDefType;
@@ -72,6 +45,40 @@ import org.slf4j.LoggerFactory;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleEventHandler {
+    private static final Map<Class<? extends JRuleValue>, Class<? extends State>> stateMapping = new HashMap<>();
+    private static final Map<Class<? extends JRuleValue>, Class<? extends Command>> commandMapping = new HashMap<>();
+
+    static {
+        commandMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
+        commandMapping.put(JRuleStringValue.class, StringType.class);
+        commandMapping.put(JRuleUpDownValue.class, UpDownType.class);
+        commandMapping.put(JRuleOnOffValue.class, OnOffType.class);
+        commandMapping.put(JRuleStopMoveValue.class, StopMoveType.class);
+        commandMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
+        commandMapping.put(JRulePointValue.class, PointType.class);
+        commandMapping.put(JRuleDecimalValue.class, DecimalType.class);
+        commandMapping.put(JRulePercentValue.class, PercentType.class);
+        commandMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
+        commandMapping.put(JRuleRewindFastforwardValue.class, RewindFastforwardType.class);
+        commandMapping.put(JRuleNextPreviousValue.class, NextPreviousType.class);
+        commandMapping.put(JRuleHsbValue.class, HSBType.class);
+        commandMapping.put(JRuleQuantityValue.class, QuantityType.class);
+
+        stateMapping.put(JRuleOpenClosedValue.class, OpenClosedType.class);
+        stateMapping.put(JRuleStringValue.class, StringType.class);
+        stateMapping.put(JRuleUpDownValue.class, UpDownType.class);
+        stateMapping.put(JRuleOnOffValue.class, OnOffType.class);
+        stateMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
+        stateMapping.put(JRuleRawValue.class, RawType.class);
+        stateMapping.put(JRulePointValue.class, PointType.class);
+        stateMapping.put(JRuleHsbValue.class, HSBType.class);
+        stateMapping.put(JRuleDecimalValue.class, DecimalType.class);
+        stateMapping.put(JRulePercentValue.class, PercentType.class);
+        stateMapping.put(JRulePlayPauseValue.class, PlayPauseType.class);
+        stateMapping.put(JRuleRewindFastforwardValue.class, RewindFastforwardType.class);
+        stateMapping.put(JRuleQuantityValue.class, QuantityType.class);
+        stateMapping.put(JRuleStringListValue.class, StringListType.class);
+    }
 
     private static final String LOG_NAME_EVENT = "JRuleEvent";
 
@@ -101,65 +108,8 @@ public class JRuleEventHandler {
         this.eventPublisher = eventPublisher;
     }
 
-    public void sendCommand(String itemName, JRulePlayPauseValue command) {
-        sendCommand(itemName, getCommand(command));
-    }
-
-    public void sendCommand(String itemName, JRuleOpenClosedValue command) {
-        sendCommand(itemName, getCommand(command));
-    }
-
-    public void sendCommand(String itemName, JRuleOnOffValue command) {
-        sendCommand(itemName, getCommand(command));
-    }
-
-    public void sendCommand(String itemName, JRuleIncreaseDecreaseValue command) {
-        sendCommand(itemName, getCommand(command));
-    }
-
-    public void sendCommand(String itemName, JRuleUpDownValue command) {
-        sendCommand(itemName, getCommand(command));
-    }
-
-    public void sendCommand(String itemName, JRuleStopMoveValue command) {
-        sendCommand(itemName, getCommand(command));
-    }
-
-    public void sendCommand(String itemName, String command) {
-        sendCommand(itemName, new StringType(command));
-    }
-
-    public void postUpdate(String itemName, JRuleRawValue command) {
-        postUpdate(itemName, new RawType(command.getData(), command.getMimeType()));
-    }
-
-    public void sendCommand(String itemName, JRulePercentType value) {
-        sendCommand(itemName, new PercentType(value.getValue()));
-    }
-
-    public void sendCommand(String itemName, int value) {
-        sendCommand(itemName, new DecimalType(value));
-    }
-
-    public void sendCommand(String itemName, double value) {
-        sendCommand(itemName, new DecimalType(value));
-    }
-
-    public void sendCommand(String itemName, Date date) {
-        sendCommand(itemName, new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())));
-    }
-
-    public void sendCommand(String itemName, ZonedDateTime zonedDateTime) {
-        sendCommand(itemName, new DateTimeType(zonedDateTime));
-    }
-
-    public void sendCommand(String itemName, JRuleColorValue colorValue) {
-        final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
-        if (hsbType == null) {
-            logError("Failed to sen command for colorValue: {}", colorValue);
-            return;
-        }
-        sendCommand(itemName, hsbType);
+    public void sendCommand(String itemName, JRuleValue command) {
+        sendCommand(itemName, command.toOhCommand());
     }
 
     public void sendCommand(String itemName, double value, String unit) {
@@ -167,70 +117,28 @@ public class JRuleEventHandler {
         sendCommand(itemName, type);
     }
 
-    public void sendCommand(String itemName, JRuleRgbValue rgbValue) {
-        sendCommand(itemName, HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue()));
-    }
-
-    public void sendCommand(String itemName, JRuleXyValue xyValue) {
-        sendCommand(itemName, HSBType.fromXY(xyValue.getX(), xyValue.getY()));
-    }
-
     public void sendCommand(String itemName, Command command) {
         if (eventPublisher == null) {
             return;
         }
         logInfo("SendCommand '{}' to '{}'", command, itemName);
-        final ItemCommandEvent commandEvent = ItemEventFactory.createCommandEvent(itemName, command);
-        eventPublisher.post(commandEvent);
-    }
-
-    public void postUpdate(String itemName, JRuleColorValue colorValue) {
-        final HSBType hsbType = JRuleItemUtil.getHsbType(colorValue);
-        if (hsbType == null) {
-            logError("Failed to get HSB Type from ColorValue: {} itemName: {}", colorValue, itemName);
-            return;
+        try {
+            if (!itemRegistry.getItem(itemName).getAcceptedCommandTypes().contains(command.getClass())) {
+                throw new JRuleRuntimeException(
+                        String.format("unacceptable command type '%s' for item '%s'", command.getClass(), itemName));
+            }
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException("cannot resolve item: " + itemName, e);
         }
-        postUpdate(itemName, hsbType);
+        eventPublisher.post(ItemEventFactory.createCommandEvent(itemName, command));
     }
 
-    public void postUpdate(String itemName, JRuleRgbValue rgbValue) {
-        postUpdate(itemName, HSBType.fromRGB(rgbValue.getRed(), rgbValue.getGreen(), rgbValue.getBlue()));
-    }
-
-    public void postUpdate(String itemName, JRuleXyValue xyValue) {
-        postUpdate(itemName, HSBType.fromXY(xyValue.getX(), xyValue.getY()));
-    }
-
-    public void postUpdate(String itemName, Date date) {
-        postUpdate(itemName, new DateTimeType(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())));
-    }
-
-    public void postUpdate(String itemName, ZonedDateTime zonedDateTime) {
-        postUpdate(itemName, new DateTimeType(zonedDateTime));
-    }
-
-    public void postUpdate(String itemName, JRulePercentType value) {
-        postUpdate(itemName, new PercentType(value.getValue()));
-    }
-
-    public void postUpdate(String itemName, JRulePlayPauseValue value) {
-        postUpdate(itemName, getStateFromValue(value));
-    }
-
-    public void postUpdate(String itemName, JRuleOnOffValue value) {
-        postUpdate(itemName, getStateFromValue(value));
-    }
-
-    public void postUpdate(String itemName, JRuleOpenClosedValue value) {
-        postUpdate(itemName, getStateFromValue(value));
-    }
-
-    public void postUpdate(String itemName, JRuleUpDownValue value) {
-        postUpdate(itemName, getStateFromValue(value));
-    }
-
-    public void postUpdate(String itemName, String value) {
-        postUpdate(itemName, new StringType(value));
+    public void postUpdate(String itemName, JRuleValue value) {
+        if (value == null) {
+            postUpdate(itemName, UnDefType.NULL);
+        } else {
+            postUpdate(itemName, value.toOhState());
+        }
     }
 
     public void postUpdate(String itemName, double value, String unit) {
@@ -238,110 +146,21 @@ public class JRuleEventHandler {
         postUpdate(itemName, type);
     }
 
-    public void postUpdate(String itemName, double value) {
-        postUpdate(itemName, new DecimalType(value));
-    }
-
-    public void postUpdate(String itemName, int value) {
-        postUpdate(itemName, new DecimalType(value));
-    }
-
-    public void postUpdate(String itemName, State state) {
+    private void postUpdate(String itemName, State state) {
         if (eventPublisher == null) {
             return;
         }
         logInfo("PostUpdate '{}' to '{}'", state, itemName);
+        try {
+            if (!itemRegistry.getItem(itemName).getAcceptedDataTypes().contains(state.getClass())) {
+                throw new JRuleRuntimeException(
+                        String.format("unacceptable command type '%s' for item '%s'", state.getClass(), itemName));
+            }
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException("cannot resolve item: " + itemName, e);
+        }
         final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state);
         eventPublisher.post(itemEvent);
-    }
-
-    public JRulePlayPauseValue getPauseValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return getPlayPauseValueFromState(state);
-    }
-
-    public JRuleColorValue getColorValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return JRuleItemUtil.getColorValueFromState(state);
-    }
-
-    public JRuleOnOffValue getOnOffValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return getOnOffValueFromState(state);
-    }
-
-    public JRuleOpenClosedValue getOpenClosedValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return getOpenClosedValueFromState(state);
-    }
-
-    public JRuleUpDownValue getUpDownValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        return getUpDownValueFromState(state);
-    }
-
-    public JRulePlayPauseValue getPlayPauseValueFromState(State state) {
-        if (state instanceof UnDefType) {
-            return JRulePlayPauseValue.UNDEF;
-        }
-        final PlayPauseType playPauseType = PlayPauseType.valueOf(state.toFullString());
-        switch (playPauseType) {
-            case PLAY:
-                return JRulePlayPauseValue.PLAY;
-            case PAUSE:
-                return JRulePlayPauseValue.PAUSE;
-            default:
-                logError("Fail to transform playpause value");
-                return JRulePlayPauseValue.UNDEF;
-        }
-    }
-
-    private JRuleOnOffValue getOnOffValueFromState(State state) {
-        if (state instanceof UnDefType) {
-            return JRuleOnOffValue.UNDEF;
-        }
-        OnOffType onOffType = OnOffType.from(state.toFullString());
-        switch (onOffType) {
-            case OFF:
-                return JRuleOnOffValue.OFF;
-            case ON:
-                return JRuleOnOffValue.ON;
-            default:
-                logError("Fail to transform onoff value");
-                return JRuleOnOffValue.UNDEF;
-        }
-    }
-
-    private JRuleOpenClosedValue getOpenClosedValueFromState(State state) {
-        if (state instanceof UnDefType) {
-            return JRuleOpenClosedValue.UNDEF;
-        }
-        OpenClosedType openClosedType = OpenClosedType.valueOf(state.toFullString());
-        switch (openClosedType) {
-            case OPEN:
-                return JRuleOpenClosedValue.OPEN;
-            case CLOSED:
-                return JRuleOpenClosedValue.CLOSED;
-            default:
-                logError("Fail to transform openclosed value");
-                return JRuleOpenClosedValue.UNDEF;
-        }
-    }
-
-    private JRuleUpDownValue getUpDownValueFromState(State state) {
-        if (state instanceof UnDefType) {
-            return JRuleUpDownValue.UNDEF;
-        }
-        final UpDownType playPauseType = UpDownType.valueOf(state.toFullString());
-        switch (playPauseType) {
-            case UP:
-                return JRuleUpDownValue.UP;
-            case DOWN:
-                return JRuleUpDownValue.DOWN;
-            default:
-                logError("Fail to transform up/down value");
-                return JRuleUpDownValue.UNDEF;
-        }
     }
 
     public State getStateFromItem(String itemName) {
@@ -360,214 +179,32 @@ public class JRuleEventHandler {
         }
     }
 
-    private State getStateFromValue(JRuleOnOffValue value) {
-        switch (value) {
-            case OFF:
-                return OnOffType.OFF;
-            case ON:
-                return OnOffType.ON;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", value);
-                return null;
-        }
-    }
-
-    private State getStateFromValue(JRuleUpDownValue value) {
-        switch (value) {
-            case UP:
-                return UpDownType.UP;
-            case DOWN:
-                return UpDownType.DOWN;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", value);
-                return null;
-        }
-    }
-
-    private State getStateFromValue(JRulePlayPauseValue value) {
-        switch (value) {
-            case PLAY:
-                return PlayPauseType.PLAY;
-            case PAUSE:
-                return PlayPauseType.PAUSE;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", value);
-                return null;
-        }
-    }
-
-    private Command getCommand(JRulePlayPauseValue command) {
-        switch (command) {
-            case PLAY:
-                return PlayPauseType.PLAY;
-            case PAUSE:
-                return PlayPauseType.PAUSE;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
-    private Command getCommand(JRuleOpenClosedValue command) {
-        switch (command) {
-            case OPEN:
-                return OpenClosedType.OPEN;
-            case CLOSED:
-                return OpenClosedType.CLOSED;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
-    private State getStateFromValue(JRuleOpenClosedValue command) {
-        switch (command) {
-            case OPEN:
-                return OpenClosedType.OPEN;
-            case CLOSED:
-                return OpenClosedType.CLOSED;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
-    private Command getCommand(JRuleOnOffValue command) {
-        switch (command) {
-            case OFF:
-                return OnOffType.OFF;
-            case ON:
-                return OnOffType.ON;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
-    private Command getCommand(JRuleUpDownValue command) {
-        switch (command) {
-            case UP:
-                return UpDownType.UP;
-            case DOWN:
-                return UpDownType.DOWN;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
-    private Command getCommand(JRuleStopMoveValue command) {
-        switch (command) {
-            case STOP:
-                return StopMoveType.STOP;
-            case MOVE:
-                return StopMoveType.MOVE;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
-    private Command getCommand(JRuleIncreaseDecreaseValue command) {
-        switch (command) {
-            case INCREASE:
-                return IncreaseDecreaseType.INCREASE;
-            case DECREASE:
-                return IncreaseDecreaseType.DECREASE;
-            case UNDEF:
-            default:
-                logError("Unhandled getCommand: {}", command);
-                return null;
-        }
-    }
-
     public void setItemRegistry(@NonNull ItemRegistry itemRegistry) {
         this.itemRegistry = itemRegistry;
     }
 
-    @SuppressWarnings("rawtypes")
-    public Double getStateFromItemAsDouble(String name) {
-        State state = getStateFromItem(name);
-        if (state == null) {
-            return null;
-        }
-        if (state instanceof PercentType) {
-            return ((PercentType) state).doubleValue();
-        } else if (state instanceof QuantityType) {
-            return ((QuantityType) state).doubleValue();
-        } else {
-            DecimalType decimalType = state.as(DecimalType.class);
-            return decimalType != null ? decimalType.doubleValue() : null;
-        }
+    public Set<String> getGroupMemberNames(String groupName, boolean recursive) {
+        return getGroupMemberItems(groupName, recursive).stream().map(JRuleItem::getName).collect(Collectors.toSet());
     }
 
-    public String getStringValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        if (state == null) {
-            return null;
-        }
-        StringType stringType = state.as(StringType.class);
-        logDebug("Got state: {} stringType: {} fullString: {} item: {}", state, stringType, state.toFullString(),
-                itemName);
-        return stringType == null ? state.toFullString() : stringType.toString();
-    }
-
-    public Integer getStateFromItemAsInt(String itemName) {
-        State state = getStateFromItem(itemName);
-        if (state == null) {
-            return null;
-        }
-        if (state instanceof PercentType) {
-            return ((PercentType) state).intValue();
-        } else {
-            DecimalType decimalType = state.as(DecimalType.class);
-            return decimalType != null ? decimalType.intValue() : null;
-        }
-    }
-
-    public Date getStateFromItemAsDate(String itemName) {
-        ZonedDateTime zonedDateTime = getStateFromItemAsZonedDateTime(itemName);
-        return zonedDateTime != null ? Date.from(zonedDateTime.toInstant()) : null;
-    }
-
-    public ZonedDateTime getStateFromItemAsZonedDateTime(String itemName) {
-        State state = getStateFromItem(itemName);
-        if (state == null) {
-            return null;
-        }
-        DateTimeType dateTimeType = state.as(DateTimeType.class);
-        return dateTimeType != null ? dateTimeType.getZonedDateTime() : null;
-    }
-
-    public JRuleRawValue getRawValue(String itemName) {
-        State state = getStateFromItem(itemName);
-        if (state != null) {
-            RawType raw = (RawType) state;
-            return new JRuleRawValue(raw.getMimeType(), raw.getBytes());
-        }
-        return null;
-    }
-
-    public Set<String> getGroupMemberNames(String groupName) {
-        return getGroupMemberItems(groupName).stream().map(JRuleItem::getName).collect(Collectors.toSet());
-    }
-
-    public Set<JRuleItem> getGroupMemberItems(String groupName) {
+    public Set<JRuleItem> getGroupMemberItems(String groupName, boolean recursive) {
         try {
             Item item = itemRegistry.getItem(groupName);
             if (item instanceof GroupItem) {
+                Set<JRuleItem> out = new HashSet<>();
                 GroupItem g = (GroupItem) item;
-                return g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
-                        .collect(Collectors.toSet());
+                g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
+                        .forEach(jRuleValueJRuleItem -> {
+                            if (recursive) {
+                                out.add(jRuleValueJRuleItem);
+                                if (jRuleValueJRuleItem.isGroup()) {
+                                    out.addAll(getGroupMemberItems(jRuleValueJRuleItem.getName(), recursive));
+                                }
+                            } else {
+                                out.add(jRuleValueJRuleItem);
+                            }
+                        });
+                return out;
             } else {
                 throw new JRuleRuntimeException(String.format("Given itemname '%s' is not a groupitem", groupName));
             }
@@ -605,5 +242,86 @@ public class JRuleEventHandler {
         } else {
             return defaultValue;
         }
+    }
+
+    public <V extends JRuleValue> V getValue(String name, Class<V> valueClass) {
+        State state = getStateFromItem(name);
+        if (state.getClass().equals(UnDefType.class)) {
+            return null;
+        }
+        Objects.requireNonNull(state, "state must not be null");
+        Class<? extends State> castTo = stateMapping.get(valueClass);
+        Objects.requireNonNull(castTo, String.format("casting to '%s' for '%s' results in null", valueClass, name));
+        State as = Optional.ofNullable(state.as(castTo))
+                .orElseThrow(() -> new JRuleRuntimeException(String.format("no mapping for type '%s' to '%s'",
+                        state.getClass().getSimpleName(), valueClass.getSimpleName())));
+
+        return toValue(as.toFullString(), valueClass);
+    }
+
+    public JRuleValue toValue(Command itemCommand) {
+        Class<? extends JRuleValue> valueClass = commandMapping.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(itemCommand.getClass())).findFirst()
+                .map((Map.Entry<Class<? extends JRuleValue>, Class<? extends Command>> classClassEntry) -> Objects
+                        .requireNonNull(classClassEntry.getKey()))
+                .orElseThrow(
+                        () -> new IllegalStateException("cannot find mapping for oh type: " + itemCommand.getClass()));
+        return toValue(itemCommand.toFullString(), valueClass);
+    }
+
+    public JRuleValue toValue(State itemState) {
+        if (itemState instanceof UnDefType) {
+            return null;
+        }
+        Class<? extends JRuleValue> valueClass = stateMapping.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(itemState.getClass())).findFirst()
+                .map((Map.Entry<Class<? extends JRuleValue>, Class<? extends State>> classClassEntry) -> Objects
+                        .requireNonNull(classClassEntry.getKey()))
+                .orElseThrow(
+                        () -> new IllegalStateException("cannot find mapping for oh type: " + itemState.getClass()));
+        return toValue(itemState.toFullString(), valueClass);
+    }
+
+    public JRuleValue getValue(String name) {
+        return toValue(getStateFromItem(name));
+    }
+
+    public <V extends JRuleValue> V toValue(String plain, Class<? extends JRuleValue> valueClass) {
+        if (JRuleOpenClosedValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleOpenClosedValue.valueOf(plain);
+        } else if (JRulePlayPauseValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRulePlayPauseValue.valueOf(plain);
+        } else if (JRuleNextPreviousValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleNextPreviousValue.valueOf(plain);
+        } else if (JRuleRewindFastforwardValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleRewindFastforwardValue.valueOf(plain);
+        } else if (JRuleStringValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleStringValue(plain);
+        } else if (JRuleUpDownValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleUpDownValue.getValueFromString(plain);
+        } else if (JRuleOnOffValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleOnOffValue.getValueFromString(plain);
+        } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleDateTimeValue(plain);
+        } else if (JRuleRawValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleRawValue(plain);
+        } else if (JRulePointValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRulePointValue(plain);
+        } else if (JRuleHsbValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleHsbValue(plain);
+        } else if (JRulePercentValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRulePercentValue(plain);
+        } else if (JRuleDecimalValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleDecimalValue(plain);
+        } else if (JRuleQuantityValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleQuantityValue(plain);
+        } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRulePlayPauseValue.valueOf(plain);
+        } else if (JRuleStopMoveValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleStopMoveValue.valueOf(plain);
+        } else if (JRuleStringListValue.class.isAssignableFrom(valueClass)) {
+            return (V) new JRuleStringListValue(plain);
+        }
+        throw new IllegalStateException(String.format("not implemented type: %s", valueClass));
     }
 }

@@ -12,10 +12,7 @@
  */
 package org.openhab.automation.jrule.rules.event;
 
-import org.openhab.automation.jrule.rules.JRuleEventState;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
-import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 /**
  * The {@link JRuleItemEvent}
@@ -25,56 +22,26 @@ import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 public class JRuleItemEvent extends JRuleEvent {
     private final String itemName;
     private final String memberName;
-    private final JRuleEventState state;
-    private final JRuleEventState oldState;
+    private final JRuleValue state;
+    private final JRuleValue oldState;
 
-    public JRuleItemEvent(String itemName, String memberName, JRuleEventState state, JRuleEventState oldState) {
+    public JRuleItemEvent(String itemName, String memberName, JRuleValue state, JRuleValue oldState) {
         this.itemName = itemName;
         this.memberName = memberName;
         this.state = state;
         this.oldState = oldState;
     }
 
-    public JRuleEventState getState() {
+    public JRuleValue getState() {
         return state;
     }
 
-    public JRuleEventState getOldState() {
+    public JRuleValue getOldState() {
         return oldState;
-    }
-
-    @Deprecated
-    public String getValue() {
-        return state.getValue();
     }
 
     public String getMemberName() {
         return memberName;
-    }
-
-    @Deprecated
-    public JRuleOnOffValue getValueAsOnOffValue() {
-        return state.getValueAsOnOffValue();
-    }
-
-    @Deprecated
-    public JRuleOpenClosedValue getValueAsOpenClosedValue() {
-        return state.getValueAsOpenClosedValue();
-    }
-
-    @Deprecated
-    public JRuleUpDownValue getValueAsUpDownValue() {
-        return state.getValueAsUpDownValue();
-    }
-
-    @Deprecated
-    public Double getValueAsDouble() {
-        return state.getValueAsDouble();
-    }
-
-    @Deprecated
-    public Integer getValueAsInteger() {
-        return state.getValueAsInteger();
     }
 
     public String getItemName() {

@@ -12,17 +12,17 @@
  */
 package org.openhab.binding.jrule.internal.rules.timers;
 
-import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringItem;
 
 /**
  * Simple dummy item used in testcase (would normally be generated from item definition)
  *
  * @author Arne Seime - Initial contribution
  */
-public class TargetItem extends JRuleStringItem {
+public class TargetItem extends JRuleInternalStringItem {
 
-    protected TargetItem(String itemName) {
-        super(itemName);
+    public TargetItem(String itemName, String label, String type, String id) {
+        super(itemName, label, type, id);
     }
 
     @Override

@@ -12,15 +12,24 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.IncreaseDecreaseType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleIncreaseDecreaseValue} JRule Command
  *
  * @author Timo Litzius - Initial contribution
  */
-public enum JRuleIncreaseDecreaseValue {
-    INCREASE,
-    DECREASE,
-    UNDEF;
+public enum JRuleIncreaseDecreaseValue implements JRuleValue {
+    INCREASE(IncreaseDecreaseType.INCREASE),
+    DECREASE(IncreaseDecreaseType.DECREASE);
+
+    private final IncreaseDecreaseType ohType;
+
+    JRuleIncreaseDecreaseValue(IncreaseDecreaseType ohType) {
+        this.ohType = ohType;
+    }
 
     public static JRuleIncreaseDecreaseValue getValueFromString(String value) {
         if (value.equals("INCREASE")) {
@@ -29,6 +38,21 @@ public enum JRuleIncreaseDecreaseValue {
         if (value.equals("DECREASE")) {
             return DECREASE;
         }
-        return UNDEF;
+        return null;
+    }
+
+    @Override
+    public String stringValue() {
+        return name();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        throw new IllegalStateException("not a state type");
     }
 }

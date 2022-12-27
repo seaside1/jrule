@@ -12,15 +12,24 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.StopMoveType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleStopMoveValue} JRule Command
  *
  * @author Timo Litzius- Initial contribution
  */
-public enum JRuleStopMoveValue {
-    STOP,
-    MOVE,
-    UNDEF;
+public enum JRuleStopMoveValue implements JRuleValue {
+    STOP(StopMoveType.STOP),
+    MOVE(StopMoveType.MOVE);
+
+    private final StopMoveType ohType;
+
+    JRuleStopMoveValue(StopMoveType ohType) {
+        this.ohType = ohType;
+    }
 
     public static JRuleStopMoveValue getValueFromString(String value) {
         if (value.equals("STOP")) {
@@ -29,6 +38,21 @@ public enum JRuleStopMoveValue {
         if (value.equals("MOVE")) {
             return MOVE;
         }
-        return UNDEF;
+        return null;
+    }
+
+    @Override
+    public String stringValue() {
+        return name();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        throw new IllegalStateException("not a state type");
     }
 }

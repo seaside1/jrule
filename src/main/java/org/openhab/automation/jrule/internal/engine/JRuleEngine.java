@@ -472,8 +472,8 @@ public class JRuleEngine implements PropertyChangeListener {
         } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
             JRuleLog.error(logger, context.getMethod().getName(), "Error {}", e);
         } catch (InvocationTargetException e) {
-            Throwable ex = e.getCause() != null ? e.getCause() : null;
-            JRuleLog.error(logger, context.getMethod().getName(), "Error message", ex);
+            Throwable ex = e.getTargetException();
+            JRuleLog.error(logger, context.getMethod().getName(), "Error message: {}", ex.getMessage());
             JRuleLog.error(logger, context.getMethod().getName(), "Error Stacktrace: {}",
                     ExceptionUtils.getStackTrace(ex));
         } finally {

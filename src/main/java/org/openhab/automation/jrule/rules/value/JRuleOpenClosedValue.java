@@ -12,15 +12,24 @@
  */
 package org.openhab.automation.jrule.rules.value;
 
+import org.openhab.core.library.types.OpenClosedType;
+import org.openhab.core.types.Command;
+import org.openhab.core.types.State;
+
 /**
  * The {@link JRuleOpenClosedValue} JRule Command
  *
  * @author Timo Litzius - Initial contribution
  */
-public enum JRuleOpenClosedValue {
-    OPEN,
-    CLOSED,
-    UNDEF;
+public enum JRuleOpenClosedValue implements JRuleValue {
+    OPEN(OpenClosedType.OPEN),
+    CLOSED(OpenClosedType.CLOSED);
+
+    private final OpenClosedType ohType;
+
+    JRuleOpenClosedValue(OpenClosedType ohType) {
+        this.ohType = ohType;
+    }
 
     public static JRuleOpenClosedValue getValueFromString(String value) {
         if (value.equals("OPEN")) {
@@ -29,6 +38,25 @@ public enum JRuleOpenClosedValue {
         if (value.equals("CLOSED")) {
             return CLOSED;
         }
-        return UNDEF;
+        return null;
+    }
+
+    public static JRuleValue valueOf(boolean command) {
+        return command ? OPEN : CLOSED;
+    }
+
+    @Override
+    public String stringValue() {
+        return name();
+    }
+
+    @Override
+    public Command toOhCommand() {
+        return this.ohType;
+    }
+
+    @Override
+    public State toOhState() {
+        return this.ohType;
     }
 }
