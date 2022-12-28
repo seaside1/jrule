@@ -39,6 +39,7 @@ import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
@@ -178,20 +179,20 @@ public class TestRules extends JRule {
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
-    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
         logInfo("Member of Group ({}) received command", event.getMemberName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
-    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member of Group ({}) received update", event.getMemberName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
-    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member of Group ({}) changed", event.getMemberName());

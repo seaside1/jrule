@@ -70,7 +70,6 @@ import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
@@ -265,11 +264,14 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private JRuleItemExecutionContext.JRuleAdditionalItemCheckData getAdditionalCheckData(AbstractEvent event) {
-        return Optional.ofNullable(event instanceof ItemEvent ? ((ItemEvent) event).getItemName() : null)
-                .map(s -> getItem(s))
-                .map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getGroupNames().stream()
-                        .collect(Collectors.toMap(name -> name, name -> getItem(name) instanceof GroupItem))))
-                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(Map.of()));
+        return Optional.ofNullable(event instanceof ItemEvent ? ((ItemEvent) event).getItemName() : null).map(s -> {
+            try {
+                return itemRegistry.getItem(s);
+            } catch (ItemNotFoundException e) {
+                throw new IllegalStateException("this can never occur", e);
+            }
+        }).map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getGroupNames()))
+                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(List.of()));
     }
 
     private Item getItem(String name) {

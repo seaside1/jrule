@@ -19,7 +19,6 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
@@ -69,15 +68,15 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
                 && ((ItemStateChangedEvent) event).getItemName().equals(this.getItemName())) {
             return true;
         }
-        if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData
-                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().containsKey(this.getItemName())) {
+        if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData) {
             switch (getMemberOf()) {
                 case All:
                     return true;
                 case Groups:
-                    return ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().get(this.getItemName());
+                    return ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName());
                 case Items:
-                    return !((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().get(this.getItemName());
+                    return !((JRuleAdditionalItemCheckData) checkData).getBelongingGroups()
+                            .contains(this.getItemName());
                 default:
                     return false;
             }
@@ -89,7 +88,8 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
         final String itemName;
         final String memberName;
-        if (isMemberOf()) {
+        if (getMemberOf() != JRuleMemberOf.None) {
+            itemName = this.getItemName();
             memberName = ((ItemEvent) event).getItemName();
         } else {
             itemName = this.getItemName();
@@ -99,8 +99,8 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
         }
 
         return new JRuleItemEvent(itemName, memberName,
-                new JRuleEventState(((ItemStateChangedEvent) event).getItemState().toString()),
-                new JRuleEventState(((ItemStateChangedEvent) event).getOldItemState().toString()));
+                JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getItemState()),
+                JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getOldItemState()));
     }
 
     @Override
