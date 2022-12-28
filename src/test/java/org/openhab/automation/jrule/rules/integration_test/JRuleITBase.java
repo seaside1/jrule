@@ -385,6 +385,15 @@ public abstract class JRuleITBase {
                 .await("rule executed").until(() -> logLines, v -> containsLine(ruleLogLine, v));
     }
 
+    protected void verifyNoLogEntry(String ruleLogLine) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // no problem here
+        }
+        Assertions.assertTrue(notContainsLine(ruleLogLine, logLines));
+    }
+
     protected void verifyCommandEventFor(String itemName) {
         verifyLogEntry(String.format("Item '%s' received command", itemName));
     }

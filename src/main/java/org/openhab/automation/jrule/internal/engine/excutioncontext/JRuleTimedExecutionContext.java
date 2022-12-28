@@ -25,6 +25,6 @@ import org.openhab.automation.jrule.rules.JRule;
 public abstract class JRuleTimedExecutionContext extends JRuleExecutionContext {
     public JRuleTimedExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             List<JRulePreconditionContext> preconditionContextList) {
-        super(jRule, logName, loggingTags, method, preconditionContextList);
+        super(jRule, logName, loggingTags, method, preconditionContextList, null);
     }
 }

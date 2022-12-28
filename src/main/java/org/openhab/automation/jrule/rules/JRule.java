@@ -18,23 +18,15 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleLocalTimerExecutionContext;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
@@ -263,7 +255,7 @@ public class JRule {
 
     /**
      * Sends a GET-HTTP request and returns the result as a String
-     * 
+     *
      * @param url Target URL
      * @return Result as String
      */
@@ -273,7 +265,7 @@ public class JRule {
 
     /**
      * Sends a GET-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
-     * 
+     *
      * @param url Target URL
      * @param headers Header parameters for the request
      * @param timeout Time after the request will be canceled, or null then it will never be canceled
@@ -285,7 +277,7 @@ public class JRule {
 
     /**
      * Sends a PUT-HTTP request and returns the result as a String
-     * 
+     *
      * @param url Target URL
      * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
@@ -297,7 +289,7 @@ public class JRule {
     /**
      * Sends a PUT-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
      * String
-     * 
+     *
      * @param url Target URL
      * @param contentType @see javax.ws.rs.core.MediaType
      * @param content Request content
@@ -312,7 +304,7 @@ public class JRule {
 
     /**
      * Sends a POST-HTTP request and returns the result as a String
-     * 
+     *
      * @param url Target URL
      * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
@@ -325,7 +317,7 @@ public class JRule {
      * Sends a POST-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
      * String
      * <br/>
-     * 
+     *
      * @param url Target URL
      * @param contentType @see javax.ws.rs.core.MediaType
      * @param content Request content
@@ -340,7 +332,7 @@ public class JRule {
 
     /**
      * Sends a DELETE-HTTP request and returns the result as a String
-     * 
+     *
      * @param url Target URL
      * @param timeout Time after the request will be canceled, or null then it will never be canceled
      * @return Result as String
@@ -351,7 +343,7 @@ public class JRule {
 
     /**
      * Sends a DELETE-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
-     * 
+     *
      * @param url Target URL
      * @param headers Header parameters for the request
      * @param timeout Time after the request will be canceled, or null then it will never be canceled
@@ -359,6 +351,114 @@ public class JRule {
      */
     protected String sendHttpDeleteRequest(String url, Map<String, String> headers, @Nullable Duration timeout) {
         return JRuleActionHandler.get().sendHttpDeleteRequest(url, headers, timeout);
+    }
+
+    /**
+     * Creates or replaces a timer.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(@Nullable String timerName, Duration delay,
+            Runnable function) {
+        return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function, null);
+    }
+
+    /**
+     * Creates a timer.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createTimer(@Nullable String timerName, Duration delay, Runnable function) {
+        return JRuleTimerHandler.get().createTimer(timerName, delay, function, null);
+    }
+
+    /**
+     * Creates a timer.
+     *
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createTimer(Duration delay, Runnable function) {
+        return JRuleTimerHandler.get().createTimer(null, delay, function, null);
+    }
+
+    /**
+     * Creates or replace a repeating timer. All timers will have a delay to the previous one.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(@Nullable String timerName, Duration delay,
+            int numberOfRepeats, Runnable function) {
+        return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(@Nullable String timerName, Duration delay,
+            int numberOfRepeats, Runnable function) {
+        return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     *
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(Duration delay, int numberOfRepeats,
+            Runnable function) {
+        return JRuleTimerHandler.get().createRepeatingTimer(null, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Cancels the timer with the given name.
+     *
+     * @param timerName Name of the timer or null.
+     * @return true if canceled, false if not.
+     */
+    protected boolean cancelTimer(String timerName) {
+        return JRuleTimerHandler.get().cancelTimer(timerName);
+    }
+
+    /**
+     * Checks if the timer with the given name is still running.
+     *
+     * @param timerName Name of the timer or null.
+     * @return true if running, false if not.
+     */
+    protected boolean isTimerRunning(String timerName) {
+        return JRuleTimerHandler.get().isTimerRunning(timerName);
+    }
+
+    /**
+     * Creating a timed look.
+     *
+     * @param lockName Name of the lock. Must be unique over all rules.
+     * @param duration Duration until the lock is held.
+     * @return Returns true if the lock for this name is not held. false if the lock is held.
+     */
+    protected boolean getTimedLock(@Nullable String lockName, Duration duration) {
+        return JRuleTimerHandler.get().getTimedLock(lockName, duration);
     }
 
     protected void say(String text, String voiceId, String sinkId) {

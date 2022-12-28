@@ -13,33 +13,31 @@
 package org.openhab.automation.jrule.rules;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.time.temporal.ChronoUnit;
 
 /**
- * The {@link JRuleWhenItemChange}
+ * The {@link JRuleDebounce} type.
+ * Default value unit is Seconds.
  *
- * @author Robert Delbrück
+ * @author Robert Delbrück - Initial contribution
  */
-@Repeatable(JRuleWhenItemChanges.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRuleWhenItemChange {
-    String item() default "";
-
-    String from() default "";
-
-    String to() default "";
-
-    boolean memberOf() default false;
-
-    JRuleCondition condition() default @JRuleCondition;
+public @interface JRuleDebounce {
+    /**
+     * Default is seconds. Can be changed via unit().
+     * 
+     * @return value as long
+     */
+    long value() default 0;
 
     /**
-     *
-     * @return The condition of the previous state
+     * Time unit. Default is seconds.
+     * 
+     * @return time unit.
      */
-    JRuleCondition previousCondition() default @JRuleCondition;
+    ChronoUnit unit() default ChronoUnit.SECONDS;
 }

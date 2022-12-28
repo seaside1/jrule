@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,18 +38,17 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     protected final Optional<String> command;
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
-            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> command) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq,
-                preconditionContextList);
+            String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
+                timedLock);
         this.command = command;
     }
 
     @Override
     public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
         if (!(event instanceof ItemCommandEvent
-                && super.matchCondition(((ItemCommandEvent) event).getItemCommand().toString())
+                && matchCondition(((ItemCommandEvent) event).getItemCommand().toString(), null)
                 && command.map(s -> ((ItemCommandEvent) event).getItemCommand().toString().equals(s)).orElse(true))) {
             return false;
         }
@@ -79,9 +79,8 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     @Override
     public String toString() {
         return "JRuleItemReceivedCommandExecutionContext{" + "command=" + command + ", itemName='" + itemName + '\''
-                + ", memberOf=" + memberOf + ", gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq="
-                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
-                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
-                + preconditionContextList + '}';
+                + ", memberOf=" + memberOf + ", conditionContext=" + conditionContext + ", logName='" + logName + '\''
+                + ", jRule=" + rule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
+                + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
