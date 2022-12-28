@@ -457,12 +457,11 @@ public class JRuleEngine implements PropertyChangeListener {
                 method.invoke(rule);
             }
         } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
-            JRuleLog.error(logger, context.getMethod().getName(), "Error {}", e);
+            JRuleLog.error(logger, context.getMethod().getName(), "Error calling rule method: {}",
+                    ExceptionUtils.getStackTrace(e));
         } catch (InvocationTargetException e) {
-            Throwable ex = e.getTargetException();
-            JRuleLog.error(logger, context.getMethod().getName(), "Error message: {}", ex.getMessage());
-            JRuleLog.error(logger, context.getMethod().getName(), "Error Stacktrace: {}",
-                    ExceptionUtils.getStackTrace(ex));
+            JRuleLog.error(logger, context.getMethod().getName(), "Error in rule: {}",
+                    ExceptionUtils.getStackTrace(e.getCause()));
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
