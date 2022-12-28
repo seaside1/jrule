@@ -87,6 +87,11 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
         Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 
+    @Test
+    public void testForNameOptional() {
+        JRuleSwitchItem.forNameOptional(ITEM_NAME).ifPresent(item -> item.sendCommand(true));
+    }
+
     protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
         return (T) JRuleSwitchGroupItem.forName(name);
     }

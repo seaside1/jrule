@@ -597,6 +597,20 @@ Use case: Use forName to create and item and send commands and get status
     }
  }
 ```
+# Example 27b
+
+Use case: Use forNameOptional to create and item and send commands and get status
+
+```java
+ public class ForNameExampleRule extends JRule {
+  
+    @JRuleName("testForNameOptional")
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    public void testForName(JRuleEvent event) {
+        JRuleSwitchItem.forNameOptional("MyOtherTestSwitch").ifPresent(item -> item.sendCommand(true));
+    }
+ }
+```
 
 # Example 28
 
