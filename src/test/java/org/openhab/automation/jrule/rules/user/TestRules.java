@@ -15,15 +15,33 @@ package org.openhab.automation.jrule.rules.user;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.items.*;
+import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.items.JRuleColorItem;
+import org.openhab.automation.jrule.items.JRuleContactItem;
+import org.openhab.automation.jrule.items.JRuleDateTimeItem;
+import org.openhab.automation.jrule.items.JRuleDimmerItem;
+import org.openhab.automation.jrule.items.JRuleImageItem;
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleLocationItem;
+import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
+import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRulePlayerItem;
+import org.openhab.automation.jrule.items.JRuleRollershutterItem;
+import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
+import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
@@ -90,6 +108,10 @@ public class TestRules extends JRule {
     public static final String COMMAND_NULL_TESTING = "null testing";
     public static final String NAME_NULL_TESTING = "Null testing";
     public static final String ITEM_NULL_TESTING = "Null_Testing";
+    public static final String NAME_TIMERS = "timers";
+    public static final String COMMAND_TIMERS = "timers";
+    public static final String NAME_DEBOUNCE = "debounce";
+    public static final String COMMAND_DEBOUNCE = "debounce";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -271,6 +293,44 @@ public class TestRules extends JRule {
         assert stringItem.getState().stringValue().equals("abc");
         stringItem.postUpdate((JRuleStringValue) null);
         assert stringItem.getState() == null;
+    }
+
+    @JRuleName(NAME_TIMERS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TIMERS))
+    public void timers(JRuleItemEvent event) throws JRuleExecutionException {
+        // normal timer
+        createTimer(Duration.ofSeconds(2), () -> logInfo("TIMER: '1'"));
+
+        // repeating timer
+        AtomicInteger counter = new AtomicInteger(0);
+        createRepeatingTimer(Duration.ofMillis(1), 200,
+                () -> logInfo("TIMER-REPEATING: '{}'", counter.getAndIncrement()));
+
+        // cancel normal timer
+        createTimer("CANCEL_ME", Duration.ofSeconds(2), () -> System.exit(-1));
+        cancelTimer("CANCEL_ME");
+
+        // cancel repeating timer
+        createRepeatingTimer("CANCEL_ME_REPEATING", Duration.ofSeconds(2), 2, () -> System.exit(-1));
+        cancelTimer("CANCEL_ME_REPEATING");
+
+        // replace timer
+        createTimer("REPLACE_TIMER", Duration.ofSeconds(2), () -> System.exit(-1));
+        createOrReplaceTimer("REPLACE_TIMER", Duration.ofSeconds(2), () -> logInfo("REPLACED TIMER: '1'"));
+
+        // replace repeating timer
+        createRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(2), 2, () -> System.exit(-1));
+        createOrReplaceRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(1), 2,
+                () -> logInfo("REPLACED REPEATING TIMER: '1'"));
+    }
+
+    private AtomicInteger debounceCounter = new AtomicInteger(0);
+
+    @JRuleName(NAME_DEBOUNCE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_DEBOUNCE))
+    @JRuleDebounce(value = 2, unit = ChronoUnit.SECONDS)
+    public void debounce(JRuleItemEvent event) throws JRuleExecutionException {
+        logInfo("Counted debounces: '{}'", debounceCounter.getAndIncrement());
     }
 
     private static void castLocation() {
