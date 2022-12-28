@@ -176,7 +176,8 @@ public class JRuleEngine implements PropertyChangeListener {
             addToContext(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, method,
                     jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
-                    jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty)), timedLock);
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty),
+                    timedLock));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -186,7 +187,8 @@ public class JRuleEngine implements PropertyChangeListener {
             addToContext(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, method,
                     jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
-                    jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty)), timedLock);
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty),
+                    timedLock));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -199,7 +201,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRulePreviousCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)), timedLock);
+                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), timedLock));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });

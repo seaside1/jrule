@@ -35,8 +35,8 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
             boolean memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList) {
-        super(jRule, logName, loggingTags, method, preconditionContextList);
+            List<JRulePreconditionContext> preconditionContextList, Duration timedLock) {
+        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock);
         this.itemName = itemName;
         this.memberOf = memberOf;
         this.conditionContext = conditionContext;
@@ -88,20 +88,6 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
             this.eq = eq;
             this.neq = neq;
         }
-    public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
-            boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt, Optional<Double> gte,
-            Optional<String> eq, Optional<String> neq, List<JRulePreconditionContext> preconditionContextList,
-            Duration timedLock) {
-        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock);
-        this.itemName = itemName;
-        this.memberOf = memberOf;
-        this.gt = gt;
-        this.gte = gte;
-        this.lt = lt;
-        this.lte = lte;
-        this.eq = eq;
-        this.neq = neq;
-    }
 
         public JRuleConditionContext(JRuleCondition jRuleCondition) {
             this.lt = Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE);

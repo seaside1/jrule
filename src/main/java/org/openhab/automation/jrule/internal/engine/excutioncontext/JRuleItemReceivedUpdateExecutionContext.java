@@ -40,7 +40,8 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
     public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
             List<JRulePreconditionContext> preconditionContextList, Optional<String> state, Duration timedLock) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList, timedLock);
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
+                timedLock);
         this.state = state;
     }
 
