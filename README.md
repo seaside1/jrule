@@ -717,6 +717,19 @@ Use case: Want to listen on all Item events of a group (without the groupstate m
 
 ## Example 36
 
+Use case: Want to listen just on changes where the state is now greater/equals then 12 and was before less then 12.
+    Without the previous condition the rule will be triggered every time the state is greater/equals then 12.
+
+```java
+    @JRuleName("Change from something less to something greater")
+    @JRuleWhenItemChange(item = ITEM_FROM_TO, previousCondition = @JRuleCondition(lt = 12), condition = @JRuleCondition(gte = 12))
+    public void itemChangeFromTo(JRuleEvent event) {
+        logInfo("state change to something >= 12 and was before < 12");
+    }
+```
+
+## Example 37
+
 Use case: Chain timers. Execute one and after this is expired, execute the next one.
 
 ```java
@@ -731,7 +744,7 @@ public void chainSomeTimers() {
 }
 ```
 
-## Example 37
+## Example 38
 
 Use case: Do not execute a rule too often
 
