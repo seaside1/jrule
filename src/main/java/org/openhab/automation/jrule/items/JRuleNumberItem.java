@@ -15,101 +15,156 @@ package org.openhab.automation.jrule.items;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import javax.measure.Unit;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.core.library.types.DecimalType;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
+import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 
 /**
- * The {@link JRuleNumberItem} Items
+ * The {@link JRuleNumberItem} JRule Item
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleNumberItem extends JRuleItem {
-
-    protected JRuleNumberItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleNumberItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleNumberItem extends JRuleItem {
+    static JRuleNumberItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleNumberItem.class);
     }
 
-    public void sendCommand(double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+    /**
+     * Sends a decimal command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleDecimalValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public void postUpdate(double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+    /**
+     * Sends a decimal update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleDecimalValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void sendCommand(double value, String unit) {
-        JRuleEventHandler.get().sendCommand(itemName, value, unit);
+    /**
+     * Sends a quantity command.
+     *
+     * @param command command to send
+     */
+    default void sendCommand(JRuleQuantityValue<?> command) {
+        sendUncheckedCommand(command);
     }
 
-    public void postUpdate(double value, String unit) {
-        JRuleEventHandler.get().postUpdate(itemName, value, unit);
+    /**
+     * Sends a quantity update.
+     *
+     * @param state state to send.
+     */
+    default void postUpdate(JRuleQuantityValue<?> state) {
+        postUncheckedUpdate(state);
     }
 
-    public Double getState() {
-        return JRuleEventHandler.get().getStateFromItemAsDouble(itemName);
+    /**
+     * Sends a number command.
+     *
+     * @param command as number via JRuleDecimalValue will be send.
+     */
+    default void sendCommand(double command) {
+        sendUncheckedCommand(new JRuleDecimalValue(command));
     }
 
-    public Optional<Double> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(Double::parseDouble);
+    /**
+     * Sends a number command.
+     *
+     * @param command as number via JRuleDecimalValue will be send.
+     */
+    default void sendCommand(int command) {
+        sendUncheckedCommand(new JRuleDecimalValue(command));
     }
 
-    public Optional<Double> maximumSince(ZonedDateTime timestamp) {
+    /**
+     * Sends a number command with the given unit.
+     *
+     * @param command as number via JRuleDecimalValue will be send.
+     * @param unit unit as string
+     */
+    default void sendCommand(double command, Unit<?> unit) {
+        sendUncheckedCommand(new JRuleQuantityValue<>(command, unit));
+    }
+
+    /**
+     * Sends a number update.
+     *
+     * @param value as number via JRuleDecimalValue will be send.
+     */
+    default void postUpdate(double value) {
+        postUncheckedUpdate(new JRuleDecimalValue(value));
+    }
+
+    /**
+     * Sends a number update.
+     *
+     * @param state as number via JRuleDecimalValue will be send.
+     */
+    default void postUpdate(int state) {
+        postUncheckedUpdate(new JRuleDecimalValue(state));
+    }
+
+    /**
+     * Sends a number command with the given unit.
+     *
+     * @param state as number via JRuleDecimalValue will be send.
+     * @param unit unit as string
+     */
+    default void postUpdate(double state, Unit<?> unit) {
+        postUncheckedUpdate(new JRuleQuantityValue<>(state, unit));
+    }
+
+    default Optional<Double> maximumSince(ZonedDateTime timestamp) {
         return maximumSince(timestamp, null);
     }
 
-    public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.maximumSince(itemName, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
-    }
+    Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public Optional<Double> minimumSince(ZonedDateTime timestamp) {
+    default Optional<Double> minimumSince(ZonedDateTime timestamp) {
         return minimumSince(timestamp, null);
     }
 
-    public Optional<Double> minimumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.minimumSince(itemName, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
-    }
+    Optional<Double> minimumSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public Optional<Double> varianceSince(ZonedDateTime timestamp) {
+    default Optional<Double> varianceSince(ZonedDateTime timestamp) {
         return varianceSince(timestamp, null);
     }
 
-    public Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.varianceSince(itemName, timestamp, persistenceServiceId)
-                .map(decimalType -> decimalType.doubleValue());
-    }
+    Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public Optional<Double> deviationSince(ZonedDateTime timestamp) {
+    default Optional<Double> deviationSince(ZonedDateTime timestamp) {
         return deviationSince(timestamp, null);
     }
 
-    public Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.deviationSince(itemName, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
-    }
+    Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public Optional<Double> averageSince(ZonedDateTime timestamp) {
+    default Optional<Double> averageSince(ZonedDateTime timestamp) {
         return averageSince(timestamp, null);
     }
 
-    public Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.averageSince(itemName, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
-    }
+    Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId);
 
-    public Optional<Double> sumSince(ZonedDateTime timestamp) {
+    default Optional<Double> sumSince(ZonedDateTime timestamp) {
         return sumSince(timestamp, null);
     }
 
-    public Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.sumSince(itemName, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
+    Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId);
+
+    default JRuleDecimalValue getStateAsDecimal() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleDecimalValue.class);
+    }
+
+    default JRuleQuantityValue getStateAsQuantity() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleQuantityValue.class);
     }
 }

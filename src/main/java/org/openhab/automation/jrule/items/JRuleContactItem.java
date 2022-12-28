@@ -12,36 +12,33 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
-import org.openhab.automation.jrule.trigger.JRuleContactTrigger;
 
 /**
- * The {@link JRuleContactItem} Items
+ * The {@link JRuleContactItem} JRule Item
  *
- * @author Timo Litzius - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleContactItem extends JRuleItem implements JRuleContactTrigger {
+public interface JRuleContactItem extends JRuleItem {
+    String OPEN = JRuleOpenClosedValue.OPEN.stringValue();
+    String CLOSED = JRuleOpenClosedValue.CLOSED.stringValue();
 
-    protected JRuleContactItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
+    static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
     }
 
-    public JRuleOpenClosedValue getState() {
-        return JRuleEventHandler.get().getOpenClosedValue(itemName);
+    /**
+     * Sends a open/close update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleOpenClosedValue state) {
+        postUncheckedUpdate(state);
     }
 
-    // Persistence method
-    public Optional<JRuleOpenClosedValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(JRuleOpenClosedValue::getValueFromString);
+    default JRuleOpenClosedValue getStateAsOpenClose() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleOpenClosedValue.class);
     }
 }

@@ -17,9 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -38,20 +37,16 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     protected final Optional<String> command;
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, boolean memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
-            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
+            String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
             List<JRulePreconditionContext> preconditionContextList, Optional<String> command) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq,
-                preconditionContextList);
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList);
         this.command = command;
     }
 
     @Override
     public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
-        JRuleLog.debug(log, "JRuleItemReceivedCommandExecutionContext", "does it match?: {}, {}, {}", this, event,
-                checkData);
         if (!(event instanceof ItemCommandEvent
-                && super.matchCondition(((ItemCommandEvent) event).getItemCommand().toString())
+                && matchCondition(((ItemCommandEvent) event).getItemCommand().toString(), null)
                 && command.map(s -> ((ItemCommandEvent) event).getItemCommand().toString().equals(s)).orElse(true))) {
             return false;
         }
@@ -76,15 +71,14 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
         }
 
         return new JRuleItemEvent(this.getItemName(), memberName,
-                new JRuleEventState(((ItemCommandEvent) event).getItemCommand().toString()), null);
+                JRuleEventHandler.get().toValue(((ItemCommandEvent) event).getItemCommand()), null);
     }
 
     @Override
     public String toString() {
         return "JRuleItemReceivedCommandExecutionContext{" + "command=" + command + ", itemName='" + itemName + '\''
-                + ", memberOf=" + memberOf + ", gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq="
-                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
-                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
-                + preconditionContextList + '}';
+                + ", memberOf=" + memberOf + ", conditionContext=" + conditionContext + ", logName='" + logName + '\''
+                + ", jRule=" + rule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
+                + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

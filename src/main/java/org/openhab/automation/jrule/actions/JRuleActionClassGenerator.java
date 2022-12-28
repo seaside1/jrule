@@ -14,7 +14,6 @@ package org.openhab.automation.jrule.actions;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 /**
  * The {@link JRuleActionClassGenerator} Class Generator for actions
@@ -81,10 +80,10 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                     targetSourceFile.getAbsolutePath());
             return true;
 
-        } catch (TemplateException | IOException e) {
+        } catch (Exception e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
                     "Internal error when generating java source for action {}: {}", thing.getUID().toString(),
-                    e.toString());
+                    ExceptionUtils.getStackTrace(e));
 
         }
 
@@ -92,17 +91,17 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     public boolean generateActionsSource(Collection<Thing> things) {
-        List<Map<String, Object>> model = things.stream()
-                .sorted(Comparator.comparing(e -> getActionFriendlyName(e.getUID().toString())))
-                .map(this::createActionsModel).collect(Collectors.toList());
-        Map<String, Object> processingModel = new HashMap<>();
-        processingModel.put("actions", model);
-        processingModel.put("packageName", jRuleConfig.getGeneratedActionPackage());
-
-        File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getActionsDirectory())
-                .append(File.separator).append("JRuleActions.java").toString());
-
         try {
+            List<Map<String, Object>> model = things.stream()
+                    .sorted(Comparator.comparing(e -> getActionFriendlyName(e.getUID().toString())))
+                    .map(this::createActionsModel).collect(Collectors.toList());
+            Map<String, Object> processingModel = new HashMap<>();
+            processingModel.put("actions", model);
+            processingModel.put("packageName", jRuleConfig.getGeneratedActionPackage());
+
+            File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getActionsDirectory())
+                    .append(File.separator).append("JRuleActions.java").toString());
+
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
                 Template template = freemarkerConfiguration.getTemplate("actions/Actions" + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
@@ -111,9 +110,10 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
             JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}",
                     targetSourceFile.getAbsolutePath());
             return true;
-        } catch (TemplateException | IOException e) {
+        } catch (Exception e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for JRuleActions.java: {}", e.toString());
+                    "Internal error when generating java source for JRuleActions.java: {}",
+                    ExceptionUtils.getStackTrace(e));
 
         }
         return false;

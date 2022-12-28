@@ -223,6 +223,7 @@ public class JRuleCompiler {
                 .forEach(className -> classFiles.get(className).delete());
         // Will trigger compilation of any missing or old item java files
         return compile(List.of(new File(jRuleConfig.getItemsDirectory(), "JRuleItems.java"),
+                new File(jRuleConfig.getItemsDirectory(), "JRuleItemNames.java"),
                 new File(jRuleConfig.getThingsDirectory(), "JRuleThings.java"),
                 new File(jRuleConfig.getActionsDirectory(), "JRuleActions.java")), genClassPath);
     }
@@ -256,7 +257,7 @@ public class JRuleCompiler {
                 return true;
             } else {
                 for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    logInfo("Error on line {} in {}: {}", diagnostic.getLineNumber(),
+                    logError("Error on line {} in {}: {}", diagnostic.getLineNumber(),
                             diagnostic.getSource() == null ? "" : diagnostic.getSource().toUri(),
                             diagnostic.getMessage(Locale.getDefault()));
                 }

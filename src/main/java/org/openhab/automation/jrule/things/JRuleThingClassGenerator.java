@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
@@ -85,16 +86,16 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     public boolean generateThingsSource(Collection<Thing> things) {
-        List<Map<String, Object>> model = things.stream().sorted(Comparator.comparing(e -> getThingFriendlyName(e)))
-                .map(this::createThingModel).collect(Collectors.toList());
-        Map<String, Object> processingModel = new HashMap<>();
-        processingModel.put("things", model);
-        processingModel.put("packageName", jRuleConfig.getGeneratedThingPackage());
-
-        File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getThingsDirectory())
-                .append(File.separator).append("JRuleThings.java").toString());
-
         try {
+            List<Map<String, Object>> model = things.stream().sorted(Comparator.comparing(e -> getThingFriendlyName(e)))
+                    .map(this::createThingModel).collect(Collectors.toList());
+            Map<String, Object> processingModel = new HashMap<>();
+            processingModel.put("things", model);
+            processingModel.put("packageName", jRuleConfig.getGeneratedThingPackage());
+
+            File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getThingsDirectory())
+                    .append(File.separator).append("JRuleThings.java").toString());
+
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
                 Template template = freemarkerConfiguration.getTemplate("things/Things" + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
@@ -103,9 +104,10 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
             JRuleLog.debug(logger, LOG_NAME_CLASS_GENERATOR, "Wrote Generated class: {}",
                     targetSourceFile.getAbsolutePath());
             return true;
-        } catch (TemplateException | IOException e) {
+        } catch (Exception e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for JRuleThings.java: {}", e.toString());
+                    "Internal error when generating java source for JRuleThings.java: {}",
+                    ExceptionUtils.getStackTrace(e));
 
         }
         return false;
@@ -139,8 +141,43 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     private List<JRuleTriggerChannel> extractTriggerChannels(Thing thing) {
-        return thing.getChannels().stream().filter(e -> e.getKind() == ChannelKind.TRIGGER).map(e -> e.getUID().getId())
-                .map(e -> new JRuleTriggerChannel(e, e.replace("#", "_"))).collect(Collectors.toList());
+        return thing.getChannels().stream().filter(channel -> channel.getKind() == ChannelKind.TRIGGER)
+                .map(channel -> channel.getUID().getId())
+                .map(channelName -> new JRuleTriggerChannel(channelName, createFieldName(thing, channelName)))
+                .collect(Collectors.toList());
+    }
+
+    public static String createFieldName(Thing thing, String channelName) {
+        String fieldName = channelName.replace("#", "_");
+
+        if (!isValidJavaIdentifier(fieldName)) {
+            // Try prefix with '_'
+            fieldName = "_" + fieldName;
+        }
+
+        // Check again, throw error
+        if (!isValidJavaIdentifier(fieldName)) {
+            throw new IllegalArgumentException(
+                    String.format("Unable to create a valid Java field name for channel name '%s' in thing '%s'",
+                            channelName, thing.getUID()));
+        }
+
+        return fieldName;
+    }
+
+    public static boolean isValidJavaIdentifier(String s) {
+        if (s.isEmpty()) {
+            return false;
+        }
+        if (!Character.isJavaIdentifierStart(s.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < s.length(); i++) {
+            if (!Character.isJavaIdentifierPart(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String getThingFriendlyName(Thing thing) {
