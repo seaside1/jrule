@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.items.*;
-import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.items.JRuleContactItem;
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
