@@ -214,4 +214,27 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_NULL_TESTING);
         verifyNoError();
     }
+
+    @Test
+    public void timers() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_TIMERS);
+        verifyRuleWasExecuted(TestRules.NAME_TIMERS);
+        verifyLogEntry("TIMER: '1'");
+        verifyLogEntry("TIMER-REPEATING: '2'");
+        verifyLogEntry("REPLACED TIMER: '1'");
+        verifyLogEntry("REPLACED REPEATING TIMER: '1'");
+        verifyNoError();
+    }
+
+    @Test
+    public void debounce() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DEBOUNCE);
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DEBOUNCE);
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DEBOUNCE);
+        verifyRuleWasExecuted(TestRules.NAME_DEBOUNCE);
+        verifyLogEntry("Counted debounces: '0'");
+        verifyNoLogEntry("Counted debounces: '1'");
+        verifyNoLogEntry("Counted debounces: '2'");
+        verifyNoError();
+    }
 }

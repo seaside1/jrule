@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,14 +32,16 @@ public abstract class JRuleExecutionContext {
     protected final Method method;
     protected final String[] loggingTags;
     protected final List<JRulePreconditionContext> preconditionContextList;
+    protected final Duration timedLock;
 
     public JRuleExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList) {
+            List<JRulePreconditionContext> preconditionContextList, Duration timedLock) {
         this.logName = logName;
         this.loggingTags = loggingTags;
         this.rule = rule;
         this.method = method;
         this.preconditionContextList = preconditionContextList;
+        this.timedLock = timedLock;
     }
 
     public JRule getRule() {
@@ -75,6 +78,10 @@ public abstract class JRuleExecutionContext {
         return "JRuleExecutionContext{" + "logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
                 + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
                 + preconditionContextList + '}';
+    }
+
+    public Duration getTimedLock() {
+        return timedLock;
     }
 
     public static class JRuleAdditionalCheckData {

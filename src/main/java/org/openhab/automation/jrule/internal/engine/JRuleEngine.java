@@ -17,6 +17,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +53,10 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCr
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
+import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleDebounce;
 import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
@@ -85,11 +88,12 @@ import org.slf4j.MDC;
  * @author Robert Delbrück - Refactoring
  */
 public class JRuleEngine implements PropertyChangeListener {
+    public static final String MDC_KEY_TIMER = "timer";
     private static final String[] EMPTY_LOG_TAGS = new String[0];
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private List<JRuleExecutionContext> contextList = new CopyOnWriteArrayList<>();
     private JRuleTimerExecutor timerExecutor = new JRuleTimerExecutor(this);
-    private static final String MDC_KEY_RULE = "rule";
+    public static final String MDC_KEY_RULE = "rule";
     protected ThreadPoolExecutor ruleExecutorService;
     protected JRuleConfig config;
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
@@ -160,6 +164,10 @@ public class JRuleEngine implements PropertyChangeListener {
         final String[] loggingTags = Optional.ofNullable(method.getDeclaredAnnotation(JRuleTag.class))
                 .map(JRuleTag::value).orElse(EMPTY_LOG_TAGS);
 
+        Duration timedLock = Optional.ofNullable(method.getDeclaredAnnotation(JRuleDebounce.class))
+                .filter(jRuleDebounce -> jRuleDebounce.value() > 0)
+                .map(jRuleDebounce -> Duration.of(jRuleDebounce.value(), jRuleDebounce.unit())).orElse(null);
+
         ruleLoadingStatistics.addRuleMethod();
         AtomicBoolean addedToContext = new AtomicBoolean(false);
 
@@ -168,7 +176,8 @@ public class JRuleEngine implements PropertyChangeListener {
             addToContext(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, method,
                     jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
-                    jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty)));
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty),
+                    timedLock));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -178,7 +187,8 @@ public class JRuleEngine implements PropertyChangeListener {
             addToContext(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, method,
                     jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
-                    jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty)));
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty),
+                    timedLock));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -191,15 +201,15 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRulePreviousCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
+                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), timedLock));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenChannelTrigger.class)).forEach(jRuleWhen -> {
-            addToContext(
-                    new JRuleChannelExecutionContext(jRule, logName, loggingTags, method, jRulePreconditionContexts,
-                            jRuleWhen.channel(), Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty)));
+            addToContext(new JRuleChannelExecutionContext(jRule, logName, loggingTags, method,
+                    jRulePreconditionContexts, jRuleWhen.channel(),
+                    Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty), timedLock));
             ruleLoadingStatistics.addChannelTrigger();
             addedToContext.set(true);
         });
@@ -226,7 +236,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
                     Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
                     Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
-                    jRulePreconditionContexts));
+                    jRulePreconditionContexts, timedLock));
             addedToContext.set(true);
         });
 
@@ -440,13 +450,23 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     private void invokeRuleInternal(JRuleExecutionContext context, JRuleEvent event) {
+        Duration timedLock = context.getTimedLock();
+        if (timedLock != null) {
+            if (!JRuleTimerHandler.get().getTimedLock(
+                    context.getMethod().getDeclaringClass().getName() + "#" + context.getMethod().getName(),
+                    timedLock)) {
+                JRuleLog.debug(logger, context.getLogName(),
+                        "Not invoking rule because method has an active debounce lock (context={})", context);
+                return;
+            }
+        }
+
         JRuleLog.debug(logger, context.getLogName(), "Invoking rule for context: {}", context);
 
         final JRule rule = context.getRule();
         final Method method = context.getMethod();
 
         try {
-
             JRule.JRULE_EXECUTION_CONTEXT.set(context);
             JRuleLog.debug(logger, context.getMethod().getName(), "setting mdc tags: {}", context.getLoggingTags());
             MDC.put(MDC_KEY_RULE, context.getMethod().getName());
@@ -465,7 +485,6 @@ public class JRuleEngine implements PropertyChangeListener {
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
-            logger.debug("Removing thread local after rule completion");
             JRule.JRULE_EXECUTION_CONTEXT.remove();
         }
     }
