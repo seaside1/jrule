@@ -343,6 +343,10 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
+        if (itemRegistry == null) {
+            // JRuleEngine not completely initialized
+            return false;
+        }
         List<String> belongingGroups = Optional.of(itemName).map(s -> {
             try {
                 return itemRegistry.getItem(s);
