@@ -36,4 +36,10 @@ public @interface JRuleWhenItemChange {
     boolean memberOf() default false;
 
     JRuleCondition condition() default @JRuleCondition;
+
+    /**
+     *
+     * @return The condition of the previous state
+     */
+    JRuleCondition previousCondition() default @JRuleCondition;
 }
