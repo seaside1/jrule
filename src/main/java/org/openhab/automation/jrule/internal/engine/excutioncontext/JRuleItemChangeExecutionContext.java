@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleEventState;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
@@ -39,22 +39,28 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     private final Logger log = LoggerFactory.getLogger(JRuleItemChangeExecutionContext.class);
     private final Optional<String> from;
     private final Optional<String> to;
+    private final Optional<JRuleConditionContext> previousConditionContext;
 
     public JRuleItemChangeExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, JRuleMemberOf memberOf, Optional<Double> lt, Optional<Double> lte, Optional<Double> gt,
-            Optional<Double> gte, Optional<String> eq, Optional<String> neq,
+            String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
+            Optional<JRuleConditionContext> previousConditionContext,
             List<JRulePreconditionContext> preconditionContextList, Optional<String> from, Optional<String> to) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, lt, lte, gt, gte, eq, neq,
-                preconditionContextList);
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList);
         this.from = from;
         this.to = to;
+        this.previousConditionContext = previousConditionContext;
+    }
+
+    public boolean matchCondition(String state, String previousState) {
+        return super.matchCondition(state, previousState)
+                && previousConditionContext.map(c -> c.matchCondition(previousState)).orElse(true);
     }
 
     @Override
     public boolean match(AbstractEvent event, JRuleAdditionalCheckData checkData) {
-        JRuleLog.debug(log, "JRuleItemChangeExecutionContext", "does it match?: {}, {}, {}", this, event, checkData);
         if (!(event instanceof ItemStateChangedEvent
-                && super.matchCondition(((ItemStateChangedEvent) event).getItemState().toString())
+                && matchCondition(((ItemStateChangedEvent) event).getItemState().toString(),
+                        ((ItemStateChangedEvent) event).getOldItemState().toString())
                 && from.map(s -> ((ItemStateChangedEvent) event).getOldItemState().toString().equals(s)).orElse(true)
                 && to.map(s -> ((ItemStateChangedEvent) event).getItemState().toString().equals(s)).orElse(true))) {
             return false;
@@ -83,8 +89,7 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
         final String itemName;
         final String memberName;
-        if (getMemberOf() != JRuleMemberOf.None) {
-            itemName = ((ItemEvent) event).getItemName();
+        if (isMemberOf()) {
             memberName = ((ItemEvent) event).getItemName();
         } else {
             itemName = this.getItemName();
@@ -101,9 +106,8 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     @Override
     public String toString() {
         return "JRuleItemChangeExecutionContext{" + "from=" + from + ", to=" + to + ", itemName='" + itemName + '\''
-                + ", memberOf=" + memberOf + ", gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq="
-                + eq + ", neq=" + neq + ", logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
-                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
-                + preconditionContextList + '}';
+                + ", memberOf=" + memberOf + ", conditionContext=" + conditionContext + ", logName='" + logName + '\''
+                + ", jRule=" + rule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
+                + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

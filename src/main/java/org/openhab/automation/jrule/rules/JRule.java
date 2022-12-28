@@ -34,8 +34,11 @@ import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
-import org.openhab.automation.jrule.items.JRulePercentType;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,8 +130,8 @@ public class JRule {
         return future.thenAccept(s -> {
             try {
                 JRule.JRULE_EXECUTION_CONTEXT.set(context);
-                JRuleLog.info(logger, context.getLogName(), "Timer has finsihed");
-                JRuleLog.debug(logger, context.getLogName(), "Timer has finsihed hashCode: {}", future.hashCode());
+                JRuleLog.info(logger, context.getLogName(), "Timer has finished");
+                JRuleLog.debug(logger, context.getLogName(), "Timer has finished hashCode: {}", future.hashCode());
                 timerNameToTimerFuture.remove(timerName);
                 fn.accept(null);
             } finally {
@@ -210,7 +213,7 @@ public class JRule {
                     JRULE_EXECUTION_CONTEXT.remove();
                 }
 
-                JRuleLog.info(logger, context.getLogName(), "Repeating Timer has finsihed");
+                JRuleLog.info(logger, context.getLogName(), "Repeating Timer has finished");
                 List<CompletableFuture<Void>> finishedList = timerNameToTimerFutureList.remove(timerName);
                 if (finishedList != null) {
                     finishedList.clear();
@@ -257,16 +260,16 @@ public class JRule {
         JRuleEventHandler.get().sendCommand(itemName, command);
     }
 
-    protected void sendCommand(String itemName, JRulePercentType percentTypeCommand) {
+    protected void sendCommand(String itemName, JRulePercentValue percentTypeCommand) {
         JRuleEventHandler.get().sendCommand(itemName, percentTypeCommand);
     }
 
     protected void sendCommand(String itemName, String command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleStringValue(command));
     }
 
     protected void sendCommand(String itemName, double value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value));
     }
 
     protected void sendCommand(String itemName, double value, String unit) {
@@ -274,15 +277,15 @@ public class JRule {
     }
 
     protected void sendCommand(String itemName, int value) {
-        JRuleEventHandler.get().sendCommand(itemName, value);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDecimalValue(value));
     }
 
     protected void sendCommand(String itemName, Date date) {
-        JRuleEventHandler.get().sendCommand(itemName, date);
+        JRuleEventHandler.get().sendCommand(itemName, new JRuleDateTimeValue(date));
     }
 
     protected void postUpdate(String itemName, Date date) {
-        JRuleEventHandler.get().postUpdate(itemName, date);
+        JRuleEventHandler.get().postUpdate(itemName, new JRuleDateTimeValue(date));
     }
 
     protected void postUpdate(String itemName, JRuleOnOffValue state) {
@@ -290,11 +293,11 @@ public class JRule {
     }
 
     protected void postUpdate(String itemName, String value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        JRuleEventHandler.get().postUpdate(itemName, new JRuleStringValue(value));
     }
 
     protected void postUpdate(String itemName, double value) {
-        JRuleEventHandler.get().postUpdate(itemName, value);
+        JRuleEventHandler.get().postUpdate(itemName, new JRuleDecimalValue(value));
     }
 
     protected boolean getTimedLock(String lockName, int seconds) {

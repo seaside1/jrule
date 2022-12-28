@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.TestRules;
@@ -89,7 +88,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MQTT_THING_CHANGED_TO_OFFLINE);
     }
 
-    @Disabled("not merged currently")
     @Test
     public void memberOfGroupReceivedCommand() throws IOException {
         sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -105,7 +103,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND);
     }
 
-    @Disabled("not merged currently")
     @Test
     public void memberOfGroupReceivedUpdate() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -121,7 +118,6 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE);
     }
 
-    @Disabled("not merged currently")
     @Test
     public void memberOfGroupChanged() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
@@ -146,7 +142,76 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void membersOfGroup() throws IOException {
+        sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_GET_MEMBERS_OF_GROUP);
+        verifyNoError();
+    }
+
+    @Test
+    public void membersOfNumberGroup() throws IOException {
+        sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_GET_MEMBERS_OF_NUMBER_GROUP);
+        verifyNoError();
+    }
+
+    @Test
     public void cronEvery5Sec() {
         verifyRuleWasExecuted(TestRules.NAME_CRON_EVERY_5_SEC);
+    }
+
+    @Test
+    public void castAllTypes() throws IOException {
+        sendCommand(TestRules.ITEM_CAST_ALL_TYPES_SWITCH, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_CAST_ALL_TYPES);
+
+        verifyStateChangeEventFor(TestRules.ITEM_SWITCH_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_SWITCH_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_NUMBER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_NUMBER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_QUANTITY_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_QUANTITY_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_DIMMER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_DIMMER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_COLOR_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_COLOR_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_STRING_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_STRING_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_DATETIME_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_DATETIME_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_PLAYER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_PLAYER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_CONTACT_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_ROLLERSHUTTER_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_ROLLERSHUTTER_TO_CAST);
+
+        verifyStateChangeEventFor(TestRules.ITEM_LOCATION_TO_CAST);
+        verifyCommandEventFor(TestRules.ITEM_LOCATION_TO_CAST);
+
+        verifyNoError();
+    }
+
+    @Test
+    public void triggerRuleFromRule() throws IOException {
+        sendCommand(TestRules.ITEM_RULE_FROM_RULE, JRuleSwitchItem.ON);
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_RULE_FROM_RULE);
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_ANOTHER_RULE);
+        verifyNoError();
+    }
+
+    @Test
+    public void nullTesting() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_NULL_TESTING);
+        verifyRuleWasExecuted(TestRules.NAME_NULL_TESTING);
+        verifyNoError();
     }
 }

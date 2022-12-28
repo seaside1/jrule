@@ -12,44 +12,77 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.trigger.JRulePlayerTrigger;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
- * The {@link JRulePlayerItem} Items
+ * The {@link JRulePlayerItem} JRule Item
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRulePlayerItem extends JRuleItem implements JRulePlayerTrigger {
+public interface JRulePlayerItem extends JRuleItem {
+    String PLAY = JRulePlayPauseValue.PLAY.stringValue();
+    String PAUSE = JRulePlayPauseValue.PAUSE.stringValue();
+    String NEXT = JRuleNextPreviousValue.NEXT.stringValue();
+    String PREVIOUS = JRuleNextPreviousValue.PREVIOUS.stringValue();
+    String REWIND = JRuleRewindFastforwardValue.REWIND.stringValue();
+    String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.stringValue();
 
-    protected JRulePlayerItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
+    static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
     }
 
-    public JRulePlayPauseValue getState() {
-        return JRuleEventHandler.get().getPauseValue(itemName);
+    /**
+     * Sends a play/pause command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRulePlayPauseValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public void sendCommand(JRulePlayPauseValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+    /**
+     * Sends a play/pause update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRulePlayPauseValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void postUpdate(JRulePlayPauseValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
+    /**
+     * Sends a rewind/fastforward update
+     *
+     * @param state update to send
+     */
+    default void postUpdate(JRuleRewindFastforwardValue state) {
+        postUncheckedUpdate(state);
     }
 
-    // Persistence method
-    public Optional<JRulePlayPauseValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(JRulePlayPauseValue::valueOf);
+    /**
+     * Sends a rewind/fastforward command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleRewindFastforwardValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    /**
+     * Sends a next/previous command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleNextPreviousValue command) {
+        sendUncheckedCommand(command);
+    }
+
+    default JRulePlayPauseValue getStateAsPlayPause() {
+        return JRuleEventHandler.get().getValue(getName(), JRulePlayPauseValue.class);
+    }
+
+    default JRuleRewindFastforwardValue getStateAsRewindFastforward() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleRewindFastforwardValue.class);
     }
 }

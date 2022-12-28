@@ -12,71 +12,39 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleColorValue;
-import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
- * The {@link JRuleColorItem} Items
+ * The {@link JRuleColorItem} JRule Item
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleColorItem extends JRuleItem {
-
-    protected JRuleColorItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleColorItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleColorItem extends JRuleDimmerItem {
+    static JRuleColorItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleColorItem.class);
     }
 
-    public JRuleColorValue getState() {
-        return JRuleEventHandler.get().getColorValue(itemName);
+    /**
+     * Sends a hsb command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleHsbValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public JRuleOnOffValue getOnOffState() {
-        return JRuleEventHandler.get().getOnOffValue(itemName);
+    /**
+     * Sends a hsb update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRuleHsbValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public int getPercentState() {
-        return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
-    }
-
-    public void sendCommand(JRuleColorValue colorValue) {
-        JRuleEventHandler.get().sendCommand(itemName, colorValue);
-    }
-
-    public void sendCommand(JRuleOnOffValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
-    }
-
-    public void sendCommand(JRuleIncreaseDecreaseValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
-    }
-
-    public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
-    }
-
-    public void postUpdate(JRuleColorValue colorValue) {
-        JRuleEventHandler.get().postUpdate(itemName, colorValue);
-    }
-
-    public void postUpdate(JRuleOnOffValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
-    }
-
-    public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
-    }
-
-    public Optional<String> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId);
+    default JRuleHsbValue getStateAsHsb() {
+        return JRuleEventHandler.get().getValue(getName(), JRuleHsbValue.class);
     }
 }

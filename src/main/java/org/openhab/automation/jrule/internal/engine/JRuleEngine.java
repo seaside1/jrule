@@ -170,13 +170,8 @@ public class JRuleEngine implements PropertyChangeListener {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
             addToContext(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, method,
                     jRuleWhen.item(), jRuleWhen.memberOf(),
-                    Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
-                    Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty)));
+                    Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -185,28 +180,20 @@ public class JRuleEngine implements PropertyChangeListener {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
             addToContext(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, method,
                     jRuleWhen.item(), jRuleWhen.memberOf(),
-                    Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
-                    Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty)));
+                    Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemChange.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
+            JRuleCondition jRulePreviousCondition = jRuleWhen.previousCondition();
             addToContext(new JRuleItemChangeExecutionContext(jRule, logName, loggingTags, method, jRuleWhen.item(),
                     jRuleWhen.memberOf(),
-                    Optional.of(jRuleCondition.lt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.lte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.gt()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.gte()).filter(aDouble -> aDouble != Double.MIN_VALUE),
-                    Optional.of(jRuleCondition.eq()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleCondition.neq()).filter(StringUtils::isNotEmpty), jRulePreconditionContexts,
-                    Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
+                    Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
+                    Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRulePreviousCondition)),
+                    jRulePreconditionContexts, Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
                     Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty)));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
@@ -476,8 +463,8 @@ public class JRuleEngine implements PropertyChangeListener {
         } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
             JRuleLog.error(logger, context.getMethod().getName(), "Error {}", e);
         } catch (InvocationTargetException e) {
-            Throwable ex = e.getCause() != null ? e.getCause() : null;
-            JRuleLog.error(logger, context.getMethod().getName(), "Error message", ex);
+            Throwable ex = e.getTargetException();
+            JRuleLog.error(logger, context.getMethod().getName(), "Error message: {}", ex.getMessage());
             JRuleLog.error(logger, context.getMethod().getName(), "Error Stacktrace: {}",
                     ExceptionUtils.getStackTrace(ex));
         } finally {

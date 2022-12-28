@@ -12,56 +12,89 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
-import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
+import org.openhab.automation.jrule.rules.value.*;
 
 /**
- * The {@link JRuleRollershutterItem} Items
+ * The {@link JRuleRollershutterItem} JRule Item
  *
- * @author Timo Litzius - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleRollershutterItem extends JRuleItem {
+public interface JRuleRollershutterItem extends JRuleItem {
+    String STOP = JRuleStopMoveValue.STOP.stringValue();
+    String MOVE = JRuleStopMoveValue.MOVE.stringValue();
+    String UP = JRuleUpDownValue.UP.stringValue();
+    String DOWN = JRuleUpDownValue.DOWN.stringValue();
 
-    protected JRuleRollershutterItem(String itemName) {
-        super(itemName);
-    }
-
-    public static JRuleRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
+    static JRuleRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleRollershutterItem.class);
     }
 
-    public int getState() {
-        return JRuleEventHandler.get().getStateFromItemAsInt(itemName);
+    /**
+     * Sends a percent command
+     * 
+     * @param command command to send.
+     */
+    default void sendCommand(JRulePercentValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public void sendCommand(JRuleUpDownValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+    /**
+     * Sends a percent update
+     * 
+     * @param state update to send
+     */
+    default void postUpdate(JRulePercentValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void sendCommand(JRuleStopMoveValue command) {
-        JRuleEventHandler.get().sendCommand(itemName, command);
+    /**
+     * Sends a percent command.
+     * 
+     * @param command as number via JRulePercentValue will be send.
+     */
+    default void sendCommand(int command) {
+        sendUncheckedCommand(new JRulePercentValue(command));
     }
 
-    public void sendCommand(int value) {
-        JRuleEventHandler.get().sendCommand(itemName, new JRulePercentType(value));
+    /**
+     * Sends a up/down command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleUpDownValue command) {
+        sendUncheckedCommand(command);
     }
 
-    public void postUpdate(JRuleUpDownValue state) {
-        JRuleEventHandler.get().postUpdate(itemName, state);
+    /**
+     * Sends a up/down update.
+     *
+     * @param state state to send.
+     */
+    default void postUpdate(JRuleUpDownValue state) {
+        postUncheckedUpdate(state);
     }
 
-    public void postUpdate(int value) {
-        JRuleEventHandler.get().postUpdate(itemName, new JRulePercentType(value));
+    /**
+     * Sends a stop/move command.
+     *
+     * @param command command to send.
+     */
+    default void sendCommand(JRuleStopMoveValue command) {
+        sendUncheckedCommand(command);
     }
 
-    // Persistence methods
-    public Optional<Integer> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(itemName, timestamp, persistenceServiceId)
-                .map(Integer::parseInt);
+    /**
+     * Sends a percent update.
+     * 
+     * @param state as number via JRulePercentValue will be send.
+     */
+    default void postUpdate(int state) {
+        postUncheckedUpdate(new JRulePercentValue(state));
+    }
+
+    default JRulePercentValue getStateAsPercent() {
+        return JRuleEventHandler.get().getValue(getName(), JRulePercentValue.class);
     }
 }
