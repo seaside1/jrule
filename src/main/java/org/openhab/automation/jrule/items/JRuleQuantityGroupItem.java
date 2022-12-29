@@ -41,11 +41,19 @@ public interface JRuleQuantityGroupItem extends JRuleQuantityItem, JRuleGroupIte
         memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
     }
 
+    default void sendCommand(int command, String unit) {
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
+    }
+
     default void postUpdate(JRuleQuantityValue state) {
         memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(double state, String unit) {
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
+    }
+
+    default void postUpdate(int state, String unit) {
         memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
     }
 }

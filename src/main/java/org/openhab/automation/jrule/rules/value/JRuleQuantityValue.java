@@ -18,6 +18,8 @@ import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
+import tech.units.indriya.format.SimpleUnitFormat;
+
 /**
  * The {@link JRuleQuantityValue}
  *
@@ -31,7 +33,7 @@ public class JRuleQuantityValue implements JRuleValue {
     }
 
     public JRuleQuantityValue(Number value, String unit) {
-        this.ohType = new QuantityType<>(value + unit);
+        this.ohType = new QuantityType<>(value, SimpleUnitFormat.getInstance().parse(unit));
     }
 
     @Override
