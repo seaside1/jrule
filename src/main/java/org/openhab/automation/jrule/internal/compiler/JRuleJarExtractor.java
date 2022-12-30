@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,16 @@ public class JRuleJarExtractor {
     public void extractJRuleJar(String jarFilePath) {
         try {
             final URL jarUrl = JRule.class.getProtectionDomain().getCodeSource().getLocation().toURI().toURL();
+            copyJRulesJarToFolder(jarUrl, jarFilePath);
+        } catch (MalformedURLException | URISyntaxException x) {
+            JRuleLog.error(logger, LOG_NAME_JAR, "Failed to extract jar due to uri exception jarFilePath: {} to: {}",
+                    jarFilePath, jarFilePath, x);
+        }
+    }
+
+    public void extractOpenhabCoreJar(String jarFilePath) {
+        try {
+            final URL jarUrl = State.class.getProtectionDomain().getCodeSource().getLocation().toURI().toURL();
             copyJRulesJarToFolder(jarUrl, jarFilePath);
         } catch (MalformedURLException | URISyntaxException x) {
             JRuleLog.error(logger, LOG_NAME_JAR, "Failed to extract jar due to uri exception jarFilePath: {} to: {}",
