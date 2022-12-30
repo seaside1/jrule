@@ -27,8 +27,8 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRuleContactItem extends JRuleItem {
-    String OPEN = JRuleOpenClosedValue.OPEN.stringValue();
-    String CLOSED = JRuleOpenClosedValue.CLOSED.stringValue();
+    String OPEN = "OPEN";
+    String CLOSED = "CLOSED";
 
     static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalContactItem.class);
@@ -40,7 +40,7 @@ public interface JRuleContactItem extends JRuleItem {
 
     /**
      * Sends a open/close update
-     * 
+     *
      * @param state update to send
      */
     default void postUpdate(JRuleOpenClosedValue state) {
