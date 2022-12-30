@@ -26,6 +26,7 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.openhab.automation.jrule.items.*;
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.items.JRuleContactItem;
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
@@ -217,7 +218,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        Set<JRuleItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItemsGeneric();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
@@ -228,14 +229,14 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems();
+        Set<JRuleItem> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItemsGeneric();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
         logInfo("contains members: {}", members.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
 
-        Set<JRuleItem> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems(true);
+        Set<JRuleItem> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItemsGeneric(true);
         if (recursiveMembers.size() != 4) {
             throw new JRuleExecutionException("expected 4 childs");
         }
@@ -479,21 +480,21 @@ public class TestRules extends JRule {
     }
 
     private static void castQuantity() {
-        JRuleNumberItem numberItem = JRuleNumberItem.forName(ITEM_QUANTITY_TO_CAST);
+        JRuleQuantityItem numberItem = JRuleQuantityItem.forName(ITEM_QUANTITY_TO_CAST);
 
-        numberItem.sendCommand(0);
-        assert numberItem.getStateAsDecimal().doubleValue() == 0;
-        assert numberItem.getStateAsDecimal().intValue() == 0;
-        assert numberItem.getStateAsDecimal().floatValue() == 0;
-        assert numberItem.getStateAsDecimal().doubleValue() == 0;
-        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+        numberItem.sendCommand(new JRuleQuantityValue("0 W"));
+        assert numberItem.getStateAsQuantity().doubleValue() == 0;
+        assert numberItem.getStateAsQuantity().intValue() == 0;
+        assert numberItem.getStateAsQuantity().floatValue() == 0;
+        assert numberItem.getStateAsQuantity().doubleValue() == 0;
+        assert numberItem.getStateAsQuantity().unit().equals("W");
 
-        numberItem.sendCommand(22);
-        assert numberItem.getStateAsDecimal().doubleValue() == 22;
-        assert numberItem.getStateAsDecimal().intValue() == 22;
-        assert numberItem.getStateAsDecimal().floatValue() == 22;
-        assert numberItem.getStateAsDecimal().doubleValue() == 22;
-        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+        numberItem.sendCommand(new JRuleQuantityValue("22 W"));
+        assert numberItem.getStateAsQuantity().doubleValue() == 22;
+        assert numberItem.getStateAsQuantity().intValue() == 22;
+        assert numberItem.getStateAsQuantity().floatValue() == 22;
+        assert numberItem.getStateAsQuantity().doubleValue() == 22;
+        assert numberItem.getStateAsQuantity().unit().equals("W");
     }
 
     private static void castSwitch() {

@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
 import org.openhab.automation.jrule.rules.value.*;
 
 /**
@@ -28,7 +32,11 @@ public interface JRuleRollershutterItem extends JRuleItem {
     String DOWN = JRuleUpDownValue.DOWN.stringValue();
 
     static JRuleRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleRollershutterItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalRollershutterItem.class);
+    }
+
+    static Optional<JRuleRollershutterItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

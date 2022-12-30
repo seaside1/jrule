@@ -13,10 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.NumberItem;
 
 /**
  * The {@link JRuleNumberGroupItemTest}
@@ -27,15 +23,5 @@ class JRuleNumberGroupItemTest extends JRuleNumberItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalNumberGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleDecimalValue(75);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new NumberItem("Name");
     }
 }

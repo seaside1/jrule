@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalLocationGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 
 /**
@@ -22,14 +26,18 @@ import org.openhab.automation.jrule.rules.value.JRulePointValue;
  */
 public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem {
     static JRuleLocationGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleLocationGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalLocationGroupItem.class);
+    }
+
+    static Optional<JRuleLocationGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRulePointValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePointValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

@@ -12,7 +12,14 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
@@ -22,22 +29,35 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  */
 public interface JRuleSwitchGroupItem extends JRuleSwitchItem, JRuleGroupItem {
     static JRuleSwitchGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleSwitchGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalSwitchGroupItem.class);
+    }
+
+    static Optional<JRuleSwitchGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
+    }
+
+    default Set<JRuleSwitchItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleSwitchItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream().map(i -> (JRuleSwitchItem) i)
+                .collect(Collectors.toSet());
     }
 
     default void sendCommand(JRuleOnOffValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleOnOffValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(boolean command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(JRuleOnOffValue.valueOf(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(JRuleOnOffValue.valueOf(command)));
     }
 
     default void postUpdate(boolean state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(JRuleOnOffValue.valueOf(state)));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(JRuleOnOffValue.valueOf(state)));
     }
 }

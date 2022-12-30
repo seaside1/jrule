@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 
 /**
@@ -22,22 +26,26 @@ import org.openhab.automation.jrule.rules.value.JRuleStringValue;
  */
 public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem {
     static JRuleStringGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleStringGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalStringGroupItem.class);
+    }
+
+    static Optional<JRuleStringGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRuleStringValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleStringValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(String command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
+        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
     }
 
     default void postUpdate(String state) {
-        memberItems().forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
+        memberItemsGeneric().forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
     }
 }
