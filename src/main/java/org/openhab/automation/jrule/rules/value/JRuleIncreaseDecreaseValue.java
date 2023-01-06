@@ -55,4 +55,9 @@ public enum JRuleIncreaseDecreaseValue implements JRuleValue {
     public State toOhState() {
         throw new IllegalStateException("not a state type");
     }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
+    }
 }

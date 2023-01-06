@@ -39,11 +39,6 @@ public enum JRuleRefreshValue implements JRuleValue {
     }
 
     @Override
-    public String toString() {
-        return name();
-    }
-
-    @Override
     public String stringValue() {
         return name();
     }
@@ -56,5 +51,10 @@ public enum JRuleRefreshValue implements JRuleValue {
     @Override
     public State toOhState() {
         throw new IllegalStateException("not a state type");
+    }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
     }
 }
