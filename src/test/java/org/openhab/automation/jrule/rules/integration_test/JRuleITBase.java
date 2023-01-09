@@ -92,19 +92,22 @@ public abstract class JRuleITBase {
                     "/mosquitto/config/mosquitto.conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/docker/mosquitto/default.acl"),
                     "/mosquitto/config/default.conf")
-            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*mosquitto version.*")).withNetwork(network);
+            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*mosquitto version.*")).withNetwork(network)
+            .withReuse(true);
 
     private static final ToxiproxyContainer toxiproxyContainer = new ToxiproxyContainer(
-            "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer);
+            "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer)
+                    .withReuse(true);
 
     private static final GenericContainer<?> influxDbContainer = new GenericContainer<>("influxdb:2.0")
             .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup").withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
             .withEnv("DOCKER_INFLUXDB_INIT_PASSWORD", "influxdb").withEnv("DOCKER_INFLUXDB_INIT_ORG", "openhab")
             .withEnv("DOCKER_INFLUXDB_INIT_BUCKET", "autogen").withEnv("DOCKER_INFLUXDB_INIT_RETENTION", "1w")
             .withEnv("DOCKER_INFLUXDB_INIT_ADMIN_TOKEN", "mytoken").withNetworkAliases("influxdb")
-            .withExposedPorts(8086).waitingFor(new LogMessageWaitStrategy()
+            .withExposedPorts(8086)
+            .waitingFor(new LogMessageWaitStrategy()
                     .withRegEx(".*service=tcp-listener transport=http addr=:8086 port=8086.*"))
-            .withNetwork(network);
+            .withNetwork(network).withReuse(true);
 
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
@@ -166,7 +169,7 @@ public abstract class JRuleITBase {
                                     }, s -> s > 0);
                         }
                     }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS)))
-            .withNetwork(network).dependsOn(influxDbContainer);
+            .withNetwork(network).dependsOn(influxDbContainer).withReuse(true);
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
     private @NotNull IMqttClient mqttClient;

@@ -17,17 +17,14 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.rules.value.JRuleRawValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.RawType;
 import org.openhab.core.persistence.HistoricItem;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
 import org.openhab.core.types.State;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRulePersistenceExtensions}
@@ -35,26 +32,13 @@ import org.slf4j.LoggerFactory;
  * @author Arne Seime - Initial contribution
  */
 class JRulePersistenceExtensions {
-
-    private final static Logger logger = LoggerFactory.getLogger(JRulePersistenceExtensions.class);
-    private static final String LOG_NAME_PERSISTENCE = "JRulePersistence";
-
-    public static Optional<String> historicState(String itemName, ZonedDateTime timestamp) {
+    public static Optional<JRuleValue> historicState(String itemName, ZonedDateTime timestamp) {
         return historicState(itemName, timestamp, null);
     }
 
-    public static Optional<String> historicState(String itemName, ZonedDateTime timestamp, String serviceId) {
-        return historicStateInternal(itemName, timestamp, serviceId).map(Object::toString);
-    }
-
-    public static Optional<JRuleRawValue> historicStateAsRawValue(String itemName, ZonedDateTime timestamp) {
-        return historicStateAsRawValue(itemName, timestamp, null);
-    }
-
-    public static Optional<JRuleRawValue> historicStateAsRawValue(String itemName, ZonedDateTime timestamp,
-            String serviceId) {
+    public static Optional<JRuleValue> historicState(String itemName, ZonedDateTime timestamp, String serviceId) {
         return historicStateInternal(itemName, timestamp, serviceId)
-                .map(state -> new JRuleRawValue(((RawType) state).getMimeType(), ((RawType) state).getBytes()));
+                .map(state -> JRuleEventHandler.get().toValue(state));
     }
 
     private static Optional<State> historicStateInternal(String itemName, ZonedDateTime timestamp, String serviceId) {
