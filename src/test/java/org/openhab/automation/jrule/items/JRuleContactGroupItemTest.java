@@ -12,22 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactGroupItem;
+
 /**
- * The {@link JRuleItemType} .
+ * The {@link JRuleContactGroupItemTest}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public enum JRuleItemType {
-    SWITCH,
-    CONTACT,
-    STRING,
-    ROLLERSHUTTER,
-    PLAYER,
-    NUMBER,
-    LOCATION,
-    IMAGE,
-    GROUP,
-    DIMMER,
-    DATETIME,
-    COLOR
+class JRuleContactGroupItemTest extends JRuleContactItemTest {
+    @Override
+    protected JRuleItem getJRuleItem() {
+        return new JRuleInternalContactGroupItem("Group", "Label", "Type", "Id");
+    }
 }

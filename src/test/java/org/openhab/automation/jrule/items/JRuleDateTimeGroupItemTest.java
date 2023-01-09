@@ -12,13 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
-
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.DateTimeItem;
 
 /**
  * The {@link JRuleDateTimeGroupItemTest}
@@ -29,15 +23,5 @@ class JRuleDateTimeGroupItemTest extends JRuleDateTimeItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalDateTimeGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleDateTimeValue(ZonedDateTime.now());
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new DateTimeItem("Name");
     }
 }

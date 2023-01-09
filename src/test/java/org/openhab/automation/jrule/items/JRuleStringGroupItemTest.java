@@ -12,16 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
 
 /**
- * The {@link JRuleSwitchGroupItemTest}
+ * The {@link JRuleStringGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRuleSwitchGroupItemTest extends JRuleSwitchItemTest {
+class JRuleStringGroupItemTest extends JRuleStringItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalSwitchGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalStringGroupItem("Group", "Label", "Type", "Id");
     }
 }

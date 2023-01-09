@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -29,7 +33,7 @@ import org.openhab.core.library.items.ColorItem;
 class JRuleColorItemTest extends JRuleItemTestBase {
 
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleColorItem item = (JRuleColorItem) getJRuleItem();
         item.sendCommand(new JRuleHsbValue(1, 2, 3));
 
@@ -59,11 +63,11 @@ class JRuleColorItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(7, item.getStateAsHsb().getBrightness().intValue());
 
         // verify event calls
-        verifyEventTypes(0, 4);
+        verifyEventTypes(testInfo, 0, 4);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleColorItem item = (JRuleColorItem) getJRuleItem();
         item.postUpdate(new JRuleHsbValue(1, 2, 3));
 
@@ -93,7 +97,7 @@ class JRuleColorItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(7, item.getStateAsHsb().getBrightness().intValue());
 
         // verify event calls
-        verifyEventTypes(4, 0);
+        verifyEventTypes(testInfo, 4, 0);
     }
 
     @Override
@@ -107,7 +111,51 @@ class JRuleColorItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new ColorItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new ColorItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleColorItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleColorItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleColorItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleColorItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    @Test
+    public void testForNameAsDimmer() {
+        Assertions.assertNotNull(JRuleDimmerItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleDimmerItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleDimmerItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleDimmerItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+
+        JRuleDimmerItem item = JRuleDimmerItem.forName(ITEM_NAME);
+        item.sendCommand(55);
+        Assertions.assertEquals(55, item.getStateAsPercent().intValue());
+        item.sendCommand(77);
+        Assertions.assertEquals(77, item.getStateAsPercent().intValue());
+    }
+
+    @Test
+    public void testForNameAsSwitch() {
+        Assertions.assertNotNull(JRuleSwitchItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleSwitchItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleSwitchItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+
+        JRuleSwitchItem item = JRuleSwitchItem.forName(ITEM_NAME);
+        item.sendCommand(false);
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAsOnOff());
+        item.sendCommand(true);
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAsOnOff());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleColorGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleColorGroupItem.forNameOptional(name);
     }
 }
