@@ -69,7 +69,8 @@ public class TestPersistence extends JRule {
         Optional<JRuleValue> historicState = jRuleItem.getHistoricState(ZonedDateTime.now().minusSeconds(1),
                 "influxdb");
         logInfo("{} before: {}", itemName, historicState.map(JRuleValue::stringValue).orElse("NULL"));
-        Optional<JRuleValue> initialState = jRuleItem.getHistoricState(ZonedDateTime.now().minusSeconds(10), "influxdb");
+        Optional<JRuleValue> initialState = jRuleItem.getHistoricState(ZonedDateTime.now().minusSeconds(10),
+                "influxdb");
         logInfo("{} initial: {}", itemName, initialState.map(JRuleValue::stringValue).orElse("NULL"));
     }
 }
