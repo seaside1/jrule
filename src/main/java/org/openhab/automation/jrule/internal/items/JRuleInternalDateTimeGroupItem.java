@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.items.JRuleDateTimeGroupItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.items.JRuleDateTimeGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalDateTimeGroupItem} Items
@@ -24,7 +25,8 @@ import java.util.Map;
  */
 public class JRuleInternalDateTimeGroupItem extends JRuleInternalDateTimeItem implements JRuleDateTimeGroupItem {
 
-    public JRuleInternalDateTimeGroupItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalDateTimeGroupItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 }

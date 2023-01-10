@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
@@ -33,10 +34,11 @@ public abstract class JRuleInternalItem implements JRuleItem {
     protected final String label;
     protected final String type;
     protected final String id;
-    protected final Map<String, String> metadata;
+    protected final Map<String, JRuleItemMetadata> metadata;
     protected final List<String> tags;
 
-    public JRuleInternalItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalItem(String name, String label, String type, String id, Map<String, JRuleItemMetadata> metadata,
+            List<String> tags) {
         this.name = name;
         this.label = label;
         this.type = type;
@@ -75,7 +77,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public Map<String, String> getMetadata() {
+    public Map<String, JRuleItemMetadata> getMetadata() {
         return metadata;
     }
 

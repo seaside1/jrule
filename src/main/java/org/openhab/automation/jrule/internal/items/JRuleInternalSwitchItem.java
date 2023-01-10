@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalSwitchItem} Items
@@ -23,7 +24,8 @@ import java.util.Map;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
-    public JRuleInternalSwitchItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalSwitchItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 }

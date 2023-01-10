@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -19,13 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalLocationItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.LocationItem;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * The {@link JRuleLocationItemTest}
@@ -73,7 +73,9 @@ class JRuleLocationItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalLocationItem("Name", "Label", "Type", "Id", Map.of(), List.of());
+        return new JRuleInternalLocationItem("Name", "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
     @Override

@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleDimmerGroupItemTest}
@@ -25,6 +26,8 @@ import java.util.Map;
 class JRuleDimmerGroupItemTest extends JRuleDimmerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDimmerGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
+        return new JRuleInternalDimmerGroupItem("Group", "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 }

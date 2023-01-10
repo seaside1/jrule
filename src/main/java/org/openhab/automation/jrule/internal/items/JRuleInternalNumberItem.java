@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.core.library.types.DecimalType;
 
 /**
@@ -27,7 +28,8 @@ import org.openhab.core.library.types.DecimalType;
  */
 public class JRuleInternalNumberItem extends JRuleInternalItem implements JRuleNumberItem {
 
-    public JRuleInternalNumberItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalNumberItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 

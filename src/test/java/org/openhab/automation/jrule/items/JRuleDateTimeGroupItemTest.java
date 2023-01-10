@@ -12,11 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleDateTimeGroupItemTest}
@@ -26,6 +26,8 @@ import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupIte
 class JRuleDateTimeGroupItemTest extends JRuleDateTimeItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDateTimeGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
+        return new JRuleInternalDateTimeGroupItem("Group", "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 }

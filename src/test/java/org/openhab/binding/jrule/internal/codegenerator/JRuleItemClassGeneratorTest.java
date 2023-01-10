@@ -34,8 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
@@ -119,7 +117,9 @@ public class JRuleItemClassGeneratorTest {
 
         MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
-        Mockito.when(metadataRegistry.stream()).thenAnswer(invocationOnMock -> Stream.of(new Metadata(new MetadataKey("Speech", "CallItem"), "some data", Map.of())));
+        Mockito.when(metadataRegistry.stream()).thenAnswer(
+                invocationOnMock -> Stream.of(new Metadata(new MetadataKey("Speech", "CallItemStringListType"),
+                        "some data", Map.of("location", "Livingroom"))));
 
         boolean success = sourceFileGenerator.generateItemsSource(items, metadataRegistry);
         assertTrue(success, "Failed to generate source file for items");

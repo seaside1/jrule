@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleRollershutterGroupItemTest}
@@ -25,6 +26,8 @@ import java.util.Map;
 class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
+        return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 }

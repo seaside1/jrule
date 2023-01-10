@@ -118,8 +118,9 @@ public class JRuleHandler implements PropertyChangeListener {
     private final JRuleDelayedDebouncingExecutor delayedItemsCompiler;
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, ThingRegistry thingRegistry,
-                        ThingManager thingManager, EventPublisher eventPublisher, JRuleEventSubscriber eventSubscriber,
-                        VoiceManager voiceManager, CronScheduler cronScheduler, BundleContext bundleContext, MetadataRegistry metadataRegistry) {
+            ThingManager thingManager, EventPublisher eventPublisher, JRuleEventSubscriber eventSubscriber,
+            VoiceManager voiceManager, CronScheduler cronScheduler, BundleContext bundleContext,
+            MetadataRegistry metadataRegistry) {
         this.itemRegistry = itemRegistry;
         this.thingRegistry = thingRegistry;
         this.metadataRegistry = metadataRegistry;

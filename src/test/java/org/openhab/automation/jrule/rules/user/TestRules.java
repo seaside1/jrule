@@ -111,6 +111,9 @@ public class TestRules extends JRule {
     public static final String COMMAND_TIMERS = "timers";
     public static final String NAME_DEBOUNCE = "debounce";
     public static final String COMMAND_DEBOUNCE = "debounce";
+    public static final String COMMAND_TAGS_AND_METADATA = "tags and metadata";
+    public static final String ITEM_DIMMER_WITH_TAGS_AND_METADATA = "Dimmer_With_Tags_And_Metadata";
+    public static final String NAME_TAGS_AND_METADATA = "tags and metadata";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -330,6 +333,16 @@ public class TestRules extends JRule {
     @JRuleDebounce(value = 2, unit = ChronoUnit.SECONDS)
     public void debounce(JRuleItemEvent event) throws JRuleExecutionException {
         logInfo("Counted debounces: '{}'", debounceCounter.getAndIncrement());
+    }
+
+    @JRuleName(NAME_TAGS_AND_METADATA)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TAGS_AND_METADATA))
+    public void getTagsAndMetadata() {
+        JRuleDimmerItem item = JRuleDimmerItem.forName(ITEM_DIMMER_WITH_TAGS_AND_METADATA);
+        logInfo("Tags: '{}'", item.getTags());
+        logInfo("Metadata: '{}'", item.getMetadata());
+        logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
+        logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
     }
 
     private static void castLocation() {

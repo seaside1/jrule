@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
@@ -47,7 +48,7 @@ public interface JRuleItem {
     String getId();
 
     @NonNullByDefault
-    Map<String, String> getMetadata();
+    Map<String, JRuleItemMetadata> getMetadata();
 
     @NonNullByDefault
     List<String> getTags();

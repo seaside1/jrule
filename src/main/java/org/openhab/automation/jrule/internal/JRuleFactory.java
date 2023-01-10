@@ -58,10 +58,10 @@ public class JRuleFactory {
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
-                        final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
-                        final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
-                        final @Reference VoiceManager voiceManager, final ComponentContext componentContext,
-                        final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry) {
+            final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
+            final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
+            final @Reference VoiceManager voiceManager, final ComponentContext componentContext,
+            final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();

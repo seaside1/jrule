@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleColorGroupItemTest}
@@ -25,6 +26,8 @@ import java.util.Map;
 class JRuleColorGroupItemTest extends JRuleColorItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalColorGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
+        return new JRuleInternalColorGroupItem("Group", "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 }

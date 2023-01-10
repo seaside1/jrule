@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.items.JRuleStringItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalStringItem} Items
@@ -24,7 +25,8 @@ import java.util.Map;
  */
 public class JRuleInternalStringItem extends JRuleInternalItem implements JRuleStringItem {
 
-    public JRuleInternalStringItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalStringItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 }

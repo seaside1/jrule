@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.items.JRuleColorGroupItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.items.JRuleColorGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalColorGroupItem} Items
@@ -24,7 +25,8 @@ import java.util.Map;
  */
 public class JRuleInternalColorGroupItem extends JRuleInternalColorItem implements JRuleColorGroupItem {
 
-    public JRuleInternalColorGroupItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalColorGroupItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 }

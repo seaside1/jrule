@@ -771,6 +771,22 @@ public void debounceMethod() {
 }
 ```
 
+## Example 39
+
+Use case: Get Tags and Metadata of Items
+
+```java
+@JRuleName(NAME_TAGS_AND_METADATA)
+@JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TAGS_AND_METADATA))
+public void getTagsAndMetadata() {
+    JRuleDimmerItem item = JRuleDimmerItem.forName(ITEM_DIMMER_WITH_TAGS_AND_METADATA);
+    logInfo("Tags: '{}'", item.getTags());
+    logInfo("Metadata: '{}'", item.getMetadata());
+    logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
+    logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
+}
+```
+
 # Changelog
 ## BETA15
 - BREAKING: All JRuleWhen has to be change to corresponding JRuleWhenItemChanged (as an example, look at JRule Examples documentation)

@@ -12,10 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.items.JRulePlayerGroupItem;
-
 import java.util.List;
 import java.util.Map;
+
+import org.openhab.automation.jrule.items.JRulePlayerGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalPlayerGroupItem} Items
@@ -24,7 +25,8 @@ import java.util.Map;
  */
 public class JRuleInternalPlayerGroupItem extends JRuleInternalPlayerItem implements JRulePlayerGroupItem {
 
-    public JRuleInternalPlayerGroupItem(String name, String label, String type, String id, Map<String, String> metadata, List<String> tags) {
+    public JRuleInternalPlayerGroupItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
         super(name, label, type, id, metadata, tags);
     }
 }

@@ -50,3 +50,5 @@ Dimmer          Dimmer_Event
 Color           Color_Event
 Location        Location_Event
 Number:Power    Quantity_Event
+
+Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }
