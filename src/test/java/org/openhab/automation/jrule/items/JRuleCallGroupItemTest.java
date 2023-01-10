@@ -16,10 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.CallItem;
 
 /**
  * The {@link JRuleCallGroupItemTest}
@@ -30,15 +26,5 @@ class JRuleCallGroupItemTest extends JRuleCallItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleStringListValue(List.of("123"));
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new CallItem("Name");
     }
 }

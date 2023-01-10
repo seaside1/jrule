@@ -193,17 +193,16 @@ public class JRuleEventHandler {
             if (item instanceof GroupItem) {
                 Set<JRuleItem> out = new HashSet<>();
                 GroupItem g = (GroupItem) item;
-                g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
-                        .forEach(jRuleValueJRuleItem -> {
-                            if (recursive) {
-                                out.add(jRuleValueJRuleItem);
-                                if (jRuleValueJRuleItem.isGroup()) {
-                                    out.addAll(getGroupMemberItems(jRuleValueJRuleItem.getName(), recursive));
-                                }
-                            } else {
-                                out.add(jRuleValueJRuleItem);
-                            }
-                        });
+                g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName())).forEach(jRuleItem -> {
+                    if (recursive) {
+                        out.add(jRuleItem);
+                        if (jRuleItem.isGroup()) {
+                            out.addAll(getGroupMemberItems(jRuleItem.getName(), recursive));
+                        }
+                    } else {
+                        out.add(jRuleItem);
+                    }
+                });
                 return out;
             } else {
                 throw new JRuleRuntimeException(String.format("Given itemname '%s' is not a groupitem", groupName));
@@ -270,7 +269,7 @@ public class JRuleEventHandler {
     }
 
     public JRuleValue toValue(State itemState) {
-        if (itemState instanceof UnDefType) {
+        if (itemState == null || itemState instanceof UnDefType) {
             return null;
         }
         Class<? extends JRuleValue> valueClass = stateMapping.entrySet().stream()

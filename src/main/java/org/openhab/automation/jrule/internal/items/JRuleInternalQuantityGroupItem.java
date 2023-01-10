@@ -10,21 +10,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.automation.jrule.items;
+package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
-
-import java.util.List;
-import java.util.Map;
+import org.openhab.automation.jrule.items.JRuleQuantityGroupItem;
 
 /**
- * The {@link JRuleNumberGroupItemTest}
+ * The {@link JRuleInternalColorGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRuleNumberGroupItemTest extends JRuleNumberItemTest {
-    @Override
-    protected JRuleItem getJRuleItem() {
-        return new JRuleInternalNumberGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
+public class JRuleInternalQuantityGroupItem extends JRuleInternalQuantityItem implements JRuleQuantityGroupItem {
+
+    public JRuleInternalQuantityGroupItem(String name, String label, String type, String id) {
+        super(name, label, type, id);
     }
 }

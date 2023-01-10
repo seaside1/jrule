@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalLocationItem;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -30,7 +34,7 @@ import java.util.Map;
  */
 class JRuleLocationItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleLocationItem item = (JRuleLocationItem) getJRuleItem();
         item.sendCommand(new JRulePointValue(12.2, 22.17));
 
@@ -45,11 +49,11 @@ class JRuleLocationItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(12.1, item.getStateAsPoint().getAltitude().doubleValue());
 
         // verify event calls
-        verifyEventTypes(0, 2);
+        verifyEventTypes(testInfo, 0, 2);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleLocationItem item = (JRuleLocationItem) getJRuleItem();
         item.postUpdate(new JRulePointValue(12.2, 22.17));
 
@@ -64,7 +68,7 @@ class JRuleLocationItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(12.1, item.getStateAsPoint().getAltitude().doubleValue());
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
@@ -78,7 +82,23 @@ class JRuleLocationItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new LocationItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new LocationItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleLocationItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleLocationItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleLocationItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleLocationItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleLocationGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleLocationGroupItem.forNameOptional(name);
     }
 }

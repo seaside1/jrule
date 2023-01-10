@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -31,6 +32,10 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 public interface JRuleItem {
     static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName);
+    }
+
+    static Optional<JRuleItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     String getName();

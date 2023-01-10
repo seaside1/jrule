@@ -13,10 +13,13 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -30,7 +33,7 @@ import org.openhab.core.library.items.CallItem;
  */
 class JRuleCallItemTest extends JRuleItemTestBase {
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleCallItem item = (JRuleCallItem) getJRuleItem();
         item.postUpdate(new JRuleStringListValue("123", "345"));
 
@@ -43,7 +46,7 @@ class JRuleCallItemTest extends JRuleItemTestBase {
         Assertions.assertEquals("999", item.getStateAsStringList().getValue(0));
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
@@ -57,7 +60,23 @@ class JRuleCallItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new CallItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new CallItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleCallItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleCallItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleCallItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleCallItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleCallGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleCallGroupItem.forNameOptional(name);
     }
 }

@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalImageItem;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -30,7 +34,7 @@ import java.util.Map;
  */
 class JRuleImageItemTest extends JRuleItemTestBase {
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleImageItem item = (JRuleImageItem) getJRuleItem();
         item.postUpdate(new JRuleRawValue("jpeg", new byte[16]));
 
@@ -39,7 +43,7 @@ class JRuleImageItemTest extends JRuleItemTestBase {
         Assertions.assertEquals("jpeg", item.getStateAsRaw().getMimeType());
 
         // verify event calls
-        verifyEventTypes(1, 0);
+        verifyEventTypes(testInfo, 1, 0);
     }
 
     @Override
@@ -53,7 +57,23 @@ class JRuleImageItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new ImageItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new ImageItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleImageItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleImageItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleImageItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleImageItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+        return (T) JRuleImageGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleImageGroupItem.forNameOptional(name);
     }
 }

@@ -23,10 +23,13 @@ import org.openhab.core.events.AbstractEvent;
  */
 public class JRuleLocalTimerExecutionContext extends JRuleExecutionContext {
 
+    private JRuleExecutionContext parentContext;
     private String timerName;
 
     public JRuleLocalTimerExecutionContext(JRuleExecutionContext parentContext, String timerName) {
-        super(parentContext.getRule(), parentContext.getLogName(), null, null, null);
+        super(parentContext.getRule(), parentContext.getLogName(), parentContext.getLoggingTags(),
+                parentContext.getMethod(), parentContext.getPreconditionContextList(), null);
+        this.parentContext = parentContext;
         this.timerName = timerName;
     }
 
@@ -37,7 +40,7 @@ public class JRuleLocalTimerExecutionContext extends JRuleExecutionContext {
 
     @Override
     public String getLogName() {
-        return super.getLogName() + "/" + timerName;
+        return parentContext.getLogName() + " / " + timerName;
     }
 
     @Override

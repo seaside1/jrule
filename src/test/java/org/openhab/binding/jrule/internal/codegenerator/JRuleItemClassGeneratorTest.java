@@ -103,6 +103,7 @@ public class JRuleItemClassGeneratorTest {
         generateAndCompile(decorate(new GroupItem("LocationGroup", new LocationItem("LocationItem"))));
         generateAndCompile(decorate(new GroupItem("CallGroup", new CallItem("CallItem"))));
         generateAndCompile(decorate(new GroupItem("ImageGroup", new ImageItem("ImageItem"))));
+        generateAndCompile(decorate(new GroupItem("UnspecifiedGroup")));
     }
 
     private Item decorate(GenericItem item) {
@@ -155,7 +156,12 @@ public class JRuleItemClassGeneratorTest {
         Assertions.assertEquals(itemName, getName.invoke(item));
 
         Method getState = item.getClass().getMethod("getState");
-        Assertions.assertNotNull(getState.invoke(item));
+        // just named group is unspecified without a state
+        if (itemName.equals("Group")) {
+            Assertions.assertNull(getState.invoke(item));
+        } else {
+            Assertions.assertNotNull(getState.invoke(item));
+        }
     }
 
     private void generateAndCompile(Item item) {

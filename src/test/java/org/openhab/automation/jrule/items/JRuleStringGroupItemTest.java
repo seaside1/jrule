@@ -12,19 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
-import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
-
-import java.util.List;
-import java.util.Map;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
 
 /**
- * The {@link JRuleRollershutterGroupItemTest}
+ * The {@link JRuleStringGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
+class JRuleStringGroupItemTest extends JRuleStringItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
+        return new JRuleInternalStringGroupItem("Group", "Label", "Type", "Id");
     }
 }

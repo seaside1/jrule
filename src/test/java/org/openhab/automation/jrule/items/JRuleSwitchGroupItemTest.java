@@ -13,10 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.SwitchItem;
 
 import java.util.List;
 import java.util.Map;
@@ -30,15 +26,5 @@ class JRuleSwitchGroupItemTest extends JRuleSwitchItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalSwitchGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return JRuleOnOffValue.ON;
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new SwitchItem("Name");
     }
 }

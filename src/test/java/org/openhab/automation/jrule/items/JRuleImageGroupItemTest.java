@@ -13,10 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalImageGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleRawValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.ImageItem;
 
 import java.util.List;
 import java.util.Map;
@@ -30,15 +26,5 @@ class JRuleImageGroupItemTest extends JRuleImageItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalImageGroupItem("Group", "Label", "Type", "Id", Map.of(), List.of());
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleRawValue("jpeg", new byte[16]);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new ImageItem("Name");
     }
 }

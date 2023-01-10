@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactItem;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
@@ -26,7 +30,11 @@ public interface JRuleContactItem extends JRuleItem {
     String CLOSED = JRuleOpenClosedValue.CLOSED.stringValue();
 
     static JRuleContactItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleContactItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalContactItem.class);
+    }
+
+    static Optional<JRuleContactItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

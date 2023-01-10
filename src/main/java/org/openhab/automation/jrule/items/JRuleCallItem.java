@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalCallItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 
 /**
@@ -23,7 +27,11 @@ import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
  */
 public interface JRuleCallItem extends JRuleItem {
     static JRuleCallItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleCallItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalCallItem.class);
+    }
+
+    static Optional<JRuleCallItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

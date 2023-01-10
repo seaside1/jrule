@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
@@ -26,7 +30,11 @@ public interface JRuleSwitchItem extends JRuleItem {
     String OFF = "OFF";
 
     static JRuleSwitchItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleSwitchItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalSwitchItem.class);
+    }
+
+    static Optional<JRuleSwitchItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

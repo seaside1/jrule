@@ -306,7 +306,7 @@ Use case create a timer for automatically turning off a light when it is turned 
     @JRuleWhenItemChange(item = _MyLightSwitch.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void myTimerRule(JRuleEvent event) {
         logInfo("Turning on light it will be turned off in 2 mins");
-        createOrReplaceTimer(_MyLightSwitch.ITEM, 2 * 60, (Void) -> { // Lambda Expression
+        createOrReplaceTimer(_MyLightSwitch.ITEM, Duration.ofMinutes(2), () -> { // Lambda Expression
             logInfo("Time is up! Turning off lights");
             JRuleItems.MyLightSwitch.sendCommand(OFF);
         });
@@ -323,7 +323,7 @@ to send multiple ON statements to be sure it actually turns on.
     @JRuleName("repeatRuleExample")
     @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void repeatRuleExample(JRuleEvent event) {
-        createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 10, (Void) -> { // Lambda Expression
+        createOrReplaceRepeatingTimer("myRepeatingTimer", 7, Duration.ofSeconds(10), () -> { // Lambda Expression
             final String messageOn = "repeatRuleExample Repeating.....";
             logInfo(messageOn);
             JRuleItems.MyBad433Switch.sendCommand(ON);
@@ -339,7 +339,7 @@ it will not reschedule the timer, if the timer is already running it won't resch
     @JRuleName("timerRuleExample")
     @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
     public synchronized void timerRuleExample(JRuleEvent event) {
-        createTimer("myTimer", 10, (Void) -> { // Lambda Expression
+        createTimer("myTimer", Duration.ofSeconds(10), () -> { // Lambda Expression
             final String messageOn = "timer example.";
             logInfo(messageOn);
             JRuleItems.MyTestWitch2.sendCommand(ON);
@@ -597,6 +597,20 @@ Use case: Use forName to create and item and send commands and get status
     }
  }
 ```
+# Example 27b
+
+Use case: Use forNameOptional to create and item and send commands and get status
+
+```java
+ public class ForNameExampleRule extends JRule {
+  
+    @JRuleName("testForNameOptional")
+    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    public void testForName(JRuleEvent event) {
+        JRuleSwitchItem.forNameOptional("MyOtherTestSwitch").ifPresent(item -> item.sendCommand(true));
+    }
+ }
+```
 
 # Example 28
 
@@ -666,7 +680,7 @@ Use case: Detect if a specific thing goes offline, wait for it to come online ag
 @JRuleName("Notify if thing stays offline")
 @JRuleWhenThingTrigger(thing = remoteopenhab_thing.ID, from = JRuleThingStatus.ONLINE)
 public void warnIfThingStaysOffline() {
-    createOrReplaceTimer("MY_TIMER", 3 * 60, unused -> {
+    createOrReplaceTimer("MY_TIMER", Duration.ofMinutes(3), () -> {
         if (JRuleThings.remoteopenhab_thing.getStatus() != JRuleThingStatus.ONLINE) {
             logWarn("Thing {} is still offline, restarting",remoteopenhab_thing.ID);
             JRuleThings.remoteopenhab_thing.restart();
@@ -713,6 +727,48 @@ Use case: Want to listen on all Item events of a group (without the groupstate m
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
     }
+```
+
+## Example 36
+
+Use case: Want to listen just on changes where the state is now greater/equals then 12 and was before less then 12.
+    Without the previous condition the rule will be triggered every time the state is greater/equals then 12.
+
+```java
+    @JRuleName("Change from something less to something greater")
+    @JRuleWhenItemChange(item = ITEM_FROM_TO, previousCondition = @JRuleCondition(lt = 12), condition = @JRuleCondition(gte = 12))
+    public void itemChangeFromTo(JRuleEvent event) {
+        logInfo("state change to something >= 12 and was before < 12");
+    }
+```
+
+## Example 37
+
+Use case: Chain timers. Execute one and after this is expired, execute the next one.
+
+```java
+@JRuleName("Notify if thing stays offline")
+@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+public void chainSomeTimers() {
+    createTimer(Duration.ofSeconds(3), () -> {
+        logInfo("First timer finished after 3 seconds");
+    }).createTimerAfter(Duration.ofSeconds(10), () -> {
+        logInfo("Second timer finished after 10 more seconds");
+    });
+}
+```
+
+## Example 38
+
+Use case: Do not execute a rule too often
+
+```java
+@JRuleDebounce(10)
+@JRuleName("Notify if thing stays offline")
+@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+public void debounceMethod() {
+    // super critical stuff which shouldn't be called too often
+}
 ```
 
 # Changelog

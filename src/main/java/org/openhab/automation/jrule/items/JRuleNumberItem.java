@@ -15,12 +15,11 @@ package org.openhab.automation.jrule.items;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import javax.measure.Unit;
-
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalNumberItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
-import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 
 /**
  * The {@link JRuleNumberItem} JRule Item
@@ -29,7 +28,11 @@ import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
  */
 public interface JRuleNumberItem extends JRuleItem {
     static JRuleNumberItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleNumberItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalNumberItem.class);
+    }
+
+    static Optional<JRuleNumberItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**
@@ -47,24 +50,6 @@ public interface JRuleNumberItem extends JRuleItem {
      * @param state update to send
      */
     default void postUpdate(JRuleDecimalValue state) {
-        postUncheckedUpdate(state);
-    }
-
-    /**
-     * Sends a quantity command.
-     *
-     * @param command command to send
-     */
-    default void sendCommand(JRuleQuantityValue<?> command) {
-        sendUncheckedCommand(command);
-    }
-
-    /**
-     * Sends a quantity update.
-     *
-     * @param state state to send.
-     */
-    default void postUpdate(JRuleQuantityValue<?> state) {
         postUncheckedUpdate(state);
     }
 
@@ -87,16 +72,6 @@ public interface JRuleNumberItem extends JRuleItem {
     }
 
     /**
-     * Sends a number command with the given unit.
-     *
-     * @param command as number via JRuleDecimalValue will be send.
-     * @param unit unit as string
-     */
-    default void sendCommand(double command, Unit<?> unit) {
-        sendUncheckedCommand(new JRuleQuantityValue<>(command, unit));
-    }
-
-    /**
      * Sends a number update.
      *
      * @param value as number via JRuleDecimalValue will be send.
@@ -112,16 +87,6 @@ public interface JRuleNumberItem extends JRuleItem {
      */
     default void postUpdate(int state) {
         postUncheckedUpdate(new JRuleDecimalValue(state));
-    }
-
-    /**
-     * Sends a number command with the given unit.
-     *
-     * @param state as number via JRuleDecimalValue will be send.
-     * @param unit unit as string
-     */
-    default void postUpdate(double state, Unit<?> unit) {
-        postUncheckedUpdate(new JRuleQuantityValue<>(state, unit));
     }
 
     default Optional<Double> maximumSince(ZonedDateTime timestamp) {
@@ -162,9 +127,5 @@ public interface JRuleNumberItem extends JRuleItem {
 
     default JRuleDecimalValue getStateAsDecimal() {
         return JRuleEventHandler.get().getValue(getName(), JRuleDecimalValue.class);
-    }
-
-    default JRuleQuantityValue getStateAsQuantity() {
-        return JRuleEventHandler.get().getValue(getName(), JRuleQuantityValue.class);
     }
 }
