@@ -56,9 +56,11 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     }
 
     public static class JRuleAdditionalItemCheckData extends JRuleAdditionalCheckData {
+        private final boolean group;
         private final List<String> belongingGroups;
 
-        public JRuleAdditionalItemCheckData(List<String> belongingGroups) {
+        public JRuleAdditionalItemCheckData(boolean group, List<String> belongingGroups) {
+            this.group = group;
             this.belongingGroups = belongingGroups;
         }
 
@@ -66,9 +68,13 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
             return belongingGroups;
         }
 
+        public boolean isGroup() {
+            return group;
+        }
+
         @Override
         public String toString() {
-            return "JRuleAdditionalItemCheckData{" + "belongingGroups=" + belongingGroups + '}';
+            return "JRuleAdditionalItemCheckData{" + "group=" + group + ", belongingGroups=" + belongingGroups + '}';
         }
     }
 

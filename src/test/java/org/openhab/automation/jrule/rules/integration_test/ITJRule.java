@@ -104,6 +104,20 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void triggerJustItems() throws IOException {
+        sendCommand(TestRules.ITEM_STRING_GROUP_MEMBER_1, "123");
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_JUST_ITEMS);
+        verifyRuleWasNotExecuted(TestRules.NAME_TRIGGER_JUST_GROUPS);
+    }
+
+    @Test
+    public void triggerJustGroups() throws IOException {
+        sendCommand(TestRules.ITEM_STRING_GROUP_MEMBER, "234");
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_JUST_GROUPS);
+        verifyRuleWasNotExecuted(TestRules.NAME_TRIGGER_JUST_ITEMS);
+    }
+
+    @Test
     public void memberOfGroupReceivedUpdate() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE);

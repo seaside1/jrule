@@ -27,39 +27,40 @@ import org.openhab.automation.jrule.rules.event.JRuleEvent;
 public class JRuleGroupItemChangeRules extends JRule {
 
     public static final String GROUP_ITEM = "group_item";
+    public static final String SUB_GROUP_ITEM = "sub_group_item";
     public static final String GROUP_ITEM_JUST_ITEMS = "group_item_just_items";
     public static final String GROUP_ITEM_JUST_GROUPS = "group_item_just_groups";
     public static final String GROUP_ITEM_FROM = "group_item_from";
     public static final String GROUP_ITEM_TO = "group_item_to";
     public static final String GROUP_ITEM_FROM_TO = "group_item_from_to";
 
-//    @JRuleName("Test JRuleWhenGroupItemChange")
-//    @JRuleWhenItemChange(item = GROUP_ITEM, memberOf = JRuleMemberOf.All)
-//    public void groupItemChange(JRuleEvent event) {
-//    }
+    @JRuleName("Test JRuleWhenGroupItemChange")
+    @JRuleWhenItemChange(item = GROUP_ITEM, memberOf = JRuleMemberOf.All)
+    public void groupItemChange(JRuleEvent event) {
+    }
 
     @JRuleName("Test JRuleWhenGroupItemChange/JustItems")
     @JRuleWhenItemChange(item = GROUP_ITEM_JUST_ITEMS, memberOf = JRuleMemberOf.Items)
     public void groupItemChangeJustItems(JRuleEvent event) {
     }
 
-//    @JRuleName("Test JRuleWhenGroupItemChange/JustGroups")
-//    @JRuleWhenItemChange(item = GROUP_ITEM_JUST_GROUPS, memberOf = JRuleMemberOf.Groups)
-//    public void groupItemChangeJustGroups(JRuleEvent event) {
-//    }
-//
-//    @JRuleName("Test JRuleWhenGroupItemChange/from")
-//    @JRuleWhenItemChange(item = GROUP_ITEM_FROM, from = "1", memberOf = JRuleMemberOf.All)
-//    public void groupItemChangeFrom(JRuleEvent event) {
-//    }
-//
-//    @JRuleName("Test JRuleWhenGroupItemChange/to")
-//    @JRuleWhenItemChange(item = GROUP_ITEM_TO, to = "1", memberOf = JRuleMemberOf.All)
-//    public void groupItemChangeTo(JRuleEvent event) {
-//    }
-//
-//    @JRuleName("Test JRuleWhenGroupItemChange/from/to")
-//    @JRuleWhenItemChange(item = GROUP_ITEM_FROM_TO, from = "1", to = "2", memberOf = JRuleMemberOf.All)
-//    public void groupItemChangeFromTo(JRuleEvent event) {
-//    }
+    @JRuleName("Test JRuleWhenGroupItemChange/JustGroups")
+    @JRuleWhenItemChange(item = GROUP_ITEM_JUST_GROUPS, memberOf = JRuleMemberOf.Groups)
+    public void groupItemChangeJustGroups(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemChange/from")
+    @JRuleWhenItemChange(item = GROUP_ITEM_FROM, from = "1", memberOf = JRuleMemberOf.All)
+    public void groupItemChangeFrom(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemChange/to")
+    @JRuleWhenItemChange(item = GROUP_ITEM_TO, to = "1", memberOf = JRuleMemberOf.All)
+    public void groupItemChangeTo(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemChange/from/to")
+    @JRuleWhenItemChange(item = GROUP_ITEM_FROM_TO, from = "1", to = "2", memberOf = JRuleMemberOf.All)
+    public void groupItemChangeFromTo(JRuleEvent event) {
+    }
 }

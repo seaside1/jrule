@@ -26,7 +26,6 @@ import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEvent;
-import org.openhab.core.items.events.ItemStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,14 +59,14 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
             return true;
         }
         if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData) {
+            JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
             switch (getMemberOf()) {
                 case All:
                     return true;
                 case Groups:
-                    return ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName());
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
                 case Items:
-                    return !((JRuleAdditionalItemCheckData) checkData).getBelongingGroups()
-                            .contains(this.getItemName());
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && !itemCheckData.isGroup();
                 default:
                     return false;
             }
@@ -88,7 +87,7 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
         }
 
         return new JRuleItemEvent(itemName, memberName,
-                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null);
+                JRuleEventHandler.get().toValue(((ItemCommandEvent) event).getItemCommand()), null);
     }
 
     @Override

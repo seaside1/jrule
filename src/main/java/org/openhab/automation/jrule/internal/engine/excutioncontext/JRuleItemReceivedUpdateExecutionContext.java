@@ -57,14 +57,14 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
             return true;
         }
         if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData) {
+            JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
             switch (getMemberOf()) {
                 case All:
                     return true;
                 case Groups:
-                    return ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName());
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
                 case Items:
-                    return !((JRuleAdditionalItemCheckData) checkData).getBelongingGroups()
-                            .contains(this.getItemName());
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && !itemCheckData.isGroup();
                 default:
                     return false;
             }

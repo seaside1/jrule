@@ -29,6 +29,7 @@ import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.events.ItemEventFactory;
+import org.openhab.core.library.CoreItemFactory;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.types.StringType;
 
@@ -50,28 +51,29 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
                 .then((Answer<Item>) invocationOnMock -> new StringItem(invocationOnMock.getArgument(0)));
     }
 
-//    @Test
-//    public void testItemChange_selfGroup() {
-//        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-//        // Only last event should trigger rule method
-//        fireEvents(List.of(itemChangeEvent(JRuleGroupItemChangeRules.GROUP_ITEM, "2", "1")));
-//        verify(rule, times(0)).groupItemChange(Mockito.any(JRuleEvent.class));
-//    }
-//
-//    @Test
-//    public void testItemChange_no_from_to() throws ItemNotFoundException {
-//        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
-//            StringItem stringItem = Mockito.mock(StringItem.class);
-//            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
-//            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM));
-//            return stringItem;
-//        });
-//
-//        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-//        // Only last event should trigger rule method
-//        fireEvents(List.of(itemChangeEvent(OTHER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
-//        verify(rule, times(1)).groupItemChange(Mockito.any(JRuleEvent.class));
-//    }
+    @Test
+    public void testItemChange_selfGroup() {
+        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(List.of(itemChangeEvent(JRuleGroupItemChangeRules.GROUP_ITEM, "2", "1")));
+        verify(rule, times(0)).groupItemChange(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
+    public void testItemChange_no_from_to() throws ItemNotFoundException {
+        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
+            StringItem stringItem = Mockito.mock(StringItem.class);
+            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
+            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM));
+            Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
+            return stringItem;
+        });
+
+        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(List.of(itemChangeEvent(OTHER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
+        verify(rule, times(1)).groupItemChange(Mockito.any(JRuleEvent.class));
+    }
 
     @Test
     public void testItemChangeJustItems() throws ItemNotFoundException {
@@ -80,80 +82,87 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
             Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
             Mockito.when(stringItem.getGroupNames())
                     .thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_ITEMS));
+            Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
             return stringItem;
         });
         Mockito.when(itemRegistry.getItem(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_ITEMS))
-                .thenAnswer(invocationOnMock -> new StringItem("Any"));
+                .thenAnswer(invocationOnMock -> new GroupItem(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_ITEMS,
+                        new StringItem("Any")));
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1")));
-//        verify(rule, times(0)).groupItemChangeJustGroups(Mockito.any(JRuleEvent.class));
+        verify(rule, times(0)).groupItemChangeJustGroups(Mockito.any(JRuleEvent.class));
         verify(rule, times(1)).groupItemChangeJustItems(Mockito.any(JRuleEvent.class));
     }
 
-//    @Test
-//    public void testItemChangeJustGroups() throws ItemNotFoundException {
-//        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
-//            StringItem stringItem = Mockito.mock(StringItem.class);
-//            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
-//            Mockito.when(stringItem.getGroupNames())
-//                    .thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_GROUPS));
-//            return stringItem;
-//        });
-//        Mockito.when(itemRegistry.getItem(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_GROUPS))
-//                .thenAnswer(invocationOnMock -> new GroupItem(invocationOnMock.getArgument(0), new StringItem("Any")));
-//
-//        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-//        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1")));
-//        verify(rule, times(1)).groupItemChangeJustGroups(Mockito.any(JRuleEvent.class));
-//        verify(rule, times(0)).groupItemChangeJustItems(Mockito.any(JRuleEvent.class));
-//    }
-//
-//    @Test
-//    public void testItemChange_from() throws ItemNotFoundException {
-//        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
-//            StringItem stringItem = Mockito.mock(StringItem.class);
-//            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
-//            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_FROM));
-//            return stringItem;
-//        });
-//
-//        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-//        // Only last event should trigger rule method
-//        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "1", "2")));
-//        verify(rule, times(1)).groupItemChangeFrom(Mockito.any(JRuleEvent.class));
-//    }
-//
-//    @Test
-//    public void testItemChange_to() throws ItemNotFoundException {
-//        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
-//            StringItem stringItem = Mockito.mock(StringItem.class);
-//            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
-//            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_TO));
-//            return stringItem;
-//        });
-//
-//        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-//        // Only last event should trigger rule method
-//        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "1", "2"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
-//        verify(rule, times(1)).groupItemChangeTo(Mockito.any(JRuleEvent.class));
-//    }
-//
-//    @Test
-//    public void testItemChange_from_to() throws ItemNotFoundException {
-//        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
-//            StringItem stringItem = Mockito.mock(StringItem.class);
-//            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
-//            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_FROM_TO));
-//            return stringItem;
-//        });
-//
-//        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-//        // Only last event should trigger rule method
-//        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "3", "2"),
-//                itemChangeEvent(MEMBER_ITEM, "1", "2")));
-//        verify(rule, times(1)).groupItemChangeFromTo(Mockito.any(JRuleEvent.class));
-//    }
+    @Test
+    public void testItemChangeJustGroups() throws ItemNotFoundException {
+        Mockito.when(itemRegistry.getItem(JRuleGroupItemChangeRules.SUB_GROUP_ITEM))
+                .then((Answer<Item>) invocationOnMock -> {
+                    GroupItem groupItem = Mockito.mock(GroupItem.class);
+                    Mockito.when(groupItem.getName()).thenReturn(invocationOnMock.getArgument(0));
+                    Mockito.when(groupItem.getGroupNames())
+                            .thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_GROUPS));
+                    Mockito.when(groupItem.getType()).thenReturn(GroupItem.TYPE);
+                    return groupItem;
+                });
+        Mockito.when(itemRegistry.getItem(JRuleGroupItemChangeRules.GROUP_ITEM_JUST_GROUPS))
+                .thenAnswer(invocationOnMock -> new GroupItem(invocationOnMock.getArgument(0), new StringItem("Any")));
+
+        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
+        fireEvents(List.of(itemChangeEvent(JRuleGroupItemChangeRules.SUB_GROUP_ITEM, "2", "1")));
+        verify(rule, times(1)).groupItemChangeJustGroups(Mockito.any(JRuleEvent.class));
+        verify(rule, times(0)).groupItemChangeJustItems(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
+    public void testItemChange_from() throws ItemNotFoundException {
+        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
+            StringItem stringItem = Mockito.mock(StringItem.class);
+            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
+            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_FROM));
+            Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
+            return stringItem;
+        });
+
+        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "1", "2")));
+        verify(rule, times(1)).groupItemChangeFrom(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
+    public void testItemChange_to() throws ItemNotFoundException {
+        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
+            StringItem stringItem = Mockito.mock(StringItem.class);
+            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
+            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_TO));
+            Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
+            return stringItem;
+        });
+
+        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "1", "2"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
+        verify(rule, times(1)).groupItemChangeTo(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
+    public void testItemChange_from_to() throws ItemNotFoundException {
+        Mockito.when(itemRegistry.getItem(MEMBER_ITEM)).then((Answer<Item>) invocationOnMock -> {
+            StringItem stringItem = Mockito.mock(StringItem.class);
+            Mockito.when(stringItem.getName()).thenReturn(invocationOnMock.getArgument(0));
+            Mockito.when(stringItem.getGroupNames()).thenReturn(List.of(JRuleGroupItemChangeRules.GROUP_ITEM_FROM_TO));
+            Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
+            return stringItem;
+        });
+
+        JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "3", "2"),
+                itemChangeEvent(MEMBER_ITEM, "1", "2")));
+        verify(rule, times(1)).groupItemChangeFromTo(Mockito.any(JRuleEvent.class));
+    }
 
     // Syntactic sugar
     private Event itemChangeEvent(String item, String from, String to) {

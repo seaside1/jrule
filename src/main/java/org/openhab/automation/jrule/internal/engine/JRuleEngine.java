@@ -73,9 +73,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.scheduler.CronScheduler;
@@ -280,8 +278,9 @@ public class JRuleEngine implements PropertyChangeListener {
             } catch (ItemNotFoundException e) {
                 throw new IllegalStateException("this can never occur", e);
             }
-        }).map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getGroupNames()))
-                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(List.of()));
+        }).map(item -> new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(item.getType().equals(GroupItem.TYPE),
+                item.getGroupNames()))
+                .orElse(new JRuleItemExecutionContext.JRuleAdditionalItemCheckData(false, List.of()));
     }
 
     private Item getItem(String name) {
