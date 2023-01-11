@@ -111,6 +111,8 @@ public class TestRules extends JRule {
     public static final String COMMAND_TIMERS = "timers";
     public static final String NAME_DEBOUNCE = "debounce";
     public static final String COMMAND_DEBOUNCE = "debounce";
+    public static final String COMMAND_DELAYED = "delayed";
+    public static final String NAME_DELAYED = "delayed";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -268,6 +270,12 @@ public class TestRules extends JRule {
         castDimmer();
         castColor();
         castLocation();
+    }
+
+    @JRuleName(NAME_DELAYED)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, command = COMMAND_DELAYED)
+    public void delayed() {
+        logInfo("delayed execution: ", ZonedDateTime.now());
     }
 
     @JRuleName(NAME_TRIGGER_RULE_FROM_RULE)

@@ -33,15 +33,17 @@ public abstract class JRuleExecutionContext {
     protected final String[] loggingTags;
     protected final List<JRulePreconditionContext> preconditionContextList;
     protected final Duration timedLock;
+    private final Duration delayed;
 
     public JRuleExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList, Duration timedLock) {
+            List<JRulePreconditionContext> preconditionContextList, Duration timedLock, Duration delayed) {
         this.logName = logName;
         this.loggingTags = loggingTags;
         this.rule = rule;
         this.method = method;
         this.preconditionContextList = preconditionContextList;
         this.timedLock = timedLock;
+        this.delayed = delayed;
     }
 
     public JRule getRule() {
@@ -82,6 +84,10 @@ public abstract class JRuleExecutionContext {
 
     public Duration getTimedLock() {
         return timedLock;
+    }
+
+    public Duration getDelayed() {
+        return delayed;
     }
 
     public static class JRuleAdditionalCheckData {

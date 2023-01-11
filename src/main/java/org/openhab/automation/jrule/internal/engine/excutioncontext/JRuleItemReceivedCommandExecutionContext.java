@@ -39,9 +39,10 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock) {
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock,
+            Duration delayed) {
         super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
-                timedLock);
+                timedLock, delayed);
         this.command = command;
     }
 

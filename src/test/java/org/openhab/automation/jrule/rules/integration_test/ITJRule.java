@@ -161,6 +161,12 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void delayed() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DELAYED);
+        verifyRuleWasExecuted(TestRules.NAME_DELAYED);
+    }
+
+    @Test
     public void castAllTypes() throws IOException {
         sendCommand(TestRules.ITEM_CAST_ALL_TYPES_SWITCH, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_CAST_ALL_TYPES);
