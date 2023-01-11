@@ -12,15 +12,16 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.items.JRuleQuantityGroupItem;
 
 /**
- * The {@link JRuleInternalSwitchItem} Items
+ * The {@link JRuleInternalColorGroupItem} Items
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück - Initial contribution
  */
-public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
-    public JRuleInternalSwitchItem(String name, String label, String type, String id) {
+public class JRuleInternalQuantityGroupItem extends JRuleInternalQuantityItem implements JRuleQuantityGroupItem {
+
+    public JRuleInternalQuantityGroupItem(String name, String label, String type, String id) {
         super(name, label, type, id);
     }
 }

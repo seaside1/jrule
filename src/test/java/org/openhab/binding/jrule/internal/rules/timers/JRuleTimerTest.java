@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.jrule.internal.rules.timers;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -36,18 +36,76 @@ import org.openhab.core.types.UnDefType;
 public class JRuleTimerTest extends JRuleAbstractTest {
 
     @Test
-    public void testOneOffTimerWithNestedtimer() throws ItemNotFoundException, InterruptedException {
+    public void testTimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "2", "1")));
-        verify(rule, times(1)).testSendCommand();
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers")));
+        verify(rule, times(1)).testTimers();
         Thread.sleep(3000); // Wait for timer inside rule to execute
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "command"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timedCommand"));
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "nestedTimedCommand"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "unique timer"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "after the other one 3"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timer2 running true"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timer2 done false"));
+        assertFalse(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "canceled timer"));
+    }
+
+    @Test
+    public void testRepeatingTimer() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING), UnDefType.UNDEF);
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME), UnDefType.UNDEF);
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING, TargetItem.class);
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME, TargetItem.class);
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED, TargetItem.class);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers-repeating")));
+        verify(rule, times(1)).testRepeatingTimers();
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME,
+                "repeating-with-name-2"));
+        assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED,
+                "repeating-with-name-replaced-5"));
+        assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING, "repeating-10"));
+    }
+
+    @Test
+    public void testGetTimedLock() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "locks")));
+        verify(rule, times(1)).testLocks();
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "first: true"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "second: false"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "third: true"));
+    }
+
+    @Test
+    public void testDebounce() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        Thread.sleep(600);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        Thread.sleep(600);
+        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        verify(rule, times(1)).testDebounce();
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "no debounce"));
     }
 
     private Event itemChangeEvent(String item, String from, String to) {

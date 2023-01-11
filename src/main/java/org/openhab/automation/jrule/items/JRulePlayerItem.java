@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerItem;
 import org.openhab.automation.jrule.rules.value.*;
 
 /**
@@ -30,7 +34,11 @@ public interface JRulePlayerItem extends JRuleItem {
     String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.stringValue();
 
     static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalPlayerItem.class);
+    }
+
+    static Optional<JRulePlayerItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

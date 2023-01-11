@@ -13,10 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerGroupItem;
-import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.PlayerItem;
 
 /**
  * The {@link JRulePlayerGroupItemTest}
@@ -27,15 +23,5 @@ class JRulePlayerGroupItemTest extends JRulePlayerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalPlayerGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return JRulePlayPauseValue.PLAY;
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new PlayerItem("Name");
     }
 }

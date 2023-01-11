@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +41,9 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> command) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList);
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
+                timedLock);
         this.command = command;
     }
 

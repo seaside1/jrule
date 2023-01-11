@@ -13,29 +13,15 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.DimmerItem;
 
 /**
- * The {@link JRulePercentGroupItemTest}
+ * The {@link JRuleDimmerGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRulePercentGroupItemTest extends JRulePercentItemTest {
+class JRuleDimmerGroupItemTest extends JRuleDimmerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalDimmerGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRulePercentValue(75);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new DimmerItem("Name");
     }
 }

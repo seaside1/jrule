@@ -16,24 +16,19 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
-import org.openhab.automation.jrule.internal.items.JRuleInternalContactGroupItem;
-import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
 
 /**
- * The {@link JRuleContactGroupItem} Items
+ * The {@link JRuleUnspecifiedGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem {
-    static JRuleContactGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalContactGroupItem.class);
+public interface JRuleUnspecifiedGroupItem extends JRuleItem, JRuleGroupItem {
+    static JRuleUnspecifiedGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+        return JRuleItemRegistry.get(itemName, JRuleInternalStringGroupItem.class);
     }
 
-    static Optional<JRuleContactGroupItem> forNameOptional(String itemName) {
+    static Optional<JRuleUnspecifiedGroupItem> forNameOptional(String itemName) {
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
-    }
-
-    default void postUpdate(JRuleOpenClosedValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

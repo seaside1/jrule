@@ -36,8 +36,10 @@ import java.util.jar.Manifest;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
+import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.common.ThreadPoolManager;
 import org.osgi.framework.FrameworkUtil;
@@ -255,5 +257,14 @@ public class JRuleUtil {
 
     public static String packageNameToPath(String packageName) {
         return packageName.replace('.', File.separatorChar);
+    }
+
+    public static <T extends JRuleItem> T forNameWrapExceptionAsNull(Supplier<T> forName) {
+        try {
+            return forName.get();
+        } catch (JRuleItemNotFoundException e) {
+            logger.trace("cannot find item", e);
+            return null;
+        }
     }
 }

@@ -13,10 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.RollershutterItem;
 
 /**
  * The {@link JRuleRollershutterGroupItemTest}
@@ -27,15 +23,5 @@ class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id");
-    }
-
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRulePercentValue(75);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new RollershutterItem("Name");
     }
 }
