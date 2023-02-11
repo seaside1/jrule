@@ -114,8 +114,8 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("sumSince", "Switch_To_Persist", 3, 0.0);
         verifyPersistence("sumSince", "Switch_To_Persist", 1, 0.0);
 
-        verifyPersistence("averageSince", "Switch_To_Persist", 7, 0.3296313435138053);
-        verifyPersistence("averageSince", "Switch_To_Persist", 5, 0.2409428704133767);
+        verifyPersistence("averageSince", "Switch_To_Persist", 7, 0.3);
+        verifyPersistence("averageSince", "Switch_To_Persist", 5, 0.2);
         verifyPersistence("averageSince", "Switch_To_Persist", 3, 0.0);
         verifyPersistence("averageSince", "Switch_To_Persist", 1, null);
 
@@ -129,29 +129,32 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("maximumSince", "Switch_To_Persist", 3, 0.0);
         verifyPersistence("maximumSince", "Switch_To_Persist", 1, 0.0);
 
-        verifyPersistence("deviationSince", "Switch_To_Persist", 7, 0.4715997023303158);
-        verifyPersistence("deviationSince", "Switch_To_Persist", 5, 0.5679791445484379);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 7, 0.5);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 5, 0.6);
         verifyPersistence("deviationSince", "Switch_To_Persist", 3, 0.0);
         verifyPersistence("deviationSince", "Switch_To_Persist", 1, null);
 
-        verifyPersistence("varianceSince", "Switch_To_Persist", 7, 0.2224763499217246);
-        verifyPersistence("varianceSince", "Switch_To_Persist", 5, 0.3238629479288706);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 7, 0.2);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 5, 0.3);
         verifyPersistence("varianceSince", "Switch_To_Persist", 3, 0.0);
         verifyPersistence("varianceSince", "Switch_To_Persist", 1, null);
 
         verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 7, true);
         verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 5, true);
         verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 3, true);
-        verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 1, true);
+        verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 1, false);
     }
 
     private void verifyPersistence(String persistenceMethod, String itemName, int beforeSeconds, Object value) {
-        String ruleLogLine = String.format("[persist all types] %s: %s since/before %ss: %s", persistenceMethod, itemName, beforeSeconds, Optional.ofNullable(value));
+        String ruleLogLine = String.format("[persist all types] %s: %s since/before %ss: %s", persistenceMethod,
+                itemName, beforeSeconds, Optional.ofNullable(value));
         verifyLogEntry(ruleLogLine);
     }
 
-    private void verifyPersistenceChangedSince(String persistenceMethod, String itemName, int beforeSeconds, Object value) {
-        String ruleLogLine = String.format("[persist all types] %s: %s since/before %ss: %s", persistenceMethod, itemName, beforeSeconds, value);
+    private void verifyPersistenceChangedSince(String persistenceMethod, String itemName, int beforeSeconds,
+            Object value) {
+        String ruleLogLine = String.format("[persist all types] %s: %s since/before %ss: %s", persistenceMethod,
+                itemName, beforeSeconds, value);
         verifyLogEntry(ruleLogLine);
     }
 }

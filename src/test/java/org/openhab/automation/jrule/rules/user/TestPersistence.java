@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.rules.user;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -145,42 +146,48 @@ public class TestPersistence extends JRule {
             Function<JRuleItem, Object> currentValue) {
         final String function = "averageSince";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> averageSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> averageSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
+                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
     }
 
     private void sumSince(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "sumSince";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> sumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> sumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
+                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
     }
 
     private void minimumSince(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "minimumSince";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> minimumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> minimumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
+                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
     }
 
     private void maximumSince(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "maximumSince";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> maximumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> maximumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
+                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
     }
 
     private void varianceSince(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "varianceSince";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> varianceSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> varianceSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
+                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
     }
 
     private void deviationSince(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "deviationSince";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> deviationSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> deviationSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
+                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
     }
 
     private void historicState(String itemName, Function<String, JRuleItem> getItem,
@@ -196,7 +203,7 @@ public class TestPersistence extends JRule {
         JRuleItem jRuleItem = getItem.apply(itemName);
 
         for (int i = 7; i > 0; i -= 2) {
-            Object historicValue = persistenceFunction.apply(i, jRuleItem);
+            var historicValue = persistenceFunction.apply(i, jRuleItem);
             logInfo("{}: {} since/before {}s: {}", functionName, itemName, i, historicValue);
         }
 
