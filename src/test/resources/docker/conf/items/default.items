@@ -51,6 +51,10 @@ Color           Color_Event
 Location        Location_Event
 Number:Power    Quantity_Event
 
+Number          Number_Persistence
+Switch          Switch_Persistence
+Contact         Contact_Persistence
+
 // Persistence 
 Switch          Switch_To_Persist
 Number          Number_To_Persist
