@@ -130,6 +130,8 @@ public class TestRules extends JRule {
     public static final String NAME_TRIGGER_JUST_GROUPS = "trigger just groups";
     public static final String ITEM_NUMBER_GROUP_MEMBER = "Number_Group_Member";
     public static final String ITEM_STRING_GROUP_MEMBER = "String_Group_Member";
+    public static final String COMMAND_DELAYED = "delayed";
+    public static final String NAME_DELAYED = "delayed";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -299,6 +301,12 @@ public class TestRules extends JRule {
         castDimmer();
         castColor();
         castLocation();
+    }
+
+    @JRuleName(NAME_DELAYED)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, command = COMMAND_DELAYED)
+    public void delayed() {
+        logInfo("delayed execution: ", ZonedDateTime.now());
     }
 
     @JRuleName(NAME_TRIGGER_RULE_FROM_RULE)

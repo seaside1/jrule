@@ -37,8 +37,8 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
 
     public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             Optional<String> thing, Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to,
-            List<JRulePreconditionContext> preconditions, Duration timedLock) {
-        super(jRule, logName, loggingTags, method, preconditions, timedLock);
+            List<JRulePreconditionContext> preconditions, Duration timedLock, Duration delayed) {
+        super(jRule, logName, loggingTags, method, preconditions, timedLock, delayed);
         this.thing = thing;
         this.from = from;
         this.to = to;

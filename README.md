@@ -774,6 +774,19 @@ public void debounceMethod() {
 }
 ```
 
+## Example 39
+
+Use case: Execute a rule delayed
+
+```java
+@JRuleDelayed(10)
+@JRuleName("Execute after ten seconds")
+@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+public void delayedMethod() {
+    // delay the execution of this
+}
+```
+
 # Changelog
 ## BETA15
 - BREAKING: All JRuleWhen has to be change to corresponding JRuleWhenItemChanged (as an example, look at JRule Examples documentation)
