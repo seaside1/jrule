@@ -42,6 +42,17 @@ import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
@@ -97,7 +108,11 @@ public class TestRules extends JRule {
     public static final String ITEM_IMAGE_TO_CAST = "Image_To_Cast";
     public static final String ITEM_ROLLERSHUTTER_TO_CAST = "Rollershutter_To_Cast";
     public static final String ITEM_LOCATION_TO_CAST = "Location_To_Cast";
-    private static final String ITEM_NUMBER_GROUP = "Number_Group";
+    public static final String ITEM_NUMBER_GROUP_MEMBER_3 = "Number_Group_Member3";
+    public static final String ITEM_STRING_GROUP_MEMBER_3 = "String_Group_Member3";
+    public static final String ITEM_STRING_GROUP_MEMBER_1 = "String_Group_Member1";
+    public static final String ITEM_NUMBER_GROUP = "Number_Group";
+    public static final String ITEM_STRING_GROUP = "String_Group";
     public static final String ITEM_RULE_FROM_RULE = "Rule_From_Rule";
     public static final String NAME_TRIGGER_RULE_FROM_RULE = "Trigger Rule From Rule";
     public static final String ITEM_TRIGGER_RULE_FROM_RULE = "Trigger_Rule_From_Rule";
@@ -114,6 +129,10 @@ public class TestRules extends JRule {
     public static final String COMMAND_TAGS_AND_METADATA = "tags and metadata";
     public static final String ITEM_DIMMER_WITH_TAGS_AND_METADATA = "Dimmer_With_Tags_And_Metadata";
     public static final String NAME_TAGS_AND_METADATA = "tags and metadata";
+    public static final String NAME_TRIGGER_JUST_ITEMS = "trigger just items";
+    public static final String NAME_TRIGGER_JUST_GROUPS = "trigger just groups";
+    public static final String ITEM_NUMBER_GROUP_MEMBER = "Number_Group_Member";
+    public static final String ITEM_STRING_GROUP_MEMBER = "String_Group_Member";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -180,20 +199,20 @@ public class TestRules extends JRule {
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
-    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
         logInfo("Member of Group ({}) received command", event.getMemberName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
-    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member of Group ({}) received update", event.getMemberName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
-    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member of Group ({}) changed", event.getMemberName());
@@ -252,6 +271,18 @@ public class TestRules extends JRule {
 
         logInfo("contains recursive members: {}", recursiveMembers.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
+    }
+
+    @JRuleName(NAME_TRIGGER_JUST_ITEMS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_STRING_GROUP, memberOf = JRuleMemberOf.Items)
+    public void triggerJustItems() {
+        logInfo("Triggered for Item");
+    }
+
+    @JRuleName(NAME_TRIGGER_JUST_GROUPS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_STRING_GROUP, memberOf = JRuleMemberOf.Groups)
+    public void triggerJustGroups() {
+        logInfo("Triggered for Group");
     }
 
     @JRuleName(NAME_CAST_ALL_TYPES)

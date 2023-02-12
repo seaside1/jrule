@@ -718,11 +718,14 @@ public void testPower(JRuleEvent event) {
 
 ## Example 35
 
-Use case: Want to listen on all Item events of a group (without the groupstate must change)
+Use case: Want to listen on all Item events of a group (without the groupstate must change). 
+    Alternatively you could just listen to just Group changes or (real) Item changes
 
 ```java
     @JRuleName("MemberOfUpdateTrigger")
-    @JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = true)
+    @JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.All)
+    //@JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.Items)
+    //@JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.Groups)
     public synchronized void memberOfUpdateTrigger(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
