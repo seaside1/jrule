@@ -15,7 +15,9 @@ package org.openhab.automation.jrule.rules.integration_test;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.regex.Matcher;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.items.JRuleContactItem;
 import org.openhab.automation.jrule.items.JRulePlayerItem;
@@ -101,43 +103,129 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyNoError();
 
         verifySwitch();
+        verifyNumber();
+        verifyQuantity();
+    }
+
+    private void verifyNumber() {
+        verifyPersistence("historicState", "Number_To_Persist", 7, null, 10);
+        verifyPersistence("historicState", "Number_To_Persist", 5, 20.0, 10);
+        verifyPersistence("historicState", "Number_To_Persist", 3, 100.0, 10);
+        verifyPersistence("historicState", "Number_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("sumSince", "Number_To_Persist", 7, 120.0, 10);
+        verifyPersistence("sumSince", "Number_To_Persist", 5, 100.0, 10);
+        verifyPersistence("sumSince", "Number_To_Persist", 3, 0.0, 10);
+        verifyPersistence("sumSince", "Number_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("averageSince", "Number_To_Persist", 7, 34.4, 10);
+        verifyPersistence("averageSince", "Number_To_Persist", 5, 22.5, 10);
+        verifyPersistence("averageSince", "Number_To_Persist", 3, 0.0, 10);
+        verifyPersistence("averageSince", "Number_To_Persist", 1, null, 10);
+
+        verifyPersistence("minimumSince", "Number_To_Persist", 7, 0.0, 10);
+        verifyPersistence("minimumSince", "Number_To_Persist", 5, 0.0, 10);
+        verifyPersistence("minimumSince", "Number_To_Persist", 3, 0.0, 10);
+        verifyPersistence("minimumSince", "Number_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("maximumSince", "Number_To_Persist", 7, 100.0, 10);
+        verifyPersistence("maximumSince", "Number_To_Persist", 5, 100.0, 10);
+        verifyPersistence("maximumSince", "Number_To_Persist", 3, 0.0, 10);
+        verifyPersistence("maximumSince", "Number_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("deviationSince", "Number_To_Persist", 7, 43.7, 10);
+        verifyPersistence("deviationSince", "Number_To_Persist", 5, 57.3, 10);
+        verifyPersistence("deviationSince", "Number_To_Persist", 3, 0.0, 10);
+        verifyPersistence("deviationSince", "Number_To_Persist", 1, null, 10);
+
+        verifyPersistence("varianceSince", "Number_To_Persist", 7, 1908.0, 10);
+        verifyPersistence("varianceSince", "Number_To_Persist", 5, 3297.0, 10);
+        verifyPersistence("varianceSince", "Number_To_Persist", 3, 0.0, 10);
+        verifyPersistence("varianceSince", "Number_To_Persist", 1, null, 10);
+
+        verifyPersistenceChangedSince("changedSince", "Number_To_Persist", 7, true);
+        verifyPersistenceChangedSince("changedSince", "Number_To_Persist", 5, true);
+        verifyPersistenceChangedSince("changedSince", "Number_To_Persist", 3, true);
+        verifyPersistenceChangedSince("changedSince", "Number_To_Persist", 1, false);
+    }
+
+    private void verifyQuantity() {
+        verifyPersistence("historicState", "Quantity_To_Persist", 7, null, 10);
+        verifyPersistence("historicState", "Quantity_To_Persist", 5, 122.0, 10);
+        verifyPersistence("historicState", "Quantity_To_Persist", 3, 100.0, 10);
+        verifyPersistence("historicState", "Quantity_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("sumSince", "Quantity_To_Persist", 7, 120.0, 10);
+        verifyPersistence("sumSince", "Quantity_To_Persist", 5, 100.0, 10);
+        verifyPersistence("sumSince", "Quantity_To_Persist", 3, 0.0, 10);
+        verifyPersistence("sumSince", "Quantity_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("averageSince", "Quantity_To_Persist", 7, 34.4, 10);
+        verifyPersistence("averageSince", "Quantity_To_Persist", 5, 22.5, 10);
+        verifyPersistence("averageSince", "Quantity_To_Persist", 3, 0.0, 10);
+        verifyPersistence("averageSince", "Quantity_To_Persist", 1, null, 10);
+
+        verifyPersistence("minimumSince", "Quantity_To_Persist", 7, 0.0, 10);
+        verifyPersistence("minimumSince", "Quantity_To_Persist", 5, 0.0, 10);
+        verifyPersistence("minimumSince", "Quantity_To_Persist", 3, 0.0, 10);
+        verifyPersistence("minimumSince", "Quantity_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("maximumSince", "Quantity_To_Persist", 7, 100.0, 10);
+        verifyPersistence("maximumSince", "Quantity_To_Persist", 5, 100.0, 10);
+        verifyPersistence("maximumSince", "Quantity_To_Persist", 3, 0.0, 10);
+        verifyPersistence("maximumSince", "Quantity_To_Persist", 1, 0.0, 10);
+
+        verifyPersistence("deviationSince", "Quantity_To_Persist", 7, 43.7, 10);
+        verifyPersistence("deviationSince", "Quantity_To_Persist", 5, 57.3, 10);
+        verifyPersistence("deviationSince", "Quantity_To_Persist", 3, 0.0, 10);
+        verifyPersistence("deviationSince", "Quantity_To_Persist", 1, null, 10);
+
+        verifyPersistence("varianceSince", "Quantity_To_Persist", 7, 1908.0, 10);
+        verifyPersistence("varianceSince", "Quantity_To_Persist", 5, 3297.0, 10);
+        verifyPersistence("varianceSince", "Quantity_To_Persist", 3, 0.0, 10);
+        verifyPersistence("varianceSince", "Quantity_To_Persist", 1, null, 10);
+
+        verifyPersistenceChangedSince("changedSince", "Quantity_To_Persist", 7, true);
+        verifyPersistenceChangedSince("changedSince", "Quantity_To_Persist", 5, true);
+        verifyPersistenceChangedSince("changedSince", "Quantity_To_Persist", 3, true);
+        verifyPersistenceChangedSince("changedSince", "Quantity_To_Persist", 1, false);
     }
 
     private void verifySwitch() {
-        verifyPersistence("historicState", "Switch_To_Persist", 7, null);
-        verifyPersistence("historicState", "Switch_To_Persist", 5, JRuleOnOffValue.OFF);
-        verifyPersistence("historicState", "Switch_To_Persist", 3, JRuleOnOffValue.ON);
-        verifyPersistence("historicState", "Switch_To_Persist", 1, JRuleOnOffValue.OFF);
+        verifyPersistence("historicState", "Switch_To_Persist", 7, null, 10);
+        verifyPersistence("historicState", "Switch_To_Persist", 5, JRuleOnOffValue.OFF, 10);
+        verifyPersistence("historicState", "Switch_To_Persist", 3, JRuleOnOffValue.ON, 10);
+        verifyPersistence("historicState", "Switch_To_Persist", 1, JRuleOnOffValue.OFF, 10);
 
-        verifyPersistence("sumSince", "Switch_To_Persist", 7, 1.0);
-        verifyPersistence("sumSince", "Switch_To_Persist", 5, 1.0);
-        verifyPersistence("sumSince", "Switch_To_Persist", 3, 0.0);
-        verifyPersistence("sumSince", "Switch_To_Persist", 1, 0.0);
+        verifyPersistence("sumSince", "Switch_To_Persist", 7, 1.0, 10);
+        verifyPersistence("sumSince", "Switch_To_Persist", 5, 1.0, 10);
+        verifyPersistence("sumSince", "Switch_To_Persist", 3, 0.0, 10);
+        verifyPersistence("sumSince", "Switch_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("averageSince", "Switch_To_Persist", 7, 0.3);
-        verifyPersistence("averageSince", "Switch_To_Persist", 5, 0.2);
-        verifyPersistence("averageSince", "Switch_To_Persist", 3, 0.0);
-        verifyPersistence("averageSince", "Switch_To_Persist", 1, null);
+        verifyPersistence("averageSince", "Switch_To_Persist", 7, 0.3, 10);
+        verifyPersistence("averageSince", "Switch_To_Persist", 5, 0.2, 10);
+        verifyPersistence("averageSince", "Switch_To_Persist", 3, 0.0, 10);
+        verifyPersistence("averageSince", "Switch_To_Persist", 1, null, 10);
 
-        verifyPersistence("minimumSince", "Switch_To_Persist", 7, 0.0);
-        verifyPersistence("minimumSince", "Switch_To_Persist", 5, 0.0);
-        verifyPersistence("minimumSince", "Switch_To_Persist", 3, 0.0);
-        verifyPersistence("minimumSince", "Switch_To_Persist", 1, 0.0);
+        verifyPersistence("minimumSince", "Switch_To_Persist", 7, 0.0, 10);
+        verifyPersistence("minimumSince", "Switch_To_Persist", 5, 0.0, 10);
+        verifyPersistence("minimumSince", "Switch_To_Persist", 3, 0.0, 10);
+        verifyPersistence("minimumSince", "Switch_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("maximumSince", "Switch_To_Persist", 7, 1.0);
-        verifyPersistence("maximumSince", "Switch_To_Persist", 5, 1.0);
-        verifyPersistence("maximumSince", "Switch_To_Persist", 3, 0.0);
-        verifyPersistence("maximumSince", "Switch_To_Persist", 1, 0.0);
+        verifyPersistence("maximumSince", "Switch_To_Persist", 7, 1.0, 10);
+        verifyPersistence("maximumSince", "Switch_To_Persist", 5, 1.0, 10);
+        verifyPersistence("maximumSince", "Switch_To_Persist", 3, 0.0, 10);
+        verifyPersistence("maximumSince", "Switch_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("deviationSince", "Switch_To_Persist", 7, 0.5);
-        verifyPersistence("deviationSince", "Switch_To_Persist", 5, 0.6);
-        verifyPersistence("deviationSince", "Switch_To_Persist", 3, 0.0);
-        verifyPersistence("deviationSince", "Switch_To_Persist", 1, null);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 7, 0.5, 10);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 5, 0.6, 10);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 3, 0.0, 10);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 1, null, 10);
 
-        verifyPersistence("varianceSince", "Switch_To_Persist", 7, 0.2);
-        verifyPersistence("varianceSince", "Switch_To_Persist", 5, 0.3);
-        verifyPersistence("varianceSince", "Switch_To_Persist", 3, 0.0);
-        verifyPersistence("varianceSince", "Switch_To_Persist", 1, null);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 7, 0.2, 10);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 5, 0.3, 10);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 3, 0.0, 10);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 1, null, 10);
 
         verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 7, true);
         verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 5, true);
@@ -145,10 +233,20 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistenceChangedSince("changedSince", "Switch_To_Persist", 1, false);
     }
 
-    private void verifyPersistence(String persistenceMethod, String itemName, int beforeSeconds, Object value) {
-        String ruleLogLine = String.format("[persist all types] %s: %s since/before %ss: %s", persistenceMethod,
-                itemName, beforeSeconds, Optional.ofNullable(value));
-        verifyLogEntry(ruleLogLine);
+    private void verifyPersistence(String persistenceMethod, String itemName, int beforeSeconds, Object expectedValue, int deviation) {
+        String ruleLogLine = String.format(".*\\[persist all types\\] %s: %s since/before %ss: '(.+)'", persistenceMethod,
+                itemName, beforeSeconds);
+        Matcher matcher = getLogEntry(ruleLogLine);
+        String givenValue = matcher.group(1);
+        if (!givenValue.equals(String.valueOf(expectedValue))) {
+            float givenFloat = Float.parseFloat(givenValue);
+            float expectedFloat = Float.parseFloat(expectedValue.toString());
+            float givenDeviation = 100f - (Math.min(givenFloat, expectedFloat) / Math.max(givenFloat, expectedFloat) * 100f);
+            if (givenDeviation > deviation) {
+                Assertions.fail(String.format("deviation of values (given=%s, expected=%s) %s is higher then expected deviation %s", givenFloat, expectedFloat, givenDeviation, deviation));
+            }
+        }
+        System.out.println(givenValue);
     }
 
     private void verifyPersistenceChangedSince(String persistenceMethod, String itemName, int beforeSeconds,

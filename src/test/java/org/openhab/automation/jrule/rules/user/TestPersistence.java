@@ -147,7 +147,7 @@ public class TestPersistence extends JRule {
         final String function = "averageSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> averageSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
+                        .map(Double::floatValue).orElse(null));
     }
 
     private void sumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -155,7 +155,7 @@ public class TestPersistence extends JRule {
         final String function = "sumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> sumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
+                        .map(Double::floatValue).orElse(null));
     }
 
     private void minimumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -163,7 +163,7 @@ public class TestPersistence extends JRule {
         final String function = "minimumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> minimumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
+                        .map(Double::floatValue).orElse(null));
     }
 
     private void maximumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -171,7 +171,7 @@ public class TestPersistence extends JRule {
         final String function = "maximumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> maximumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
+                        .map(Double::floatValue).orElse(null));
     }
 
     private void varianceSince(String itemName, Function<String, JRuleItem> getItem,
@@ -179,7 +179,7 @@ public class TestPersistence extends JRule {
         final String function = "varianceSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> varianceSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
+                        .map(Double::floatValue).orElse(null));
     }
 
     private void deviationSince(String itemName, Function<String, JRuleItem> getItem,
@@ -187,14 +187,14 @@ public class TestPersistence extends JRule {
         final String function = "deviationSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> deviationSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(v -> String.format(Locale.ENGLISH, "%.1f", v.floatValue())));
+                        .map(Double::floatValue).orElse(null));
     }
 
     private void historicState(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "historicState";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> item.getHistoricState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID));
+                (i, item) -> item.getHistoricState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID).orElse(null));
     }
 
     private void printInfos(String itemName, Function<String, JRuleItem> getItem,
@@ -204,7 +204,7 @@ public class TestPersistence extends JRule {
 
         for (int i = 7; i > 0; i -= 2) {
             var historicValue = persistenceFunction.apply(i, jRuleItem);
-            logInfo("{}: {} since/before {}s: {}", functionName, itemName, i, historicValue);
+            logInfo("{}: {} since/before {}s: '{}'", functionName, itemName, i, historicValue);
         }
 
         logInfo("{}: {} now: {}", functionName, itemName, currentValue.apply(jRuleItem));

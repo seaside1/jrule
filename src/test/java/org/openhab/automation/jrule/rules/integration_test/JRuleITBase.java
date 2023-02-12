@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
@@ -270,6 +272,10 @@ public abstract class JRuleITBase {
         return logLines.stream().anyMatch(s -> s.contains(line));
     }
 
+    private boolean matchesLine(String line, List<String> logLines) {
+        return logLines.stream().anyMatch(s -> s.matches(line));
+    }
+
     private boolean notContainsLine(String line, List<String> logLines) {
         return logLines.stream().noneMatch(s -> s.contains(line));
     }
@@ -385,6 +391,20 @@ public abstract class JRuleITBase {
     protected void verifyLogEntry(String ruleLogLine) {
         Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
                 .await("rule executed").until(() -> logLines, v -> containsLine(ruleLogLine, v));
+    }
+
+    protected Matcher getLogEntry(String ruleLogLinePattern) {
+        Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
+                .await("rule executed").until(() -> logLines, v -> matchesLine(ruleLogLinePattern, v));
+        Pattern p = Pattern.compile(ruleLogLinePattern);
+        return logLines.stream().filter(s -> s.matches(ruleLogLinePattern))
+                .findFirst()
+                .map(input -> {
+                    Matcher matcher = p.matcher(input);
+                    matcher.matches();
+                    return matcher;
+                })
+                .orElseThrow();
     }
 
     protected void verifyNoLogEntry(String ruleLogLine) {
