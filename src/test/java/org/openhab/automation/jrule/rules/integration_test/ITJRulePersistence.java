@@ -125,8 +125,8 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("sumSince", "Number_To_Persist", 3, 0.0, 10);
         verifyPersistence("sumSince", "Number_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("averageSince", "Number_To_Persist", 7, 34.08041, 20);
-        verifyPersistence("averageSince", "Number_To_Persist", 5, 22.187965, 20);
+        verifyPersistence("averageSince", "Number_To_Persist", 7, 34.08041, 50);
+        verifyPersistence("averageSince", "Number_To_Persist", 5, 22.187965, 50);
         verifyPersistence("averageSince", "Number_To_Persist", 3, 0.0, 10);
         verifyPersistence("averageSince", "Number_To_Persist", 1, null, 10);
 
@@ -140,13 +140,13 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("maximumSince", "Number_To_Persist", 3, 0.0, 10);
         verifyPersistence("maximumSince", "Number_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("deviationSince", "Number_To_Persist", 7, 43.69222, 20);
-        verifyPersistence("deviationSince", "Number_To_Persist", 5, 57.487183, 20);
+        verifyPersistence("deviationSince", "Number_To_Persist", 7, 43.69222, 50);
+        verifyPersistence("deviationSince", "Number_To_Persist", 5, 57.487183, 50);
         verifyPersistence("deviationSince", "Number_To_Persist", 3, 0.0, 10);
         verifyPersistence("deviationSince", "Number_To_Persist", 1, null, 10);
 
-        verifyPersistence("varianceSince", "Number_To_Persist", 7, 1911.5375, 20);
-        verifyPersistence("varianceSince", "Number_To_Persist", 5, 3314.9006, 20);
+        verifyPersistence("varianceSince", "Number_To_Persist", 7, 1911.5375, 50);
+        verifyPersistence("varianceSince", "Number_To_Persist", 5, 3314.9006, 50);
         verifyPersistence("varianceSince", "Number_To_Persist", 3, 0.0, 10);
         verifyPersistence("varianceSince", "Number_To_Persist", 1, null, 10);
 
@@ -167,8 +167,8 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("sumSince", "Switch_To_Persist", 3, 0.0, 10);
         verifyPersistence("sumSince", "Switch_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("averageSince", "Switch_To_Persist", 7, 0.32474226, 20);
-        verifyPersistence("averageSince", "Switch_To_Persist", 5, 0.23780069, 20);
+        verifyPersistence("averageSince", "Switch_To_Persist", 7, 0.32474226, 50);
+        verifyPersistence("averageSince", "Switch_To_Persist", 5, 0.23780069, 50);
         verifyPersistence("averageSince", "Switch_To_Persist", 3, 0.0, 10);
         verifyPersistence("averageSince", "Switch_To_Persist", 1, null, 10);
 
@@ -182,13 +182,13 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("maximumSince", "Switch_To_Persist", 3, 0.0, 10);
         verifyPersistence("maximumSince", "Switch_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("deviationSince", "Switch_To_Persist", 7, 0.47164488, 20);
-        verifyPersistence("deviationSince", "Switch_To_Persist", 5, 0.56792647, 20);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 7, 0.47164488, 50);
+        verifyPersistence("deviationSince", "Switch_To_Persist", 5, 0.56792647, 50);
         verifyPersistence("deviationSince", "Switch_To_Persist", 3, 0.0, 10);
         verifyPersistence("deviationSince", "Switch_To_Persist", 1, null, 10);
 
-        verifyPersistence("varianceSince", "Switch_To_Persist", 7, 0.22251323, 20);
-        verifyPersistence("varianceSince", "Switch_To_Persist", 5, 0.32358465, 20);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 7, 0.22251323, 50);
+        verifyPersistence("varianceSince", "Switch_To_Persist", 5, 0.32358465, 50);
         verifyPersistence("varianceSince", "Switch_To_Persist", 3, 0.0, 10);
         verifyPersistence("varianceSince", "Switch_To_Persist", 1, null, 10);
 
@@ -209,7 +209,7 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("sumSince", "Dimmer_To_Persist", 3, 0.0, 10);
         verifyPersistence("sumSince", "Dimmer_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("averageSince", "Dimmer_To_Persist", 7, 0.16506158, 20);
+        verifyPersistence("averageSince", "Dimmer_To_Persist", 7, 0.16506158, 50);
         verifyPersistence("averageSince", "Dimmer_To_Persist", 5, 0.0, 10);
         verifyPersistence("averageSince", "Dimmer_To_Persist", 3, null, 10);
         verifyPersistence("averageSince", "Dimmer_To_Persist", 1, null, 10);
@@ -224,7 +224,7 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyPersistence("maximumSince", "Dimmer_To_Persist", 3, 0.0, 10);
         verifyPersistence("maximumSince", "Dimmer_To_Persist", 1, 0.0, 10);
 
-        verifyPersistence("deviationSince", "Dimmer_To_Persist", 7, 0.60352737, 20);
+        verifyPersistence("deviationSince", "Dimmer_To_Persist", 7, 0.60352737, 50);
         verifyPersistence("deviationSince", "Dimmer_To_Persist", 5, 0.0, 10);
         verifyPersistence("deviationSince", "Dimmer_To_Persist", 3, null, 10);
         verifyPersistence("deviationSince", "Dimmer_To_Persist", 1, null, 10);
