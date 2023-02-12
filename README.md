@@ -776,6 +776,20 @@ public void debounceMethod() {
 
 ## Example 39
 
+Use case: Send some requests to http endpoints
+
+```java
+@JRuleName("send http methods")
+@JRuleWhenItemReceivedCommand(item = _MyHttpTrigger.ITEM, command = "send http calls")
+public void sendHttpCalls() {
+    String responseGet = sendHttpGetRequest("http://http-mock:8080" + HTTP_GET_SOMETHING, null);
+    logInfo("send Http: {}", responseGet);
+    sendHttpDeleteRequest("http://http-mock:8080" + HTTP_DELETE_SOMETHING, Duration.ofSeconds(5));
+}
+```
+
+## Example 40
+
 Use case: Execute a rule delayed
 
 ```java
