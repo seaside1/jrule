@@ -61,7 +61,7 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
             JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
             switch (getMemberOf()) {
                 case All:
-                    return true;
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName());
                 case Groups:
                     return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
                 case Items:
