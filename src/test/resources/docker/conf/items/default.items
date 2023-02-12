@@ -9,6 +9,9 @@ Switch          Switch_Group_Member2        (Switch_Group)
 Number          Number_Condition
 String          Precondition_String
 Switch          Preconditioned_Switch
+
+String          Trigger_HttpAction
+
 Switch          Get_Members_Of_Group_Switch
 
 Group           Number_Group

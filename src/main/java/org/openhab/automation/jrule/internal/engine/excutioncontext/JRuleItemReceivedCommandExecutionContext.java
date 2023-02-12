@@ -40,9 +40,10 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock) {
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock,
+            Duration delayed) {
         super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
-                timedLock);
+                timedLock, delayed);
         this.command = command;
     }
 
@@ -62,7 +63,7 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
             JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
             switch (getMemberOf()) {
                 case All:
-                    return true;
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName());
                 case Groups:
                     return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
                 case Items:

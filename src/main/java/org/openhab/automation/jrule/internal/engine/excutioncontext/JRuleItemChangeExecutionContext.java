@@ -45,9 +45,9 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
             String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
             Optional<JRuleConditionContext> previousConditionContext,
             List<JRulePreconditionContext> preconditionContextList, Optional<String> from, Optional<String> to,
-            Duration timedLock) {
+            Duration timedLock, Duration delayed) {
         super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
-                timedLock);
+                timedLock, delayed);
         this.from = from;
         this.to = to;
         this.previousConditionContext = previousConditionContext;
