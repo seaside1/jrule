@@ -35,8 +35,8 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
 
     public JRuleChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             List<JRulePreconditionContext> preconditionContextList, String channel, Optional<String> event,
-            Duration timedLock) {
-        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock);
+            Duration timedLock, Duration delayed) {
+        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock, delayed);
         this.channel = channel;
         this.event = event;
     }

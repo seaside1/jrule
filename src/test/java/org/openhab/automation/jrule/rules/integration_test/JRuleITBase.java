@@ -63,6 +63,7 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.clas
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.ParseException;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.EntityUtils;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -173,6 +174,9 @@ public abstract class JRuleITBase {
                     }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS)))
             .withNetwork(network).dependsOn(influxDbContainer).withReuse(true);
 
+    protected static final GenericContainer<?> mockServer = new GenericContainer<>("wiremock/wiremock:2.32.0")
+            .withExposedPorts(8080).withNetwork(network).withNetworkAliases("http-mock");
+
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
     private @NotNull IMqttClient mqttClient;
 
@@ -182,6 +186,7 @@ public abstract class JRuleITBase {
         mqttProxy = toxiproxyContainer.getProxy(mqttContainer, 1883);
         System.out.println(mqttProxy.getOriginalProxyPort());
         openhabContainer.start();
+        mockServer.start();
     }
 
     @BeforeEach
@@ -206,6 +211,9 @@ public abstract class JRuleITBase {
         mqttClient = getMqttClient();
         subscribeMqtt("number/state");
         publishMqttMessage("number/state", "0");
+
+        WireMock.configureFor(mockServer.getHost(), mockServer.getFirstMappedPort());
+        WireMock.reset();
     }
 
     @AfterEach
