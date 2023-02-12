@@ -397,14 +397,11 @@ public abstract class JRuleITBase {
         Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
                 .await("rule executed").until(() -> logLines, v -> matchesLine(ruleLogLinePattern, v));
         Pattern p = Pattern.compile(ruleLogLinePattern);
-        return logLines.stream().filter(s -> s.matches(ruleLogLinePattern))
-                .findFirst()
-                .map(input -> {
-                    Matcher matcher = p.matcher(input);
-                    matcher.matches();
-                    return matcher;
-                })
-                .orElseThrow();
+        return logLines.stream().filter(s -> s.matches(ruleLogLinePattern)).findFirst().map(input -> {
+            Matcher matcher = p.matcher(input);
+            matcher.matches();
+            return matcher;
+        }).orElseThrow();
     }
 
     protected void verifyNoLogEntry(String ruleLogLine) {

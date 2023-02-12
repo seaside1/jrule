@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.rules.user;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -193,8 +192,8 @@ public class TestPersistence extends JRule {
     private void historicState(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "historicState";
-        printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> item.getHistoricState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID).orElse(null));
+        printInfos(itemName, getItem, currentValue, function, (i, item) -> item
+                .getHistoricState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID).orElse(null));
     }
 
     private void printInfos(String itemName, Function<String, JRuleItem> getItem,
