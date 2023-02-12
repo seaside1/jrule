@@ -18,7 +18,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
@@ -62,7 +62,7 @@ public class JRule {
         JRuleVoiceHandler.get().say(text, volume);
     }
 
-    protected String transform(String stateDescPattern, String state) throws JRuleExecutionException {
+    protected String transform(String stateDescPattern, String state) throws JRuleRuntimeException {
         return JRuleTransformationHandler.get().transform(stateDescPattern, state);
     }
 

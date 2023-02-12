@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -38,7 +39,7 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
     private final Optional<String> state;
 
     public JRuleItemReceivedUpdateExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
+            String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
             List<JRulePreconditionContext> preconditionContextList, Optional<String> state, Duration timedLock,
             Duration delayed) {
         super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
@@ -53,26 +54,38 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
                 && state.map(s -> ((ItemStateEvent) event).getItemState().toString().equals(s)).orElse(true))) {
             return false;
         }
-        if (!isMemberOf() && ((ItemStateEvent) event).getItemName().equals(this.getItemName())) {
+        if (getMemberOf() == JRuleMemberOf.None && ((ItemStateEvent) event).getItemName().equals(this.getItemName())) {
             return true;
         }
-        if (isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
-                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName())) {
-            return true;
+        if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData) {
+            JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
+            switch (getMemberOf()) {
+                case All:
+                    return true;
+                case Groups:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
+                case Items:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && !itemCheckData.isGroup();
+                default:
+                    return false;
+            }
         }
         return false;
     }
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
+        final String itemName;
         final String memberName;
-        if (isMemberOf()) {
+        if (getMemberOf() != JRuleMemberOf.None) {
             memberName = ((ItemEvent) event).getItemName();
+            itemName = ((ItemEvent) event).getItemName();
         } else {
             memberName = null;
+            itemName = this.getItemName();
         }
 
-        return new JRuleItemEvent(this.getItemName(), memberName,
+        return new JRuleItemEvent(itemName, memberName,
                 JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null);
     }
 
