@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.core.library.types.QuantityType;
 
 /**
@@ -30,11 +31,11 @@ import org.openhab.core.library.types.QuantityType;
  */
 public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
     protected final String itemName;
-    protected final boolean memberOf;
+    protected final JRuleMemberOf memberOf;
     protected final Optional<JRuleConditionContext> conditionContext;
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
-            boolean memberOf, Optional<JRuleConditionContext> conditionContext,
+            JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
             List<JRulePreconditionContext> preconditionContextList, Duration timedLock) {
         super(jRule, logName, loggingTags, method, preconditionContextList, timedLock);
         this.itemName = itemName;
@@ -50,14 +51,16 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
         return conditionContext.map(c -> c.matchCondition(state)).orElse(true);
     }
 
-    public boolean isMemberOf() {
+    public JRuleMemberOf getMemberOf() {
         return memberOf;
     }
 
     public static class JRuleAdditionalItemCheckData extends JRuleAdditionalCheckData {
+        private final boolean group;
         private final List<String> belongingGroups;
 
-        public JRuleAdditionalItemCheckData(List<String> belongingGroups) {
+        public JRuleAdditionalItemCheckData(boolean group, List<String> belongingGroups) {
+            this.group = group;
             this.belongingGroups = belongingGroups;
         }
 
@@ -65,9 +68,13 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
             return belongingGroups;
         }
 
+        public boolean isGroup() {
+            return group;
+        }
+
         @Override
         public String toString() {
-            return "JRuleAdditionalItemCheckData{" + "belongingGroups=" + belongingGroups + '}';
+            return "JRuleAdditionalItemCheckData{" + "group=" + group + ", belongingGroups=" + belongingGroups + '}';
         }
     }
 
