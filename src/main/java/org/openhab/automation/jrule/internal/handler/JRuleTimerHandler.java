@@ -185,6 +185,10 @@ public class JRuleTimerHandler {
         return CompletableFuture.supplyAsync(() -> null, delayedExecutor);
     }
 
+    public void cancelAll() {
+        this.timers.forEach(jRuleTimer -> cancelTimer(jRuleTimer.name));
+    }
+
     public final class JRuleTimer {
         private final Duration delay;
         private final String name;

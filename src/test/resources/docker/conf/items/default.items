@@ -20,6 +20,13 @@ Number          Number_Group_Member1        (Number_Group)
 Number          Number_Group_Member2        (Number_Group_Member)
 Number          Number_Group_Member3        (Number_Group_Member)
 
+
+Group           String_Group
+Group           String_Group_Member         (String_Group)
+String          String_Group_Member1        (String_Group)
+String          String_Group_Member2        (String_Group_Member)
+String          String_Group_Member3        (String_Group_Member)
+
 Switch          Cast_All_Types_Switch
 Switch          Switch_To_Cast
 Number          Number_To_Cast

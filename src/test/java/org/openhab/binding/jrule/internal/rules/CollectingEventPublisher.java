@@ -15,6 +15,7 @@ package org.openhab.binding.jrule.internal.rules;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
@@ -40,6 +41,11 @@ public class CollectingEventPublisher implements EventPublisher {
         return events.stream().filter(e -> e.event instanceof ItemCommandEvent).map(e -> (ItemCommandEvent) e.event)
                 .anyMatch(e -> e.getTopic().equals(createTopic(itemName, "command"))
                         && e.getItemCommand().toString().equals(command.toString()));
+    }
+
+    public List<Container> getCommandEvents(String itemName) {
+        return events.stream().filter(e -> e.event instanceof ItemCommandEvent)
+                .filter(e -> e.event.getTopic().equals(createTopic(itemName, "command"))).collect(Collectors.toList());
     }
 
     public long countCommandEvent(String itemName, Object command) {
@@ -73,13 +79,25 @@ public class CollectingEventPublisher implements EventPublisher {
                 .isPresent();
     }
 
-    final class Container {
+    public void clear() {
+        this.events.clear();
+    }
+
+    public final class Container {
         private ZonedDateTime time;
         private Event event;
 
         public Container(ZonedDateTime time, Event event) {
             this.time = time;
             this.event = event;
+        }
+
+        public ZonedDateTime getTime() {
+            return time;
+        }
+
+        public Event getEvent() {
+            return event;
         }
     }
 }
