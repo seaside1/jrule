@@ -73,7 +73,10 @@ import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GroupItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.scheduler.CronScheduler;
@@ -128,7 +131,7 @@ public class JRuleEngine implements PropertyChangeListener {
         logDebug("Adding rule method: {}", method.getName());
 
         if (!method.isAnnotationPresent(JRuleName.class)) {
-            logWarn("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
+            logDebug("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
                     jRule.getClass().getName());
             return;
         }
