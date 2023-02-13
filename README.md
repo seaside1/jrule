@@ -718,11 +718,14 @@ public void testPower(JRuleEvent event) {
 
 ## Example 35
 
-Use case: Want to listen on all Item events of a group (without the groupstate must change)
+Use case: Want to listen on all Item events of a group (without the groupstate must change). 
+    Alternatively you could just listen to just Group changes or (real) Item changes
 
 ```java
     @JRuleName("MemberOfUpdateTrigger")
-    @JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = true)
+    @JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.All)
+    //@JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.Items)
+    //@JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.Groups)
     public synchronized void memberOfUpdateTrigger(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
@@ -768,6 +771,33 @@ Use case: Do not execute a rule too often
 @JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
 public void debounceMethod() {
     // super critical stuff which shouldn't be called too often
+}
+```
+
+## Example 39
+
+Use case: Send some requests to http endpoints
+
+```java
+@JRuleName("send http methods")
+@JRuleWhenItemReceivedCommand(item = _MyHttpTrigger.ITEM, command = "send http calls")
+public void sendHttpCalls() {
+    String responseGet = sendHttpGetRequest("http://http-mock:8080" + HTTP_GET_SOMETHING, null);
+    logInfo("send Http: {}", responseGet);
+    sendHttpDeleteRequest("http://http-mock:8080" + HTTP_DELETE_SOMETHING, Duration.ofSeconds(5));
+}
+```
+
+## Example 40
+
+Use case: Execute a rule delayed
+
+```java
+@JRuleDelayed(10)
+@JRuleName("Execute after ten seconds")
+@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+public void delayedMethod() {
+    // delay the execution of this
 }
 ```
 

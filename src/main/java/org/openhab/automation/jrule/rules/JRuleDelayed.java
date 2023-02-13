@@ -13,25 +13,31 @@
 package org.openhab.automation.jrule.rules;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.time.temporal.ChronoUnit;
 
 /**
- * The {@link JRuleWhenItemReceivedUpdate}
+ * The {@link JRuleDelayed} type.
+ * Default value unit is Seconds.
  *
- * @author Robert Delbrück
+ * @author Robert Delbrück - Initial contribution
  */
-@Repeatable(JRuleWhenItemReceivedUpdates.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface JRuleWhenItemReceivedUpdate {
-    String item() default "";
+public @interface JRuleDelayed {
+    /**
+     * Default is seconds. Can be changed via unit().
+     *
+     * @return value as long
+     */
+    long value() default 0;
 
-    String state() default "";
-
-    JRuleMemberOf memberOf() default JRuleMemberOf.None;
-
-    JRuleCondition condition() default @JRuleCondition;
+    /**
+     * Time unit. Default is seconds.
+     *
+     * @return time unit.
+     */
+    ChronoUnit unit() default ChronoUnit.SECONDS;
 }

@@ -88,4 +88,9 @@ public class JRuleDecimalValue implements JRuleValue {
     public long longValue() {
         return this.ohType.longValue();
     }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
+    }
 }
