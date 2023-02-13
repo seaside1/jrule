@@ -13,14 +13,13 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
-
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.core.library.types.DecimalType;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.core.library.types.DecimalType;
 
 /**
  * The {@link JRuleInternalSwitchItem} Items
