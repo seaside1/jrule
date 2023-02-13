@@ -27,8 +27,8 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRuleDimmerItem extends JRuleSwitchItem {
-    String INCREASE = JRuleIncreaseDecreaseValue.INCREASE.stringValue();
-    String DECREASE = JRuleIncreaseDecreaseValue.DECREASE.stringValue();
+    String INCREASE = "INCREASE";
+    String DECREASE = "DECREASE";
 
     static JRuleDimmerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalDimmerItem.class);

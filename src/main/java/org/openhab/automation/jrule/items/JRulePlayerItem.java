@@ -26,12 +26,12 @@ import org.openhab.automation.jrule.rules.value.*;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRulePlayerItem extends JRuleItem {
-    String PLAY = JRulePlayPauseValue.PLAY.stringValue();
-    String PAUSE = JRulePlayPauseValue.PAUSE.stringValue();
-    String NEXT = JRuleNextPreviousValue.NEXT.stringValue();
-    String PREVIOUS = JRuleNextPreviousValue.PREVIOUS.stringValue();
-    String REWIND = JRuleRewindFastforwardValue.REWIND.stringValue();
-    String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.stringValue();
+    String PLAY = "PLAY";
+    String PAUSE = "PAUSE";
+    String NEXT = "NEXT";
+    String PREVIOUS = "PREVIOUS";
+    String REWIND = "REWIND";
+    String FASTFORWARD = "FASTFORWARD";
 
     static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalPlayerItem.class);
