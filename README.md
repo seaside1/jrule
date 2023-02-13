@@ -817,6 +817,8 @@ public void getTagsAndMetadata() {
 }
 ```
 
+
+
 # Changelog
 ## BETA15
 - BREAKING: All JRuleWhen has to be change to corresponding JRuleWhenItemChanged (as an example, look at JRule Examples documentation)
