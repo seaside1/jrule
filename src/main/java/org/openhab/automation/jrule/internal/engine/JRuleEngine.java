@@ -30,6 +30,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -55,6 +56,7 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedEx
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
 import org.openhab.automation.jrule.rules.JRuleDebounce;
@@ -73,7 +75,10 @@ import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GroupItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.scheduler.CronScheduler;
@@ -128,7 +133,7 @@ public class JRuleEngine implements PropertyChangeListener {
         logDebug("Adding rule method: {}", method.getName());
 
         if (!method.isAnnotationPresent(JRuleName.class)) {
-            logWarn("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
+            logDebug("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
                     jRule.getClass().getName());
             return;
         }
@@ -168,6 +173,10 @@ public class JRuleEngine implements PropertyChangeListener {
                 .filter(jRuleDebounce -> jRuleDebounce.value() > 0)
                 .map(jRuleDebounce -> Duration.of(jRuleDebounce.value(), jRuleDebounce.unit())).orElse(null);
 
+        Duration delayed = Optional.ofNullable(method.getAnnotation(JRuleDelayed.class))
+                .filter(jRuleDelayed -> jRuleDelayed.value() > 0)
+                .map(jRuleDebounce -> Duration.of(jRuleDebounce.value(), jRuleDebounce.unit())).orElse(null);
+
         ruleLoadingStatistics.addRuleMethod();
         AtomicBoolean addedToContext = new AtomicBoolean(false);
 
@@ -177,7 +186,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty),
-                    timedLock));
+                    timedLock, delayed));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -188,7 +197,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty),
-                    timedLock));
+                    timedLock, delayed));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -201,7 +210,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRulePreviousCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), timedLock));
+                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), timedLock, delayed));
             ruleLoadingStatistics.addItemStateTrigger();
             addedToContext.set(true);
         });
@@ -209,7 +218,7 @@ public class JRuleEngine implements PropertyChangeListener {
         Arrays.stream(method.getAnnotationsByType(JRuleWhenChannelTrigger.class)).forEach(jRuleWhen -> {
             addToContext(new JRuleChannelExecutionContext(jRule, logName, loggingTags, method,
                     jRulePreconditionContexts, jRuleWhen.channel(),
-                    Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty), timedLock));
+                    Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty), timedLock, delayed));
             ruleLoadingStatistics.addChannelTrigger();
             addedToContext.set(true);
         });
@@ -236,7 +245,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
                     Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
                     Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
-                    jRulePreconditionContexts, timedLock));
+                    jRulePreconditionContexts, timedLock, delayed));
             addedToContext.set(true);
         });
 
@@ -448,9 +457,10 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
         if (config.isExecutorsEnabled()) {
-            ruleExecutorService.submit(() -> invokeRuleInternal(context, event));
+            ruleExecutorService.submit(() -> invokeDelayed(context, event,
+                    (jRuleExecutionContext, jRuleEvent) -> invokeRuleInternal(context, event)));
         } else {
-            invokeRuleInternal(context, event);
+            invokeDelayed(context, event, (jRuleExecutionContext, jRuleEvent) -> invokeRuleInternal(context, event));
         }
     }
 
@@ -491,6 +501,16 @@ public class JRuleEngine implements PropertyChangeListener {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
             JRule.JRULE_EXECUTION_CONTEXT.remove();
+        }
+    }
+
+    private void invokeDelayed(JRuleExecutionContext context, JRuleEvent event,
+            BiConsumer<JRuleExecutionContext, JRuleEvent> ruleInvoker) {
+        if (context.getDelayed() != null) {
+            JRuleTimerHandler.get().createTimer(null, context.getDelayed(), () -> ruleInvoker.accept(context, event),
+                    context);
+        } else {
+            ruleInvoker.accept(context, event);
         }
     }
 }

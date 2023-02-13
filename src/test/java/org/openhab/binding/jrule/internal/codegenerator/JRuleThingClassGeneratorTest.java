@@ -81,10 +81,13 @@ public class JRuleThingClassGeneratorTest {
                 .withKind(ChannelKind.TRIGGER).build();
         Channel stateChannel = ChannelBuilder.create(new ChannelUID(thing.getUID(), "stateChannel"))
                 .withKind(ChannelKind.STATE).build();
+        Channel illegalCharactersChannel = ChannelBuilder
+                .create(new ChannelUID(thing.getUID(), "dash-Channel#keyPress")).withKind(ChannelKind.TRIGGER).build();
         thing.addChannel(triggerChannel);
         thing.addChannel(triggerChannelWithType);
         thing.addChannel(triggerChannelWithNumber);
         thing.addChannel(stateChannel);
+        thing.addChannel(illegalCharactersChannel);
 
         generateAndCompile(thing);
     }

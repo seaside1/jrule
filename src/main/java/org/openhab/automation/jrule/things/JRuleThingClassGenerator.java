@@ -148,7 +148,7 @@ public class JRuleThingClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     public static String createFieldName(Thing thing, String channelName) {
-        String fieldName = channelName.replace("#", "_");
+        String fieldName = channelName.replaceAll("[#\\-:\\.]", "_");
 
         if (!isValidJavaIdentifier(fieldName)) {
             // Try prefix with '_'

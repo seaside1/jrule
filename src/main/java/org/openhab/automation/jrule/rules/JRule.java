@@ -15,7 +15,9 @@ package org.openhab.automation.jrule.rules;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
@@ -70,13 +72,119 @@ public class JRule {
         JRuleActionHandler.get().executeCommandLine(commandLine);
     }
 
-    protected String executeCommandLineAndAwaitResponse(long delayInSeconds, String... commandLine) {
-        return JRuleActionHandler.get().executeCommandAndAwaitResponse(delayInSeconds, commandLine);
+    @Deprecated
+    protected String executeCommandLineAndAwaitResponse(long timeout, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(Duration.of(timeout, ChronoUnit.SECONDS),
+                commandLine);
+    }
+
+    protected String executeCommandLineAndAwaitResponse(Duration timeout, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(timeout, commandLine);
+    }
+
+    /**
+     * Sends a GET-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @return Result as String
+     */
+    protected String sendHttpGetRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpGetRequest(url, null, timeout);
+    }
+
+    /**
+     * Sends a GET-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
+     *
+     * @param url Target URL
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpGetRequest(String url, @Nullable Map<String, String> headers, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpGetRequest(url, headers, timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, null, null, null, timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     *
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, String contentType, String content, Map<String, String> headers,
+            @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, contentType, content, headers, timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, null, null, null, timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     * <br/>
+     *
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, String contentType, String content, Map<String, String> headers,
+            @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, contentType, content, headers, timeout);
+    }
+
+    /**
+     * Sends a DELETE-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpDeleteRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpDeleteRequest(url, null, timeout);
+    }
+
+    /**
+     * Sends a DELETE-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
+     *
+     * @param url Target URL
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpDeleteRequest(String url, Map<String, String> headers, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpDeleteRequest(url, headers, timeout);
     }
 
     /**
      * Creates or replaces a timer.
-     * 
+     *
      * @param timerName Name of the timer or null.
      * @param delay Initial delay and delay between the timers.
      * @param function Code to execute.
@@ -89,7 +197,7 @@ public class JRule {
 
     /**
      * Creates a timer.
-     * 
+     *
      * @param timerName Name of the timer or null.
      * @param delay Initial delay and delay between the timers.
      * @param function Code to execute.
@@ -153,7 +261,7 @@ public class JRule {
 
     /**
      * Cancels the timer with the given name.
-     * 
+     *
      * @param timerName Name of the timer or null.
      * @return true if canceled, false if not.
      */
@@ -163,7 +271,7 @@ public class JRule {
 
     /**
      * Checks if the timer with the given name is still running.
-     * 
+     *
      * @param timerName Name of the timer or null.
      * @return true if running, false if not.
      */
@@ -173,7 +281,7 @@ public class JRule {
 
     /**
      * Creating a timed look.
-     * 
+     *
      * @param lockName Name of the lock. Must be unique over all rules.
      * @param duration Duration until the lock is held.
      * @return Returns true if the lock for this name is not held. false if the lock is held.

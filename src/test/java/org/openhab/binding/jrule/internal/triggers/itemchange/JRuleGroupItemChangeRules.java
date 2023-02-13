@@ -12,10 +12,7 @@
  */
 package org.openhab.binding.jrule.internal.triggers.itemchange;
 
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleMemberOf;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 
 /**
@@ -52,6 +49,36 @@ public class JRuleGroupItemChangeRules extends JRule {
     @JRuleName("Test JRuleWhenGroupItemChange/from")
     @JRuleWhenItemChange(item = GROUP_ITEM_FROM, from = "1", memberOf = JRuleMemberOf.All)
     public void groupItemChangeFrom(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemReceivedUpdate/JustItems")
+    @JRuleWhenItemReceivedUpdate(item = GROUP_ITEM_JUST_ITEMS, memberOf = JRuleMemberOf.Items)
+    public void groupItemReceivedUpdateJustItems(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemReceivedUpdate/JustGroups")
+    @JRuleWhenItemReceivedUpdate(item = GROUP_ITEM_JUST_GROUPS, memberOf = JRuleMemberOf.Groups)
+    public void groupItemReceivedUpdateJustGroups(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemReceivedUpdate/from")
+    @JRuleWhenItemReceivedUpdate(item = GROUP_ITEM_FROM, memberOf = JRuleMemberOf.All)
+    public void groupItemReceivedUpdateTo(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemReceivedCommand/JustItems")
+    @JRuleWhenItemReceivedCommand(item = GROUP_ITEM_JUST_ITEMS, memberOf = JRuleMemberOf.Items)
+    public void groupItemReceivedCommandJustItems(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemReceivedCommand/JustGroups")
+    @JRuleWhenItemReceivedCommand(item = GROUP_ITEM_JUST_GROUPS, memberOf = JRuleMemberOf.Groups)
+    public void groupItemReceivedCommandJustGroups(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenGroupItemReceivedCommand/from")
+    @JRuleWhenItemReceivedCommand(item = GROUP_ITEM_FROM, memberOf = JRuleMemberOf.All)
+    public void groupItemReceivedCommandFrom(JRuleEvent event) {
     }
 
     @JRuleName("Test JRuleWhenGroupItemChange/to")

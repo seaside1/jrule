@@ -36,8 +36,8 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
 
     public JRuleItemExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method, String itemName,
             JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Duration timedLock) {
-        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock);
+            List<JRulePreconditionContext> preconditionContextList, Duration timedLock, Duration delayed) {
+        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock, delayed);
         this.itemName = itemName;
         this.memberOf = memberOf;
         this.conditionContext = conditionContext;

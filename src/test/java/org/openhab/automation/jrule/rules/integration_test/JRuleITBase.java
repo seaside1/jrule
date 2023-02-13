@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
@@ -48,9 +50,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.ToxiproxyContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
+import org.testcontainers.containers.wait.strategy.*;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import org.testcontainers.utility.MountableFile;
 
@@ -63,6 +63,7 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.clas
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.ParseException;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.EntityUtils;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -94,10 +95,22 @@ public abstract class JRuleITBase {
                     "/mosquitto/config/mosquitto.conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/docker/mosquitto/default.acl"),
                     "/mosquitto/config/default.conf")
-            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*mosquitto version.*")).withNetwork(network);
+            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*mosquitto version.*")).withNetwork(network)
+            .withReuse(true);
 
     private static final ToxiproxyContainer toxiproxyContainer = new ToxiproxyContainer(
-            "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer);
+            "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer)
+                    .withReuse(true);
+
+    private static final GenericContainer<?> influxDbContainer = new GenericContainer<>("influxdb:2.0")
+            .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup").withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
+            .withEnv("DOCKER_INFLUXDB_INIT_PASSWORD", "influxdb").withEnv("DOCKER_INFLUXDB_INIT_ORG", "openhab")
+            .withEnv("DOCKER_INFLUXDB_INIT_BUCKET", "autogen").withEnv("DOCKER_INFLUXDB_INIT_RETENTION", "1w")
+            .withEnv("DOCKER_INFLUXDB_INIT_ADMIN_TOKEN", "mytoken").withNetworkAliases("influxdb")
+            .withExposedPorts(8086)
+            .waitingFor(new LogMessageWaitStrategy()
+                    .withRegEx(".*service=tcp-listener transport=http addr=:8086 port=8086.*"))
+            .withNetwork(network).withReuse(true);
 
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
@@ -159,7 +172,10 @@ public abstract class JRuleITBase {
                                     }, s -> s > 0);
                         }
                     }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS)))
-            .withNetwork(network);
+            .withNetwork(network).dependsOn(influxDbContainer).withReuse(true);
+
+    protected static final GenericContainer<?> mockServer = new GenericContainer<>("wiremock/wiremock:2.32.0")
+            .withExposedPorts(8080).withNetwork(network).withNetworkAliases("http-mock");
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
     private @NotNull IMqttClient mqttClient;
@@ -170,6 +186,7 @@ public abstract class JRuleITBase {
         mqttProxy = toxiproxyContainer.getProxy(mqttContainer, 1883);
         System.out.println(mqttProxy.getOriginalProxyPort());
         openhabContainer.start();
+        mockServer.start();
     }
 
     @BeforeEach
@@ -194,6 +211,9 @@ public abstract class JRuleITBase {
         mqttClient = getMqttClient();
         subscribeMqtt("number/state");
         publishMqttMessage("number/state", "0");
+
+        WireMock.configureFor(mockServer.getHost(), mockServer.getFirstMappedPort());
+        WireMock.reset();
     }
 
     @AfterEach
@@ -258,6 +278,10 @@ public abstract class JRuleITBase {
 
     private boolean containsLine(String line, List<String> logLines) {
         return logLines.stream().anyMatch(s -> s.contains(line));
+    }
+
+    private boolean matchesLine(String line, List<String> logLines) {
+        return logLines.stream().anyMatch(s -> s.matches(line));
     }
 
     private boolean notContainsLine(String line, List<String> logLines) {
@@ -375,6 +399,17 @@ public abstract class JRuleITBase {
     protected void verifyLogEntry(String ruleLogLine) {
         Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
                 .await("rule executed").until(() -> logLines, v -> containsLine(ruleLogLine, v));
+    }
+
+    protected Matcher getLogEntry(String ruleLogLinePattern) {
+        Awaitility.await().with().timeout(20, TimeUnit.SECONDS).pollInterval(200, TimeUnit.MILLISECONDS)
+                .await("rule executed").until(() -> logLines, v -> matchesLine(ruleLogLinePattern, v));
+        Pattern p = Pattern.compile(ruleLogLinePattern);
+        return logLines.stream().filter(s -> s.matches(ruleLogLinePattern)).findFirst().map(input -> {
+            Matcher matcher = p.matcher(input);
+            matcher.matches();
+            return matcher;
+        }).orElseThrow();
     }
 
     protected void verifyNoLogEntry(String ruleLogLine) {
