@@ -85,4 +85,9 @@ public class JRuleQuantityValue implements JRuleValue {
     public String unit() {
         return this.ohType.getUnit().toString();
     }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
+    }
 }

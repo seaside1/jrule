@@ -85,8 +85,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
 
     @Override
     public Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(s -> JRuleEventHandler.get().toValue(s, getState().getClass()));
+        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId);
     }
 
     @Override

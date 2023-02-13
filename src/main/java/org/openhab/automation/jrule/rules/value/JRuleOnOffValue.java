@@ -46,11 +46,6 @@ public enum JRuleOnOffValue implements JRuleValue {
     }
 
     @Override
-    public String toString() {
-        return name();
-    }
-
-    @Override
     public String stringValue() {
         return name();
     }
@@ -63,5 +58,10 @@ public enum JRuleOnOffValue implements JRuleValue {
     @Override
     public State toOhState() {
         return this.ohType;
+    }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
     }
 }

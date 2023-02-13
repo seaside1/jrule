@@ -55,4 +55,9 @@ public enum JRuleRewindFastforwardValue implements JRuleValue {
     public State toOhState() {
         return this.ohType;
     }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
+    }
 }

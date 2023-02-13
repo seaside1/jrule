@@ -61,3 +61,20 @@ Color           Color_Event
 Location        Location_Event
 Number:Power    Quantity_Event
 
+Number          Number_Persistence
+Switch          Switch_Persistence
+Contact         Contact_Persistence
+
+// Persistence 
+Switch          Switch_To_Persist
+Number          Number_To_Persist
+String          String_To_Persist
+DateTime        DateTime_To_Persist
+Player          Player_To_Persist
+Contact         Contact_To_Persist
+Image           Image_To_Persist
+Rollershutter   Rollershutter_To_Persist
+Dimmer          Dimmer_To_Persist
+Color           Color_To_Persist
+Location        Location_To_Persist
+Number:Power    Quantity_To_Persist
