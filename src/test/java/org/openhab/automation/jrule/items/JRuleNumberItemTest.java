@@ -84,11 +84,11 @@ class JRuleNumberItemTest extends JRuleItemTestBase {
         Assertions.assertFalse(JRuleNumberItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 
-    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
         return (T) JRuleNumberGroupItem.forName(name);
     }
 
-    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
         return (Optional<T>) JRuleNumberGroupItem.forNameOptional(name);
     }
 }

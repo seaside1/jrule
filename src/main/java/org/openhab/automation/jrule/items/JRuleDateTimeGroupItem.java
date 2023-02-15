@@ -26,7 +26,7 @@ import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem, JRuleGroupItem {
+public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem, JRuleGroupItem<JRuleDateTimeItem> {
     static JRuleDateTimeGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalDateTimeGroupItem.class);
     }
@@ -36,26 +36,26 @@ public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem, JRuleGroupIte
     }
 
     default void sendCommand(JRuleDateTimeValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleDateTimeValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(Date command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
     }
 
     default void sendCommand(ZonedDateTime command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
     }
 
     default void postUpdate(Date state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
     }
 
     default void postUpdate(ZonedDateTime state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
     }
 }

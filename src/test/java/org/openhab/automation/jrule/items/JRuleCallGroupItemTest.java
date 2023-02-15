@@ -12,16 +12,29 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 
 /**
  * The {@link JRuleCallGroupItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRuleCallGroupItemTest extends JRuleCallItemTest {
+public class JRuleCallGroupItemTest extends JRuleCallItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalCallGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleStringListValue> set = JRuleCallGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleCallItem::getStateAsStringList).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

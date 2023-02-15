@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRulePointValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem {
+public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem<JRuleLocationItem> {
     static JRuleLocationGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalLocationGroupItem.class);
     }
@@ -34,10 +34,10 @@ public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupIte
     }
 
     default void sendCommand(JRulePointValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePointValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem {
+public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem<JRuleContactItem> {
     static JRuleContactGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalContactGroupItem.class);
     }
@@ -34,6 +34,6 @@ public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem 
     }
 
     default void postUpdate(JRuleOpenClosedValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

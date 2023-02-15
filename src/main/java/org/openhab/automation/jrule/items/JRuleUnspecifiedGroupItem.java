@@ -16,16 +16,16 @@ import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
-import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalUnspecifiedGroupItem;
 
 /**
  * The {@link JRuleUnspecifiedGroupItem} Items
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleUnspecifiedGroupItem extends JRuleItem, JRuleGroupItem {
+public interface JRuleUnspecifiedGroupItem extends JRuleItem, JRuleGroupItem<JRuleItem> {
     static JRuleUnspecifiedGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleInternalStringGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalUnspecifiedGroupItem.class);
     }
 
     static Optional<JRuleUnspecifiedGroupItem> forNameOptional(String itemName) {

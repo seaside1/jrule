@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleColorGroupItem extends JRuleColorItem, JRuleDimmerGroupItem {
+public interface JRuleColorGroupItem extends JRuleColorItem, JRuleDimmerGroupItem<JRuleColorItem> {
     static JRuleColorGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalColorGroupItem.class);
     }
@@ -34,10 +34,10 @@ public interface JRuleColorGroupItem extends JRuleColorItem, JRuleDimmerGroupIte
     }
 
     default void sendCommand(JRuleHsbValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        this.memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleHsbValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        this.memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

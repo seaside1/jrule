@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleStringValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem {
+public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem<JRuleStringItem> {
     static JRuleStringGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalStringGroupItem.class);
     }
@@ -34,18 +34,18 @@ public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem {
     }
 
     default void sendCommand(JRuleStringValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleStringValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(String command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
     }
 
     default void postUpdate(String state) {
-        memberItemsGeneric().forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
+        memberItems().forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
     }
 }

@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem {
+public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem<JRuleCallItem> {
     static JRuleCallGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalCallGroupItem.class);
     }
@@ -34,6 +34,6 @@ public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem {
     }
 
     default void postUpdate(JRuleStringListValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 }

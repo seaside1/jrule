@@ -118,11 +118,11 @@ class JRuleDimmerItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAsOnOff());
     }
 
-    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
         return (T) JRuleDimmerGroupItem.forName(name);
     }
 
-    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
         return (Optional<T>) JRuleDimmerGroupItem.forNameOptional(name);
     }
 }

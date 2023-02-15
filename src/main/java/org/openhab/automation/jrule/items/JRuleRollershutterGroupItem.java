@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.*;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleRollershutterGroupItem extends JRuleRollershutterItem, JRuleGroupItem {
+public interface JRuleRollershutterGroupItem extends JRuleRollershutterItem, JRuleGroupItem<JRuleRollershutterItem> {
     static JRuleRollershutterGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalRollershutterGroupItem.class);
     }
@@ -34,26 +34,26 @@ public interface JRuleRollershutterGroupItem extends JRuleRollershutterItem, JRu
     }
 
     default void sendCommand(JRulePercentValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePercentValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(int command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
     }
 
     default void sendCommand(JRuleUpDownValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void sendCommand(JRuleStopMoveValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(int state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
     }
 }

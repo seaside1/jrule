@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleQuantityGroupItem extends JRuleQuantityItem, JRuleGroupItem {
+public interface JRuleQuantityGroupItem extends JRuleQuantityItem, JRuleGroupItem<JRuleQuantityItem> {
     static JRuleQuantityGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalQuantityGroupItem.class);
     }
@@ -34,26 +34,26 @@ public interface JRuleQuantityGroupItem extends JRuleQuantityItem, JRuleGroupIte
     }
 
     default void sendCommand(JRuleQuantityValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void sendCommand(double command, String unit) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
     }
 
     default void sendCommand(int command, String unit) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
     }
 
     default void postUpdate(JRuleQuantityValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(double state, String unit) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
     }
 
     default void postUpdate(int state, String unit) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
     }
 }

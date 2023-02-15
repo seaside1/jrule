@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
+public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem<JRuleNumberItem> {
     static JRuleNumberGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalNumberGroupItem.class);
     }
@@ -34,26 +34,26 @@ public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
     }
 
     default void sendCommand(JRuleDecimalValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleDecimalValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(double command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
     default void sendCommand(int command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
+        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
     default void postUpdate(double state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 
     default void postUpdate(int state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
+        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 }

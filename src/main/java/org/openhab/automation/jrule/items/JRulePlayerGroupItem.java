@@ -24,7 +24,7 @@ import org.openhab.automation.jrule.rules.value.*;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem {
+public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem<JRulePlayerItem> {
     static JRulePlayerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalPlayerGroupItem.class);
     }
@@ -34,18 +34,18 @@ public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem {
     }
 
     default void sendCommand(JRulePlayPauseValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePlayPauseValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(JRuleRewindFastforwardValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void sendCommand(JRuleNextPreviousValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 }

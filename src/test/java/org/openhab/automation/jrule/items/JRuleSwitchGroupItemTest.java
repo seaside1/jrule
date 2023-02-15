@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * The {@link JRuleSwitchGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleSwitchGroupItemTest extends JRuleSwitchItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalSwitchGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleOnOffValue> set = JRuleSwitchGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleSwitchItem::getStateAsOnOff).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

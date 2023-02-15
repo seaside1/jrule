@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
@@ -23,42 +24,35 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupItem extends JRuleItem {
+public interface JRuleGroupItem<I extends JRuleItem> extends JRuleItem {
     @Deprecated
     default Set<String> members() {
         return JRuleEventHandler.get().getGroupMemberNames(getName(), false);
     }
 
-    default Set<? extends JRuleItem> memberItems() {
-        return memberItemsGeneric(false);
+    default Set<I> memberItems() {
+        return memberItems(false);
     }
 
-    default Set<? extends JRuleItem> memberItems(boolean recursive) {
-        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive);
-    }
-
-    default Set<JRuleItem> memberItemsGeneric() {
-        return memberItemsGeneric(false);
-    }
-
-    default Set<JRuleItem> memberItemsGeneric(boolean recursive) {
-        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive);
+    default Set<I> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (I) jRuleItem).collect(Collectors.toSet());
     }
 
     default void sendUncheckedCommand(JRuleValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUncheckedUpdate(JRuleValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(JRuleRefreshValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postNullUpdate() {
-        memberItemsGeneric().forEach(i -> i.postUpdate(null));
+        memberItems().forEach(JRuleItem::postNullUpdate);
     }
 
     @Override

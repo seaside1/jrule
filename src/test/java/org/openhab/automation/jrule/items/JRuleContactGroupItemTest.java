@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalContactGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
  * The {@link JRuleContactGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleContactGroupItemTest extends JRuleContactItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalContactGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleOpenClosedValue> set = JRuleContactGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleContactItem::getStateAsOpenClose).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

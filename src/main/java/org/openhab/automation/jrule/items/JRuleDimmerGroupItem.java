@@ -25,36 +25,36 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleDimmerGroupItem extends JRuleDimmerItem, JRuleSwitchGroupItem {
-    static JRuleDimmerGroupItem forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleDimmerGroupItem<I extends JRuleDimmerItem> extends JRuleDimmerItem, JRuleSwitchGroupItem<I> {
+    static JRuleDimmerGroupItem<JRuleDimmerItem> forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalDimmerGroupItem.class);
     }
 
-    static Optional<JRuleDimmerGroupItem> forNameOptional(String itemName) {
+    static Optional<JRuleDimmerGroupItem<JRuleDimmerItem>> forNameOptional(String itemName) {
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     default void sendCommand(JRulePercentValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        this.memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePercentValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        this.memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(int command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
+        this.memberItems().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
     }
 
     default void sendCommand(JRuleIncreaseDecreaseValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        this.memberItems().forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleIncreaseDecreaseValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        this.memberItems().forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(int state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
+        this.memberItems().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
     }
 }
