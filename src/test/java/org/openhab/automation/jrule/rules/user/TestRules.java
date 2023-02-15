@@ -239,7 +239,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleSwitchItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        Set<? extends JRuleSwitchItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }

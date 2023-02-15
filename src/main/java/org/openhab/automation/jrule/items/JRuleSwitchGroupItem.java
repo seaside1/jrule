@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
@@ -24,28 +27,39 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleSwitchGroupItem<I extends JRuleSwitchItem> extends JRuleSwitchItem, JRuleGroupItem<I> {
-    static JRuleSwitchGroupItem<JRuleSwitchItem> forName(String itemName) throws JRuleItemNotFoundException {
+public interface JRuleSwitchGroupItem extends JRuleSwitchItem, JRuleGroupItem<JRuleSwitchItem> {
+    static JRuleSwitchGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalSwitchGroupItem.class);
     }
 
-    static Optional<JRuleSwitchGroupItem<JRuleSwitchItem>> forNameOptional(String itemName) {
+    static Optional<JRuleSwitchGroupItem> forNameOptional(String itemName) {
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
+    default Set<? extends JRuleSwitchItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<? extends JRuleSwitchItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleSwitchItem) jRuleItem).collect(Collectors.toSet());
+    }
+
     default void sendCommand(JRuleOnOffValue command) {
-        this.memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleOnOffValue state) {
-        this.memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(boolean command) {
-        this.memberItems().forEach(i -> i.sendUncheckedCommand(JRuleOnOffValue.valueOf(command)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.sendUncheckedCommand(JRuleOnOffValue.valueOf(command)));
     }
 
     default void postUpdate(boolean state) {
-        this.memberItems().forEach(i -> i.postUncheckedUpdate(JRuleOnOffValue.valueOf(state)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.postUncheckedUpdate(JRuleOnOffValue.valueOf(state)));
     }
 }

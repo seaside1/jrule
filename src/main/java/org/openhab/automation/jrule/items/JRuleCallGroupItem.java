@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalCallGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 
@@ -33,7 +36,16 @@ public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem<JRuleC
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
+    default Set<JRuleCallItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleCallItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleCallItem) jRuleItem).collect(Collectors.toSet());
+    }
+
     default void postUpdate(JRuleStringListValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }

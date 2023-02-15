@@ -30,29 +30,28 @@ public interface JRuleGroupItem<I extends JRuleItem> extends JRuleItem {
         return JRuleEventHandler.get().getGroupMemberNames(getName(), false);
     }
 
-    default Set<I> memberItems() {
+    default Set<? extends JRuleItem> memberItems() {
         return memberItems(false);
     }
 
-    default Set<I> memberItems(boolean recursive) {
-        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
-                .map(jRuleItem -> (I) jRuleItem).collect(Collectors.toSet());
+    default Set<? extends JRuleItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream().collect(Collectors.toSet());
     }
 
     default void sendUncheckedCommand(JRuleValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUncheckedUpdate(JRuleValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(JRuleRefreshValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postNullUpdate() {
-        memberItems().forEach(JRuleItem::postNullUpdate);
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(JRuleItem::postNullUpdate);
     }
 
     @Override

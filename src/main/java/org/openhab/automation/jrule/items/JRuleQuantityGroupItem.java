@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 
@@ -33,27 +36,40 @@ public interface JRuleQuantityGroupItem extends JRuleQuantityItem, JRuleGroupIte
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
+    default Set<JRuleQuantityItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleQuantityItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleQuantityItem) jRuleItem).collect(Collectors.toSet());
+    }
+
     default void sendCommand(JRuleQuantityValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void sendCommand(double command, String unit) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
     }
 
     default void sendCommand(int command, String unit) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.sendUncheckedCommand(new JRuleQuantityValue(command, unit)));
     }
 
     default void postUpdate(JRuleQuantityValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(double state, String unit) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
     }
 
     default void postUpdate(int state, String unit) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.postUncheckedUpdate(new JRuleQuantityValue(state, unit)));
     }
 }

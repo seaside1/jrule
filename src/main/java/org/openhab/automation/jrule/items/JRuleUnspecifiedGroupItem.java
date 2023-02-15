@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalUnspecifiedGroupItem;
 
 /**
@@ -30,5 +33,13 @@ public interface JRuleUnspecifiedGroupItem extends JRuleItem, JRuleGroupItem<JRu
 
     static Optional<JRuleUnspecifiedGroupItem> forNameOptional(String itemName) {
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
+    }
+
+    default Set<JRuleItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream().collect(Collectors.toSet());
     }
 }

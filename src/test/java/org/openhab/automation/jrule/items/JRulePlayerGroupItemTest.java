@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerGroupItem;
-import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 
 /**
  * The {@link JRulePlayerGroupItemTest}
@@ -33,8 +33,8 @@ class JRulePlayerGroupItemTest extends JRulePlayerItemTest {
 
     @Test
     public void testMemberOfGeneric() {
-        List<JRulePercentValue> set = JRuleDimmerGroupItem.forName(GROUP_NAME).memberItems().stream()
-                .map(JRuleDimmerItem::getStateAsPercent).collect(Collectors.toList());
+        List<JRulePlayPauseValue> set = JRulePlayerGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRulePlayerItem::getStateAsPlayPause).collect(Collectors.toList());
         Assertions.assertEquals(3, set.size());
     }
 }
