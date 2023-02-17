@@ -341,7 +341,7 @@ public class TestRules extends JRule {
 
         // repeating timer
         AtomicInteger counter = new AtomicInteger(0);
-        createRepeatingTimer(Duration.ofMillis(10), 20,
+        createRepeatingTimer(Duration.ofMillis(1), 200,
                 () -> logInfo("TIMER-REPEATING: '{}'", counter.getAndIncrement()));
 
         // cancel normal timer
