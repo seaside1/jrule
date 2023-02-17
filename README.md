@@ -95,13 +95,17 @@ Switch MyTestSwitch2  "Test Switch 2" (JRule)
 ```java
 package org.openhab.automation.jrule.rules.user;
 
-import org.openhab.automation.jrule.items.generated._MyTestSwitch;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
 import org.openhab.automation.jrule.rules.JRule;
+import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.OFF;
+import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.ON;
 import org.openhab.automation.jrule.rules.JRuleName;
 
 public class MySwitchRule extends JRule {
 
     @JRuleName("MySwitchRule")
+    @JRuleWhenItemChange(item = MyTestSwitch, from = OFF, to = ON)
     public void execOffToOnRule() {
         logInfo("||||| --> Hello World!");
     }
@@ -141,9 +145,6 @@ Logging from rule can be done in 3 different ways
 JRule has some optional configuration. Place config file under: /etc/openhab/automation/jrule/jrule.conf
 Example of config file.
 ```
-#Prefix to be used when generating items, files
-org.openhab.automation.jrule.itemprefix=_
-
 ## Run rules in a separate threadpool
 org.openhab.automation.jrule.engine.executors.enable=false
 
@@ -174,7 +175,7 @@ See example 12, 25 and 26
 Use Case: Invoke another item Switch from rule
 ```java
     @JRuleName("MyRuleTurnSwich2On")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
         JRuleItems.MySwitch2.sendCommand(ON);
@@ -188,7 +189,7 @@ This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
 
 ```java
     @JRuleName("MyLockTestRule1")
-    @JRuleWhenItemChange(item = _MyTestSwitch2.ITEM, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch2, from = OFF, to = ON)
     public void execLockTestRule() {
         if (getTimedLock("MyLockTestRule1", 20)) {
             JRuleItems.MyDoorBellItem.sendCommand(ON);
@@ -205,7 +206,7 @@ When the rule is triggered, the triggered value is stored in the event.
 
 ```java
     @JRuleName("MyEventValueTest")
-    @JRuleWhenItemReceivedCommand(item = _MyTestSwitch2.ITEM)
+    @JRuleWhenItemReceivedCommand(item = MyTestSwitch2)
     public void myEventValueTest(JRuleEvent event) {
         logInfo("Got value from event: {}", event.getState().getValue());
     }
@@ -217,8 +218,8 @@ To add an OR statement we simply add multiple @JRuleWhen statements
 
 ```java
     @JRuleName("MyNumberRule1")
-    @JRuleWhenItemChange(item = _MyTestNumber.ITEM, from = "14", to = "10")
-    @JRuleWhenItemChange(item = _MyTestNumber.ITEM, from = "10", to = "12")
+    @JRuleWhenItemChange(item = MyTestNumber, from = "14", to = "10")
+    @JRuleWhenItemChange(item = MyTestNumber, from = "10", to = "12")
     public void myOrRuleNumber(JRuleEvent event) {
         logInfo("Got change number: {}", event.getState().getValue());
     }
@@ -248,8 +249,6 @@ package org.openhab.automation.jrule.rules.user;
 
 ```java
 import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
-
-import org.openhab.automation.jrule.items.generated._MyTestSwitch;
 import org.openhab.automation.jrule.rules.user.JRuleUser;
 
 public class MySwitchRule extends JRuleUser {
@@ -284,13 +283,14 @@ We then extend the rule from the Java Rules file:
 ```java
 package org.openhab.automation.jrule.rules.user;
 
-import org.openhab.automation.jrule.items.generated._MyTestSwitch;
+import org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
 
 public class MyTestUserRule extends JRuleUser {
 
     @JRuleName("TestUserDefinedRule")
+    @JRuleWhenItemChange(item = MyTestSwitch, from = OFF, to = ON)
     public void mySendNotificationRUle(JRuleEvent event) {
         if (timeIsOkforDisturbance()) {
             logInfo("It's ok to send a disturbing notification");
@@ -303,12 +303,15 @@ public class MyTestUserRule extends JRuleUser {
 Use case create a timer for automatically turning off a light when it is turned on. If it's running cancel it and schedule a new one. 
 ```java
     @JRuleName("myTimerRule")
-    @JRuleWhenItemChange(item = _MyLightSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyLightSwitch, to = ON)
     public synchronized void myTimerRule(JRuleEvent event) {
         logInfo("Turning on light it will be turned off in 2 mins");
-        createOrReplaceTimer(_MyLightSwitch.ITEM, Duration.ofMinutes(2), () -> { // Lambda Expression
-            logInfo("Time is up! Turning off lights");
-            JRuleItems.MyLightSwitch.sendCommand(OFF);
+        createOrReplaceTimer(MyLightSwitch, Duration.ofMinutes(2), new Runnable() {
+            @Override
+            public void run() {                       
+               logInfo("Time is up! Turning off lights");
+               JRuleItems.MyLightSwitch.sendCommand(OFF);
+            }
         });
     }
 ```
@@ -321,12 +324,14 @@ to send multiple ON statements to be sure it actually turns on.
  
 ```java
     @JRuleName("repeatRuleExample")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public synchronized void repeatRuleExample(JRuleEvent event) {
-        createOrReplaceRepeatingTimer("myRepeatingTimer", 7, Duration.ofSeconds(10), () -> { // Lambda Expression
-            final String messageOn = "repeatRuleExample Repeating.....";
-            logInfo(messageOn);
-            JRuleItems.MyBad433Switch.sendCommand(ON);
+        createOrReplaceRepeatingTimer("myRepeatingTimer", 7, Duration.ofSeconds(10), new Runnable() { 
+            @Override
+            public void run() {                                   
+              String messageOn = "repeatRuleExample Repeating.....";
+              logInfo(messageOn);
+              JRuleItems.MyBad433Switch.sendCommand(ON);
         });
     }
 ```
@@ -337,12 +342,14 @@ Use case Create a simple timer. When MyTestSwitch turns on it will wait 10 secon
 it will not reschedule the timer, if the timer is already running it won't reschedule it.
 ```java
     @JRuleName("timerRuleExample")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public synchronized void timerRuleExample(JRuleEvent event) {
-        createTimer("myTimer", Duration.ofSeconds(10), () -> { // Lambda Expression
-            final String messageOn = "timer example.";
-            logInfo(messageOn);
-            JRuleItems.MyTestWitch2.sendCommand(ON);
+        createTimer("myTimer", Duration.ofSeconds(10), new Runnable() { 
+            @Override
+            public void run() {                                   
+              String messageOn = "timer example.";
+              logInfo(messageOn);
+              JRuleItems.MyTestWitch2.sendCommand(ON);
         });
     }
 ```
@@ -370,7 +377,7 @@ gte = greater than or equals
 eq = equals  
 ```java
     @JRuleName("turnOnFanIfTemperatureIsLow")
-    @JRuleWhenItemChange(item = _MyTemperatureSensor.ITEM, condition = @JRuleCondition(lte = 20))
+    @JRuleWhenItemChange(item = MyTemperatureSensor, condition = @JRuleCondition(lte = 20))
     public synchronized void turnOnFanIfTemperatureIsLow(JRuleEvent event) {
         logInfo("Starting fan since temperature dropped below 20");
         JRuleItems.MyHeatingFanSwitch.sendCommand(JRuleOnOffValue.ON);
@@ -382,7 +389,7 @@ eq = equals
 Use case: Using say command for tts
 ```java
     @JRuleName("testSystemTts")
-    @JRuleWhenItemChange(item = _TestSystemTts.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = TestSystemTts, to = ON)
     public synchronized void testSystemTts(JRuleEvent event) {
         logInfo("System TTS Test");
         String message = "Testing tts! I hope you can hear it!";
@@ -394,9 +401,8 @@ Use case: Using say command for tts
 
 Use case: Executing command from CLI
 ```java
-
     @JRuleName("TestExecutingCommandLine")
-    @JRuleWhenItemReceivedCommand(item = _MySwitchGroup.ITEM)
+    @JRuleWhenItemReceivedCommand(item = MySwitchGroup)
     public synchronized void testExecutingCommandLine(JRuleEvent event) {
         logInfo("Creating dummy file using CLI");
         executeCommandLine("touch", "/openhab/userdata/example.txt");
@@ -407,7 +413,7 @@ Use case: Executing command from CLI
 Use case: A group of switches, see if status is changed, and also which member in the group changed state
 ```java
     @JRuleName("groupMySwitchesChanged")
-    @JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+    @JRuleWhenItemChange(item = MySwitchGroup)
     public synchronized void groupMySwitchGroupChanged(JRuleEvent event) {
     final boolean groupIsOnline = ((JRuleItemEvent) event).getState().getValueAsOnOffValue() == JRuleOnOffValue.ON;
     final String memberThatChangedStatus = ((JRuleItemEvent) event).getMemberName();
@@ -420,7 +426,7 @@ Use case: A group of switches, see if status is changed, and also which member i
 Use case: A group of switches , trigger when it's changed from OFF to ON
 ```java
     @JRuleName("groupMySwitchesChangedOffToOn")
-    @JRuleWhenItemChange(item = _MySwitchGroup.ITEM, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MySwitchGroup, from = OFF, to = ON)
     public synchronized void groupMySwitchesChangedOffToOn(JRuleEvent event) {
         logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberName());
     }
@@ -471,13 +477,13 @@ Use case: Get the brigtness from a color item, set a color item to white (HSB 0,
 ```java
   
     @JRuleName("testBrightnessFromColorItem")
-    @JRuleWhenItemChange(item = _MyTestColorItem.ITEM)
+    @JRuleWhenItemChange(item = MyTestColorItem)
     public void testBrightnessFromColorItem(JRuleEvent event) {
        JRuleColorValue color = JRuleItems.MyTestColorItem.getState();
        int brightness = color.getHsbValue().getBrightness();
     }
 
-    @JRuleWhenItemChange(item = _MyTestColorItem.ITEM)
+    @JRuleWhenItemChange(item = MyTestColorItem)
     public void testSetWhiteOnColorItem(JRuleEvent event) {
         JRuleItems.MyTestColorItem.sendCommand(JRuleColorValue.fromHsb(0,0,100));
     }
@@ -488,7 +494,7 @@ Use case: Set logging name for a specific rule
 ```java
     @JRuleName("MyCustomLoggingRule")
     @JRuleLogName("MYLOG")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
         JRuleItems.MySwitch2.sendCommand(ON);
@@ -501,7 +507,7 @@ Use case: Override logging for all rules defined in one file
    public class ColorRules extends JRule {
 
     @JRuleName("MyCustomLoggingRuleOnClass")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public void execChangedToRule() {
     	logInfo("||||| --> Executing rule MyRule: changed to on");
         JRuleItems.MySwitch2.sendCommand(ON);
@@ -522,7 +528,7 @@ Use case: Apply transformation using openHAB transformation service
    public class TransformationRule extends JRule {
 
     @JRuleName("MyTransformation")
-    @JRuleWhenItemReceivedCommand(item = _MyStringValue.ITEM)
+    @JRuleWhenItemReceivedCommand(item = MyStringValue)
     public void applyTransformation(JRuleEvent event) {
         String transformedValue = transform("MAP(my.map):%s", event.getState().getValue());
         logInfo("Transformed {} to {}", event.getState().getValue(), transformedValue);
@@ -538,9 +544,9 @@ if it is ok for disturbance. If it is ok the switch is set to ON and we can send
 message is updated.
 
 ```java
-    @JRulePrecondition(item = _MyTestDisturbanceSwitch.ITEM, condition = @JRuleCondition(eq = "ON"))
+    @JRulePrecondition(item = MyTestDisturbanceSwitch, condition = @JRuleCondition(eq = "ON"))
     @JRuleName("MyTestPreConditionRule1")
-    @JRuleWhenItemReceivedCommand(item = _MyMessageNotification.ITEM)
+    @JRuleWhenItemReceivedCommand(item = MyMessageNotification)
     public void testPrecondition(JRuleEvent event) {
         String notificationMessage = ((JRuleItemEvent) event).getState().getValue();
         logInfo("It is ok to send notification: {}", notificationMessage);
@@ -554,9 +560,9 @@ a motion detector is triggered we will turn on a fan.
 ```java
    public class PreConditionTestTemperature extends JRule {
 
-    @JRulePrecondition(item=_MyTestTemperatureSensor.ITEM, gt = 30)
+    @JRulePrecondition(item=MyTestTemperatureSensor, gt = 30)
     @JRuleName("MyTestPreConditionRuleTemperature")
-    @JRuleWhenItemChange(item = _MyMotionDetector.ITEM, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyMotionDetector, from = OFF, to = ON)
     public void testPrecondition(JRuleEvent event) {
         logInfo("Temperature is above 30 and we should start the fan since the motiondetector is triggered");
         JRuleItems.MyFan.sendCommand(ON);
@@ -572,7 +578,7 @@ Use case: Send Quantity type Watt (W) from rule.
    public class QuantityTypeRule extends JRule {
   
     @JRuleName("testQuantityPowerWatt")
-    @JRuleWhenItemChange(item = _MyTestMeterPower.ITEM)
+    @JRuleWhenItemChange(item = MyTestMeterPower)
     public void testQuantityPower(JRuleEvent event) {
         logInfo("TestQuantity power will send this value as Watt: {}", event.getState().getValue());
         JRuleItems.TestPowerQuantityType.sendCommand(event.getState().getValueAsDouble(), "W");
@@ -587,7 +593,7 @@ Use case: Use forName to create and item and send commands and get status
  public class ForNameExampleRule extends JRule {
   
     @JRuleName("testForName")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public void testForName(JRuleEvent event) {
         JRuleSwitchItem switchItem = JRuleSwitchItem.forName("MyOtherTestSwitch");
         switchItem.sendItemCommand(OFF);
@@ -605,7 +611,7 @@ Use case: Use forNameOptional to create and item and send commands and get statu
  public class ForNameExampleRule extends JRule {
   
     @JRuleName("testForNameOptional")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public void testForName(JRuleEvent event) {
         JRuleSwitchItem.forNameOptional("MyOtherTestSwitch").ifPresent(item -> item.sendCommand(true));
     }
@@ -622,8 +628,8 @@ triggered the rule.
  public class TriggerNameExample extends JRule {
   
     @JRuleName("triggerNameExample")
-    @JRuleWhenItemChange(item = _MyTestSwitch1.ITEM, to = JRuleSwitchItem.ON)
-    @JRuleWhenItemChange(item = _MyTestSwitch2.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch1, to = ON)
+    @JRuleWhenItemChange(item = MyTestSwitch2, to = ON)
     public void triggerNameExample(JRuleEvent event) {
      logInfo("The rule was triggered by the following item: {}", event.getItemName());
      logInfo("The rule was Old Value was: {} and new value: {}", event.getOldState().getValue(), event.getState().getValue());  
@@ -652,7 +658,7 @@ Use case: Use generated JRuleItems.java to get hold of items. For instance get s
  public class ItemsExampleRule extends JRule {
   
     @JRuleName("testItems")
-    @JRuleWhenItemChange(item = _MyTestSwitch.ITEM, to = JRuleSwitchItem.ON)
+    @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
     public void testItems(JRuleEvent event) {
         JRuleItems.MyOtherTestSwitch.getState();
     }
@@ -709,7 +715,7 @@ Note that you will have to set up a pusheover account as thing in openHAB.
 
 ```java
 @JRuleName("PushOverTest")
-@JRuleWhenItemChange(item = _MyTestSendPushOverButton.ITEM, to = _MyTestSendPushOverButton.ON)
+@JRuleWhenItemChange(item = MyTestSendPushOverButton, to = ON)
 public void testPower(JRuleEvent event) {
        logInfo("Sending Test message using pushover via actions");
        JRuleActions.pushoverPushoverAccountXYZ.sendMessage("MyMessage", "MyTitle");
@@ -723,9 +729,9 @@ Use case: Want to listen on all Item events of a group (without the groupstate m
 
 ```java
     @JRuleName("MemberOfUpdateTrigger")
-    @JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.All)
-    //@JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.Items)
-    //@JRuleWhenItemReceivedUpdate(item = _MySwitchGroup.ITEM, memberOf = JRuleMemberOf.Groups)
+    @JRuleWhenItemReceivedUpdate(item = MySwitchGroup, memberOf = JRuleMemberOf.All)
+    //@JRuleWhenItemReceivedUpdate(item = MySwitchGroup, memberOf = JRuleMemberOf.Items)
+    //@JRuleWhenItemReceivedUpdate(item = MySwitchGroup, memberOf = JRuleMemberOf.Groups)
     public synchronized void memberOfUpdateTrigger(JRuleItemEvent event) {
         final String memberThatChangedStatus = event.getMemberName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
@@ -751,7 +757,7 @@ Use case: Chain timers. Execute one and after this is expired, execute the next 
 
 ```java
 @JRuleName("Notify if thing stays offline")
-@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+@JRuleWhenItemChange(item = MySwitchGroup)
 public void chainSomeTimers() {
     createTimer(Duration.ofSeconds(3), () -> {
         logInfo("First timer finished after 3 seconds");
@@ -768,7 +774,7 @@ Use case: Do not execute a rule too often
 ```java
 @JRuleDebounce(10)
 @JRuleName("Notify if thing stays offline")
-@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+@JRuleWhenItemChange(item = MySwitchGroup)
 public void debounceMethod() {
     // super critical stuff which shouldn't be called too often
 }
@@ -780,7 +786,7 @@ Use case: Send some requests to http endpoints
 
 ```java
 @JRuleName("send http methods")
-@JRuleWhenItemReceivedCommand(item = _MyHttpTrigger.ITEM, command = "send http calls")
+@JRuleWhenItemReceivedCommand(item = MyHttpTrigger, command = "send http calls")
 public void sendHttpCalls() {
     String responseGet = sendHttpGetRequest("http://http-mock:8080" + HTTP_GET_SOMETHING, null);
     logInfo("send Http: {}", responseGet);
@@ -795,7 +801,7 @@ Use case: Execute a rule delayed
 ```java
 @JRuleDelayed(10)
 @JRuleName("Execute after ten seconds")
-@JRuleWhenItemChange(item = _MySwitchGroup.ITEM)
+@JRuleWhenItemChange(item = MySwitchGroup)
 public void delayedMethod() {
     // delay the execution of this
 }
