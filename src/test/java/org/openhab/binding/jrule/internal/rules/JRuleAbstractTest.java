@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
@@ -43,6 +44,12 @@ public abstract class JRuleAbstractTest {
 
     protected ItemRegistry itemRegistry;
     protected CollectingEventPublisher eventPublisher;
+    private JRuleMockedEventBus eventBus = new JRuleMockedEventBus();
+
+    @AfterAll
+    protected void shutdown() {
+        eventBus.stop();
+    }
 
     @BeforeAll
     protected void initEngine() {
@@ -60,6 +67,8 @@ public abstract class JRuleAbstractTest {
 
         eventPublisher = new CollectingEventPublisher();
         JRuleEventHandler.get().setEventPublisher(eventPublisher);
+
+        eventBus.start();
     }
 
     protected <T extends JRule> T initRule(Class<T> rule) {
@@ -69,9 +78,8 @@ public abstract class JRuleAbstractTest {
         return spyRule;
     }
 
-    protected void fireEvents(List<Event> events) {
-        JRuleMockedEventBus eventBus = new JRuleMockedEventBus(events);
-        eventBus.start();
+    protected void fireEvents(boolean async, List<Event> events) {
+        eventBus.fire(async, events);
     }
 
     protected void setState(GenericItem item, State state) throws ItemNotFoundException {

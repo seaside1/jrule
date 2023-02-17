@@ -50,9 +50,10 @@ public class JRuleItemChangeConditionTest extends JRuleAbstractTest {
     public void testItemChange_from_to() {
         JRuleItemChangeConditionRules rule = initRule(JRuleItemChangeConditionRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO, "12", "13"),
-                itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO, "10", "11"),
-                itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO, "11", "12")));
+        fireEvents(false,
+                List.of(itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO, "12", "13"),
+                        itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO, "10", "11"),
+                        itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO, "11", "12")));
         verify(rule, times(1)).itemChangeFromTo(Mockito.any(JRuleEvent.class));
     }
 
@@ -60,7 +61,7 @@ public class JRuleItemChangeConditionTest extends JRuleAbstractTest {
     public void testItemChange_from_to_2() {
         JRuleItemChangeConditionRules rule = initRule(JRuleItemChangeConditionRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO_2, "10", "20"),
+        fireEvents(false, List.of(itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO_2, "10", "20"),
                 itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO_2, "9", "21")));
         verify(rule, times(1)).itemChangeFromTo2(Mockito.any(JRuleEvent.class));
     }
