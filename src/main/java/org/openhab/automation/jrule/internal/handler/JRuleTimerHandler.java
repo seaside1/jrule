@@ -126,6 +126,8 @@ public class JRuleTimerHandler {
         JRuleTimer timer = new JRuleTimer(newTimerName, newTimers, context != null ? context : getCurrentContext(),
                 delay);
         timers.add(timer);
+        logger.trace("added repeating timers '{}': {}", newTimerName, newTimers.size());
+        getTimers(newTimerName);
 
         newTimers.forEach(
                 future -> future.thenAccept(s -> executorService.submit(() -> invokeTimerInternal(timer, function))));
@@ -148,7 +150,10 @@ public class JRuleTimerHandler {
     }
 
     private synchronized List<JRuleTimer> getTimers(String timerName) {
-        return timers.stream().filter(timer -> timer.name.equals(timerName)).collect(Collectors.toList());
+        List<JRuleTimer> list = timers.stream().filter(timer -> timer.name.equals(timerName))
+                .collect(Collectors.toList());
+        logger.trace("timers for name '{}': {}", timerName, list.size());
+        return list;
     }
 
     private void invokeTimerInternal(JRuleTimer timer, Runnable runnable) {
@@ -170,12 +175,15 @@ public class JRuleTimerHandler {
             MDC.remove(JRuleEngine.MDC_KEY_RULE);
             MDC.remove(JRuleEngine.MDC_KEY_TIMER);
             logger.debug("Removing thread local after rule completion");
-            timers.remove(timer);
+            if (timer.isDone()) {
+                removeTimer(timer.name);
+            }
             JRule.JRULE_EXECUTION_CONTEXT.remove();
         }
     }
 
     private synchronized void removeTimer(String timerName) {
+        logger.trace("remove timer: '{}'", timerName);
         timers.removeIf(timer -> timer.name.equals(timerName));
     }
 
@@ -212,7 +220,9 @@ public class JRuleTimerHandler {
         }
 
         public void cancel() {
+            logger.debug("before: {}", futures);
             this.futures.forEach(future -> future.cancel(false));
+            logger.debug("after: {}", futures);
         }
 
         public String getLogName() {

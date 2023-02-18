@@ -55,7 +55,7 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
 
         JRuleItemRegistry.get(JRuleDelayedTestRules.TARGET_ITEM, TargetItem.class);
         ZonedDateTime fired = ZonedDateTime.now();
-        fireEvents(List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
         Thread.sleep(3000); // Wait for delayed execution
         verify(rule, times(1)).test2s();
         List<CollectingEventPublisher.Container> events = eventPublisher
@@ -73,7 +73,7 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
 
         JRuleItemRegistry.get(JRuleDelayedTestRules.TARGET_ITEM, TargetItem.class);
         ZonedDateTime fired = ZonedDateTime.now();
-        fireEvents(List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
         verify(rule, times(0)).test2s();
     }
 

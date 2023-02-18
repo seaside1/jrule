@@ -58,7 +58,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
     public void testItemChange_selfGroup() {
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(JRuleGroupItemChangeRules.GROUP_ITEM, "2", "1")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleGroupItemChangeRules.GROUP_ITEM, "2", "1")));
         verify(rule, times(0)).groupItemChange(Mockito.any(JRuleEvent.class));
     }
 
@@ -85,7 +85,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(OTHER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
+        fireEvents(false, List.of(itemChangeEvent(OTHER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
         verify(rule, times(1)).groupItemChange(Mockito.any(JRuleEvent.class));
     }
 
@@ -104,7 +104,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
                         new StringItem("Any")));
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1")));
+        fireEvents(false, List.of(itemChangeEvent(MEMBER_ITEM, "2", "1")));
         verify(rule, times(0)).groupItemChangeJustGroups(Mockito.any(JRuleEvent.class));
         verify(rule, times(1)).groupItemChangeJustItems(Mockito.any(JRuleEvent.class));
     }
@@ -134,7 +134,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
                 .thenAnswer(invocationOnMock -> new GroupItem(invocationOnMock.getArgument(0), new StringItem("Any")));
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-        fireEvents(List.of(itemChangeEvent(SUB_GROUP_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
+        fireEvents(false, List.of(itemChangeEvent(SUB_GROUP_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
         verify(rule, times(1)).groupItemChangeJustGroups(Mockito.any(JRuleEvent.class));
         verify(rule, times(0)).groupItemChangeJustItems(Mockito.any(JRuleEvent.class));
     }
@@ -164,7 +164,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
                 .thenAnswer(invocationOnMock -> new GroupItem(invocationOnMock.getArgument(0), new StringItem("Any")));
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-        fireEvents(List.of(itemReceivedUpdateEvent(SUB_GROUP_ITEM, "1"), itemReceivedUpdateEvent(MEMBER_ITEM, "1")));
+        fireEvents(false,
+                List.of(itemReceivedUpdateEvent(SUB_GROUP_ITEM, "1"), itemReceivedUpdateEvent(MEMBER_ITEM, "1")));
         verify(rule, times(1)).groupItemReceivedUpdateJustGroups(Mockito.any(JRuleEvent.class));
         verify(rule, times(0)).groupItemReceivedUpdateJustItems(Mockito.any(JRuleEvent.class));
     }
@@ -194,7 +195,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
                 .thenAnswer(invocationOnMock -> new GroupItem(invocationOnMock.getArgument(0), new StringItem("Any")));
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
-        fireEvents(List.of(itemReceivedCommandEvent(SUB_GROUP_ITEM, "1"), itemReceivedCommandEvent(MEMBER_ITEM, "1")));
+        fireEvents(false,
+                List.of(itemReceivedCommandEvent(SUB_GROUP_ITEM, "1"), itemReceivedCommandEvent(MEMBER_ITEM, "1")));
         verify(rule, times(1)).groupItemReceivedCommandJustGroups(Mockito.any(JRuleEvent.class));
         verify(rule, times(0)).groupItemReceivedCommandJustItems(Mockito.any(JRuleEvent.class));
     }
@@ -213,7 +215,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "1", "2")));
+        fireEvents(false, List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "1", "2")));
         verify(rule, times(1)).groupItemChangeFrom(Mockito.any(JRuleEvent.class));
     }
 
@@ -239,7 +241,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemReceivedUpdateEvent(MEMBER_ITEM, "1"), itemReceivedUpdateEvent(SUB_GROUP_ITEM, "2")));
+        fireEvents(false,
+                List.of(itemReceivedUpdateEvent(MEMBER_ITEM, "1"), itemReceivedUpdateEvent(SUB_GROUP_ITEM, "2")));
         verify(rule, times(2)).groupItemReceivedUpdateTo(Mockito.any(JRuleEvent.class));
     }
 
@@ -265,7 +268,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemReceivedCommandEvent(MEMBER_ITEM, "1"), itemReceivedCommandEvent(SUB_GROUP_ITEM, "2")));
+        fireEvents(false,
+                List.of(itemReceivedCommandEvent(MEMBER_ITEM, "1"), itemReceivedCommandEvent(SUB_GROUP_ITEM, "2")));
         verify(rule, times(2)).groupItemReceivedCommandFrom(Mockito.any(JRuleEvent.class));
     }
 
@@ -283,7 +287,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "1", "2"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
+        fireEvents(false, List.of(itemChangeEvent(MEMBER_ITEM, "1", "2"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
         verify(rule, times(1)).groupItemChangeTo(Mockito.any(JRuleEvent.class));
     }
 
@@ -301,7 +305,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "3", "2"),
+        fireEvents(false, List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "3", "2"),
                 itemChangeEvent(MEMBER_ITEM, "1", "2")));
         verify(rule, times(1)).groupItemChangeFromTo(Mockito.any(JRuleEvent.class));
     }

@@ -12,8 +12,9 @@
  */
 package org.openhab.automation.jrule.internal.test;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.core.events.Event;
@@ -24,23 +25,29 @@ import org.openhab.core.events.Event;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleMockedEventBus extends JRuleEventSubscriber {
+    private final Executor executor = Executors.newFixedThreadPool(10);
 
-    private final List<Event> eventList;
-
-    public JRuleMockedEventBus(String eventBusResourceName) {
-        super();
-        JRuleTestEventLogParser parser = new JRuleTestEventLogParser(eventBusResourceName);
-        eventList = parser.parse();
-    }
-
-    public JRuleMockedEventBus(List<Event> events) {
-        eventList = new ArrayList<>();
-        eventList.addAll(events);
+    public JRuleMockedEventBus() {
     }
 
     public void start() {
         startSubscriber();
-        eventList.forEach(super::receive);
+    }
+
+    public void fire(boolean async, List<Event> events) {
+        if (async) {
+            events.forEach(event -> executor.execute(() -> super.receive(event)));
+        } else {
+            events.forEach(super::receive);
+        }
+    }
+
+    public void fire(String eventBusResourceName) {
+        JRuleTestEventLogParser parser = new JRuleTestEventLogParser(eventBusResourceName);
+        fire(false, parser.parse());
+    }
+
+    public void stop() {
         stopSubscriber();
     }
 }
