@@ -40,6 +40,13 @@ public class JRuleItemEvent extends JRuleEvent {
         return item;
     }
 
+    /**
+     * Casts the item to the given type.
+     * 
+     * @param asType Cast to this type
+     * @return the casted item
+     * @param <I> new item type
+     */
     public <I extends JRuleItem> I getItem(Class<I> asType) {
         if (!asType.isAssignableFrom(item.getClass())) {
             throw new JRuleRuntimeException(String.format("'%s' cannot be cast to '%s'", item.getClass(), asType));
@@ -51,6 +58,13 @@ public class JRuleItemEvent extends JRuleEvent {
         return memberItem;
     }
 
+    /**
+     * Casts the member-item to the given type.
+     * 
+     * @param asType Cast to this type
+     * @return the casted member-item
+     * @param <I> new item type
+     */
     public <I extends JRuleItem> I getMemberItem(Class<I> asType) {
         if (!asType.isAssignableFrom(memberItem.getClass())) {
             throw new JRuleRuntimeException(
@@ -59,10 +73,20 @@ public class JRuleItemEvent extends JRuleEvent {
         return (I) memberItem;
     }
 
+    /**
+     * Gets the new state of the item. Must be used while receiving commands.
+     * 
+     * @return the new item state
+     */
     public JRuleValue getState() {
         return state;
     }
 
+    /**
+     * Gets the old state of the item. Just for Item-Change-Events
+     * 
+     * @return the old state of the item
+     */
     public JRuleValue getOldState() {
         return oldState;
     }
