@@ -23,6 +23,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.binding.jrule.internal.rules.JRuleAbstractTest;
 import org.openhab.core.events.Event;
 import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.types.StringType;
@@ -42,7 +43,7 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers")));
         verify(rule, times(1)).testTimers();
         Thread.sleep(3000); // Wait for timer inside rule to execute
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "command"));
@@ -66,7 +67,7 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING, TargetItem.class);
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME, TargetItem.class);
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED, TargetItem.class);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers-repeating")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers-repeating")));
         verify(rule, times(1)).testRepeatingTimers();
         Thread.sleep(3000); // Wait for timer inside rule to execute
         assertTrue(eventPublisher.isLastCommandEvent(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME,
@@ -77,13 +78,32 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     }
 
     @Test
+    public void testRepeatingTimerComplex() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED, TargetItem.class);
+        fireEvents(true, List.of(itemCommandEvent(JRuleTimerTestRules.TRIGGER_ITEM, "timers-repeating-complex")));
+        Thread.sleep(500);
+        fireEvents(true, List.of(itemCommandEvent(JRuleTimerTestRules.TRIGGER_ITEM, "timers-repeating-complex")));
+        Thread.sleep(3000); // Wait for timer inside rule to execute
+        verify(rule, times(2)).testRepeatingTimersComplex();
+        assertEquals(1,
+                eventPublisher.getCommandEvents(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED).stream()
+                        .filter(c -> ((ItemCommandEvent) c.getEvent()).getItemCommand().toString()
+                                .equals("repeating-with-name-replaced-5"))
+                        .count());
+    }
+
+    @Test
     public void testGetTimedLock() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "locks")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "locks")));
         verify(rule, times(1)).testLocks();
         Thread.sleep(3000); // Wait for timer inside rule to execute
         assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "first: true"));
@@ -98,11 +118,11 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
         Thread.sleep(600);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
         Thread.sleep(600);
-        fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
         verify(rule, times(1)).testDebounce();
         Thread.sleep(3000); // Wait for timer inside rule to execute
         assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "no debounce"));
@@ -110,5 +130,9 @@ public class JRuleTimerTest extends JRuleAbstractTest {
 
     private Event itemChangeEvent(String item, String from, String to) {
         return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from));
+    }
+
+    private Event itemCommandEvent(String item, String to) {
+        return ItemEventFactory.createCommandEvent(item, new StringType(to));
     }
 }
