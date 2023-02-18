@@ -34,6 +34,7 @@ import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.CoreItemFactory;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.types.StringType;
+import org.openhab.core.types.UnDefType;
 
 /**
  * The {@link JRuleGroupItemChangeRules} contains tests for @JRuleWhenItemChange with memberOf=true trigger
@@ -78,6 +79,9 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
             Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
             return stringItem;
         });
+
+        registerItem(new StringItem(JRuleGroupItemChangeRules.GROUP_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleGroupItemChangeRules.GROUP_ITEM_TO), UnDefType.UNDEF);
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
@@ -205,6 +209,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
             return stringItem;
         });
 
+        registerItem(new StringItem(GROUP_ITEM_FROM), UnDefType.UNDEF);
+
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
         fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(MEMBER_ITEM, "1", "2")));
@@ -273,6 +279,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
             return stringItem;
         });
 
+        registerItem(new StringItem(JRuleGroupItemChangeRules.GROUP_ITEM_TO), UnDefType.UNDEF);
+
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
         fireEvents(List.of(itemChangeEvent(MEMBER_ITEM, "1", "2"), itemChangeEvent(MEMBER_ITEM, "2", "1")));
@@ -288,6 +296,8 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
             Mockito.when(stringItem.getType()).thenReturn(CoreItemFactory.STRING);
             return stringItem;
         });
+
+        registerItem(new StringItem(JRuleGroupItemChangeRules.GROUP_ITEM_FROM_TO), UnDefType.UNDEF);
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method

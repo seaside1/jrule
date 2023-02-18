@@ -74,7 +74,7 @@ public abstract class JRuleAbstractTest {
         eventBus.start();
     }
 
-    protected void setState(GenericItem item, State state) throws ItemNotFoundException {
+    protected void registerItem(GenericItem item, State state) throws ItemNotFoundException {
         item.setState(state);
         when(itemRegistry.getItem(item.getName())).thenReturn(item);
     }

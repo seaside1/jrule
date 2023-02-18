@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
@@ -75,18 +76,19 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        final String itemName;
-        final String memberName;
+        final JRuleItem itemName;
+        final JRuleItem memberName;
         if (getMemberOf() != JRuleMemberOf.None) {
-            memberName = ((ItemEvent) event).getItemName();
-            itemName = ((ItemEvent) event).getItemName();
+            memberName = JRuleItem.forName(((ItemEvent) event).getItemName());
+            itemName = JRuleItem.forName(((ItemEvent) event).getItemName());
         } else {
             memberName = null;
-            itemName = this.getItemName();
+            itemName = JRuleItem.forName(this.getItemName());
         }
 
         return new JRuleItemEvent(itemName, memberName,
-                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null);
+                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()),
+                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()));
     }
 
     @Override

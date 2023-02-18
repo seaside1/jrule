@@ -39,7 +39,8 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     public void testTimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
         fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "timers")));
@@ -59,9 +60,10 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     public void testRepeatingTimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING), UnDefType.UNDEF);
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME), UnDefType.UNDEF);
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING, TargetItem.class);
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME, TargetItem.class);
@@ -80,7 +82,8 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     public void testGetTimedLock() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
         fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "locks")));
@@ -95,7 +98,8 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     public void testDebounce() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
         fireEvents(List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "debounce")));
