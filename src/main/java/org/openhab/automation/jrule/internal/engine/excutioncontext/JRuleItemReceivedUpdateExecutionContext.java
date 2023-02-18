@@ -76,19 +76,22 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        final JRuleItem itemName;
-        final JRuleItem memberName;
+        final JRuleItem item;
+        final JRuleItem memberItem;
         if (getMemberOf() != JRuleMemberOf.None) {
-            memberName = JRuleItem.forName(((ItemEvent) event).getItemName());
-            itemName = JRuleItem.forName(((ItemEvent) event).getItemName());
+            memberItem = JRuleItem.forName(((ItemEvent) event).getItemName());
+            item = JRuleItem.forName(((ItemEvent) event).getItemName());
         } else {
-            memberName = null;
-            itemName = JRuleItem.forName(this.getItemName());
+            memberItem = null;
+            item = JRuleItem.forName(this.getItemName());
         }
 
-        return new JRuleItemEvent(itemName, memberName,
-                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()),
-                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()));
+        // updating the item state to be sure that it's update when the JRule method is fired
+        JRuleEventHandler.get().setValue(((ItemStateEvent) event).getItemName(),
+                ((ItemStateEvent) event).getItemState());
+
+        return new JRuleItemEvent(item, memberItem,
+                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null);
     }
 
     @Override

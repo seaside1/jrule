@@ -83,7 +83,7 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     public void testRepeatingTimerComplex() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM_REPEATING_WITH_NAME_REPLACED, TargetItem.class);
         fireEvents(true, List.of(itemCommandEvent(JRuleTimerTestRules.TRIGGER_ITEM, "timers-repeating-complex")));
