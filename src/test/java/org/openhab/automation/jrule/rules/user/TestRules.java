@@ -148,25 +148,25 @@ public class TestRules extends JRule {
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().stringValue());
+        logInfo("received update: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ON_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH, state = JRuleSwitchItem.ON)
     public void switchReceivedOnUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().stringValue());
+        logInfo("received update: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemChanged(JRuleItemEvent event) {
-        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getState());
+        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getItem().getState());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED_TO_ON)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void switchReceivedChangedToOn(JRuleItemEvent event) {
-        logInfo("changed: {}", event.getState().stringValue());
+        logInfo("changed: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_INVOKE_MQTT_ACTION)
@@ -200,27 +200,29 @@ public class TestRules extends JRule {
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
-        logInfo("Member of Group ({}) received command", event.getMemberName());
+        logInfo("Member of Group ({}) received command", event.getMemberItem().getName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) received update", event.getMemberName());
+        final String memberThatChangedStatus = event.getMemberItem().getName();
+        logInfo("Member of Group ({}) received update", event.getMemberItem().getName());
+        logInfo("Member of Group ({}) received update value",
+                event.getMemberItem(JRuleSwitchItem.class).getStateAsOnOff());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
     @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) changed", event.getMemberName());
+        final String memberThatChangedStatus = event.getMemberItem().getName();
+        logInfo("Member of Group ({}) changed", event.getMemberItem().getName());
     }
 
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
     public synchronized void conditionLteAndGteForNumber(JRuleItemEvent event) {
-        logInfo("trigger when between 18 and 20, current: {}", event.getState().stringValue());
+        logInfo("trigger when between 18 and 20, current: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_CRON_EVERY_5_SEC)

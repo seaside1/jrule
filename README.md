@@ -221,7 +221,9 @@ To add an OR statement we simply add multiple @JRuleWhen statements
     @JRuleWhenItemChange(item = MyTestNumber, from = "14", to = "10")
     @JRuleWhenItemChange(item = MyTestNumber, from = "10", to = "12")
     public void myOrRuleNumber(JRuleEvent event) {
-        logInfo("Got change number: {}", event.getState().getValue());
+        logInfo("Got change number: {}", event.getState().asStringValue());
+        // or
+        logInfo("Got change number: {}", event.getItem().getState().asStringValue());
     }
 ```
 
@@ -631,7 +633,7 @@ triggered the rule.
     @JRuleWhenItemChange(item = MyTestSwitch1, to = ON)
     @JRuleWhenItemChange(item = MyTestSwitch2, to = ON)
     public void triggerNameExample(JRuleEvent event) {
-     logInfo("The rule was triggered by the following item: {}", event.getItemName());
+     logInfo("The rule was triggered by the following item: {}", event.getItem().getName());
      logInfo("The rule was Old Value was: {} and new value: {}", event.getOldState().getValue(), event.getState().getValue());  
       
     }

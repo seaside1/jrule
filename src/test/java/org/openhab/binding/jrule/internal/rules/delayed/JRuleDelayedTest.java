@@ -49,7 +49,9 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
     public void testDelayed() throws ItemNotFoundException, InterruptedException {
         JRuleDelayedTestRules rule = initRule(JRuleDelayedTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
+        registerItem(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleDelayedTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleDelayedTestRules.TARGET_ITEM, TargetItem.class);
         ZonedDateTime fired = ZonedDateTime.now();
@@ -66,7 +68,8 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
     public void testDelayedNotWaiting() throws ItemNotFoundException, InterruptedException {
         JRuleDelayedTestRules rule = initRule(JRuleDelayedTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleDelayedTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleDelayedTestRules.TARGET_ITEM, TargetItem.class);
         ZonedDateTime fired = ZonedDateTime.now();

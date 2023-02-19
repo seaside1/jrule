@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.rules.user;
 
+import org.openhab.automation.jrule.items.*;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
@@ -137,72 +138,84 @@ public class TestReceiveCommands extends JRule {
     @JRuleName(NAME_RECEIVE_SWITCH_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_EVENT)
     public void receiveSwitchUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleSwitchItem.class).getStateAsOnOff());
     }
 
     @JRuleName(NAME_RECEIVE_NUMBER_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_NUMBER_EVENT)
     public void receiveNumberUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleNumberItem.class).getStateAsDecimal().floatValue());
     }
 
     @JRuleName(NAME_RECEIVE_STRING_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_STRING_EVENT)
     public void receiveStringUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleStringItem.class).getStateAsString());
     }
 
     @JRuleName(NAME_RECEIVE_DATETIME_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_DATETIME_EVENT)
     public void receiveDatetimeUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleDateTimeItem.class).getStateAsDateTime().getValue());
     }
 
     @JRuleName(NAME_RECEIVE_PLAYER_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_PLAYER_EVENT)
     public void receivePlayerUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRulePlayerItem.class).getStateAsPlayPause());
     }
 
     @JRuleName(NAME_RECEIVE_CONTACT_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_CONTACT_EVENT)
     public void receiveContactUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleContactItem.class).getStateAsOpenClose());
     }
 
     @JRuleName(NAME_RECEIVE_IMAGE_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_IMAGE_EVENT)
     public void receiveImageUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleImageItem.class).getStateAsRaw());
     }
 
     @JRuleName(NAME_RECEIVE_ROLLERSHUTTER_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_ROLLERSHUTTER_EVENT)
     public void receiveRollershutterUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleRollershutterItem.class).getStateAsPercent().floatValue());
     }
 
     @JRuleName(NAME_RECEIVE_DIMMER_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_DIMMER_EVENT)
     public void receiveDimmerUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleDimmerItem.class).getStateAsPercent().floatValue());
     }
 
     @JRuleName(NAME_RECEIVE_COLOR_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_COLOR_EVENT)
     public void receiveColorUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleColorItem.class).getStateAsHsb());
     }
 
     @JRuleName(NAME_RECEIVE_LOCATION_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_LOCATION_EVENT)
     public void receiveLocationUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleLocationItem.class).getStateAsPoint());
     }
 
     @JRuleName(NAME_RECEIVE_QUANTITY_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_QUANTITY_EVENT)
     public void receiveQuantityUpdate(JRuleItemEvent event) {
-        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+        logInfo("received: '{}', type: '{}'", event.getItem().getState(), event.getItem().getState().getClass());
+        logInfo("received value: {}", event.getItem(JRuleQuantityItem.class).getStateAsDecimal().floatValue());
     }
 }

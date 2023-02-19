@@ -25,10 +25,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.core.events.EventPublisher;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.*;
@@ -176,6 +173,21 @@ public class JRuleEventHandler {
         } catch (IllegalArgumentException i) {
             logDebug("Failed to get state from item: {}, returning undef", itemName);
             return UnDefType.UNDEF;
+        }
+    }
+
+    public void setValue(String itemName, State itemState) {
+        if (itemRegistry == null) {
+            throw new JRuleRuntimeException("ItemRegistry must not be null");
+        }
+        try {
+            Item item = itemRegistry.getItem(itemName);
+            if (!(item instanceof GenericItem)) {
+                throw new JRuleRuntimeException("Given item must be of type GenericItem");
+            }
+            ((GenericItem) item).setState(itemState);
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException(String.format("Failed to find item: %s", itemName));
         }
     }
 
