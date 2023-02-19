@@ -134,9 +134,10 @@ public abstract class JRuleItemTestBase {
         Assertions.assertFalse(groupForNameOptionalMethod(ITEM_NON_EXISTING).isPresent());
     }
 
-    protected abstract <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name);
+    protected abstract <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(
+            String name);
 
-    protected abstract <T extends JRuleGroupItem> T groupForNameMethod(String name);
+    protected abstract <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name);
 
     @Test
     public void testMemberItems(TestInfo testInfo) {

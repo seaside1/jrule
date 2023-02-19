@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalImageGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
  * The {@link JRuleImageGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleImageGroupItemTest extends JRuleImageItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalImageGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleRawValue> set = JRuleImageGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleImageItem::getStateAsRaw).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

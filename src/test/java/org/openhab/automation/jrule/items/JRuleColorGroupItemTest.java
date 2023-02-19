@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 
 /**
  * The {@link JRuleColorGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleColorGroupItemTest extends JRuleColorItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalColorGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleHsbValue> set = JRuleColorGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleColorItem::getStateAsHsb).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

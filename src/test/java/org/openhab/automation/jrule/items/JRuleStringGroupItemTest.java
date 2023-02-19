@@ -12,6 +12,11 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
 
 /**
@@ -23,5 +28,12 @@ class JRuleStringGroupItemTest extends JRuleStringItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalStringGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<String> set = JRuleStringGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleStringItem::getStateAsString).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

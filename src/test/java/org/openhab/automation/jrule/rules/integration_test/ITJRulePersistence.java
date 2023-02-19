@@ -257,7 +257,6 @@ public class ITJRulePersistence extends JRuleITBase {
                         givenFloat, expectedFloat, givenDeviation, deviation));
             }
         }
-        System.out.println(givenValue);
     }
 
     private void verifyPersistenceChangedSince(String itemName, int beforeSeconds, Object value) {

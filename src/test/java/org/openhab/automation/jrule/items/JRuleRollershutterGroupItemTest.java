@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
  * The {@link JRuleRollershutterGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRulePercentValue> set = JRuleRollershutterGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleRollershutterItem::getStateAsPercent).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

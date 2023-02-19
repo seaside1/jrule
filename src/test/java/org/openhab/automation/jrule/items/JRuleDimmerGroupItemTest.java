@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
 /**
  * The {@link JRuleDimmerGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleDimmerGroupItemTest extends JRuleDimmerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalDimmerGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRulePercentValue> set = JRuleDimmerGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleDimmerItem::getStateAsPercent).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

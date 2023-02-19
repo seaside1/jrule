@@ -12,7 +12,13 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 
 /**
  * The {@link JRuleDateTimeGroupItemTest}
@@ -23,5 +29,12 @@ class JRuleDateTimeGroupItemTest extends JRuleDateTimeItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
         return new JRuleInternalDateTimeGroupItem("Group", "Label", "Type", "Id");
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleDateTimeValue> set = JRuleDateTimeGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleDateTimeItem::getStateAsDateTime).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

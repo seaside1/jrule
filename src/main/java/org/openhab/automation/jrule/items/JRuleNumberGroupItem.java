@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 
@@ -24,7 +27,7 @@ import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
+public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem<JRuleNumberItem> {
     static JRuleNumberGroupItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalNumberGroupItem.class);
     }
@@ -33,27 +36,40 @@ public interface JRuleNumberGroupItem extends JRuleNumberItem, JRuleGroupItem {
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
+    default Set<JRuleNumberItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleNumberItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleNumberItem) jRuleItem).collect(Collectors.toSet());
+    }
+
     default void sendCommand(JRuleDecimalValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleDecimalValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(double command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
     default void sendCommand(int command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.sendUncheckedCommand(new JRuleDecimalValue(command)));
     }
 
     default void postUpdate(double state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 
     default void postUpdate(int state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.postUncheckedUpdate(new JRuleDecimalValue(state)));
     }
 }
