@@ -1,8 +1,50 @@
 # Examples
 
-## Example 1
+- [Examples](#examples)
+    + [Example 1 - Invoke another item Switch from rule](#example-1---invoke-another-item-switch-from-rule)
+    + [Example 2 - Using a timed lock](#example-2---using-a-timed-lock)
+    + [Example 3 - Using event data](#example-3---using-event-data)
+    + [Example 4 - Multiple rule triggers](#example-4---multiple-rule-triggers)
+    + [Example 5 - Creating a custom parent rule class](#example-5---creating-a-custom-parent-rule-class)
+    + [Example 6 - Using a custom parent rule class](#example-6---using-a-custom-parent-rule-class)
+    + [Example 7 - Reusing rule functionality](#example-7---reusing-rule-functionality)
+    + [Example 8 - Creating a timer](#example-8---creating-a-timer)
+    + [Example 9 - Creating a repeating timer](#example-9---creating-a-repeating-timer)
+    + [Example 10 - Creating a timer #2](#example-10---creating-a-timer--2)
+    + [Example 11 - Using JRuleWhenTimeTrigger](#example-11---using-jrulewhentimetrigger)
+    + [Example 12 - Condition on trigger](#example-12---condition-on-trigger)
+    + [Example 13 - Text to speech](#example-13---text-to-speech)
+    + [Example 14 - Executing a shell command](#example-14---executing-a-shell-command)
+    + [Example 15 - Group items](#example-15---group-items)
+    + [Example 16 - Group items #2](#example-16---group-items--2)
+    + [Example 17 - Channel triggers](#example-17---channel-triggers)
+    + [Example 18 - Cron based trigger](#example-18---cron-based-trigger)
+    + [Example 19 - Persistence and lastUpdated](#example-19---persistence-and-lastupdated)
+    + [Example 20 - Color item](#example-20---color-item)
+    + [Example 21 - Set logging name for a specific rule](#example-21---set-logging-name-for-a-specific-rule)
+    + [Example 22 - Override logging for all rules defined in one file](#example-22---override-logging-for-all-rules-defined-in-one-file)
+    + [Example 23 - Apply transformation using openHAB transformation service](#example-23---apply-transformation-using-openhab-transformation-service)
+    + [Example 24 - Preconditions #1](#example-24---preconditions--1)
+    + [Example 25 - Preconditions #2](#example-25---preconditions--2)
+    + [Example 26 - Send Quantity type Watt (W) from rule](#example-26---send-quantity-type-watt--w--from-rule)
+    + [Example 27 - Use forName to create and item and send commands and get status](#example-27---use-forname-to-create-and-item-and-send-commands-and-get-status)
+    + [Example 27b - Use forNameOptional to create and item and send commands and get status](#example-27b---use-fornameoptional-to-create-and-item-and-send-commands-and-get-status)
+    + [Example 28 - Get the name of the item that triggered the rule as well as new and old state value](#example-28---get-the-name-of-the-item-that-triggered-the-rule-as-well-as-new-and-old-state-value)
+    + [Example 29 - Get average value for a Number item last hour](#example-29---get-average-value-for-a-number-item-last-hour)
+    + [Example 30 - Use generated JRuleItems.java to get hold of items](#example-30---use-generated-jruleitemsjava-to-get-hold-of-items)
+    + [Example 31 - Restart thing every night due to binding flakyness](#example-31---restart-thing-every-night-due-to-binding-flakyness)
+    + [Example 32 - Detect if a specific thing goes offline, wait for it to come online again within a given time](#example-32---detect-if-a-specific-thing-goes-offline--wait-for-it-to-come-online-again-within-a-given-time)
+    + [Example 33 - Listen for thing status events on
+      _all_ things](#example-33---listen-for-thing-status-events-on--all--things)
+    + [Example 34 - Thing actions, send message with pushover and other services](#example-34---thing-actions--send-message-with-pushover-and-other-services)
+    + [Example 35 - Listen on all Item events of a group (without the groupstate must change)](#example-35---listen-on-all-item-events-of-a-group--without-the-groupstate-must-change-)
+    + [Example 36 - Listen for group changes - with conditions](#example-36---listen-for-group-changes---with-conditions)
+    + [Example 37 - Timer chaining](#example-37---timer-chaining)
+    + [Example 38 - Debounce](#example-38---debounce)
+    + [Example 39 - HTTP requests](#example-39---http-requests)
+    + [Example 40 - Delay rule execution](#example-40---delay-rule-execution)
 
-Use Case: Invoke another item Switch from rule
+### Example 1 - Invoke another item Switch from rule
 
 ```java
 public class DemoRule extends JRule {
@@ -15,7 +57,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 2
+### Example 2 - Using a timed lock
 
 Use case: Invoke a Doorbell, but only allow the rule to be invoked once every 20 seconds.
 This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
@@ -35,7 +77,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 3
+### Example 3 - Using event data
 
 Use case: Use the value that caused the trigger
 When the rule is triggered, the triggered value is stored in the event.
@@ -50,10 +92,10 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 4
+### Example 4 - Multiple rule triggers
 
 Use case: Or statement for rule trigger
-To add an OR statement we simply add multiple @JRuleWhen statements
+To add an OR statement we simply add multiple @JRuleWhenXXX statements
 
 ```java
 public class DemoRule extends JRule {
@@ -68,7 +110,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 5
+### Example 5 - Creating a custom parent rule class
 
 Use case: Define your own functionality
 Create a Rules class that extends: JRuleUser.java
@@ -80,12 +122,12 @@ package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.JRule;
 
-public class JRuleUser extends JRule {
+public abstract class JRuleUser extends JRule {
 
 }
 ```
 
-## Example 6
+### Example 6 - Using a custom parent rule class
 
 Your class rules can now extend the JRuleUser
 package org.openhab.automation.jrule.rules.user;
@@ -100,7 +142,7 @@ public class MySwitchRule extends JRuleUser {
 }
 ```
 
-## Example 7
+### Example 7 - Reusing rule functionality
 
 Let's say we want to add a common function that should be available for all user rules.
 We want to add a function that checks if it is ok to send notifications depends on what time it is.
@@ -143,7 +185,7 @@ public class MyTestUserRule extends JRuleUser {
 }
 ```
 
-## Example 8
+### Example 8 - Creating a timer
 
 Use case create a timer for automatically turning off a light when it is turned on. If it's running cancel it and
 schedule a new one.
@@ -165,7 +207,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 9
+### Example 9 - Creating a repeating timer
 
 Use case: Let's say we have a 433 MHz wall socket with no ON/OFF feedback and a bit of bad radio reception. We can then
 create a repeating timer
@@ -185,16 +227,16 @@ public class DemoRule extends JRule {
                 String messageOn = "repeatRuleExample Repeating.....";
                 logInfo(messageOn);
                 JRuleItems.MyBad433Switch.sendCommand(ON);
-            });
-        }
+            }
+        });
     }
+}
 ```
 
-## Example 10
+### Example 10 - Creating a timer #2
 
 Use case Create a simple timer. When MyTestSwitch turns on it will wait 10 seconds and then turn MyTestSwitch2 to on.
-Note that
-it will not reschedule the timer, if the timer is already running it won't reschedule it.
+Note that it will not reschedule the timer, if the timer is already running it won't reschedule it.
 
 ```java
 public class DemoRule extends JRule {
@@ -207,12 +249,13 @@ public class DemoRule extends JRule {
                 String messageOn = "timer example.";
                 logInfo(messageOn);
                 JRuleItems.MyTestWitch2.sendCommand(ON);
-            });
-        }
+            }
+        });
     }
+}
 ```
 
-## Example 11
+### Example 11 - Using JRuleWhenTimeTrigger
 
 Use case trigger a rule at 22:30 in the evening to set initial brightness for a ZwaveDimmer to 30%
 
@@ -228,7 +271,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 12
+### Example 12 - Condition on trigger
 
 Use case: If temperature is below or equals to 20 degrees send command on to a heating fan  
 It is possible to use:  
@@ -250,7 +293,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 13
+### Example 13 - Text to speech
 
 Use case: Using say command for tts
 
@@ -266,7 +309,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 14
+### Example 14 - Executing a shell command
 
 Use case: Executing command from CLI
 
@@ -281,7 +324,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 15
+### Example 15 - Group items
 
 Use case: A group of switches, see if status is changed, and also which member in the group changed state
 
@@ -291,13 +334,13 @@ public class DemoRule extends JRule {
     @JRuleWhenItemChange(item = MySwitchGroup)
     public synchronized void groupMySwitchGroupChanged(JRuleEvent event) {
         final boolean groupIsOnline = ((JRuleItemEvent) event).getState().getValueAsOnOffValue() == JRuleOnOffValue.ON;
-        final String memberThatChangedStatus = ((JRuleItemEvent) event).getMemberName();
+        final String memberThatChangedStatus = ((JRuleItemEvent) event).getMemberItem.getName();
         logInfo("Member that changed the status of the Group of switches: {}", memberThatChangedStatus);
     }
 }
 ```
 
-## Example 16
+### Example 16 - Group items #2
 
 Use case: A group of switches , trigger when it's changed from OFF to ON
 
@@ -306,12 +349,12 @@ public class DemoRule extends JRule {
     @JRuleName("groupMySwitchesChangedOffToOn")
     @JRuleWhenItemChange(item = MySwitchGroup, from = OFF, to = ON)
     public synchronized void groupMySwitchesChangedOffToOn(JRuleEvent event) {
-        logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberName());
+        logInfo("Member that changed the status of the Group from OFF to ON: {}", event.getMemberItem().getName());
     }
 }
 ```
 
-## Example 17
+### Example 17 - Channel triggers
 
 Use case: Listen for a Channel Trigger Event
 
@@ -325,7 +368,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 18
+### Example 18 - Cron based trigger
 
 Use case: Cron based expression to trigger rule
 
@@ -339,7 +382,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 19
+### Example 19 - Persistence and lastUpdated
 
 Use case: getLastUpdated for an item  
 Note that `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated("mapdb");`
@@ -360,7 +403,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 20
+### Example 20 - Color item
 
 Use case: Get the brigtness from a color item, set a color item to white (HSB 0, 0, 100)
 
@@ -381,9 +424,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 21
-
-Use case: Set logging name for a specific rule
+### Example 21 - Set logging name for a specific rule
 
 ```java 
 public class DemoRule extends JRule {
@@ -398,9 +439,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 22
-
-Use case: Override logging for all rules defined in one file
+### Example 22 - Override logging for all rules defined in one file
 
 ```java
 public class ColorRules extends JRule {
@@ -418,9 +457,7 @@ public class ColorRules extends JRule {
 }
 ```
 
-## Example 23
-
-Use case: Apply transformation using openHAB transformation service
+### Example 23 - Apply transformation using openHAB transformation service
 
 ```java
 public class TransformationRule extends JRule {
@@ -434,7 +471,7 @@ public class TransformationRule extends JRule {
 }
 ```
 
-## Example 24
+### Example 24 - Preconditions #1
 
 Use case: Use precondition annotation in order to create "AND" logic. Example we have a switch that will tell
 if it is ok for disturbance. If it is ok the switch is set to ON and we can send a notification if the notification
@@ -454,7 +491,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 25
+### Example 25 - Preconditions #2
 
 Use case: Use precondition annotation in order to create "AND" logic. Example when the temperature is above 30 degrees (
 celcius probably) and
@@ -472,9 +509,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 26
-
-Use case: Send Quantity type Watt (W) from rule.
+### Example 26 - Send Quantity type Watt (W) from rule
 
 ```java
 public class DemoRule extends JRule {
@@ -487,9 +522,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 27
-
-Use case: Use forName to create and item and send commands and get status
+### Example 27 - Use forName to create and item and send commands and get status
 
 ```java
 public class DemoRule extends JRule {
@@ -505,9 +538,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 27b
-
-Use case: Use forNameOptional to create and item and send commands and get status
+### Example 27b - Use forNameOptional to create and item and send commands and get status
 
 ```java
 public class DemoRule extends JRule {
@@ -519,9 +550,8 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 28
+### Example 28 - Get the name of the item that triggered the rule as well as new and old state value
 
-Use case: Get the name of the item that triggered the rule as well as new and old state value.
 This can be useful if you have multiple JRuleWhen with different items, and you want to know which item
 triggered the rule.
 
@@ -537,9 +567,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 29
-
-Use case: get average value for a Number item last hour
+### Example 29 - Get average value for a Number item last hour
 
 ```java
 public class DemoRule extends JRule {
@@ -552,9 +580,9 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 30
+### Example 30 - Use generated JRuleItems.java to get hold of items
 
-Use case: Use generated JRuleItems.java to get hold of items. For instance get state of an item.
+For instance get state of an item.
 
 ```java
 public class DemoRule extends JRule {
@@ -566,9 +594,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 31
-
-Use case: Restart thing every night due to binding flakyness
+### Example 31 - Restart thing every night due to binding flakyness
 
 ```java
 public class DemoRule extends JRule {
@@ -580,9 +606,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 32
-
-Use case: Detect if a specific thing goes offline, wait for it to come online again within a given time
+### Example 32 - Detect if a specific thing goes offline, wait for it to come online again within a given time
 
 ```java
 public class DemoRule extends JRule {
@@ -599,9 +623,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 33
-
-Use case: Listen for thing status events on _all_ things
+### Example 33 - Listen for thing status events on _all_ things
 
 ```java
 public class DemoRule extends JRule {
@@ -614,10 +636,9 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 34
+### Example 34 - Thing actions, send message with pushover and other services
 
-Use case: Thing actions, send message with pushover and other services.
-Note that you will have to set up a pusheover account as thing in openHAB.
+Note that you will have to set up a pushover account as thing in openHAB.
 
 ```java
 public class DemoRule extends JRule {
@@ -630,9 +651,8 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 35
+### Example 35 - Listen on all Item events of a group (without the groupstate must change)
 
-Use case: Want to listen on all Item events of a group (without the groupstate must change).
 Alternatively you could just listen to just Group changes or (real) Item changes
 
 ```java
@@ -648,7 +668,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 36
+### Example 36 - Listen for group changes - with conditions
 
 Use case: Want to listen just on changes where the state is now greater/equals then 12 and was before less then 12.
 Without the previous condition the rule will be triggered every time the state is greater/equals then 12.
@@ -663,7 +683,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 37
+### Example 37 - Timer chaining
 
 Use case: Chain timers. Execute one and after this is expired, execute the next one.
 
@@ -681,7 +701,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 38
+### Example 38 - Debounce
 
 Use case: Do not execute a rule too often
 
@@ -696,9 +716,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 39
-
-Use case: Send some requests to http endpoints
+### Example 39 - HTTP requests
 
 ```java
 public class DemoRule extends JRule {
@@ -712,9 +730,9 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 40
+### Example 40 - Delay rule execution
 
-Use case: Execute a rule delayed
+Use case: Execute a rule delayed without manually creating a timer
 
 ```java
 public class DemoRule extends JRule {
@@ -725,5 +743,4 @@ public class DemoRule extends JRule {
         // delay the execution of this
     }
 }
-
 ```
