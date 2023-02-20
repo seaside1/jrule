@@ -14,8 +14,6 @@ package org.openhab.automation.jrule.items;
 
 import java.util.List;
 import java.util.Map;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;

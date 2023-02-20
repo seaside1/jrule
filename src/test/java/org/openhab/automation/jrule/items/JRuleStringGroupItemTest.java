@@ -13,13 +13,11 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.List;
-import java.util.Map;
-
 import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 

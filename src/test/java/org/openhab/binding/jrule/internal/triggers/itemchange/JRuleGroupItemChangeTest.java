@@ -268,8 +268,7 @@ public class JRuleGroupItemChangeTest extends JRuleAbstractTest {
 
         JRuleGroupItemChangeRules rule = initRule(JRuleGroupItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(false,
-                List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(OTHER_ITEM, "1", "2"),
+        fireEvents(false, List.of(itemChangeEvent(MEMBER_ITEM, "2", "1"), itemChangeEvent(OTHER_ITEM, "1", "2"),
                 itemChangeEvent(MEMBER_ITEM, "1", "2")));
         verify(rule, times(1)).groupItemChangeFrom(Mockito.any(JRuleEvent.class));
     }
