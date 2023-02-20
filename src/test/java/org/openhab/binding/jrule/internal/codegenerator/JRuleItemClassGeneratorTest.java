@@ -15,18 +15,20 @@ package org.openhab.binding.jrule.internal.codegenerator;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +57,8 @@ import org.openhab.core.library.items.PlayerItem;
 import org.openhab.core.library.items.RollershutterItem;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.items.SwitchItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleItemClassGeneratorTest}
@@ -64,6 +68,7 @@ import org.openhab.core.library.items.SwitchItem;
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JRuleItemClassGeneratorTest {
+    private static final Logger log = LoggerFactory.getLogger(JRuleItemClassGeneratorTest.class);
 
     private JRuleItemClassGenerator sourceFileGenerator;
     private File targetFolder;
@@ -112,15 +117,16 @@ public class JRuleItemClassGeneratorTest {
     }
 
     @Test
-    public void testGenerateItemsFile()
-            throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            MalformedURLException, ClassNotFoundException, NoSuchFieldException, ItemNotFoundException {
+    public void testGenerateItemsFile() throws InvocationTargetException, NoSuchMethodException, InstantiationException,
+            IllegalAccessException, IOException, ClassNotFoundException, NoSuchFieldException, ItemNotFoundException {
         Set<Item> items = JRuleItemTestUtils.getAllDummyItems().keySet();
 
         boolean success = sourceFileGenerator.generateItemsSource(items);
         assertTrue(success, "Failed to generate source file for items");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleItems.java")), "target/classes:target/gen");
+        File jRuleItemsFile = new File(targetFolder, "JRuleItems.java");
+        log.info("compiling JRuleItems: {}", FileUtils.readFileToString(jRuleItemsFile, StandardCharsets.UTF_8));
+        compiler.compile(List.of(jRuleItemsFile), "target/classes:target/gen");
 
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
         Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {
