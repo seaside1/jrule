@@ -13,6 +13,11 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import java.util.List;
 import java.util.Map;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
@@ -29,5 +34,12 @@ class JRuleStringGroupItemTest extends JRuleStringItemTest {
         return new JRuleInternalStringGroupItem("Group", "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<String> set = JRuleStringGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleStringItem::getStateAsString).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

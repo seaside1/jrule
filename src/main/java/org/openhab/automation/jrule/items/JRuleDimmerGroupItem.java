@@ -13,9 +13,12 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
@@ -34,27 +37,38 @@ public interface JRuleDimmerGroupItem extends JRuleDimmerItem, JRuleSwitchGroupI
         return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
+    default Set<? extends JRuleDimmerItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<? extends JRuleDimmerItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleDimmerItem) jRuleItem).collect(Collectors.toSet());
+    }
+
     default void sendCommand(JRulePercentValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePercentValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(int command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.sendUncheckedCommand(new JRulePercentValue(command)));
     }
 
     default void sendCommand(JRuleIncreaseDecreaseValue command) {
-        memberItemsGeneric().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleIncreaseDecreaseValue state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(int state) {
-        memberItemsGeneric().forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false)
+                .forEach(i -> i.postUncheckedUpdate(new JRulePercentValue(state)));
     }
 }

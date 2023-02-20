@@ -19,14 +19,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.items.events.GroupItemStateChangedEvent;
-import org.openhab.core.items.events.ItemEvent;
-import org.openhab.core.items.events.ItemStateChangedEvent;
+import org.openhab.core.items.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,19 +88,23 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        final String itemName;
-        final String memberName;
+        final JRuleItem item;
+        final JRuleItem memberItem;
         if (getMemberOf() != JRuleMemberOf.None) {
-            itemName = this.getItemName();
-            memberName = ((ItemEvent) event).getItemName();
+            item = JRuleItem.forName(this.getItemName());
+            memberItem = JRuleItem.forName(((ItemEvent) event).getItemName());
         } else {
-            itemName = this.getItemName();
-            memberName = event instanceof GroupItemStateChangedEvent
-                    ? ((GroupItemStateChangedEvent) event).getMemberName()
+            item = JRuleItem.forName(this.getItemName());
+            memberItem = event instanceof GroupItemStateChangedEvent
+                    ? JRuleItem.forName(((GroupItemStateChangedEvent) event).getMemberName())
                     : null;
         }
 
-        return new JRuleItemEvent(itemName, memberName,
+        // updating the item state to be sure that it's update when the JRule method is fired
+        JRuleEventHandler.get().setValue(((ItemStateChangedEvent) event).getItemName(),
+                ((ItemStateChangedEvent) event).getItemState());
+
+        return new JRuleItemEvent(item, memberItem,
                 JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getItemState()),
                 JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getOldItemState()));
     }

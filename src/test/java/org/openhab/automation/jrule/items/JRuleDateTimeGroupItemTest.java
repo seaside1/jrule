@@ -13,9 +13,15 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import java.util.List;
 import java.util.Map;
 
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupItem;
+import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
@@ -29,5 +35,12 @@ class JRuleDateTimeGroupItemTest extends JRuleDateTimeItemTest {
         return new JRuleInternalDateTimeGroupItem("Group", "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
+    }
+
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleDateTimeValue> set = JRuleDateTimeGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleDateTimeItem::getStateAsDateTime).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

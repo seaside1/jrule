@@ -12,7 +12,6 @@
  */
 package org.openhab.binding.jrule.internal.rules.delayed;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -50,11 +49,13 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
     public void testDelayed() throws ItemNotFoundException, InterruptedException {
         JRuleDelayedTestRules rule = initRule(JRuleDelayedTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+
+        registerItem(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleDelayedTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleDelayedTestRules.TARGET_ITEM, TargetItem.class);
         ZonedDateTime fired = ZonedDateTime.now();
-        fireEvents(List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
         Thread.sleep(3000); // Wait for delayed execution
         verify(rule, times(1)).test2s();
         List<CollectingEventPublisher.Container> events = eventPublisher
@@ -67,11 +68,12 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
     public void testDelayedNotWaiting() throws ItemNotFoundException, InterruptedException {
         JRuleDelayedTestRules rule = initRule(JRuleDelayedTestRules.class);
         // Set item state in ItemRegistry
-        setState(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleDelayedTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleDelayedTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
 
         JRuleItemRegistry.get(JRuleDelayedTestRules.TARGET_ITEM, TargetItem.class);
         ZonedDateTime fired = ZonedDateTime.now();
-        fireEvents(List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleDelayedTestRules.TRIGGER_ITEM, "nothing", "2s")));
         verify(rule, times(0)).test2s();
     }
 

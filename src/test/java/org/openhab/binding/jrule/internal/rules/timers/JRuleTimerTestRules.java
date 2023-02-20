@@ -96,6 +96,19 @@ public class JRuleTimerTestRules extends JRule {
                 () -> repeatingItem.sendCommand("repeating-" + repeatingCounter.incrementAndGet()));
     }
 
+    @JRuleName("Repeating Timers")
+    @JRuleWhenItemReceivedCommand(item = TRIGGER_ITEM, command = "timers-repeating-complex")
+    public void testRepeatingTimersComplex() {
+        final AtomicInteger counter = new AtomicInteger(0);
+
+        JRuleStringItem repeatingWithNameReplacedItem = JRuleStringItem
+                .forName(TARGET_ITEM_REPEATING_WITH_NAME_REPLACED);
+
+        final String TIMER_NAME = "repeating-with-name-replaced";
+        createOrReplaceRepeatingTimer(TIMER_NAME, Duration.ofMillis(200), 5,
+                () -> repeatingWithNameReplacedItem.sendCommand(TIMER_NAME + "-" + counter.incrementAndGet()));
+    }
+
     @JRuleName("Rule name")
     @JRuleLogName("Rule log name")
     @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "locks")

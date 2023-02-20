@@ -50,7 +50,7 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     public void testItemChange_no_from_to() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(
+        fireEvents(false,
                 List.of(itemChangeEvent("other_item", "2", "1"), itemChangeEvent(JRuleItemChangeRules.ITEM, "2", "1")));
         verify(rule, times(1)).itemChange(Mockito.any(JRuleEvent.class));
     }
@@ -59,7 +59,7 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     public void testItemChange_from() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_FROM, "2", "1"),
+        fireEvents(false, List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_FROM, "2", "1"),
                 itemChangeEvent(JRuleItemChangeRules.ITEM_FROM, "1", "2")));
         verify(rule, times(1)).itemChangeFrom(Mockito.any(JRuleEvent.class));
     }
@@ -68,7 +68,7 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     public void testItemChange_to() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_TO, "1", "2"),
+        fireEvents(false, List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_TO, "1", "2"),
                 itemChangeEvent(JRuleItemChangeRules.ITEM_TO, "2", "1")));
         verify(rule, times(1)).itemChangeTo(Mockito.any(JRuleEvent.class));
     }
@@ -77,16 +77,17 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     public void testItemChange_from_to() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
         // Only last event should trigger rule method
-        fireEvents(List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "2", "1"),
-                itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "3", "2"),
-                itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "1", "2")));
+        fireEvents(false,
+                List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "2", "1"),
+                        itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "3", "2"),
+                        itemChangeEvent(JRuleItemChangeRules.ITEM_FROM_TO, "1", "2")));
         verify(rule, times(1)).itemChangeFromTo(Mockito.any(JRuleEvent.class));
     }
 
     @Test
     public void testItemChange_multipleMatchingContexts() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
-        fireEvents(List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_DUPLICATE, "2", "1")));
+        fireEvents(false, List.of(itemChangeEvent(JRuleItemChangeRules.ITEM_DUPLICATE, "2", "1")));
         verify(rule, times(1)).duplicateMatchingWhen(Mockito.any(JRuleEvent.class));
     }
 

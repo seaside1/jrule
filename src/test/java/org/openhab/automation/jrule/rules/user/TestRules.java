@@ -151,25 +151,25 @@ public class TestRules extends JRule {
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().stringValue());
+        logInfo("received update: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ON_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH, state = JRuleSwitchItem.ON)
     public void switchReceivedOnUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().stringValue());
+        logInfo("received update: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemChanged(JRuleItemEvent event) {
-        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getState());
+        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getItem().getState());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED_TO_ON)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void switchReceivedChangedToOn(JRuleItemEvent event) {
-        logInfo("changed: {}", event.getState().stringValue());
+        logInfo("changed: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_INVOKE_MQTT_ACTION)
@@ -203,27 +203,29 @@ public class TestRules extends JRule {
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
-        logInfo("Member of Group ({}) received command", event.getMemberName());
+        logInfo("Member of Group ({}) received command", event.getMemberItem().getName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) received update", event.getMemberName());
+        final String memberThatChangedStatus = event.getMemberItem().getName();
+        logInfo("Member of Group ({}) received update", event.getMemberItem().getName());
+        logInfo("Member of Group ({}) received update value",
+                event.getMemberItem(JRuleSwitchItem.class).getStateAsOnOff());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
     @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) changed", event.getMemberName());
+        final String memberThatChangedStatus = event.getMemberItem().getName();
+        logInfo("Member of Group ({}) changed", event.getMemberItem().getName());
     }
 
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
     public synchronized void conditionLteAndGteForNumber(JRuleItemEvent event) {
-        logInfo("trigger when between 18 and 20, current: {}", event.getState().stringValue());
+        logInfo("trigger when between 18 and 20, current: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_CRON_EVERY_5_SEC)
@@ -242,7 +244,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItemsGeneric();
+        Set<? extends JRuleSwitchItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
@@ -253,14 +255,14 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItemsGeneric();
+        Set<JRuleNumberItem> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
         logInfo("contains members: {}", members.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
 
-        Set<JRuleItem> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItemsGeneric(true);
+        Set<JRuleNumberItem> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems(true);
         if (recursiveMembers.size() != 4) {
             throw new JRuleExecutionException("expected 4 childs");
         }
@@ -344,7 +346,7 @@ public class TestRules extends JRule {
 
         // repeating timer
         AtomicInteger counter = new AtomicInteger(0);
-        createRepeatingTimer(Duration.ofMillis(1), 200,
+        createRepeatingTimer(Duration.ofMillis(10), 20,
                 () -> logInfo("TIMER-REPEATING: '{}'", counter.getAndIncrement()));
 
         // cancel normal timer

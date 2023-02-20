@@ -26,6 +26,7 @@ import org.openhab.automation.jrule.rules.value.JRuleStringListValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.CallItem;
+import org.openhab.core.library.types.StringListType;
 
 /**
  * The {@link JRuleCallItemTest}
@@ -64,7 +65,9 @@ class JRuleCallItemTest extends JRuleItemTestBase {
 
     @Override
     protected GenericItem getOhItem(String name) {
-        return new CallItem(name);
+        CallItem item = new CallItem(name);
+        Optional.ofNullable(name).ifPresent(s -> item.setState(new StringListType(s)));
+        return item;
     }
 
     @Test
@@ -75,11 +78,11 @@ class JRuleCallItemTest extends JRuleItemTestBase {
         Assertions.assertFalse(JRuleCallItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
     }
 
-    protected <T extends JRuleGroupItem> T groupForNameMethod(String name) {
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
         return (T) JRuleCallGroupItem.forName(name);
     }
 
-    protected <T extends JRuleGroupItem> Optional<T> groupForNameOptionalMethod(String name) {
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
         return (Optional<T>) JRuleCallGroupItem.forNameOptional(name);
     }
 }
