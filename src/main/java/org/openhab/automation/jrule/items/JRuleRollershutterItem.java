@@ -27,10 +27,10 @@ import org.openhab.automation.jrule.rules.value.*;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRuleRollershutterItem extends JRuleItem {
-    String STOP = JRuleStopMoveValue.STOP.stringValue();
-    String MOVE = JRuleStopMoveValue.MOVE.stringValue();
-    String UP = JRuleUpDownValue.UP.stringValue();
-    String DOWN = JRuleUpDownValue.DOWN.stringValue();
+    String STOP = "STOP";
+    String MOVE = "MOVE";
+    String UP = "UP";
+    String DOWN = "DOWN";
 
     static JRuleRollershutterItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName, JRuleInternalRollershutterItem.class);
