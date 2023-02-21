@@ -120,13 +120,14 @@ public class JRuleItemRegistry {
                         String.class, String.class, String.class);
                 jruleItem = constructor.newInstance(item.getName(), item.getLabel(), item.getType(), item.getUID());
                 itemRegistry.put(itemName, jruleItem);
-                logger.debug("creating a new JRuleItem for name '{}': '{}'", itemName, jruleItem.getType());
+                logger.debug("creating a new JRuleItem for name '{}': '{}'", itemName,
+                        jruleItem.getClass().getSimpleName());
             } catch (Exception ex) {
                 throw new RuntimeException(String.format("cannot create item '%s' for type '%s'", itemName,
                         jRuleItemClass.getSimpleName()), ex);
             }
         } else {
-            logger.debug("using cached JRuleItem for name '{}': '{}'", itemName, jruleItem.getType());
+            logger.debug("using cached JRuleItem for name '{}': '{}'", itemName, jruleItem.getClass().getSimpleName());
         }
         return (T) jruleItem;
     }
