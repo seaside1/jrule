@@ -40,10 +40,10 @@ public class JRuleItemRegistry {
 
     private static final Map<String, Class<? extends JRuleItem>> typeMap = new HashMap<>();
     private static final Map<String, Class<? extends JRuleItem>> groupTypeMap = new HashMap<>();
-    private static final Map<String, JRuleItem> itemRegistry = new HashMap<>();
+    private static final Map<String, JRuleItem> itemCache = new HashMap<>();
 
     public static void clear() {
-        itemRegistry.clear();
+        itemCache.clear();
     }
 
     public static final String ITEM_TYPE_QUANTITY = "Quantity";
@@ -81,55 +81,60 @@ public class JRuleItemRegistry {
     }
 
     public static <T extends JRuleValue> JRuleItem get(String itemName) throws JRuleItemNotFoundException {
-        JRuleItem jRuleItem = itemRegistry.get(itemName);
-        if (jRuleItem == null) {
-            Item item = verifyThatItemExist(itemName);
+        synchronized (itemCache) {
+            JRuleItem jRuleItem = itemCache.get(itemName);
+            if (jRuleItem == null) {
+                Item item = verifyThatItemExist(itemName);
 
-            Class<? extends JRuleItem> jRuleItemClass = typeMap
-                    .get(item.getType().contains(":") ? "Quantity" : item.getType());
-            if (item instanceof GroupItem) {
-                String baseItemType = Optional.ofNullable(((GroupItem) item).getBaseItem()).map(Item::getType)
-                        .or(() -> Optional.of(JRuleItemClassGenerator.ITEM_GROUP_TYPE_UNSPECIFIED))
-                        .map(s -> s.contains(":") ? "Quantity" : s)
-                        .orElse(JRuleItemClassGenerator.ITEM_GROUP_TYPE_UNSPECIFIED);
+                Class<? extends JRuleItem> jRuleItemClass = typeMap
+                        .get(item.getType().contains(":") ? "Quantity" : item.getType());
+                if (item instanceof GroupItem) {
+                    String baseItemType = Optional.ofNullable(((GroupItem) item).getBaseItem()).map(Item::getType)
+                            .or(() -> Optional.of(JRuleItemClassGenerator.ITEM_GROUP_TYPE_UNSPECIFIED))
+                            .map(s -> s.contains(":") ? "Quantity" : s)
+                            .orElse(JRuleItemClassGenerator.ITEM_GROUP_TYPE_UNSPECIFIED);
 
-                jRuleItemClass = groupTypeMap.get(baseItemType);
+                    jRuleItemClass = groupTypeMap.get(baseItemType);
+                }
+
+                try {
+                    Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
+                            String.class, String.class, String.class);
+                    constructor.setAccessible(true);
+                    jRuleItem = constructor.newInstance(itemName, item.getLabel(), item.getType(), item.getUID());
+                    itemCache.put(itemName, jRuleItem);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
-
-            try {
-                Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
-                        String.class, String.class, String.class);
-                constructor.setAccessible(true);
-                jRuleItem = constructor.newInstance(itemName, item.getLabel(), item.getType(), item.getUID());
-                itemRegistry.put(itemName, jRuleItem);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            return jRuleItem;
         }
-        return jRuleItem;
     }
 
     public static <T> T get(String itemName, Class<? extends JRuleItem> jRuleItemClass)
             throws JRuleItemNotFoundException {
-        JRuleItem jruleItem = itemRegistry.get(itemName);
-        if (jruleItem == null) {
-            Item item = verifyThatItemExist(itemName);
+        synchronized (itemCache) {
+            JRuleItem jruleItem = itemCache.get(itemName);
+            if (jruleItem == null) {
+                Item item = verifyThatItemExist(itemName);
 
-            try {
-                Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
-                        String.class, String.class, String.class);
-                jruleItem = constructor.newInstance(item.getName(), item.getLabel(), item.getType(), item.getUID());
-                itemRegistry.put(itemName, jruleItem);
-                logger.debug("creating a new JRuleItem for name '{}': '{}'", itemName,
+                try {
+                    Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
+                            String.class, String.class, String.class);
+                    jruleItem = constructor.newInstance(item.getName(), item.getLabel(), item.getType(), item.getUID());
+                    itemCache.put(itemName, jruleItem);
+                    logger.debug("creating a new JRuleItem for name '{}': '{}'", itemName,
+                            jruleItem.getClass().getSimpleName());
+                } catch (Exception ex) {
+                    throw new RuntimeException(String.format("cannot create item '%s' for type '%s'", itemName,
+                            jRuleItemClass.getSimpleName()), ex);
+                }
+            } else {
+                logger.debug("using cached JRuleItem for name '{}': '{}'", itemName,
                         jruleItem.getClass().getSimpleName());
-            } catch (Exception ex) {
-                throw new RuntimeException(String.format("cannot create item '%s' for type '%s'", itemName,
-                        jRuleItemClass.getSimpleName()), ex);
             }
-        } else {
-            logger.debug("using cached JRuleItem for name '{}': '{}'", itemName, jruleItem.getClass().getSimpleName());
+            return (T) jruleItem;
         }
-        return (T) jruleItem;
     }
 
     private static Item verifyThatItemExist(String itemName) throws JRuleItemNotFoundException {
