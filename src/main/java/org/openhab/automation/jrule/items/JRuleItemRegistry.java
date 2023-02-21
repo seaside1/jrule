@@ -26,6 +26,8 @@ import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.CoreItemFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRuleItemRegistry} Items
@@ -34,6 +36,8 @@ import org.openhab.core.library.CoreItemFactory;
  */
 
 public class JRuleItemRegistry {
+    private static final Logger logger = LoggerFactory.getLogger(JRuleItemRegistry.class);
+
     private static final Map<String, Class<? extends JRuleItem>> typeMap = new HashMap<>();
     private static final Map<String, Class<? extends JRuleItem>> groupTypeMap = new HashMap<>();
     private static final Map<String, JRuleItem> itemRegistry = new HashMap<>();
@@ -116,10 +120,13 @@ public class JRuleItemRegistry {
                         String.class, String.class, String.class);
                 jruleItem = constructor.newInstance(item.getName(), item.getLabel(), item.getType(), item.getUID());
                 itemRegistry.put(itemName, jruleItem);
+                logger.debug("creating a new JRuleItem for name '{}': '{}'", itemName, jruleItem.getType());
             } catch (Exception ex) {
                 throw new RuntimeException(String.format("cannot create item '%s' for type '%s'", itemName,
                         jRuleItemClass.getSimpleName()), ex);
             }
+        } else {
+            logger.debug("using cached JRuleItem for name '{}': '{}'", itemName, jruleItem.getType());
         }
         return (T) jruleItem;
     }
