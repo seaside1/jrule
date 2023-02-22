@@ -313,7 +313,7 @@ public class JRuleHandler implements PropertyChangeListener {
     private synchronized Boolean compileGeneratedSourcesInternal() {
         logInfo("Compiling generated sources");
         itemGenerator.generateItemsSource(itemRegistry.getItems(), metadataRegistry);
-        itemNameGenerator.generateItemNamesSource(itemRegistry.getItems());
+        itemNameGenerator.generateItemNamesSource(itemRegistry.getItems(), metadataRegistry);
         thingGenerator.generateThingsSource(thingRegistry.getAll());
         Set<Thing> filteredThings = thingRegistry.getAll().stream().filter(thing -> {
             boolean b = thing.getHandler() != null;
