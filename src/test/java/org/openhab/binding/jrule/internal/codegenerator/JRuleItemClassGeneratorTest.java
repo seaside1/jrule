@@ -37,6 +37,7 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
@@ -79,6 +80,7 @@ public class JRuleItemClassGeneratorTest {
         JRuleConfig config = new JRuleConfig(map);
         sourceFileGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
+        JRuleItemRegistry.clear();
     }
 
     @BeforeEach
