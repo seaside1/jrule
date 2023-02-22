@@ -34,8 +34,7 @@
     + [Example 30 - Use generated JRuleItems.java to get hold of items](#example-30---use-generated-jruleitemsjava-to-get-hold-of-items)
     + [Example 31 - Restart thing every night due to binding flakyness](#example-31---restart-thing-every-night-due-to-binding-flakyness)
     + [Example 32 - Detect if a specific thing goes offline, wait for it to come online again within a given time](#example-32---detect-if-a-specific-thing-goes-offline--wait-for-it-to-come-online-again-within-a-given-time)
-    + [Example 33 - Listen for thing status events on
-      _all_ things](#example-33---listen-for-thing-status-events-on--all--things)
+    + [Example 33 - Listen for thing status events on _all_ things](#example-33---listen-for-thing-status-events-on--all--things)
     + [Example 34 - Thing actions, send message with pushover and other services](#example-34---thing-actions--send-message-with-pushover-and-other-services)
     + [Example 35 - Listen on all Item events of a group (without the groupstate must change)](#example-35---listen-on-all-item-events-of-a-group--without-the-groupstate-must-change-)
     + [Example 36 - Listen for group changes - with conditions](#example-36---listen-for-group-changes---with-conditions)
@@ -47,6 +46,14 @@
 ### Example 1 - Invoke another item Switch from rule
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("MyRuleTurnSwich2On")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -63,6 +70,15 @@ Use case: Invoke a Doorbell, but only allow the rule to be invoked once every 20
 This is done by acquiring a lock getTimedLock("MyLockTestRule1", 20).
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.OFF;
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch2;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("MyLockTestRule1")
     @JRuleWhenItemChange(item = MyTestSwitch2, from = OFF, to = ON)
@@ -83,6 +99,14 @@ Use case: Use the value that caused the trigger
 When the rule is triggered, the triggered value is stored in the event.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch2;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("MyEventValueTest")
     @JRuleWhenItemReceivedCommand(item = MyTestSwitch2)
@@ -98,6 +122,14 @@ Use case: Or statement for rule trigger
 To add an OR statement we simply add multiple @JRuleWhenXXX statements
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestNumber;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("MyNumberRule1")
     @JRuleWhenItemChange(item = MyTestNumber, from = "14", to = "10")
@@ -133,8 +165,9 @@ Your class rules can now extend the JRuleUser
 package org.openhab.automation.jrule.rules.user;
 
 ```java
-import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+package org.openhab.automation.jrule.rules.user;
 
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
 import org.openhab.automation.jrule.rules.user.JRuleUser;
 
 public class MySwitchRule extends JRuleUser {
@@ -169,9 +202,14 @@ We then extend the rule from the Java Rules file:
 ```java
 package org.openhab.automation.jrule.rules.user;
 
-import org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.OFF;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 
 public class MyTestUserRule extends JRuleUser {
 
@@ -191,6 +229,15 @@ Use case create a timer for automatically turning off a light when it is turned 
 schedule a new one.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyLightSwitch;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("myTimerRule")
     @JRuleWhenItemChange(item = MyLightSwitch, to = ON)
@@ -217,6 +264,15 @@ createOrReplaceRepeatingTimer("myRepeatingTimer", 7, 4, will create a repeating 
 If the Timer is already running it will cancel it and create a new one.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("repeatRuleExample")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -239,6 +295,14 @@ Use case Create a simple timer. When MyTestSwitch turns on it will wait 10 secon
 Note that it will not reschedule the timer, if the timer is already running it won't reschedule it.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("timerRuleExample")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -260,6 +324,13 @@ public class DemoRule extends JRule {
 Use case trigger a rule at 22:30 in the evening to set initial brightness for a ZwaveDimmer to 30%
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("setDayBrightness")
     @JRuleWhenTimeTrigger(hours = 22, minutes = 30)
@@ -273,16 +344,23 @@ public class DemoRule extends JRule {
 
 ### Example 12 - Condition on trigger
 
-Use case: If temperature is below or equals to 20 degrees send command on to a heating fan  
-It is possible to use:  
-lte = less than or equals  
-lt = less than  
-gt = greater than  
-gte = greater than or equals  
+Use case: If temperature is below or equals to 20 degrees send command on to a heating fan
+It is possible to use:
+lte = less than or equals
+lt = less than
+gt = greater than
+gte = greater than or equals
 eq = equals
 neq = not equals
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("turnOnFanIfTemperatureIsLow")
     @JRuleWhenItemChange(item = MyTemperatureSensor, condition = @JRuleCondition(lte = 20))
@@ -298,6 +376,13 @@ public class DemoRule extends JRule {
 Use case: Using say command for tts
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testSystemTts")
     @JRuleWhenItemChange(item = TestSystemTts, to = ON)
@@ -314,6 +399,14 @@ public class DemoRule extends JRule {
 Use case: Executing command from CLI
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MySwitchGroup;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("TestExecutingCommandLine")
     @JRuleWhenItemReceivedCommand(item = MySwitchGroup)
@@ -329,6 +422,14 @@ public class DemoRule extends JRule {
 Use case: A group of switches, see if status is changed, and also which member in the group changed state
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MySwitchGroup;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("groupMySwitchesChanged")
     @JRuleWhenItemChange(item = MySwitchGroup)
@@ -345,6 +446,14 @@ public class DemoRule extends JRule {
 Use case: A group of switches , trigger when it's changed from OFF to ON
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MySwitchGroup;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("groupMySwitchesChangedOffToOn")
     @JRuleWhenItemChange(item = MySwitchGroup, from = OFF, to = ON)
@@ -359,6 +468,13 @@ public class DemoRule extends JRule {
 Use case: Listen for a Channel Trigger Event
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("ChannelTriggered")
     @JRuleWhenChannelTrigger(channel = binding_thing.buttonevent)
@@ -373,6 +489,13 @@ public class DemoRule extends JRule {
 Use case: Cron based expression to trigger rule
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenCromTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testCron")
     @JRuleWhenCronTrigger(cron = "*/5 * * * * *")
@@ -384,12 +507,19 @@ public class DemoRule extends JRule {
 
 ### Example 19 - Persistence and lastUpdated
 
-Use case: getLastUpdated for an item  
+Use case: getLastUpdated for an item
 Note that `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated("mapdb");`
 can be called without serviceId
 argument: `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated();`
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testLastUpdate")
     @JRuleWhenCronTrigger(cron = "4 * * * * *")
@@ -408,6 +538,14 @@ public class DemoRule extends JRule {
 Use case: Get the brigtness from a color item, set a color item to white (HSB 0, 0, 100)
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestColorItem;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
 
     @JRuleName("testBrightnessFromColorItem")
@@ -427,6 +565,14 @@ public class DemoRule extends JRule {
 ### Example 21 - Set logging name for a specific rule
 
 ```java 
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
 
     @JRuleName("MyCustomLoggingRule")
@@ -442,6 +588,13 @@ public class DemoRule extends JRule {
 ### Example 22 - Override logging for all rules defined in one file
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class ColorRules extends JRule {
     @JRuleName("MyCustomLoggingRuleOnClass")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -460,6 +613,14 @@ public class ColorRules extends JRule {
 ### Example 23 - Apply transformation using openHAB transformation service
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyStringValue;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class TransformationRule extends JRule {
     @JRuleName("MyTransformation")
     @JRuleWhenItemReceivedCommand(item = MyStringValue)
@@ -478,6 +639,14 @@ if it is ok for disturbance. If it is ok the switch is set to ON and we can send
 message is updated.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyDisturbanceSwitch;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
 
     @JRulePrecondition(item = MyTestDisturbanceSwitch, condition = @JRuleCondition(eq = "ON"))
@@ -498,6 +667,16 @@ celcius probably) and
 a motion detector is triggered we will turn on a fan.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyMotionDetector;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.ON;
+import static org.openhab.automation.jrule.rules.JRuleOnOffValue.OFF;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRulePrecondition(item = MyTestTemperatureSensor, gt = 30)
     @JRuleName("MyTestPreConditionRuleTemperature")
@@ -512,6 +691,14 @@ public class DemoRule extends JRule {
 ### Example 26 - Send Quantity type Watt (W) from rule
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestMeterPower;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testQuantityPowerWatt")
     @JRuleWhenItemChange(item = MyTestMeterPower)
@@ -525,6 +712,14 @@ public class DemoRule extends JRule {
 ### Example 27 - Use forName to create and item and send commands and get status
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testForName")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -541,6 +736,14 @@ public class DemoRule extends JRule {
 ### Example 27b - Use forNameOptional to create and item and send commands and get status
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testForNameOptional")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -556,6 +759,15 @@ This can be useful if you have multiple JRuleWhen with different items, and you 
 triggered the rule.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch1;
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch2;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("triggerNameExample")
     @JRuleWhenItemChange(item = MyTestSwitch1, to = ON)
@@ -570,6 +782,13 @@ public class DemoRule extends JRule {
 ### Example 29 - Get average value for a Number item last hour
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testAverageLastHour")
     @JRuleWhenCronTrigger(cron = "4 * * * * *")
@@ -585,6 +804,14 @@ public class DemoRule extends JRule {
 For instance get state of an item.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.MyTestSwitch;
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("testItems")
     @JRuleWhenItemChange(item = MyTestSwitch, to = ON)
@@ -597,6 +824,12 @@ public class DemoRule extends JRule {
 ### Example 31 - Restart thing every night due to binding flakyness
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("Restart thing every night")
     @JRuleWhenTimeTrigger(hours = 3)
@@ -609,6 +842,13 @@ public class DemoRule extends JRule {
 ### Example 32 - Detect if a specific thing goes offline, wait for it to come online again within a given time
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.things.JRuleThings.remoteopenhab_thing;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("Notify if thing stays offline")
     @JRuleWhenThingTrigger(thing = remoteopenhab_thing.ID, from = JRuleThingStatus.ONLINE)
@@ -626,6 +866,13 @@ public class DemoRule extends JRule {
 ### Example 33 - Listen for thing status events on _all_ things
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("Log every thing that goes offline")
     @JRuleWhenThingTrigger(from = JRuleThingStatus.ONLINE)
@@ -641,6 +888,13 @@ public class DemoRule extends JRule {
 Note that you will have to set up a pushover account as thing in openHAB.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("PushOverTest")
     @JRuleWhenItemChange(item = MyTestSendPushOverButton, to = ON)
@@ -656,6 +910,13 @@ public class DemoRule extends JRule {
 Alternatively you could just listen to just Group changes or (real) Item changes
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("MemberOfUpdateTrigger")
     @JRuleWhenItemReceivedUpdate(item = MySwitchGroup, memberOf = JRuleMemberOf.All)
@@ -674,6 +935,13 @@ Use case: Want to listen just on changes where the state is now greater/equals t
 Without the previous condition the rule will be triggered every time the state is greater/equals then 12.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("Change from something less to something greater")
     @JRuleWhenItemChange(item = ITEM_FROM_TO, previousCondition = @JRuleCondition(lt = 12), condition = @JRuleCondition(gte = 12))
@@ -688,6 +956,12 @@ public class DemoRule extends JRule {
 Use case: Chain timers. Execute one and after this is expired, execute the next one.
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("Notify if thing stays offline")
     @JRuleWhenItemChange(item = MySwitchGroup)
@@ -706,6 +980,13 @@ public class DemoRule extends JRule {
 Use case: Do not execute a rule too often
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleDebounce;
+
 public class DemoRule extends JRule {
     @JRuleDebounce(10)
     @JRuleName("Notify if thing stays offline")
@@ -719,6 +1000,12 @@ public class DemoRule extends JRule {
 ### Example 39 - HTTP requests
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRule;
+
 public class DemoRule extends JRule {
     @JRuleName("send http methods")
     @JRuleWhenItemReceivedCommand(item = MyHttpTrigger, command = "send http calls")
@@ -735,6 +1022,13 @@ public class DemoRule extends JRule {
 Use case: Execute a rule delayed without manually creating a timer
 
 ```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleDelayed;
+
 public class DemoRule extends JRule {
     @JRuleDelayed(10)
     @JRuleName("Execute after ten seconds")
