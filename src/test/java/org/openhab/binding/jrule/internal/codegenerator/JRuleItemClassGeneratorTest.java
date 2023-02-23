@@ -77,6 +77,7 @@ public class JRuleItemClassGeneratorTest {
         JRuleConfig config = new JRuleConfig(map);
         sourceFileGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
+        JRuleItemRegistry.clear();
     }
 
     @BeforeEach
