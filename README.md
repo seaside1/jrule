@@ -137,6 +137,23 @@ equal `/etc/openhab/automation/jrule` in the following table:
 * When a Java source file with rules in `$JRULE_ROOT/rules/` is updated, the rule is compiled and reloaded.
 * When a jar file in `$JRULE_ROOT/rules-jar/` is updated, all rules are reloaded.
 
+### Example scripts to easily handle the copy process
+
+#### Grab the jrule engine from the server
+```shell
+scp <user>@<oh-server>:$JRULE_ROOT/jar/jrule.jar lib/jrule.jar
+```
+
+#### Grab the generated jrule source
+```shell
+scp <user>@<oh-server>:$JRULE_ROOT/jar/jrule-generated.jar lib/jrule-generated.jar
+```
+
+#### Grab the generated jrule source
+```shell
+scp target/openhab-rules-1.0-SNAPSHOT.jar <user>@<oh-server>:$JRULE_ROOT/rules-jar/openhab-rules-1.0-SNAPSHOT.jar
+```
+
 ### Third Party External Dependencies
 
 You can add any 3rd party library as dependency. Copy the jar files needed to `$JRULE_ROOT/ext-lib/`
@@ -202,6 +219,8 @@ Supported `OPERATOR` values:
 | `lt`       | Less than           |
 | `lte`      | Less than equals    |
 
+whereby gt, gte, lt, lte just working with numeric Items
+
 ### Logging
 
 * A rule may log any activity to a separate logger if `@JRuleLogName` is added.
@@ -228,7 +247,7 @@ Logging from rule can be done in 3 different ways
 
 * `org.openhab.automation.jrule.generated.items.JRuleItems` contains a field for each `Item`. You can send
   commands/updates and access state/label/metadata
-* `org.openhab.automation.jrule.generated.items.JRuleItemsNames` contains an `Item` name field for each item for item
+* `org.openhab.automation.jrule.generated.items.JRuleItemNames` contains an `Item` name field for each item for item
   name safety in annotations etc.
 
 ### JRuleThings
