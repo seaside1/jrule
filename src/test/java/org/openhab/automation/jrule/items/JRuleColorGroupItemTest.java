@@ -30,7 +30,7 @@ import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 class JRuleColorGroupItemTest extends JRuleColorItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalColorGroupItem("Group", "Label", "Type", "Id",
+        return new JRuleInternalColorGroupItem(GROUP_NAME, "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
     }

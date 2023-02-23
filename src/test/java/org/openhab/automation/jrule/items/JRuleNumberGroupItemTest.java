@@ -30,7 +30,7 @@ import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 class JRuleNumberGroupItemTest extends JRuleNumberItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalNumberGroupItem("Group", "Label", "Type", "Id",
+        return new JRuleInternalNumberGroupItem(GROUP_NAME, "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
     }

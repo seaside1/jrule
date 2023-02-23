@@ -86,7 +86,7 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalRollershutterItem("Name", "Label", "Type", "Id",
+        return new JRuleInternalRollershutterItem(ITEM_NAME, "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
     }

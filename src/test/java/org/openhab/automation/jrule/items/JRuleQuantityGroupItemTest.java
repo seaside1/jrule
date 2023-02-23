@@ -30,7 +30,7 @@ import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 class JRuleQuantityGroupItemTest extends JRuleQuantityItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalQuantityGroupItem("Group", "Label", "Type", "Id",
+        return new JRuleInternalQuantityGroupItem(GROUP_NAME, "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
     }

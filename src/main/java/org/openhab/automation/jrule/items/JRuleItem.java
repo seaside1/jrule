@@ -13,9 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
@@ -52,6 +50,25 @@ public interface JRuleItem {
 
     @NonNullByDefault
     List<String> getTags();
+
+    /**
+     * Returns all GroupItems, which this item belongs to -> this item is a member of the returning result
+     * 
+     * @return GroupItems which this items belongs to
+     */
+    default Set<JRuleGroupItem<? extends JRuleItem>> getGroupItems() {
+        return getGroupItems(false);
+    }
+
+    /**
+     * Returns all GroupItems, which this item belongs to -> this item is a member of the returning result
+     *
+     * @param recursive recursively up to the root or not
+     * @return (recursively) all GroupItems which this items belongs to
+     */
+    default Set<JRuleGroupItem<? extends JRuleItem>> getGroupItems(boolean recursive) {
+        return new HashSet<>(JRuleEventHandler.get().getGroupItems(getName(), recursive));
+    }
 
     default String getStateAsString() {
         return getState().toString();

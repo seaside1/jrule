@@ -20,6 +20,7 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
+import org.openhab.automation.jrule.items.JRuleGroupItem;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.JRule;
@@ -222,6 +223,23 @@ public class JRuleEventHandler {
         } catch (ItemNotFoundException e) {
             throw new JRuleItemNotFoundException(
                     String.format("Item not found in registry for groupname '%s'", groupName));
+        }
+    }
+
+    public List<JRuleGroupItem<? extends JRuleItem>> getGroupItems(String itemName, boolean recursive) {
+        try {
+            Item item = itemRegistry.getItem(itemName);
+            List<JRuleGroupItem<? extends JRuleItem>> list = item.getGroupNames().stream().map(JRuleItemRegistry::get)
+                    .filter(JRuleItem::isGroup).map(i -> (JRuleGroupItem<? extends JRuleItem>) i)
+                    .collect(Collectors.toList());
+            if (recursive) {
+                list.addAll(new ArrayList<>(list).stream().map(i -> getGroupItems(i.getName(), recursive))
+                        .flatMap(Collection::stream).collect(Collectors.toList()));
+            }
+            return list.stream().distinct().collect(Collectors.toList());
+        } catch (ItemNotFoundException e) {
+            throw new JRuleItemNotFoundException(
+                    String.format("Item not found in registry for item-name '%s'", itemName));
         }
     }
 

@@ -12,7 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -97,6 +97,17 @@ public abstract class JRuleItemTestBase {
     public void testGetTags() {
         JRuleItem item = getJRuleItem();
         Assertions.assertEquals(2, item.getTags().size());
+    }
+
+    @Test
+    public void testGetGroupItems() {
+        JRuleItem item = getJRuleItem();
+        if (item.isGroup()) {
+            Assertions.assertEquals(0, item.getGroupItems().size());
+        } else {
+            Assertions.assertEquals(1, item.getGroupItems().size());
+            Assertions.assertEquals(GROUP_NAME, new ArrayList<>(item.getGroupItems()).get(0).getName());
+        }
     }
 
     @Test

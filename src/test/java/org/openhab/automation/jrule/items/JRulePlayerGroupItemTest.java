@@ -30,7 +30,7 @@ import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
 class JRulePlayerGroupItemTest extends JRulePlayerItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalPlayerGroupItem("Group", "Label", "Type", "Id",
+        return new JRuleInternalPlayerGroupItem(GROUP_NAME, "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
     }

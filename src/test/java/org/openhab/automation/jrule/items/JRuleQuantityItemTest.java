@@ -72,7 +72,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalQuantityItem("Name", "Label", "Type", "Id",
+        return new JRuleInternalQuantityItem(ITEM_NAME, "Label", "Type", "Id",
                 Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
                 List.of("Lighting", "Inside"));
     }
