@@ -65,7 +65,7 @@ Number          Number_Persistence
 Switch          Switch_Persistence
 Contact         Contact_Persistence
 
-// Persistence 
+// Persistence
 Switch          Switch_To_Persist
 Number          Number_To_Persist
 String          String_To_Persist
@@ -78,3 +78,6 @@ Dimmer          Dimmer_To_Persist
 Color           Color_To_Persist
 Location        Location_To_Persist
 Number:Power    Quantity_To_Persist
+
+
+Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }

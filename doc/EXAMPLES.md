@@ -42,6 +42,7 @@
     + [Example 38 - Debounce](#example-38---debounce)
     + [Example 39 - HTTP requests](#example-39---http-requests)
     + [Example 40 - Delay rule execution](#example-40---delay-rule-execution)
+    + [Example 41 - Get Metadata and Tags](#example-41---get-metadata-and-tags)
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1036,5 +1037,30 @@ public class DemoRule extends JRule {
     public void delayedMethod() {
         // delay the execution of this
     }
+}
+```
+
+## Example 41 - Get Metadata and Tags
+
+Use case: Get Tags and Metadata of Items
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleDelayed;
+
+public class DemoRule extends JRule {
+  @JRuleName("read some metadata and tags")
+  @JRuleWhenItemReceivedCommand(item = MyTrigger)
+  public void getTagsAndMetadata() {
+    JRuleDimmerItem item = JRuleItems.ItemWithMetadataAndTags;
+    logInfo("Tags: '{}'", item.getTags());
+    logInfo("Metadata: '{}'", item.getMetadata());
+    logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
+    logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
+  }
 }
 ```

@@ -20,8 +20,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
@@ -59,7 +61,7 @@ public class JRuleFactory {
             final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
             final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
             final @Reference VoiceManager voiceManager, final ComponentContext componentContext,
-            final @Reference CronScheduler cronScheduler) {
+            final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
@@ -67,9 +69,10 @@ public class JRuleFactory {
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleEngine.setCronScheduler(cronScheduler);
         jRuleEngine.initialize();
+        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
 
         jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
-                eventSubscriber, voiceManager, cronScheduler, componentContext.getBundleContext());
+                eventSubscriber, voiceManager, cronScheduler, componentContext.getBundleContext(), metadataRegistry);
         delayedInit.call(this::init);
     }
 

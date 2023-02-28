@@ -9,6 +9,17 @@ package ${packageName};
 */
 public class JRuleItemNames {
 <#list itemNames as itemName>
+    /**
+     * Name: ${itemName.name}
+     * <br/>
+     * Type: ${itemName.type}
+     * <br/>
+     * Label: ${(itemName.label)!}
+     * <br/>
+     * Tags: ${itemName.tags}
+     * <br/>
+     * Metadata: ${itemName.metadata}
+     */
  public static final String ${itemName.name} = "${itemName.name}";
 </#list>
 }

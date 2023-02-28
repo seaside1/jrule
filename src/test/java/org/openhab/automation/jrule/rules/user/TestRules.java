@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -126,12 +127,17 @@ public class TestRules extends JRule {
     public static final String COMMAND_TIMERS = "timers";
     public static final String NAME_DEBOUNCE = "debounce";
     public static final String COMMAND_DEBOUNCE = "debounce";
+    public static final String COMMAND_TAGS_AND_METADATA = "tags and metadata";
+    public static final String ITEM_DIMMER_WITH_TAGS_AND_METADATA = "Dimmer_With_Tags_And_Metadata";
+    public static final String NAME_TAGS_AND_METADATA = "tags and metadata";
     public static final String NAME_TRIGGER_JUST_ITEMS = "trigger just items";
     public static final String NAME_TRIGGER_JUST_GROUPS = "trigger just groups";
     public static final String ITEM_NUMBER_GROUP_MEMBER = "Number_Group_Member";
     public static final String ITEM_STRING_GROUP_MEMBER = "String_Group_Member";
     public static final String COMMAND_DELAYED = "delayed";
     public static final String NAME_DELAYED = "delayed";
+    public static final String NAME_GET_GROUPS = "get groups";
+    public static final String COMMAND_GROUPS = "groups";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -236,6 +242,21 @@ public class TestRules extends JRule {
     @JRuleWhenItemReceivedCommand(item = ITEM_PRECONDITIONED_SWITCH)
     public void preconditionExecution(JRuleItemEvent event) {
         logInfo("received command: {}", event.getState().stringValue());
+    }
+
+    @JRuleName(NAME_GET_GROUPS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, command = COMMAND_GROUPS)
+    public void getGroups(JRuleItemEvent event) throws JRuleExecutionException {
+        Set<JRuleGroupItem<? extends JRuleItem>> parents = JRuleNumberItem.forName(ITEM_NUMBER_GROUP_MEMBER_3)
+                .getGroupItems();
+        if (parents.size() != 1) {
+            throw new JRuleExecutionException("expected 1 parent");
+        }
+        if (!new ArrayList<>(parents).get(0).getName().equals(ITEM_NUMBER_GROUP_MEMBER)) {
+            throw new JRuleExecutionException("expected parent with name: " + ITEM_NUMBER_GROUP_MEMBER);
+        }
+        logInfo("parents: {}", parents.stream().map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType())
+                .collect(Collectors.joining(", ")));
     }
 
     @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
@@ -371,6 +392,16 @@ public class TestRules extends JRule {
     @JRuleDebounce(value = 2, unit = ChronoUnit.SECONDS)
     public void debounce(JRuleItemEvent event) throws JRuleExecutionException {
         logInfo("Counted debounces: '{}'", debounceCounter.getAndIncrement());
+    }
+
+    @JRuleName(NAME_TAGS_AND_METADATA)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TAGS_AND_METADATA))
+    public void getTagsAndMetadata() {
+        JRuleDimmerItem item = JRuleDimmerItem.forName(ITEM_DIMMER_WITH_TAGS_AND_METADATA);
+        logInfo("Tags: '{}'", item.getTags());
+        logInfo("Metadata: '{}'", item.getMetadata());
+        logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
+        logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
     }
 
     private static void castLocation() {

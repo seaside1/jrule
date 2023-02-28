@@ -103,6 +103,8 @@ public class JRuleItemTestUtils {
         }
         item.setLabel(clazz.getSimpleName() + "Label");
         item.setState(initialState);
+        item.addTag("Tag1");
+        item.addTag("Tag2");
         return item;
     }
 }

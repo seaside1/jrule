@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
+import java.util.List;
+import java.util.Map;
+
 import org.openhab.automation.jrule.items.JRuleLocationGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalLocationGroupItem} Items
@@ -21,7 +25,8 @@ import org.openhab.automation.jrule.items.JRuleLocationGroupItem;
  */
 public class JRuleInternalLocationGroupItem extends JRuleInternalLocationItem implements JRuleLocationGroupItem {
 
-    public JRuleInternalLocationGroupItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalLocationGroupItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
+        super(name, label, type, id, metadata, tags);
     }
 }

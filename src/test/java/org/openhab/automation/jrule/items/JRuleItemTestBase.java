@@ -12,7 +12,7 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -21,10 +21,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemStateEvent;
 import org.openhab.core.types.State;
@@ -89,9 +86,38 @@ public abstract class JRuleItemTestBase {
             return null;
         }).when(eventPublisher).post(Mockito.any());
         JRuleEventHandler.get().setEventPublisher(eventPublisher);
+
+        MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
+        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
     }
 
     protected abstract JRuleItem getJRuleItem();
+
+    @Test
+    public void testGetTags() {
+        JRuleItem item = getJRuleItem();
+        Assertions.assertEquals(2, item.getTags().size());
+    }
+
+    @Test
+    public void testGetGroupItems() {
+        JRuleItem item = getJRuleItem();
+        if (item.isGroup()) {
+            Assertions.assertEquals(0, item.getGroupItems().size());
+        } else {
+            Assertions.assertEquals(1, item.getGroupItems().size());
+            Assertions.assertEquals(GROUP_NAME, new ArrayList<>(item.getGroupItems()).get(0).getName());
+        }
+    }
+
+    @Test
+    public void testGetMetadata() {
+        JRuleItem item = getJRuleItem();
+        Assertions.assertEquals(1, item.getMetadata().size());
+        Assertions.assertEquals("SetLightState", item.getMetadata().get("Speech").getValue());
+        Assertions.assertEquals(1, item.getMetadata().get("Speech").getConfiguration().size());
+        Assertions.assertEquals("Livingroom", item.getMetadata().get("Speech").getConfiguration().get("location"));
+    }
 
     @Test
     public void testPostNull() {

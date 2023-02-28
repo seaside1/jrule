@@ -21,11 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.core.items.Item;
+import org.openhab.core.items.MetadataRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +51,10 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
         super(jRuleConfig);
     }
 
-    public boolean generateItemNamesSource(Collection<Item> items) {
+    public boolean generateItemNamesSource(Collection<Item> items, MetadataRegistry metadataRegistry) {
         List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
-                .map(this::createItemModel).collect(Collectors.toList());
+                .map(item -> createItemModel(item, JRuleItemRegistry.getAllMetadata(item, metadataRegistry)))
+                .collect(Collectors.toList());
         Map<String, Object> processingModel = new HashMap<>();
         processingModel.put("itemNames", model);
         processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
@@ -76,9 +80,14 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
         return false;
     }
 
-    private Map<String, Object> createItemModel(Item item) {
+    private Map<String, Object> createItemModel(Item item, Map<String, JRuleItemMetadata> metadata) {
         Map<String, Object> itemModel = new HashMap<>();
         itemModel.put("name", item.getName());
+        itemModel.put("label", item.getLabel());
+        itemModel.put("type", item.getType());
+        itemModel.put("metadata", metadata.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining(", ")));
+        itemModel.put("tags", StringUtils.join(item.getTags(), ", "));
         return itemModel;
     }
 }

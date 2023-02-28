@@ -156,6 +156,13 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void getGroups() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_GROUPS);
+        verifyRuleWasExecuted(TestRules.NAME_GET_GROUPS);
+        verifyNoError();
+    }
+
+    @Test
     public void membersOfGroup() throws IOException {
         sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_GET_MEMBERS_OF_GROUP);
@@ -255,6 +262,16 @@ public class ITJRule extends JRuleITBase {
         verifyLogEntry("Counted debounces: '0'");
         verifyNoLogEntry("Counted debounces: '1'");
         verifyNoLogEntry("Counted debounces: '2'");
+        verifyNoError();
+    }
+
+    @Test
+    public void tagsAndMetadata() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_TAGS_AND_METADATA);
+        verifyRuleWasExecuted(TestRules.NAME_TAGS_AND_METADATA);
+        verifyLogEntry("Tags: '[Control, Light]'");
+        verifyLogEntry(
+                "Metadata: '{Speech=SetLightState, configuration={location=Livingroom}, semantics=Point_Control, configuration={relatesTo=Property_Light}}'");
         verifyNoError();
     }
 }
