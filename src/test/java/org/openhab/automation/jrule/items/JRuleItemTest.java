@@ -13,8 +13,9 @@
 package org.openhab.automation.jrule.items;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,21 +39,21 @@ public class JRuleItemTest {
         MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
 
-        Map<Item, Class<? extends JRuleItem>> items = JRuleItemTestUtils.getAllDummyItems();
+        List<Pair<? extends Item, Class<? extends JRuleItem>>> items = JRuleItemTestUtils.getAllDummyItems();
 
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
         Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {
             Object itemName = invocationOnMock.getArgument(0);
-            return items.keySet().stream().filter(item -> item.getName().equals(itemName)).findFirst().orElseThrow();
+            return items.stream().filter(item -> item.getKey().getName().equals(itemName)).findFirst().orElseThrow();
         });
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
 
-        items.forEach((ohItem, value) -> {
-            JRuleItem item = JRuleItem.forName(ohItem.getName());
+        items.forEach((entry) -> {
+            JRuleItem item = JRuleItem.forName(entry.getKey().getName());
             Assertions.assertNotNull(item);
-            Assertions.assertEquals(ohItem.getName(), item.getName());
-            Assertions.assertTrue(value.isAssignableFrom(item.getClass()),
-                    String.format("value '%s' is assignable from '%s'", value, item.getClass()));
+            Assertions.assertEquals(entry.getKey().getName(), item.getName());
+            Assertions.assertTrue(entry.getValue().isAssignableFrom(item.getClass()),
+                    String.format("value '%s' is assignable from '%s'", entry.getValue(), item.getClass()));
         });
     }
 }
