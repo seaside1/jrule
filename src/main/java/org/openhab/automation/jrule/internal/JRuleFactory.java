@@ -70,6 +70,7 @@ public class JRuleFactory {
         jRuleEngine.setConfig(config);
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleEngine.setCronScheduler(cronScheduler);
+        jRuleEngine.setRuleProvider(ruleProvider);
         jRuleEngine.initialize();
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
