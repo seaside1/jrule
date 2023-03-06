@@ -25,9 +25,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,18 +42,6 @@ import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
 import org.openhab.core.items.*;
-import org.openhab.core.library.items.CallItem;
-import org.openhab.core.library.items.ColorItem;
-import org.openhab.core.library.items.ContactItem;
-import org.openhab.core.library.items.DateTimeItem;
-import org.openhab.core.library.items.DimmerItem;
-import org.openhab.core.library.items.ImageItem;
-import org.openhab.core.library.items.LocationItem;
-import org.openhab.core.library.items.NumberItem;
-import org.openhab.core.library.items.PlayerItem;
-import org.openhab.core.library.items.RollershutterItem;
-import org.openhab.core.library.items.StringItem;
-import org.openhab.core.library.items.SwitchItem;
 
 /**
  * The {@link JRuleItemClassGeneratorTest}
@@ -66,6 +55,7 @@ public class JRuleItemClassGeneratorTest {
     private JRuleItemClassGenerator sourceFileGenerator;
     private File targetFolder;
     private JRuleCompiler compiler;
+    private MetadataRegistry metadataRegistry;
 
     @BeforeAll
     public void setup() {
@@ -86,43 +76,23 @@ public class JRuleItemClassGeneratorTest {
         Arrays.stream(targetFolder.listFiles()).forEach(File::delete);
     }
 
-    @Test
-    public void testGenerateAndCompileGroupItem() {
-        generateAndCompile(decorate(new GroupItem("ColorGroup", new ColorItem("ColorItem"))));
-        generateAndCompile(decorate(new GroupItem("ContactGroup", new ContactItem("ContactItem"))));
-        generateAndCompile(decorate(new GroupItem("DateTimeGroup", new DateTimeItem("DateTimeItem"))));
-        generateAndCompile(decorate(new GroupItem("DimmerGroup", new DimmerItem("DimmerItem"))));
-        generateAndCompile(decorate(new GroupItem("NumberGroup", new NumberItem("NumberItem"))));
-        generateAndCompile(
-                decorate(new GroupItem("QuantityGroup", new NumberItem("Number:Temperature", "QuantityItem"))));
-        generateAndCompile(decorate(new GroupItem("PlayerGroup", new PlayerItem("PlayerItem"))));
-        generateAndCompile(decorate(new GroupItem("RollershutterGroup", new RollershutterItem("RollershutterItem"))));
-        generateAndCompile(decorate(new GroupItem("StringGroup", new StringItem("StringItem"))));
-        generateAndCompile(decorate(new GroupItem("SwitchGroup", new SwitchItem("SwitchItem"))));
-        generateAndCompile(decorate(new GroupItem("LocationGroup", new LocationItem("LocationItem"))));
-        generateAndCompile(decorate(new GroupItem("CallGroup", new CallItem("CallItem"))));
-        generateAndCompile(decorate(new GroupItem("ImageGroup", new ImageItem("ImageItem"))));
-        generateAndCompile(decorate(new GroupItem("UnspecifiedGroup")));
-    }
-
-    private Item decorate(GenericItem item) {
-        item.setLabel(item.getName() + "Label");
-        return item;
+    @BeforeEach
+    public void mockMetadataRegistry() {
+        metadataRegistry = Mockito.mock(MetadataRegistry.class);
+        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
+        Mockito.when(metadataRegistry.stream()).thenAnswer(
+                invocationOnMock -> Stream.of(new Metadata(new MetadataKey("Speech", "CallItemStringListType"),
+                        "some data", Map.of("location", "Livingroom"))));
     }
 
     @Test
     public void testGenerateItemsFile()
             throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             MalformedURLException, ClassNotFoundException, NoSuchFieldException, ItemNotFoundException {
-        Set<Item> items = JRuleItemTestUtils.getAllDummyItems().keySet();
+        List<Item> items = JRuleItemTestUtils.getAllDummyItems().stream().map(Pair::getKey)
+                .collect(Collectors.toList());
 
-        MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
-        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
-        Mockito.when(metadataRegistry.stream()).thenAnswer(
-                invocationOnMock -> Stream.of(new Metadata(new MetadataKey("Speech", "CallItemStringListType"),
-                        "some data", Map.of("location", "Livingroom"))));
-
-        boolean success = sourceFileGenerator.generateItemsSource(items, metadataRegistry);
+        boolean success = sourceFileGenerator.generateItemsSource(items, this.metadataRegistry);
         assertTrue(success, "Failed to generate source file for items");
 
         compiler.compile(List.of(new File(targetFolder, "JRuleItems.java")), "target/classes:target/gen");
@@ -158,20 +128,10 @@ public class JRuleItemClassGeneratorTest {
 
         Method getState = item.getClass().getMethod("getState");
         // just named group is unspecified without a state
-        if (itemName.equals("Group")) {
+        if (itemName.startsWith("Group")) {
             Assertions.assertNull(getState.invoke(item));
         } else {
             Assertions.assertNotNull(getState.invoke(item));
         }
-    }
-
-    private void generateAndCompile(Item item) {
-        // boolean success = sourceFileGenerator.generateItemSource(item);
-        // assertTrue(success, "Failed to generate source file for " + item);
-        //
-        // compiler.compile(List.of(new File(targetFolder, "_" + item.getName() + ".java")), "target/classes");
-        //
-        // File compiledClass = new File(targetFolder, "_" + item.getName() + ".class");
-        // assertTrue(compiledClass.exists());
     }
 }
