@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,12 +38,9 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.library.items.CallItem;
 import org.openhab.core.library.items.ColorItem;
 import org.openhab.core.library.items.ContactItem;
@@ -79,6 +77,7 @@ public class JRuleItemClassGeneratorTest {
         JRuleConfig config = new JRuleConfig(map);
         sourceFileGenerator = new JRuleItemClassGenerator(config);
         compiler = new JRuleCompiler(config);
+        JRuleItemRegistry.clear();
     }
 
     @BeforeEach
@@ -103,6 +102,7 @@ public class JRuleItemClassGeneratorTest {
         generateAndCompile(decorate(new GroupItem("LocationGroup", new LocationItem("LocationItem"))));
         generateAndCompile(decorate(new GroupItem("CallGroup", new CallItem("CallItem"))));
         generateAndCompile(decorate(new GroupItem("ImageGroup", new ImageItem("ImageItem"))));
+        generateAndCompile(decorate(new GroupItem("UnspecifiedGroup")));
     }
 
     private Item decorate(GenericItem item) {
@@ -116,7 +116,13 @@ public class JRuleItemClassGeneratorTest {
             MalformedURLException, ClassNotFoundException, NoSuchFieldException, ItemNotFoundException {
         Set<Item> items = JRuleItemTestUtils.getAllDummyItems().keySet();
 
-        boolean success = sourceFileGenerator.generateItemsSource(items);
+        MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
+        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
+        Mockito.when(metadataRegistry.stream()).thenAnswer(
+                invocationOnMock -> Stream.of(new Metadata(new MetadataKey("Speech", "CallItemStringListType"),
+                        "some data", Map.of("location", "Livingroom"))));
+
+        boolean success = sourceFileGenerator.generateItemsSource(items, metadataRegistry);
         assertTrue(success, "Failed to generate source file for items");
 
         compiler.compile(List.of(new File(targetFolder, "JRuleItems.java")), "target/classes:target/gen");
@@ -151,7 +157,12 @@ public class JRuleItemClassGeneratorTest {
         Assertions.assertEquals(itemName, getName.invoke(item));
 
         Method getState = item.getClass().getMethod("getState");
-        Assertions.assertNotNull(getState.invoke(item));
+        // just named group is unspecified without a state
+        if (itemName.equals("Group")) {
+            Assertions.assertNull(getState.invoke(item));
+        } else {
+            Assertions.assertNotNull(getState.invoke(item));
+        }
     }
 
     private void generateAndCompile(Item item) {

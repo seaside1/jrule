@@ -12,11 +12,15 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.NumberItem;
 
 /**
  * The {@link JRuleNumberGroupItemTest}
@@ -26,16 +30,15 @@ import org.openhab.core.library.items.NumberItem;
 class JRuleNumberGroupItemTest extends JRuleNumberItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalNumberGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalNumberGroupItem(GROUP_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleDecimalValue(75);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new NumberItem("Name");
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleDecimalValue> set = JRuleNumberGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleNumberItem::getStateAsDecimal).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

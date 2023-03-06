@@ -12,9 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
@@ -27,7 +34,7 @@ import org.openhab.core.library.items.SwitchItem;
  */
 class JRuleSwitchItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleSwitchItem item = (JRuleSwitchItem) getJRuleItem();
         item.sendCommand(true);
 
@@ -40,11 +47,11 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAs(JRuleOnOffValue.class));
 
         // verify event calls
-        verifyEventTypes(0, 2);
+        verifyEventTypes(testInfo, 0, 2);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleSwitchItem item = (JRuleSwitchItem) getJRuleItem();
         item.postUpdate(true);
 
@@ -57,12 +64,14 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAs(JRuleOnOffValue.class));
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalSwitchItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalSwitchItem(ITEM_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
     @Override
@@ -71,7 +80,28 @@ class JRuleSwitchItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new SwitchItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new SwitchItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleSwitchItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleSwitchItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleSwitchItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    @Test
+    public void testForNameOptional() {
+        JRuleSwitchItem.forNameOptional(ITEM_NAME).ifPresent(item -> item.sendCommand(true));
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
+        return (T) JRuleSwitchGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleSwitchGroupItem.forNameOptional(name);
     }
 }

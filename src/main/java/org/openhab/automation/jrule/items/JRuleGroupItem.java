@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
@@ -23,34 +24,34 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleGroupItem extends JRuleItem {
+public interface JRuleGroupItem<I extends JRuleItem> extends JRuleItem {
     @Deprecated
     default Set<String> members() {
         return JRuleEventHandler.get().getGroupMemberNames(getName(), false);
     }
 
-    default Set<JRuleItem> memberItems() {
+    default Set<? extends JRuleItem> memberItems() {
         return memberItems(false);
     }
 
-    default Set<JRuleItem> memberItems(boolean recursive) {
-        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive);
+    default Set<? extends JRuleItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream().collect(Collectors.toSet());
     }
 
     default void sendUncheckedCommand(JRuleValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUncheckedUpdate(JRuleValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(JRuleRefreshValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postNullUpdate() {
-        memberItems().forEach(i -> i.postUpdate(null));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(JRuleItem::postNullUpdate);
     }
 
     @Override

@@ -12,20 +12,26 @@
  */
 package org.openhab.automation.jrule.rules;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * The {@link JRuleOr}
+ * The {@link JRuleMemberOf}
  *
- * @author Joseph (Seaside) Hagberg - Initial contribution
+ * @author Robert Delbrück
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface JRuleOr {
-    String item() default "";
-
-    String trigger() default "";
+public enum JRuleMemberOf {
+    /**
+     * Not using memberOf
+     */
+    None,
+    /**
+     * Listen on all child items
+     */
+    All,
+    /**
+     * Just listen on child groups
+     */
+    Groups,
+    /**
+     * Just listen on concrete Items (without groups)
+     */
+    Items
 }

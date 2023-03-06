@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +34,9 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     private final Optional<String> event;
 
     public JRuleChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList, String channel, Optional<String> event) {
-        super(jRule, logName, loggingTags, method, preconditionContextList);
+            List<JRulePreconditionContext> preconditionContextList, String channel, Optional<String> event,
+            Duration timedLock, Duration delayed) {
+        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock, delayed);
         this.channel = channel;
         this.event = event;
     }

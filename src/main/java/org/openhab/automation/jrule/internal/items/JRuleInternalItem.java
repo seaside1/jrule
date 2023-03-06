@@ -13,11 +13,14 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
@@ -31,12 +34,17 @@ public abstract class JRuleInternalItem implements JRuleItem {
     protected final String label;
     protected final String type;
     protected final String id;
+    protected final Map<String, JRuleItemMetadata> metadata;
+    protected final List<String> tags;
 
-    public JRuleInternalItem(String name, String label, String type, String id) {
+    public JRuleInternalItem(String name, String label, String type, String id, Map<String, JRuleItemMetadata> metadata,
+            List<String> tags) {
         this.name = name;
         this.label = label;
         this.type = type;
         this.id = id;
+        this.metadata = metadata;
+        this.tags = tags;
     }
 
     @Override
@@ -69,6 +77,16 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
+    public Map<String, JRuleItemMetadata> getMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public List<String> getTags() {
+        return tags;
+    }
+
+    @Override
     public Optional<ZonedDateTime> lastUpdated(String persistenceServiceId) {
         return JRulePersistenceExtensions.lastUpdate(name, persistenceServiceId);
     }
@@ -85,8 +103,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
 
     @Override
     public Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId)
-                .map(s -> JRuleEventHandler.get().toValue(s, getState().getClass()));
+        return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId);
     }
 
     @Override

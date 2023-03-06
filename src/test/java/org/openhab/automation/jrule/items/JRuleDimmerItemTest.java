@@ -12,9 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -22,13 +29,13 @@ import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.DimmerItem;
 
 /**
- * The {@link JRulePercentItemTest}
+ * The {@link JRuleDimmerItemTest}
  *
  * @author Robert Delbrück - Initial contribution
  */
-class JRulePercentItemTest extends JRuleItemTestBase {
+class JRuleDimmerItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleDimmerItem item = (JRuleDimmerItem) getJRuleItem();
         item.sendCommand(17);
 
@@ -49,11 +56,11 @@ class JRulePercentItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
 
         // verify event calls
-        verifyEventTypes(0, 3);
+        verifyEventTypes(testInfo, 0, 3);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleDimmerItem item = (JRuleDimmerItem) getJRuleItem();
         item.postUpdate(17);
 
@@ -74,12 +81,14 @@ class JRulePercentItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAs(JRuleOnOffValue.class));
 
         // verify event calls
-        verifyEventTypes(3, 0);
+        verifyEventTypes(testInfo, 3, 0);
     }
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDimmerItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalDimmerItem(ITEM_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
     @Override
@@ -88,7 +97,37 @@ class JRulePercentItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new DimmerItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new DimmerItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleDimmerItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleDimmerItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleDimmerItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleDimmerItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    @Test
+    public void testForNameAsSwitch() {
+        Assertions.assertNotNull(JRuleSwitchItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleSwitchItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleSwitchItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleSwitchItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+
+        JRuleSwitchItem item = JRuleSwitchItem.forName(ITEM_NAME);
+        item.sendCommand(false);
+        Assertions.assertEquals(JRuleOnOffValue.OFF, item.getStateAsOnOff());
+        item.sendCommand(true);
+        Assertions.assertEquals(JRuleOnOffValue.ON, item.getStateAsOnOff());
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
+        return (T) JRuleDimmerGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleDimmerGroupItem.forNameOptional(name);
     }
 }

@@ -15,14 +15,19 @@ package org.openhab.automation.jrule.rules.user;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.openhab.automation.jrule.items.*;
 import org.openhab.automation.jrule.items.JRuleColorItem;
 import org.openhab.automation.jrule.items.JRuleContactItem;
 import org.openhab.automation.jrule.items.JRuleDateTimeItem;
@@ -37,8 +42,10 @@ import org.openhab.automation.jrule.items.JRuleRollershutterItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRulePrecondition;
 import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
@@ -102,7 +109,11 @@ public class TestRules extends JRule {
     public static final String ITEM_IMAGE_TO_CAST = "Image_To_Cast";
     public static final String ITEM_ROLLERSHUTTER_TO_CAST = "Rollershutter_To_Cast";
     public static final String ITEM_LOCATION_TO_CAST = "Location_To_Cast";
-    private static final String ITEM_NUMBER_GROUP = "Number_Group";
+    public static final String ITEM_NUMBER_GROUP_MEMBER_3 = "Number_Group_Member3";
+    public static final String ITEM_STRING_GROUP_MEMBER_3 = "String_Group_Member3";
+    public static final String ITEM_STRING_GROUP_MEMBER_1 = "String_Group_Member1";
+    public static final String ITEM_NUMBER_GROUP = "Number_Group";
+    public static final String ITEM_STRING_GROUP = "String_Group";
     public static final String ITEM_RULE_FROM_RULE = "Rule_From_Rule";
     public static final String NAME_TRIGGER_RULE_FROM_RULE = "Trigger Rule From Rule";
     public static final String ITEM_TRIGGER_RULE_FROM_RULE = "Trigger_Rule_From_Rule";
@@ -112,6 +123,21 @@ public class TestRules extends JRule {
     public static final String COMMAND_NULL_TESTING = "null testing";
     public static final String NAME_NULL_TESTING = "Null testing";
     public static final String ITEM_NULL_TESTING = "Null_Testing";
+    public static final String NAME_TIMERS = "timers";
+    public static final String COMMAND_TIMERS = "timers";
+    public static final String NAME_DEBOUNCE = "debounce";
+    public static final String COMMAND_DEBOUNCE = "debounce";
+    public static final String COMMAND_TAGS_AND_METADATA = "tags and metadata";
+    public static final String ITEM_DIMMER_WITH_TAGS_AND_METADATA = "Dimmer_With_Tags_And_Metadata";
+    public static final String NAME_TAGS_AND_METADATA = "tags and metadata";
+    public static final String NAME_TRIGGER_JUST_ITEMS = "trigger just items";
+    public static final String NAME_TRIGGER_JUST_GROUPS = "trigger just groups";
+    public static final String ITEM_NUMBER_GROUP_MEMBER = "Number_Group_Member";
+    public static final String ITEM_STRING_GROUP_MEMBER = "String_Group_Member";
+    public static final String COMMAND_DELAYED = "delayed";
+    public static final String NAME_DELAYED = "delayed";
+    public static final String NAME_GET_GROUPS = "get groups";
+    public static final String COMMAND_GROUPS = "groups";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -128,25 +154,25 @@ public class TestRules extends JRule {
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().stringValue());
+        logInfo("received update: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ON_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH, state = JRuleSwitchItem.ON)
     public void switchReceivedOnUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getState().stringValue());
+        logInfo("received update: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemChanged(JRuleItemEvent event) {
-        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getState());
+        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getItem().getState());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED_TO_ON)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void switchReceivedChangedToOn(JRuleItemEvent event) {
-        logInfo("changed: {}", event.getState().stringValue());
+        logInfo("changed: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_INVOKE_MQTT_ACTION)
@@ -178,29 +204,31 @@ public class TestRules extends JRule {
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
-    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemReceivedCommand(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedCommand(JRuleItemEvent event) {
-        logInfo("Member of Group ({}) received command", event.getMemberName());
+        logInfo("Member of Group ({}) received command", event.getMemberItem().getName());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE)
-    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemReceivedUpdate(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupReceivedUpdate(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) received update", event.getMemberName());
+        final String memberThatChangedStatus = event.getMemberItem().getName();
+        logInfo("Member of Group ({}) received update", event.getMemberItem().getName());
+        logInfo("Member of Group ({}) received update value",
+                event.getMemberItem(JRuleSwitchItem.class).getStateAsOnOff());
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_CHANGED)
-    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = true)
+    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP, memberOf = JRuleMemberOf.All)
     public synchronized void memberOfGroupChanged(JRuleItemEvent event) {
-        final String memberThatChangedStatus = event.getMemberName();
-        logInfo("Member of Group ({}) changed", event.getMemberName());
+        final String memberThatChangedStatus = event.getMemberItem().getName();
+        logInfo("Member of Group ({}) changed", event.getMemberItem().getName());
     }
 
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
     public synchronized void conditionLteAndGteForNumber(JRuleItemEvent event) {
-        logInfo("trigger when between 18 and 20, current: {}", event.getState().stringValue());
+        logInfo("trigger when between 18 and 20, current: {}", event.getItem().getState().stringValue());
     }
 
     @JRuleName(NAME_CRON_EVERY_5_SEC)
@@ -216,10 +244,25 @@ public class TestRules extends JRule {
         logInfo("received command: {}", event.getState().stringValue());
     }
 
+    @JRuleName(NAME_GET_GROUPS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, command = COMMAND_GROUPS)
+    public void getGroups(JRuleItemEvent event) throws JRuleExecutionException {
+        Set<JRuleGroupItem<? extends JRuleItem>> parents = JRuleNumberItem.forName(ITEM_NUMBER_GROUP_MEMBER_3)
+                .getGroupItems();
+        if (parents.size() != 1) {
+            throw new JRuleExecutionException("expected 1 parent");
+        }
+        if (!new ArrayList<>(parents).get(0).getName().equals(ITEM_NUMBER_GROUP_MEMBER)) {
+            throw new JRuleExecutionException("expected parent with name: " + ITEM_NUMBER_GROUP_MEMBER);
+        }
+        logInfo("parents: {}", parents.stream().map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType())
+                .collect(Collectors.joining(", ")));
+    }
+
     @JRuleName(NAME_GET_MEMBERS_OF_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
+        Set<? extends JRuleSwitchItem> members = JRuleSwitchGroupItem.forName(ITEM_SWITCH_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
@@ -230,14 +273,14 @@ public class TestRules extends JRule {
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
-        Set<JRuleItem> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems();
+        Set<JRuleNumberItem> members = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems();
         if (members.size() != 2) {
             throw new JRuleExecutionException("expected 2 childs");
         }
         logInfo("contains members: {}", members.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
 
-        Set<JRuleItem> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems(true);
+        Set<JRuleNumberItem> recursiveMembers = JRuleNumberGroupItem.forName(ITEM_NUMBER_GROUP).memberItems(true);
         if (recursiveMembers.size() != 4) {
             throw new JRuleExecutionException("expected 4 childs");
         }
@@ -250,6 +293,18 @@ public class TestRules extends JRule {
 
         logInfo("contains recursive members: {}", recursiveMembers.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
+    }
+
+    @JRuleName(NAME_TRIGGER_JUST_ITEMS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_STRING_GROUP, memberOf = JRuleMemberOf.Items)
+    public void triggerJustItems() {
+        logInfo("Triggered for Item");
+    }
+
+    @JRuleName(NAME_TRIGGER_JUST_GROUPS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_STRING_GROUP, memberOf = JRuleMemberOf.Groups)
+    public void triggerJustGroups() {
+        logInfo("Triggered for Group");
     }
 
     @JRuleName(NAME_CAST_ALL_TYPES)
@@ -269,6 +324,12 @@ public class TestRules extends JRule {
         castDimmer();
         castColor();
         castLocation();
+    }
+
+    @JRuleName(NAME_DELAYED)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, command = COMMAND_DELAYED)
+    public void delayed() {
+        logInfo("delayed execution: ", ZonedDateTime.now());
     }
 
     @JRuleName(NAME_TRIGGER_RULE_FROM_RULE)
@@ -293,6 +354,54 @@ public class TestRules extends JRule {
         assert stringItem.getState().stringValue().equals("abc");
         stringItem.postUpdate((JRuleStringValue) null);
         assert stringItem.getState() == null;
+    }
+
+    @JRuleName(NAME_TIMERS)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TIMERS))
+    public void timers(JRuleItemEvent event) throws JRuleExecutionException {
+        // normal timer
+        createTimer(Duration.ofSeconds(2), () -> logInfo("TIMER: '1'"));
+
+        // repeating timer
+        AtomicInteger counter = new AtomicInteger(0);
+        createRepeatingTimer(Duration.ofMillis(10), 20,
+                () -> logInfo("TIMER-REPEATING: '{}'", counter.getAndIncrement()));
+
+        // cancel normal timer
+        createTimer("CANCEL_ME", Duration.ofSeconds(2), () -> System.exit(-1));
+        cancelTimer("CANCEL_ME");
+
+        // cancel repeating timer
+        createRepeatingTimer("CANCEL_ME_REPEATING", Duration.ofSeconds(2), 2, () -> System.exit(-1));
+        cancelTimer("CANCEL_ME_REPEATING");
+
+        // replace timer
+        createTimer("REPLACE_TIMER", Duration.ofSeconds(2), () -> System.exit(-1));
+        createOrReplaceTimer("REPLACE_TIMER", Duration.ofSeconds(2), () -> logInfo("REPLACED TIMER: '1'"));
+
+        // replace repeating timer
+        createRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(2), 2, () -> System.exit(-1));
+        createOrReplaceRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(1), 2,
+                () -> logInfo("REPLACED REPEATING TIMER: '1'"));
+    }
+
+    private AtomicInteger debounceCounter = new AtomicInteger(0);
+
+    @JRuleName(NAME_DEBOUNCE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_DEBOUNCE))
+    @JRuleDebounce(value = 2, unit = ChronoUnit.SECONDS)
+    public void debounce(JRuleItemEvent event) throws JRuleExecutionException {
+        logInfo("Counted debounces: '{}'", debounceCounter.getAndIncrement());
+    }
+
+    @JRuleName(NAME_TAGS_AND_METADATA)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TAGS_AND_METADATA))
+    public void getTagsAndMetadata() {
+        JRuleDimmerItem item = JRuleDimmerItem.forName(ITEM_DIMMER_WITH_TAGS_AND_METADATA);
+        logInfo("Tags: '{}'", item.getTags());
+        logInfo("Metadata: '{}'", item.getMetadata());
+        logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
+        logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
     }
 
     private static void castLocation() {
@@ -443,21 +552,21 @@ public class TestRules extends JRule {
     }
 
     private static void castQuantity() {
-        JRuleNumberItem numberItem = JRuleNumberItem.forName(ITEM_QUANTITY_TO_CAST);
+        JRuleQuantityItem numberItem = JRuleQuantityItem.forName(ITEM_QUANTITY_TO_CAST);
 
-        numberItem.sendCommand(0);
-        assert numberItem.getStateAsDecimal().doubleValue() == 0;
-        assert numberItem.getStateAsDecimal().intValue() == 0;
-        assert numberItem.getStateAsDecimal().floatValue() == 0;
-        assert numberItem.getStateAsDecimal().doubleValue() == 0;
-        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.OFF;
+        numberItem.sendCommand(new JRuleQuantityValue("0 W"));
+        assert numberItem.getStateAsQuantity().doubleValue() == 0;
+        assert numberItem.getStateAsQuantity().intValue() == 0;
+        assert numberItem.getStateAsQuantity().floatValue() == 0;
+        assert numberItem.getStateAsQuantity().doubleValue() == 0;
+        assert numberItem.getStateAsQuantity().unit().equals("W");
 
-        numberItem.sendCommand(22);
-        assert numberItem.getStateAsDecimal().doubleValue() == 22;
-        assert numberItem.getStateAsDecimal().intValue() == 22;
-        assert numberItem.getStateAsDecimal().floatValue() == 22;
-        assert numberItem.getStateAsDecimal().doubleValue() == 22;
-        assert numberItem.getStateAs(JRuleOnOffValue.class) == JRuleOnOffValue.ON;
+        numberItem.sendCommand(new JRuleQuantityValue("22 W"));
+        assert numberItem.getStateAsQuantity().doubleValue() == 22;
+        assert numberItem.getStateAsQuantity().intValue() == 22;
+        assert numberItem.getStateAsQuantity().floatValue() == 22;
+        assert numberItem.getStateAsQuantity().doubleValue() == 22;
+        assert numberItem.getStateAsQuantity().unit().equals("W");
     }
 
     private static void castSwitch() {

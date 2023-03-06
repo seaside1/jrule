@@ -12,9 +12,14 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.core.library.types.DecimalType;
 
 /**
  * The {@link JRuleInternalSwitchItem} Items
@@ -22,20 +27,37 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
-    public JRuleInternalSwitchItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalSwitchItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
+        super(name, label, type, id, metadata, tags);
     }
 
-    public void sendCommand(boolean command) {
-        JRuleEventHandler.get().sendCommand(getName(), JRuleOnOffValue.valueOf(command));
+    public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.maximumSince(name, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 
-    public void postUpdate(boolean state) {
-        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(state));
+    public Optional<Double> minimumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.minimumSince(name, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
     }
 
-    @Override
-    public JRuleOnOffValue getState() {
-        return JRuleEventHandler.get().getValue(getName(), JRuleOnOffValue.class);
+    public Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.varianceSince(name, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
+    }
+
+    public Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.deviationSince(name, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
+    }
+
+    public Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.averageSince(name, timestamp, persistenceServiceId)
+                .map(DecimalType::doubleValue);
+    }
+
+    public Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.sumSince(name, timestamp, persistenceServiceId).map(DecimalType::doubleValue);
     }
 }

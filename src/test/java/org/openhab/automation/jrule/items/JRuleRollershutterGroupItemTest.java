@@ -12,11 +12,15 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.RollershutterItem;
 
 /**
  * The {@link JRuleRollershutterGroupItemTest}
@@ -26,16 +30,15 @@ import org.openhab.core.library.items.RollershutterItem;
 class JRuleRollershutterGroupItemTest extends JRuleRollershutterItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalRollershutterGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalRollershutterGroupItem(GROUP_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRulePercentValue(75);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new RollershutterItem("Name");
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRulePercentValue> set = JRuleRollershutterGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleRollershutterItem::getStateAsPercent).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

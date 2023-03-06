@@ -55,6 +55,7 @@ import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
@@ -94,6 +95,9 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(JRuleHandler.class);
 
+    @NonNullByDefault({})
+    private final MetadataRegistry metadataRegistry;
+
     @Nullable
     private JRuleRulesWatcher directoryWatcher;
 
@@ -115,9 +119,11 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, ThingRegistry thingRegistry,
             ThingManager thingManager, EventPublisher eventPublisher, JRuleEventSubscriber eventSubscriber,
-            VoiceManager voiceManager, CronScheduler cronScheduler, BundleContext bundleContext) {
+            VoiceManager voiceManager, CronScheduler cronScheduler, BundleContext bundleContext,
+            MetadataRegistry metadataRegistry) {
         this.itemRegistry = itemRegistry;
         this.thingRegistry = thingRegistry;
+        this.metadataRegistry = metadataRegistry;
         this.eventSubscriber = eventSubscriber;
         this.config = config;
         this.delayedRulesReloader = new JRuleDelayedDebouncingExecutor(config.getRulesInitDelaySeconds(),
@@ -306,8 +312,8 @@ public class JRuleHandler implements PropertyChangeListener {
     @Nullable
     private synchronized Boolean compileGeneratedSourcesInternal() {
         logInfo("Compiling generated sources");
-        itemGenerator.generateItemsSource(itemRegistry.getItems());
-        itemNameGenerator.generateItemNamesSource(itemRegistry.getItems());
+        itemGenerator.generateItemsSource(itemRegistry.getItems(), metadataRegistry);
+        itemNameGenerator.generateItemNamesSource(itemRegistry.getItems(), metadataRegistry);
         thingGenerator.generateThingsSource(thingRegistry.getAll());
         Set<Thing> filteredThings = thingRegistry.getAll().stream().filter(thing -> {
             boolean b = thing.getHandler() != null;

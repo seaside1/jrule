@@ -74,4 +74,9 @@ public class JRuleDateTimeValue implements JRuleValue {
     public int hashCode() {
         return Objects.hash(ohType);
     }
+
+    @Override
+    public String toString() {
+        return ohType.toString();
+    }
 }

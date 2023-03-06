@@ -13,12 +13,15 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -37,9 +40,11 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     protected final Optional<String> command;
 
     public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> command) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList);
+            String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock,
+            Duration delayed) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
+                timedLock, delayed);
         this.command = command;
     }
 
@@ -51,26 +56,39 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
             return false;
         }
 
-        if (!isMemberOf() && ((ItemCommandEvent) event).getItemName().equals(this.getItemName())) {
+        if (getMemberOf() == JRuleMemberOf.None
+                && ((ItemCommandEvent) event).getItemName().equals(this.getItemName())) {
             return true;
         }
-        if (isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
-                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName())) {
-            return true;
+        if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData) {
+            JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
+            switch (getMemberOf()) {
+                case All:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName());
+                case Groups:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
+                case Items:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && !itemCheckData.isGroup();
+                default:
+                    return false;
+            }
         }
         return false;
     }
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        final String memberName;
-        if (isMemberOf()) {
-            memberName = ((ItemEvent) event).getItemName();
+        final JRuleItem item;
+        final JRuleItem memberItem;
+        if (getMemberOf() != JRuleMemberOf.None) {
+            memberItem = JRuleItem.forName(((ItemEvent) event).getItemName());
+            item = JRuleItem.forName(((ItemEvent) event).getItemName());
         } else {
-            memberName = null;
+            memberItem = null;
+            item = JRuleItem.forName(this.getItemName());
         }
 
-        return new JRuleItemEvent(this.getItemName(), memberName,
+        return new JRuleItemEvent(item, memberItem,
                 JRuleEventHandler.get().toValue(((ItemCommandEvent) event).getItemCommand()), null);
     }
 

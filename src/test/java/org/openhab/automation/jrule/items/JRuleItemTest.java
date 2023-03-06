@@ -23,6 +23,7 @@ import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.MetadataRegistry;
 
 /**
  * The {@link JRuleItemTest}
@@ -34,6 +35,9 @@ public class JRuleItemTest {
     @Test
     public void testForName() throws ItemNotFoundException, InvocationTargetException, NoSuchMethodException,
             InstantiationException, IllegalAccessException {
+        MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
+        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
+
         Map<Item, Class<? extends JRuleItem>> items = JRuleItemTestUtils.getAllDummyItems();
 
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
@@ -47,7 +51,8 @@ public class JRuleItemTest {
             JRuleItem item = JRuleItem.forName(ohItem.getName());
             Assertions.assertNotNull(item);
             Assertions.assertEquals(ohItem.getName(), item.getName());
-            Assertions.assertTrue(value.isAssignableFrom(item.getClass()));
+            Assertions.assertTrue(value.isAssignableFrom(item.getClass()),
+                    String.format("value '%s' is assignable from '%s'", value, item.getClass()));
         });
     }
 }

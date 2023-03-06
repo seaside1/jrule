@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerItem;
 import org.openhab.automation.jrule.rules.value.JRuleIncreaseDecreaseValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 
@@ -23,11 +27,15 @@ import org.openhab.automation.jrule.rules.value.JRulePercentValue;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRuleDimmerItem extends JRuleSwitchItem {
-    String INCREASE = JRuleIncreaseDecreaseValue.INCREASE.stringValue();
-    String DECREASE = JRuleIncreaseDecreaseValue.DECREASE.stringValue();
+    String INCREASE = "INCREASE";
+    String DECREASE = "DECREASE";
 
     static JRuleDimmerItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleDimmerItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalDimmerItem.class);
+    }
+
+    static Optional<JRuleDimmerItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

@@ -12,9 +12,16 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalContactItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
@@ -27,7 +34,7 @@ import org.openhab.core.library.items.ContactItem;
  */
 class JRuleContactItemTest extends JRuleItemTestBase {
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleContactItem item = (JRuleContactItem) getJRuleItem();
         item.postUpdate(JRuleOpenClosedValue.OPEN);
 
@@ -39,12 +46,14 @@ class JRuleContactItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleOpenClosedValue.CLOSED, item.getStateAsOpenClose());
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalContactItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalContactItem(ITEM_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
     @Override
@@ -53,7 +62,23 @@ class JRuleContactItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new ContactItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new ContactItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleContactItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleContactItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleContactItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleContactItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
+        return (T) JRuleContactGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleContactGroupItem.forNameOptional(name);
     }
 }

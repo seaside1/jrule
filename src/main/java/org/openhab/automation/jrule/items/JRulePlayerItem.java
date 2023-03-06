@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerItem;
 import org.openhab.automation.jrule.rules.value.*;
 
 /**
@@ -22,15 +26,19 @@ import org.openhab.automation.jrule.rules.value.*;
  * @author Robert Delbrück - Initial contribution
  */
 public interface JRulePlayerItem extends JRuleItem {
-    String PLAY = JRulePlayPauseValue.PLAY.stringValue();
-    String PAUSE = JRulePlayPauseValue.PAUSE.stringValue();
-    String NEXT = JRuleNextPreviousValue.NEXT.stringValue();
-    String PREVIOUS = JRuleNextPreviousValue.PREVIOUS.stringValue();
-    String REWIND = JRuleRewindFastforwardValue.REWIND.stringValue();
-    String FASTFORWARD = JRuleRewindFastforwardValue.FASTFORWARD.stringValue();
+    String PLAY = "PLAY";
+    String PAUSE = "PAUSE";
+    String NEXT = "NEXT";
+    String PREVIOUS = "PREVIOUS";
+    String REWIND = "REWIND";
+    String FASTFORWARD = "FASTFORWARD";
 
     static JRulePlayerItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRulePlayerItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalPlayerItem.class);
+    }
+
+    static Optional<JRulePlayerItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

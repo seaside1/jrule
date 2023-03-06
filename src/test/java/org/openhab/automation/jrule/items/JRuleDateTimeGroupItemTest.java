@@ -12,13 +12,15 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.DateTimeItem;
 
 /**
  * The {@link JRuleDateTimeGroupItemTest}
@@ -28,16 +30,15 @@ import org.openhab.core.library.items.DateTimeItem;
 class JRuleDateTimeGroupItemTest extends JRuleDateTimeItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalDateTimeGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalDateTimeGroupItem(GROUP_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleDateTimeValue(ZonedDateTime.now());
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new DateTimeItem("Name");
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleDateTimeValue> set = JRuleDateTimeGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleDateTimeItem::getStateAsDateTime).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

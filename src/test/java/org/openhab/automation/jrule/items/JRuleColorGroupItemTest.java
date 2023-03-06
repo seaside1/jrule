@@ -12,11 +12,15 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.ColorItem;
 
 /**
  * The {@link JRuleColorGroupItemTest}
@@ -26,16 +30,15 @@ import org.openhab.core.library.items.ColorItem;
 class JRuleColorGroupItemTest extends JRuleColorItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalColorGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalColorGroupItem(GROUP_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleHsbValue(1, 2, 3);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new ColorItem("Name");
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleHsbValue> set = JRuleColorGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleColorItem::getStateAsHsb).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

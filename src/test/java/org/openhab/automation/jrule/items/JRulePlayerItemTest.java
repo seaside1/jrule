@@ -12,10 +12,20 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.rules.value.JRuleNextPreviousValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleRewindFastforwardValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.PlayerItem;
 
@@ -27,7 +37,7 @@ import org.openhab.core.library.items.PlayerItem;
 class JRulePlayerItemTest extends JRuleItemTestBase {
 
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRulePlayerItem item = (JRulePlayerItem) getJRuleItem();
         item.sendCommand(JRulePlayPauseValue.PLAY);
 
@@ -45,11 +55,11 @@ class JRulePlayerItemTest extends JRuleItemTestBase {
         Assertions.assertEquals(JRuleRewindFastforwardValue.FASTFORWARD, item.getStateAsRewindFastforward());
 
         // verify event calls
-        verifyEventTypes(0, 3);
+        verifyEventTypes(testInfo, 0, 3);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRulePlayerItem item = (JRulePlayerItem) getJRuleItem();
         item.postUpdate(JRulePlayPauseValue.PLAY);
 
@@ -63,12 +73,14 @@ class JRulePlayerItemTest extends JRuleItemTestBase {
                 item.getStateAs(JRuleRewindFastforwardValue.class));
 
         // verify event calls
-        verifyEventTypes(2, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalPlayerItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalPlayerItem(ITEM_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
     @Override
@@ -77,7 +89,23 @@ class JRulePlayerItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new PlayerItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new PlayerItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRulePlayerItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRulePlayerItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRulePlayerItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRulePlayerItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
+        return (T) JRulePlayerGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRulePlayerGroupItem.forNameOptional(name);
     }
 }

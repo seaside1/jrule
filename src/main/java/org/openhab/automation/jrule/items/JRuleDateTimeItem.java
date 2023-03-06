@@ -14,9 +14,12 @@ package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeItem;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 
 /**
@@ -26,7 +29,11 @@ import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
  */
 public interface JRuleDateTimeItem extends JRuleItem {
     static JRuleDateTimeItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleDateTimeItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalDateTimeItem.class);
+    }
+
+    static Optional<JRuleDateTimeItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

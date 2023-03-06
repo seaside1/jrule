@@ -25,19 +25,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.library.items.CallItem;
 import org.openhab.core.library.items.ColorItem;
 import org.openhab.core.library.items.ContactItem;
@@ -148,7 +148,13 @@ public class JRuleItemNameClassGeneratorTest {
         // items.add(createGroupItem(CallItem.class, new StringType("+4930123456")));
         items.add(createGroupItem(ImageItem.class, new RawType(new byte[0], "jpeg")));
 
-        boolean success = sourceFileGenerator.generateItemNamesSource(items);
+        MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
+        JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
+        Mockito.when(metadataRegistry.stream()).thenAnswer(
+                invocationOnMock -> Stream.of(new Metadata(new MetadataKey("Speech", "CallItemStringListType"),
+                        "some data", Map.of("location", "Livingroom"))));
+
+        boolean success = sourceFileGenerator.generateItemNamesSource(items, metadataRegistry);
         assertTrue(success, "Failed to generate source file for items");
 
         compiler.compile(List.of(new File(targetFolder, "JRuleItemNames.java")), "target/classes:target/gen");

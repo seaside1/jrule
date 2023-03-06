@@ -12,10 +12,18 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalNumberItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.NumberItem;
 
@@ -26,48 +34,42 @@ import org.openhab.core.library.items.NumberItem;
  */
 class JRuleNumberItemTest extends JRuleItemTestBase {
     @Test
-    public void testSendCommand() {
+    public void testSendCommand(TestInfo testInfo) {
         JRuleNumberItem item = (JRuleNumberItem) getJRuleItem();
         item.sendCommand(17);
 
         // decimal
         Assertions.assertEquals(17, item.getStateAsDecimal().intValue());
 
-        // send quantity
-        item.sendCommand(new JRuleQuantityValue<>("12mV"));
-        Assertions.assertEquals(12, item.getStateAsDecimal().intValue());
-
         // send jrule-decimal
         item.sendCommand(new JRuleDecimalValue(22));
         Assertions.assertEquals(22, item.getStateAsDecimal().intValue());
 
         // verify event calls
-        verifyEventTypes(0, 3);
+        verifyEventTypes(testInfo, 0, 2);
     }
 
     @Test
-    public void testPostUpdate() {
+    public void testPostUpdate(TestInfo testInfo) {
         JRuleNumberItem item = (JRuleNumberItem) getJRuleItem();
         item.postUpdate(17);
 
         // decimal
         Assertions.assertEquals(17, item.getStateAsDecimal().intValue());
 
-        // send quantity
-        item.postUpdate(new JRuleQuantityValue<>("12mV"));
-        Assertions.assertEquals(12, item.getStateAsDecimal().intValue());
-
         // send jrule-decimal
         item.postUpdate(new JRuleDecimalValue(22));
         Assertions.assertEquals(22, item.getStateAsDecimal().intValue());
 
         // verify event calls
-        verifyEventTypes(3, 0);
+        verifyEventTypes(testInfo, 2, 0);
     }
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalNumberItem("Name", "Label", "Type", "Id");
+        return new JRuleInternalNumberItem(ITEM_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
     @Override
@@ -76,7 +78,23 @@ class JRuleNumberItemTest extends JRuleItemTestBase {
     }
 
     @Override
-    protected GenericItem getOhItem() {
-        return new NumberItem("Name");
+    protected GenericItem getOhItem(String name) {
+        return new NumberItem(name);
+    }
+
+    @Test
+    public void testForName() {
+        Assertions.assertNotNull(JRuleNumberItem.forName(ITEM_NAME));
+        Assertions.assertThrows(JRuleItemNotFoundException.class, () -> JRuleNumberItem.forName(ITEM_NON_EXISTING));
+        Assertions.assertTrue(JRuleNumberItem.forNameOptional(ITEM_NAME).isPresent());
+        Assertions.assertFalse(JRuleNumberItem.forNameOptional(ITEM_NON_EXISTING).isPresent());
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
+        return (T) JRuleNumberGroupItem.forName(name);
+    }
+
+    protected <T extends JRuleGroupItem<? extends JRuleItem>> Optional<T> groupForNameOptionalMethod(String name) {
+        return (Optional<T>) JRuleNumberGroupItem.forNameOptional(name);
     }
 }

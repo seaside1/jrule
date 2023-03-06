@@ -12,7 +12,14 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalImageGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
 
 /**
@@ -20,12 +27,25 @@ import org.openhab.automation.jrule.rules.value.JRuleRawValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem {
+public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem<JRuleImageItem> {
     static JRuleImageGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleImageGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalImageGroupItem.class);
+    }
+
+    static Optional<JRuleImageGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
+    }
+
+    default Set<JRuleImageItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleImageItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleImageItem) jRuleItem).collect(Collectors.toSet());
     }
 
     default void postUpdate(JRuleRawValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }

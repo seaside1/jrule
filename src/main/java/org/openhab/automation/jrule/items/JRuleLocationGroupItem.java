@@ -12,7 +12,14 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalLocationGroupItem;
 import org.openhab.automation.jrule.rules.value.JRulePointValue;
 
 /**
@@ -20,16 +27,29 @@ import org.openhab.automation.jrule.rules.value.JRulePointValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem {
+public interface JRuleLocationGroupItem extends JRuleLocationItem, JRuleGroupItem<JRuleLocationItem> {
     static JRuleLocationGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleLocationGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalLocationGroupItem.class);
+    }
+
+    static Optional<JRuleLocationGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
+    }
+
+    default Set<JRuleLocationItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleLocationItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleLocationItem) jRuleItem).collect(Collectors.toSet());
     }
 
     default void sendCommand(JRulePointValue command) {
-        memberItems().forEach(i -> i.sendUncheckedCommand(command));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePointValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }

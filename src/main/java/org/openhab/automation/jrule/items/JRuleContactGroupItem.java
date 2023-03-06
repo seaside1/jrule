@@ -12,7 +12,14 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactGroupItem;
 import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
 
 /**
@@ -20,12 +27,25 @@ import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem {
+public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem<JRuleContactItem> {
     static JRuleContactGroupItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleContactGroupItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalContactGroupItem.class);
+    }
+
+    static Optional<JRuleContactGroupItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
+    }
+
+    default Set<JRuleContactItem> memberItems() {
+        return memberItems(false);
+    }
+
+    default Set<JRuleContactItem> memberItems(boolean recursive) {
+        return JRuleEventHandler.get().getGroupMemberItems(getName(), recursive).stream()
+                .map(jRuleItem -> (JRuleContactItem) jRuleItem).collect(Collectors.toSet());
     }
 
     default void postUpdate(JRuleOpenClosedValue state) {
-        memberItems().forEach(i -> i.postUncheckedUpdate(state));
+        JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }

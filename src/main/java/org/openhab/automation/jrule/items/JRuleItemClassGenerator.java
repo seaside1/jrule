@@ -21,13 +21,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
-import org.openhab.core.library.CoreItemFactory;
+import org.openhab.core.items.MetadataRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,18 +45,19 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     private static final String TEMPLATE_SUFFIX = ".ftlh";
 
     protected static final String LOG_NAME_CLASS_GENERATOR = "JRuleItemClassGen";
+    public static final String ITEM_GROUP_TYPE_UNSPECIFIED = "Unspecified";
 
     private final Logger logger = LoggerFactory.getLogger(JRuleItemClassGenerator.class);
 
     public JRuleItemClassGenerator(JRuleConfig jRuleConfig) {
-
         super(jRuleConfig);
     }
 
-    public boolean generateItemsSource(Collection<Item> items) {
+    public boolean generateItemsSource(Collection<Item> items, MetadataRegistry metadataRegistry) {
         try {
             List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
-                    .map(this::createItemModel).collect(Collectors.toList());
+                    .map(item -> createItemModel(item, JRuleItemRegistry.getAllMetadata(item, metadataRegistry)))
+                    .collect(Collectors.toList());
             Map<String, Object> processingModel = new HashMap<>();
             processingModel.put("items", model);
             processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
@@ -78,18 +81,18 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         }
     }
 
-    private Map<String, Object> createItemModel(Item item) {
+    private Map<String, Object> createItemModel(Item item, Map<String, JRuleItemMetadata> metadata) {
         Map<String, Object> itemModel = new HashMap<>();
         itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
-        String plainType = getPlainGroupType(null, item);
+        String plainType = getPlainType(item);
         itemModel.put("internalClass", "JRuleInternal" + plainType + "Item");
         itemModel.put("interfaceClass", "JRule" + plainType + "Item");
-        if (isQuantityType(item.getType())) {
-            itemModel.put("quantityType", getQuantityType(item.getType()));
-        }
         itemModel.put("label", item.getLabel());
         itemModel.put("type", item.getType());
+        itemModel.put("metadata", metadata.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining(", ")));
+        itemModel.put("tags", StringUtils.join(item.getTags(), ", "));
 
         // Group handling
         if (item.getType().equals(GroupItem.TYPE)) {
@@ -102,32 +105,26 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         return itemModel;
     }
 
+    private static String getPlainType(Item baseItem) {
+        if (baseItem.getType().contains(":")) {
+            return "Quantity";
+        }
+        return baseItem.getType();
+    }
+
     private static String getPlainGroupType(GroupItem item, Item baseItem) {
         if (baseItem == null) {
             if (item == null) {
-                return "String";
+                return ITEM_GROUP_TYPE_UNSPECIFIED;
             }
             List<String> childItemTypes = item.getAllMembers().stream().map(Item::getType).distinct()
                     .collect(Collectors.toList());
             if (childItemTypes.size() == 1) {
                 return childItemTypes.get(0);
             } else {
-                // TODO: have to create an unspecified GroupItem
-                return "String";
+                return ITEM_GROUP_TYPE_UNSPECIFIED;
             }
         }
-        if (baseItem.getType().contains(":")) {
-            return baseItem.getType().split(":")[0];
-        }
-        return baseItem.getType();
-    }
-
-    private String getQuantityType(String type) {
-        return type.split(":")[1];
-    }
-
-    private boolean isQuantityType(String type) {
-        String[] split = type.split(":");
-        return split.length > 1 && CoreItemFactory.NUMBER.equals(split[0]);
+        return getPlainType(baseItem);
     }
 }

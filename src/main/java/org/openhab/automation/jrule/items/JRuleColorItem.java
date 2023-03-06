@@ -12,8 +12,12 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.Optional;
+
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
 import org.openhab.automation.jrule.rules.value.*;
 
 /**
@@ -23,7 +27,11 @@ import org.openhab.automation.jrule.rules.value.*;
  */
 public interface JRuleColorItem extends JRuleDimmerItem {
     static JRuleColorItem forName(String itemName) throws JRuleItemNotFoundException {
-        return JRuleItemRegistry.get(itemName, JRuleColorItem.class);
+        return JRuleItemRegistry.get(itemName, JRuleInternalColorItem.class);
+    }
+
+    static Optional<JRuleColorItem> forNameOptional(String itemName) {
+        return Optional.ofNullable(JRuleUtil.forNameWrapExceptionAsNull(() -> forName(itemName)));
     }
 
     /**

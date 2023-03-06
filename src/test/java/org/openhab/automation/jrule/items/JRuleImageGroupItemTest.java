@@ -12,11 +12,15 @@
  */
 package org.openhab.automation.jrule.items;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.internal.items.JRuleInternalImageGroupItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleRawValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.library.items.ImageItem;
 
 /**
  * The {@link JRuleImageGroupItemTest}
@@ -26,16 +30,15 @@ import org.openhab.core.library.items.ImageItem;
 class JRuleImageGroupItemTest extends JRuleImageItemTest {
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalImageGroupItem("Group", "Label", "Type", "Id");
+        return new JRuleInternalImageGroupItem(GROUP_NAME, "Label", "Type", "Id",
+                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+                List.of("Lighting", "Inside"));
     }
 
-    @Override
-    protected JRuleValue getDefaultCommand() {
-        return new JRuleRawValue("jpeg", new byte[16]);
-    }
-
-    @Override
-    protected GenericItem getOhItem() {
-        return new ImageItem("Name");
+    @Test
+    public void testMemberOfGeneric() {
+        List<JRuleRawValue> set = JRuleImageGroupItem.forName(GROUP_NAME).memberItems().stream()
+                .map(JRuleImageItem::getStateAsRaw).collect(Collectors.toList());
+        Assertions.assertEquals(3, set.size());
     }
 }

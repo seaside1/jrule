@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +37,8 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
 
     public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
             Optional<String> thing, Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to,
-            List<JRulePreconditionContext> preconditions) {
-        super(jRule, logName, loggingTags, method, preconditions);
+            List<JRulePreconditionContext> preconditions, Duration timedLock, Duration delayed) {
+        super(jRule, logName, loggingTags, method, preconditions, timedLock, delayed);
         this.thing = thing;
         this.from = from;
         this.to = to;

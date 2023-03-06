@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
+import java.util.List;
+import java.util.Map;
+
 import org.openhab.automation.jrule.items.JRuleImageItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
  * The {@link JRuleInternalImageItem} Items
@@ -20,7 +24,8 @@ import org.openhab.automation.jrule.items.JRuleImageItem;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleInternalImageItem extends JRuleInternalItem implements JRuleImageItem {
-    public JRuleInternalImageItem(String name, String label, String type, String id) {
-        super(name, label, type, id);
+    public JRuleInternalImageItem(String name, String label, String type, String id,
+            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
+        super(name, label, type, id, metadata, tags);
     }
 }

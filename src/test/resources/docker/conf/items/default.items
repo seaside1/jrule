@@ -9,6 +9,9 @@ Switch          Switch_Group_Member2        (Switch_Group)
 Number          Number_Condition
 String          Precondition_String
 Switch          Preconditioned_Switch
+
+String          Trigger_HttpAction
+
 Switch          Get_Members_Of_Group_Switch
 
 Group           Number_Group
@@ -16,6 +19,13 @@ Group           Number_Group_Member         (Number_Group)
 Number          Number_Group_Member1        (Number_Group)
 Number          Number_Group_Member2        (Number_Group_Member)
 Number          Number_Group_Member3        (Number_Group_Member)
+
+
+Group           String_Group
+Group           String_Group_Member         (String_Group)
+String          String_Group_Member1        (String_Group)
+String          String_Group_Member2        (String_Group_Member)
+String          String_Group_Member3        (String_Group_Member)
 
 Switch          Cast_All_Types_Switch
 Switch          Switch_To_Cast
@@ -50,3 +60,24 @@ Dimmer          Dimmer_Event
 Color           Color_Event
 Location        Location_Event
 Number:Power    Quantity_Event
+
+Number          Number_Persistence
+Switch          Switch_Persistence
+Contact         Contact_Persistence
+
+// Persistence
+Switch          Switch_To_Persist
+Number          Number_To_Persist
+String          String_To_Persist
+DateTime        DateTime_To_Persist
+Player          Player_To_Persist
+Contact         Contact_To_Persist
+Image           Image_To_Persist
+Rollershutter   Rollershutter_To_Persist
+Dimmer          Dimmer_To_Persist
+Color           Color_To_Persist
+Location        Location_To_Persist
+Number:Power    Quantity_To_Persist
+
+
+Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }

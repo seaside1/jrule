@@ -12,26 +12,21 @@
  */
 package org.openhab.automation.jrule.rules;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-import org.openhab.automation.jrule.exception.JRuleExecutionException;
+import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleLocalTimerExecutionContext;
 import org.openhab.automation.jrule.internal.handler.JRuleActionHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleTransformationHandler;
 import org.openhab.automation.jrule.internal.handler.JRuleVoiceHandler;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
@@ -51,181 +46,10 @@ public class JRule {
 
     private static final Logger logger = LoggerFactory.getLogger(JRule.class);
 
-    private final static Map<String, CompletableFuture<Void>> timerNameToLockFuture = new HashMap<>();
-    private final static Map<String, CompletableFuture<Void>> timerNameToTimerFuture = new HashMap<>();
-    private final static Map<String, List<CompletableFuture<Void>>> timerNameToTimerFutureList = new HashMap<>();
-
     public static final ThreadLocal<JRuleExecutionContext> JRULE_EXECUTION_CONTEXT = new ThreadLocal<>();
 
     public JRule() {
         JRuleEngine.get().add(this);
-    }
-
-    protected synchronized boolean isTimerRunning(String timerName) {
-        final CompletableFuture<Void> completableFuture = timerNameToTimerFuture.get(timerName);
-        return completableFuture != null && (completableFuture.isDone() || completableFuture.isCancelled());
-    }
-
-    protected synchronized CompletableFuture<Void> createOrReplaceTimer(String timerName, long timeInSeconds,
-            Consumer<Void> fn) {
-        CompletableFuture<Void> future = timerNameToTimerFuture.get(timerName);
-        if (future != null) {
-            JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                    timerName);
-            JRuleLog.debug(logger, context.getLogName(), "Future already running hashCode: {}", future.hashCode());
-            boolean cancelled = future.cancel(false);
-            timerNameToTimerFuture.remove(timerName);
-
-            JRuleLog.info(logger, context.getLogName(), "Replacing existing timer by removing old timer cancelled: {}",
-                    cancelled);
-        }
-        return createTimer(timerName, timeInSeconds, fn);
-    }
-
-    protected boolean timerIsRunning(String timerName) {
-        return timerNameToTimerFuture.containsKey(timerName) || timerNameToTimerFutureList.containsKey(timerName);
-    }
-
-    protected synchronized boolean cancelTimer(String timerName) {
-        boolean cancelled = false;
-        final CompletableFuture<Void> completableFuture = timerNameToTimerFuture.get(timerName);
-        if (completableFuture != null) {
-            JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                    timerName);
-            JRuleLog.debug(logger, context.getLogName(), "Future already running");
-            try {
-                cancelled = completableFuture.cancel(false);
-            } catch (Exception x) {
-                JRuleLog.debug(logger, context.getLogName(), "Failed to cancel timer", x);
-            } finally {
-                timerNameToTimerFuture.remove(timerName);
-            }
-        }
-
-        List<CompletableFuture<Void>> completableFutures = timerNameToTimerFutureList.get(timerName);
-        if (completableFutures != null) {
-            cancelled |= cancelListOfTimersFutures(timerName, completableFutures);
-        }
-
-        return cancelled;
-    }
-
-    protected synchronized CompletableFuture<Void> createTimer(String timerName, int timeInSeconds, Consumer<Void> fn) {
-        return createTimer(timerName, (long) timeInSeconds, fn);
-    }
-
-    protected synchronized CompletableFuture<Void> createTimer(String timerName, long timeInSeconds,
-            Consumer<Void> fn) {
-        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                timerName);
-        if (timerNameToTimerFuture.containsKey(timerName)) {
-            JRuleLog.debug(logger, context.getLogName(), "Future already running hashCode: " + timerName.hashCode());
-            return timerNameToTimerFuture.get(timerName);
-        }
-        CompletableFuture<Void> future = JRuleUtil.delayedExecution(timeInSeconds, TimeUnit.SECONDS);
-        timerNameToTimerFuture.put(timerName, future);
-
-        JRuleLog.info(logger, context.getLogName(), "Start timer timeSeconds: {} hashCode: {}", timeInSeconds,
-                future.hashCode());
-        return future.thenAccept(s -> {
-            try {
-                JRule.JRULE_EXECUTION_CONTEXT.set(context);
-                JRuleLog.info(logger, context.getLogName(), "Timer has finished");
-                JRuleLog.debug(logger, context.getLogName(), "Timer has finished hashCode: {}", future.hashCode());
-                timerNameToTimerFuture.remove(timerName);
-                fn.accept(null);
-            } finally {
-                logger.debug("Removing thread local after createTimer");
-                JRule.JRULE_EXECUTION_CONTEXT.remove();
-            }
-        });
-    }
-
-    protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String timerName,
-            int dealyInSeconds, int numberOfReapts, Consumer<Void> fn) {
-        return createOrReplaceRepeatingTimer(timerName, (long) dealyInSeconds, numberOfReapts, fn);
-    }
-
-    protected synchronized List<CompletableFuture<Void>> createOrReplaceRepeatingTimer(String timerName,
-            long delayInSeconds, int numberOfRepeats, Consumer<Void> fn) {
-        List<CompletableFuture<Void>> completableFutures = timerNameToTimerFutureList.get(timerName);
-        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                timerName);
-        if (completableFutures != null) {
-            cancelListOfTimersFutures(timerName, completableFutures);
-            JRuleLog.info(logger, context.getLogName(), "Replacing existing repeating timer by removing old timer");
-        }
-        return createRepeatingTimer(timerName, delayInSeconds, numberOfRepeats, fn);
-    }
-
-    private boolean cancelListOfTimersFutures(String timerName, List<CompletableFuture<Void>> completableFutures) {
-        boolean cancelled = false;
-        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                timerName);
-        JRuleLog.debug(logger, context.getLogName(), "Cancel Futures");
-        for (CompletableFuture<?> future : completableFutures) {
-            cancelled |= future.cancel(true);
-        }
-        completableFutures.clear();
-        timerNameToTimerFutureList.remove(timerName);
-        return cancelled;
-    }
-
-    protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String timerName, long delayInSeconds,
-            int numberOfRepeats, Consumer<Void> fn) {
-        List<CompletableFuture<Void>> futures = timerNameToTimerFutureList.get(timerName);
-
-        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                timerName);
-
-        if (futures != null) {
-            JRuleLog.debug(logger, context.getLogName(), "Repeating timer already running");
-            return timerNameToTimerFutureList.get(timerName);
-        }
-        JRuleLog.info(logger, context.getLogName(), "Start Repeating timer, delay: {}s repeats: {}", delayInSeconds,
-                numberOfRepeats);
-
-        futures = new ArrayList<>();
-        timerNameToTimerFutureList.put(timerName, futures);
-        CompletableFuture<Void> lastFuture = null;
-        for (int i = 0; i < numberOfRepeats; i++) {
-            lastFuture = JRuleUtil.delayedExecution(delayInSeconds * (i + 1), TimeUnit.SECONDS);
-            futures.add(lastFuture);
-        }
-
-        futures.forEach(f -> f.thenAccept(s -> {
-            try {
-                JRule.JRULE_EXECUTION_CONTEXT.set(context);
-                fn.accept(s);
-            } finally {
-                logger.info("Removing thread local after createRepeatingTimer (initial)");
-                JRULE_EXECUTION_CONTEXT.remove();
-            }
-
-        }));
-        if (lastFuture != null) {
-            futures.add(lastFuture.thenAccept(s -> {
-                try {
-                    JRule.JRULE_EXECUTION_CONTEXT.set(context);
-                    fn.accept(s);
-                } finally {
-                    logger.debug("Removing thread local after createRepeatingTimer (lastFuture)");
-                    JRULE_EXECUTION_CONTEXT.remove();
-                }
-
-                JRuleLog.info(logger, context.getLogName(), "Repeating Timer has finished");
-                List<CompletableFuture<Void>> finishedList = timerNameToTimerFutureList.remove(timerName);
-                if (finishedList != null) {
-                    finishedList.clear();
-                }
-            }));
-        }
-        return futures;
-    }
-
-    protected synchronized List<CompletableFuture<Void>> createRepeatingTimer(String timerName, int delayInSeconds,
-            int numberOfRepeats, Consumer<Void> fn) {
-        return createRepeatingTimer(timerName, (long) delayInSeconds, numberOfRepeats, fn);
     }
 
     protected void say(String text) {
@@ -240,7 +64,7 @@ public class JRule {
         JRuleVoiceHandler.get().say(text, volume);
     }
 
-    protected String transform(String stateDescPattern, String state) throws JRuleExecutionException {
+    protected String transform(String stateDescPattern, String state) throws JRuleRuntimeException {
         return JRuleTransformationHandler.get().transform(stateDescPattern, state);
     }
 
@@ -248,8 +72,222 @@ public class JRule {
         JRuleActionHandler.get().executeCommandLine(commandLine);
     }
 
-    protected String executeCommandLineAndAwaitResponse(long delayInSeconds, String... commandLine) {
-        return JRuleActionHandler.get().executeCommandAndAwaitResponse(delayInSeconds, commandLine);
+    @Deprecated
+    protected String executeCommandLineAndAwaitResponse(long timeout, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(Duration.of(timeout, ChronoUnit.SECONDS),
+                commandLine);
+    }
+
+    protected String executeCommandLineAndAwaitResponse(Duration timeout, String... commandLine) {
+        return JRuleActionHandler.get().executeCommandAndAwaitResponse(timeout, commandLine);
+    }
+
+    /**
+     * Sends a GET-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @return Result as String
+     */
+    protected String sendHttpGetRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpGetRequest(url, null, timeout);
+    }
+
+    /**
+     * Sends a GET-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
+     *
+     * @param url Target URL
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpGetRequest(String url, @Nullable Map<String, String> headers, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpGetRequest(url, headers, timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, null, null, null, timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     *
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, String contentType, String content, Map<String, String> headers,
+            @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, contentType, content, headers, timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, null, null, null, timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     * <br/>
+     *
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, String contentType, String content, Map<String, String> headers,
+            @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, contentType, content, headers, timeout);
+    }
+
+    /**
+     * Sends a DELETE-HTTP request and returns the result as a String
+     *
+     * @param url Target URL
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpDeleteRequest(String url, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpDeleteRequest(url, null, timeout);
+    }
+
+    /**
+     * Sends a DELETE-HTTP request with the given request headers, and timeout in ms, and returns the result as a String
+     *
+     * @param url Target URL
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpDeleteRequest(String url, Map<String, String> headers, @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpDeleteRequest(url, headers, timeout);
+    }
+
+    /**
+     * Creates or replaces a timer.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(@Nullable String timerName, Duration delay,
+            Runnable function) {
+        return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function, null);
+    }
+
+    /**
+     * Creates a timer.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createTimer(@Nullable String timerName, Duration delay, Runnable function) {
+        return JRuleTimerHandler.get().createTimer(timerName, delay, function, null);
+    }
+
+    /**
+     * Creates a timer.
+     *
+     * @param delay Initial delay and delay between the timers.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createTimer(Duration delay, Runnable function) {
+        return JRuleTimerHandler.get().createTimer(null, delay, function, null);
+    }
+
+    /**
+     * Creates or replace a repeating timer. All timers will have a delay to the previous one.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(@Nullable String timerName, Duration delay,
+            int numberOfRepeats, Runnable function) {
+        return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     *
+     * @param timerName Name of the timer or null.
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(@Nullable String timerName, Duration delay,
+            int numberOfRepeats, Runnable function) {
+        return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Creates a repeating timer. All timers will have a delay to the previous one.
+     *
+     * @param delay Initial delay and delay between the timers.
+     * @param numberOfRepeats Number of repetitions.
+     * @param function Code to execute.
+     * @return A handle for the timer.
+     */
+    protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(Duration delay, int numberOfRepeats,
+            Runnable function) {
+        return JRuleTimerHandler.get().createRepeatingTimer(null, delay, numberOfRepeats, function, null);
+    }
+
+    /**
+     * Cancels the timer with the given name.
+     *
+     * @param timerName Name of the timer or null.
+     * @return true if canceled, false if not.
+     */
+    protected boolean cancelTimer(String timerName) {
+        return JRuleTimerHandler.get().cancelTimer(timerName);
+    }
+
+    /**
+     * Checks if the timer with the given name is still running.
+     *
+     * @param timerName Name of the timer or null.
+     * @return true if running, false if not.
+     */
+    protected boolean isTimerRunning(String timerName) {
+        return JRuleTimerHandler.get().isTimerRunning(timerName);
+    }
+
+    /**
+     * Creating a timed look.
+     *
+     * @param lockName Name of the lock. Must be unique over all rules.
+     * @param duration Duration until the lock is held.
+     * @return Returns true if the lock for this name is not held. false if the lock is held.
+     */
+    protected boolean getTimedLock(@Nullable String lockName, Duration duration) {
+        return JRuleTimerHandler.get().getTimedLock(lockName, duration);
     }
 
     protected void say(String text, String voiceId, String sinkId) {
@@ -298,24 +336,6 @@ public class JRule {
 
     protected void postUpdate(String itemName, double value) {
         JRuleEventHandler.get().postUpdate(itemName, new JRuleDecimalValue(value));
-    }
-
-    protected boolean getTimedLock(String lockName, int seconds) {
-        CompletableFuture<Void> future = timerNameToLockFuture.get(lockName);
-        if (future != null) {
-            return false;
-        }
-        Supplier<CompletableFuture<Void>> asyncTask = () -> CompletableFuture.completedFuture(null);
-        JRuleLocalTimerExecutionContext context = new JRuleLocalTimerExecutionContext(JRULE_EXECUTION_CONTEXT.get(),
-                lockName);
-        future = JRuleUtil.scheduleAsync(asyncTask, seconds, TimeUnit.SECONDS, context);
-
-        timerNameToLockFuture.put(lockName, future);
-        future.thenAccept(itemName -> {
-            JRuleLog.info(logger, context.getLogName(), "Timer completed! Releasing lock");
-            timerNameToLockFuture.remove(lockName);
-        });
-        return true;
     }
 
     protected int nowHour() {

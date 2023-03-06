@@ -20,15 +20,13 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
+import org.openhab.automation.jrule.items.JRuleGroupItem;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.core.events.EventPublisher;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.*;
@@ -179,6 +177,21 @@ public class JRuleEventHandler {
         }
     }
 
+    public void setValue(String itemName, State itemState) {
+        if (itemRegistry == null) {
+            throw new JRuleRuntimeException("ItemRegistry must not be null");
+        }
+        try {
+            Item item = itemRegistry.getItem(itemName);
+            if (!(item instanceof GenericItem)) {
+                throw new JRuleRuntimeException("Given item must be of type GenericItem");
+            }
+            ((GenericItem) item).setState(itemState);
+        } catch (ItemNotFoundException e) {
+            throw new JRuleRuntimeException(String.format("Failed to find item: %s", itemName));
+        }
+    }
+
     public void setItemRegistry(@NonNull ItemRegistry itemRegistry) {
         this.itemRegistry = itemRegistry;
     }
@@ -193,17 +206,16 @@ public class JRuleEventHandler {
             if (item instanceof GroupItem) {
                 Set<JRuleItem> out = new HashSet<>();
                 GroupItem g = (GroupItem) item;
-                g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName()))
-                        .forEach(jRuleValueJRuleItem -> {
-                            if (recursive) {
-                                out.add(jRuleValueJRuleItem);
-                                if (jRuleValueJRuleItem.isGroup()) {
-                                    out.addAll(getGroupMemberItems(jRuleValueJRuleItem.getName(), recursive));
-                                }
-                            } else {
-                                out.add(jRuleValueJRuleItem);
-                            }
-                        });
+                g.getMembers().stream().map(item1 -> JRuleItemRegistry.get(item1.getName())).forEach(jRuleItem -> {
+                    if (recursive) {
+                        out.add(jRuleItem);
+                        if (jRuleItem.isGroup()) {
+                            out.addAll(getGroupMemberItems(jRuleItem.getName(), recursive));
+                        }
+                    } else {
+                        out.add(jRuleItem);
+                    }
+                });
                 return out;
             } else {
                 throw new JRuleRuntimeException(String.format("Given itemname '%s' is not a groupitem", groupName));
@@ -211,6 +223,23 @@ public class JRuleEventHandler {
         } catch (ItemNotFoundException e) {
             throw new JRuleItemNotFoundException(
                     String.format("Item not found in registry for groupname '%s'", groupName));
+        }
+    }
+
+    public List<JRuleGroupItem<? extends JRuleItem>> getGroupItems(String itemName, boolean recursive) {
+        try {
+            Item item = itemRegistry.getItem(itemName);
+            List<JRuleGroupItem<? extends JRuleItem>> list = item.getGroupNames().stream().map(JRuleItemRegistry::get)
+                    .filter(JRuleItem::isGroup).map(i -> (JRuleGroupItem<? extends JRuleItem>) i)
+                    .collect(Collectors.toList());
+            if (recursive) {
+                list.addAll(new ArrayList<>(list).stream().map(i -> getGroupItems(i.getName(), recursive))
+                        .flatMap(Collection::stream).collect(Collectors.toList()));
+            }
+            return list.stream().distinct().collect(Collectors.toList());
+        } catch (ItemNotFoundException e) {
+            throw new JRuleItemNotFoundException(
+                    String.format("Item not found in registry for item-name '%s'", itemName));
         }
     }
 
@@ -270,7 +299,7 @@ public class JRuleEventHandler {
     }
 
     public JRuleValue toValue(State itemState) {
-        if (itemState instanceof UnDefType) {
+        if (itemState == null || itemState instanceof UnDefType) {
             return null;
         }
         Class<? extends JRuleValue> valueClass = stateMapping.entrySet().stream()

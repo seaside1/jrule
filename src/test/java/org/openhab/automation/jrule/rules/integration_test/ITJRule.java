@@ -104,6 +104,20 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void triggerJustItems() throws IOException {
+        sendCommand(TestRules.ITEM_STRING_GROUP_MEMBER_1, "123");
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_JUST_ITEMS);
+        verifyRuleWasNotExecuted(TestRules.NAME_TRIGGER_JUST_GROUPS);
+    }
+
+    @Test
+    public void triggerJustGroups() throws IOException {
+        sendCommand(TestRules.ITEM_STRING_GROUP_MEMBER, "234");
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_JUST_GROUPS);
+        verifyRuleWasNotExecuted(TestRules.NAME_TRIGGER_JUST_ITEMS);
+    }
+
+    @Test
     public void memberOfGroupReceivedUpdate() throws IOException {
         postUpdate(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE);
@@ -142,6 +156,13 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void getGroups() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_GROUPS);
+        verifyRuleWasExecuted(TestRules.NAME_GET_GROUPS);
+        verifyNoError();
+    }
+
+    @Test
     public void membersOfGroup() throws IOException {
         sendCommand(TestRules.ITEM_GET_MEMBERS_OF_GROUP_SWITCH, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_GET_MEMBERS_OF_GROUP);
@@ -158,6 +179,12 @@ public class ITJRule extends JRuleITBase {
     @Test
     public void cronEvery5Sec() {
         verifyRuleWasExecuted(TestRules.NAME_CRON_EVERY_5_SEC);
+    }
+
+    @Test
+    public void delayed() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DELAYED);
+        verifyRuleWasExecuted(TestRules.NAME_DELAYED);
     }
 
     @Test
@@ -212,6 +239,39 @@ public class ITJRule extends JRuleITBase {
     public void nullTesting() throws IOException {
         sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_NULL_TESTING);
         verifyRuleWasExecuted(TestRules.NAME_NULL_TESTING);
+        verifyNoError();
+    }
+
+    @Test
+    public void timers() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_TIMERS);
+        verifyRuleWasExecuted(TestRules.NAME_TIMERS);
+        verifyLogEntry("TIMER: '1'");
+        verifyLogEntry("TIMER-REPEATING: '2'");
+        verifyLogEntry("REPLACED TIMER: '1'");
+        verifyLogEntry("REPLACED REPEATING TIMER: '1'");
+        verifyNoError();
+    }
+
+    @Test
+    public void debounce() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DEBOUNCE);
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DEBOUNCE);
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_DEBOUNCE);
+        verifyRuleWasExecuted(TestRules.NAME_DEBOUNCE);
+        verifyLogEntry("Counted debounces: '0'");
+        verifyNoLogEntry("Counted debounces: '1'");
+        verifyNoLogEntry("Counted debounces: '2'");
+        verifyNoError();
+    }
+
+    @Test
+    public void tagsAndMetadata() throws IOException {
+        sendCommand(TestRules.ITEM_TRIGGER_RULE, TestRules.COMMAND_TAGS_AND_METADATA);
+        verifyRuleWasExecuted(TestRules.NAME_TAGS_AND_METADATA);
+        verifyLogEntry("Tags: '[Control, Light]'");
+        verifyLogEntry(
+                "Metadata: '{Speech=SetLightState, configuration={location=Livingroom}, semantics=Point_Control, configuration={relatesTo=Property_Light}}'");
         verifyNoError();
     }
 }

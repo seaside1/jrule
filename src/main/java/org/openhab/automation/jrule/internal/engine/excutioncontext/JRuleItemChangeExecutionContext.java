@@ -13,12 +13,15 @@
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -40,10 +43,12 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
     private final Optional<JRuleConditionContext> previousConditionContext;
 
     public JRuleItemChangeExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, boolean memberOf, Optional<JRuleConditionContext> conditionContext,
+            String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
             Optional<JRuleConditionContext> previousConditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> from, Optional<String> to) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList);
+            List<JRulePreconditionContext> preconditionContextList, Optional<String> from, Optional<String> to,
+            Duration timedLock, Duration delayed) {
+        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
+                timedLock, delayed);
         this.from = from;
         this.to = to;
         this.previousConditionContext = previousConditionContext;
@@ -63,28 +68,45 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
                 && to.map(s -> ((ItemStateChangedEvent) event).getItemState().toString().equals(s)).orElse(true))) {
             return false;
         }
-        if (!isMemberOf() && ((ItemStateChangedEvent) event).getItemName().equals(this.getItemName())) {
+        if (getMemberOf() == JRuleMemberOf.None
+                && ((ItemStateChangedEvent) event).getItemName().equals(this.getItemName())) {
             return true;
         }
-        if (isMemberOf() && checkData instanceof JRuleAdditionalItemCheckData
-                && ((JRuleAdditionalItemCheckData) checkData).getBelongingGroups().contains(this.getItemName())) {
-            return true;
+        if (getMemberOf() != JRuleMemberOf.None && checkData instanceof JRuleAdditionalItemCheckData) {
+            JRuleAdditionalItemCheckData itemCheckData = (JRuleAdditionalItemCheckData) checkData;
+            switch (getMemberOf()) {
+                case All:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName());
+                case Groups:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && itemCheckData.isGroup();
+                case Items:
+                    return itemCheckData.getBelongingGroups().contains(this.getItemName()) && !itemCheckData.isGroup();
+                default:
+                    return false;
+            }
         }
         return false;
     }
 
     @Override
     public JRuleEvent createJRuleEvent(AbstractEvent event) {
-        final String memberName;
-        if (isMemberOf()) {
-            memberName = ((ItemEvent) event).getItemName();
+        final JRuleItem item;
+        final JRuleItem memberItem;
+        if (getMemberOf() != JRuleMemberOf.None) {
+            item = JRuleItem.forName(this.getItemName());
+            memberItem = JRuleItem.forName(((ItemEvent) event).getItemName());
         } else {
-            memberName = event instanceof GroupItemStateChangedEvent
-                    ? ((GroupItemStateChangedEvent) event).getMemberName()
+            item = JRuleItem.forName(this.getItemName());
+            memberItem = event instanceof GroupItemStateChangedEvent
+                    ? JRuleItem.forName(((GroupItemStateChangedEvent) event).getMemberName())
                     : null;
         }
 
-        return new JRuleItemEvent(this.getItemName(), memberName,
+        // updating the item state to be sure that it's update when the JRule method is fired
+        // JRuleEventHandler.get().setValue(((ItemStateChangedEvent) event).getItemName(),
+        // ((ItemStateChangedEvent) event).getItemState());
+
+        return new JRuleItemEvent(item, memberItem,
                 JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getItemState()),
                 JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getOldItemState()));
     }
