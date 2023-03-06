@@ -75,7 +75,7 @@ public class JRuleItemTestUtils {
 
         GroupItem groupItemNoBaseWithMember = createGroupItem(null, new QuantityType<>(340, Units.BAR));
         groupItemNoBaseWithMember.addMember(createItem(NumberItem.class, new QuantityType<>(340, Units.BAR)));
-        items.add(Pair.of(groupItemNoBaseWithMember, JRuleQuantityGroupItem.class));
+        items.add(Pair.of(groupItemNoBaseWithMember, JRuleUnspecifiedGroupItem.class));
 
         items.add(Pair.of(createGroupItem(RollershutterItem.class, new PercentType(22)),
                 JRuleRollershutterGroupItem.class));

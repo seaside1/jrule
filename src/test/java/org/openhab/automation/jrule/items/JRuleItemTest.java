@@ -44,7 +44,8 @@ public class JRuleItemTest {
         ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
         Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {
             Object itemName = invocationOnMock.getArgument(0);
-            return items.stream().filter(item -> item.getKey().getName().equals(itemName)).findFirst().orElseThrow();
+            return items.stream().filter(item -> item.getKey().getName().equals(itemName)).findFirst()
+                    .map(e -> e.getKey()).orElseThrow();
         });
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
 
