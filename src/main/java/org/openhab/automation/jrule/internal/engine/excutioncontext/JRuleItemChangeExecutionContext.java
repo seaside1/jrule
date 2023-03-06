@@ -25,7 +25,9 @@ import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.items.events.*;
+import org.openhab.core.items.events.GroupItemStateChangedEvent;
+import org.openhab.core.items.events.ItemEvent;
+import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,8 +103,8 @@ public class JRuleItemChangeExecutionContext extends JRuleItemExecutionContext {
         }
 
         // updating the item state to be sure that it's update when the JRule method is fired
-        JRuleEventHandler.get().setValue(((ItemStateChangedEvent) event).getItemName(),
-                ((ItemStateChangedEvent) event).getItemState());
+        // JRuleEventHandler.get().setValue(((ItemStateChangedEvent) event).getItemName(),
+        // ((ItemStateChangedEvent) event).getItemState());
 
         return new JRuleItemEvent(item, memberItem,
                 JRuleEventHandler.get().toValue(((ItemStateChangedEvent) event).getItemState()),
