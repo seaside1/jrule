@@ -370,6 +370,10 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public boolean watchingForItem(String itemName) {
+        if (itemRegistry == null) {
+            // JRuleEngine not completely initialized
+            return false;
+        }
         List<String> parentGroups = Optional.of(itemName).map(this::getItem).map(Item::getGroupNames).orElse(List.of());
 
         boolean b = this.contextList.stream().filter(context -> context instanceof JRuleItemExecutionContext)
