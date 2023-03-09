@@ -494,7 +494,7 @@ package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRuleWhenCromTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
 import org.openhab.automation.jrule.rules.JRule;
 
 public class DemoRule extends JRule {
