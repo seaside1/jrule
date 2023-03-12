@@ -1,3 +1,34 @@
+## BETA16
+
+- Enrich memberOf with options to just listen on items or groups by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/95 
+- Add http action by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/97
+- Fixed typo by [thwint](https://github.com/thwint) PR https://github.com/seaside1/jrule/pull/98
+- Log exception stacktrace by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/99
+- Enhance and cleanup the internal timers by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/100
+- Improve trigger channelname conversion and error reporting by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/103
+- Add previousCondition to JRuleWhenItemChange by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/104
+- Let transform throw a runtime exception by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/106
+- ForNameOptional, UnspecifiedGroupItem, QuantityItem by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/107
+- Fix NPE with watchingForItem while not completely initialized  by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/110
+- Fixed contact item issue by [seaside1](https://github.com/seaside1) PR https://github.com/seaside1/jrule/pull/114
+- Add tests for historicState NPE, add toString for values by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/118
+- Fix merge (transform exception) by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/119
+- Add metadata and tags getters for items by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/121
+- Add delayed execution, remove unused JRuleOr by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/122
+- Remove illegal characters from generated channel name by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/124
+- Reduce loglevel for non-annotated java methods in rule classes by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/125
+- Fix member of by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/126
+- Make Item constants constant by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/128
+- Exclude lambdas while scanning methods by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/129
+- Exclude persistence verifications by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/130
+- Memberitems type specific by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/131
+- Fix repeating timers by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/133
+- Let JRuleItemEvent contain JRuleItem by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/134
+- Restructure documentation by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/135
+- Fixed group item class generation by [gerrieg](https://github.com/gerrieg)PR https://github.com/seaside1/jrule/pull/138
+- Remove direct item registry update causing new events to be produced by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/140
+- Spelling fixed [rdrxr](https://github.com/rdrxr) PR https://github.com/seaside1/jrule/pull/141
+
 ## BETA15
 
 - BREAKING: All JRuleWhen has to be change to corresponding JRuleWhenItemChanged (as an example, look at JRule Examples
