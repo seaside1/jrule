@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
-import org.openhab.automation.jrule.internal.handler.JRuleRuleProvider;
+import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;

@@ -35,6 +35,9 @@ public abstract class JRuleExecutionContext {
     protected final Duration timedLock;
     private final Duration delayed;
 
+    // If this rule is enabled or disabled in openHAB rules engine
+    private boolean enabled = false;
+
     public JRuleExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
             List<JRulePreconditionContext> preconditionContextList, Duration timedLock, Duration delayed) {
         this.logName = logName;
@@ -88,6 +91,14 @@ public abstract class JRuleExecutionContext {
 
     public Duration getDelayed() {
         return delayed;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public static class JRuleAdditionalCheckData {
