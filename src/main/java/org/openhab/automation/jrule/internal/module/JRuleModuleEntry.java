@@ -96,90 +96,53 @@ public class JRuleModuleEntry extends SimpleRule {
         enabled = false;
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenItemReceivedUpdate jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenItemReceivedUpdate(JRuleExecutionContext context) {
         executionContextList.add(context);
-        triggerConfig.put("itemName", jRuleWhen.item());
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
                 .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenItemReceivedUpdate.class));
-        // .withConfiguration(triggerConfig);
         ruleTriggers.add(triggerBuilder.build());
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenItemReceivedCommand jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenItemReceivedCommand(JRuleExecutionContext context) {
         executionContextList.add(context);
-        triggerConfig.put("itemName", jRuleWhen.item());
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
-                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenItemReceivedCommand.class))
-                .withConfiguration(triggerConfig);
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenItemReceivedCommand.class));
         ruleTriggers.add(triggerBuilder.build());
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenItemChange jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenItemChange(JRuleExecutionContext context) {
         executionContextList.add(context);
-        triggerConfig.put("itemName", jRuleWhen.item());
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
-                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenItemChange.class))
-                .withConfiguration(triggerConfig);
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenItemChange.class));
         ruleTriggers.add(triggerBuilder.build());
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenChannelTrigger jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenChannelTrigger(JRuleExecutionContext context) {
         executionContextList.add(context);
-        triggerConfig.put("channelUID", jRuleWhen.channel());
-        if (jRuleWhen.event() != null)
-            triggerConfig.put("event", jRuleWhen.event());
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
-                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenChannelTrigger.class))
-                .withConfiguration(triggerConfig);
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenChannelTrigger.class));
         ruleTriggers.add(triggerBuilder.build());
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenCronTrigger jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenCronTrigger(JRuleExecutionContext context) {
         executionContextList.add(context);
-        triggerConfig.put("cronExpression", jRuleWhen.cron());
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
-                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenCronTrigger.class))
-                .withConfiguration(triggerConfig);
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenCronTrigger.class));
 
         ruleTriggers.add(triggerBuilder.build());
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenTimeTrigger jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenTimeTrigger(JRuleExecutionContext context) {
         executionContextList.add(context);
-        List<String> triggers = new ArrayList<>();
-
-        if (jRuleWhen.hours() != -1)
-            triggers.add("hours=" + jRuleWhen.hours());
-        if (jRuleWhen.minutes() != -1)
-            triggers.add("minutes=" + jRuleWhen.minutes());
-        if (jRuleWhen.seconds() != -1)
-            triggers.add("seconds=" + jRuleWhen.seconds());
-        triggerConfig.put("cronExpression", String.join(",", triggers));
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
-                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenTimeTrigger.class))
-                .withConfiguration(triggerConfig);
-
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenTimeTrigger.class));
         ruleTriggers.add(triggerBuilder.build());
     }
 
-    public void addJRuleWhenAnnotation(JRuleWhenThingTrigger jRuleWhen, JRuleExecutionContext context) {
-        Configuration triggerConfig = new Configuration();
+    public void addJRuleWhenThingTrigger(JRuleExecutionContext context) {
         executionContextList.add(context);
-        triggerConfig.put("thingUID", jRuleWhen.thing());
-        if (jRuleWhen.to() != null)
-            triggerConfig.put("status", jRuleWhen.to());
-        if (jRuleWhen.from() != null)
-            triggerConfig.put("previousStatus", jRuleWhen.from());
-
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
-                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenThingTrigger.class))
-                .withConfiguration(triggerConfig);
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenThingTrigger.class));
 
         ruleTriggers.add(triggerBuilder.build());
     }

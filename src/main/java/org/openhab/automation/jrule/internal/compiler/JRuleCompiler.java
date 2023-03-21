@@ -47,6 +47,7 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.JRuleUtil;
+import org.openhab.automation.jrule.rules.JRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,12 +143,12 @@ public class JRuleCompiler {
         if (createInstance) {
             if (Modifier.isAbstract(loadedClass.getModifiers())) {
                 logDebug("Not creating and instance of abstract class: {}", className);
-            } else {
+            } else if (JRule.class.isAssignableFrom(loadedClass)) {
                 try {
                     final Object obj = loadedClass.getDeclaredConstructor().newInstance();
                     logDebug("Created instance: {} obj: {}", className, obj);
                 } catch (Exception x) {
-                    logDebug("Could not create create instance using default constructor: {}", className);
+                    logError("Could not create create instance using default constructor: {}: {}", className, x);
                 }
             }
         }
