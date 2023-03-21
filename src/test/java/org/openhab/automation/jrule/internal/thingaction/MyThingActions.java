@@ -41,6 +41,11 @@ public class MyThingActions implements ThingActions {
         return 0;
     }
 
+    @RuleAction(label = "noActionInput")
+    public int noActionInput(@ActionInput(name = "value") String value, @ActionInput(name = "blabla") Float blabla) {
+        return 0;
+    }
+
     @RuleAction(label = "doSomethingAbstract")
     public int doSomethingAbstract(@ActionInput(name = "value") Command value) {
         return 10;

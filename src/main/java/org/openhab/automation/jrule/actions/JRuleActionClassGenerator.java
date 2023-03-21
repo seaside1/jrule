@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -153,6 +155,9 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                     .orElseThrow(() -> new IllegalStateException("should not occur here"));
 
             freemarkerModel.put("type", thingActionsClass.getTypeName());
+            Set<String> imports = new TreeSet<>();
+            freemarkerModel.put("imports", imports);
+
             Arrays.stream(thingActionsClass.getDeclaredMethods())
                     .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
                     .forEach(method -> {
@@ -161,16 +166,23 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                         methodMap.put("returnType", method.getReturnType().getTypeName());
                         methodMap.put("import", !method.getReturnType().isPrimitive());
                         methodMap.put("hasReturnType", !method.getReturnType().getTypeName().equalsIgnoreCase("void"));
+                        if (!method.getReturnType().isPrimitive()
+                                && !method.getReturnType().getTypeName().equalsIgnoreCase("void")) {
+                            imports.add(method.getReturnType().getTypeName());
+                        }
+
                         List<Object> args = new ArrayList<>();
                         methodMap.put("args", args);
                         Arrays.stream(method.getParameters()).forEach(parameter -> {
-                            Map<Object, Object> arg = new HashMap<>();
-                            arg.put("type", parameter.getType().getTypeName());
-                            arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType()).getTypeName()
-                                    .replaceFirst("java.lang.", ""));
-                            arg.put("name", Objects.requireNonNull(parameter.getAnnotation(ActionInput.class),
-                                    "ActionInput not set on action method parameter").name());
-                            args.add(arg);
+                            if (parameter.getAnnotation(ActionInput.class) != null) {
+                                Map<Object, Object> arg = new HashMap<>();
+                                arg.put("type", parameter.getType().getTypeName());
+                                arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType())
+                                        .getTypeName().replaceFirst("java.lang.", ""));
+                                arg.put("name", Objects.requireNonNull(parameter.getAnnotation(ActionInput.class),
+                                        "ActionInput not set on action method parameter").name());
+                                args.add(arg);
+                            }
                         });
                         methodList.add(methodMap);
                     });
