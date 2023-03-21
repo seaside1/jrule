@@ -297,6 +297,8 @@ Rules are registered in the rule registry:
 Rules can be **disabled** and **re-enabled** runtime, and this will persist across restarts as this is managed by
 openHAB.
 
+![Enable/disable rule](enable_disable_rule.png)
+
 > There is *no* support for neither writing nor executing rules directly from the GUI.
 
 # Examples
