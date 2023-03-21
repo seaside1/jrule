@@ -154,25 +154,25 @@ public class TestRules extends JRule {
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getItem().getState().stringValue());
+        logInfo("received update: {}", event.getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ON_UPDATE)
     @JRuleWhenItemReceivedUpdate(item = ITEM_RECEIVING_COMMAND_SWITCH, state = JRuleSwitchItem.ON)
     public void switchReceivedOnUpdate(JRuleItemEvent event) {
-        logInfo("received update: {}", event.getItem().getState().stringValue());
+        logInfo("received update: {}", event.getState().stringValue());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemChanged(JRuleItemEvent event) {
-        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getItem().getState());
+        logInfo("changed from '{}' to '{}'", event.getOldState(), event.getState());
     }
 
     @JRuleName(NAME_SWITCH_ITEM_CHANGED_TO_ON)
     @JRuleWhenItemChange(item = ITEM_RECEIVING_COMMAND_SWITCH, from = JRuleSwitchItem.OFF, to = JRuleSwitchItem.ON)
     public void switchReceivedChangedToOn(JRuleItemEvent event) {
-        logInfo("changed: {}", event.getItem().getState().stringValue());
+        logInfo("changed: {}", event.getState().stringValue());
     }
 
     @JRuleName(NAME_INVOKE_MQTT_ACTION)
@@ -228,7 +228,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_PRECONDITION_LTE_AND_GTE_FOR_NUMBER)
     @JRuleWhenItemChange(item = ITEM_NUMBER_CONDITION, condition = @JRuleCondition(lte = 20, gte = 18))
     public synchronized void conditionLteAndGteForNumber(JRuleItemEvent event) {
-        logInfo("trigger when between 18 and 20, current: {}", event.getItem().getState().stringValue());
+        logInfo("trigger when between 18 and 20, current: {}", event.getState().stringValue());
     }
 
     @JRuleName(NAME_CRON_EVERY_5_SEC)

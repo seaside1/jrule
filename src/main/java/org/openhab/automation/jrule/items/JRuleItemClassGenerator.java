@@ -85,7 +85,7 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         Map<String, Object> itemModel = new HashMap<>();
         itemModel.put("id", item.getUID());
         itemModel.put("name", item.getName());
-        String plainType = getPlainType(item);
+        String plainType = getPlainType(item.getType());
         itemModel.put("internalClass", "JRuleInternal" + plainType + "Item");
         itemModel.put("interfaceClass", "JRule" + plainType + "Item");
         itemModel.put("label", item.getLabel());
@@ -105,11 +105,11 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
         return itemModel;
     }
 
-    private static String getPlainType(Item baseItem) {
-        if (baseItem.getType().contains(":")) {
+    private static String getPlainType(String itemType) {
+        if (itemType.contains(":")) {
             return "Quantity";
         }
-        return baseItem.getType();
+        return itemType;
     }
 
     private static String getPlainGroupType(GroupItem item, Item baseItem) {
@@ -120,11 +120,11 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
             List<String> childItemTypes = item.getAllMembers().stream().map(Item::getType).distinct()
                     .collect(Collectors.toList());
             if (childItemTypes.size() == 1) {
-                return childItemTypes.get(0);
+                return getPlainType(childItemTypes.get(0));
             } else {
                 return ITEM_GROUP_TYPE_UNSPECIFIED;
             }
         }
-        return getPlainType(baseItem);
+        return getPlainType(baseItem.getType());
     }
 }
