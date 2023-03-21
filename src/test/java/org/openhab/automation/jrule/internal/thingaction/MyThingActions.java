@@ -42,7 +42,7 @@ public class MyThingActions implements ThingActions {
     }
 
     @RuleAction(label = "noActionInput")
-    public int noActionInput(@ActionInput(name = "value") String value, @ActionInput(name = "blabla") Float blabla) {
+    public int noActionInput(String value) {
         return 0;
     }
 
