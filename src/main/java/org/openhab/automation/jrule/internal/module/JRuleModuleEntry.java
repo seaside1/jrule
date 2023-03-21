@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
@@ -79,6 +80,7 @@ public class JRuleModuleEntry extends SimpleRule {
      */
     public void ruleEnabled() {
         if (!enabled) {
+            JRuleEngine.get().getRuleLoadingStatistics().addEnabledRule();
             logger.info("Enabling rule {} / {}", getName(), uid);
         }
         executionContextList.forEach(e -> e.setEnabled(true));
