@@ -26,6 +26,7 @@ public class JRuleLoadingStatistics {
     private int numRuleClasses;
 
     private int numRuleMethods;
+    private int numEnabledRules;
     private final JRuleLoadingStatistics previous;
 
     public JRuleLoadingStatistics(JRuleLoadingStatistics previous) {
@@ -54,6 +55,10 @@ public class JRuleLoadingStatistics {
 
     public void addRuleMethod() {
         numRuleMethods++;
+    }
+
+    public void addEnabledRule() {
+        numEnabledRules++;
     }
 
     @Override
@@ -88,6 +93,18 @@ public class JRuleLoadingStatistics {
         b.append("********   ");
         b.append(String.format("Loaded %d thing triggers, change %d", numThingTriggers,
                 previous == null ? 0 : numThingTriggers - previous.numThingTriggers));
+
+        int numDisabledRules = numRuleMethods - numEnabledRules;
+
+        if (numDisabledRules > 0) {
+            b.append("\n");
+            b.append("********   ");
+            if (numDisabledRules == 1) {
+                b.append("NOTE: 1 rule is disabled in the GUI");
+            } else {
+                b.append(String.format("NOTE: %d rules are disabled in the GUI", numDisabledRules));
+            }
+        }
 
         return b.toString();
     }

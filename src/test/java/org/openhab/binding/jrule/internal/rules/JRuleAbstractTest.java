@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.JRule;
@@ -66,6 +67,7 @@ public abstract class JRuleAbstractTest {
         itemRegistry = Mockito.mock(ItemRegistry.class);
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
         JRuleEngine.get().setItemRegistry(itemRegistry);
+        JRuleEngine.get().setRuleProvider(new JRuleRuleProvider());
 
         JRuleItemRegistry.setMetadataRegistry(Mockito.mock(MetadataRegistry.class));
 
@@ -78,7 +80,7 @@ public abstract class JRuleAbstractTest {
     protected <T extends JRule> T initRule(Class<T> rule) {
         T spyRule = Mockito.spy(rule);
         JRuleEngine.get().reset();
-        JRuleEngine.get().add(spyRule);
+        JRuleEngine.get().add(spyRule, true);
         return spyRule;
     }
 

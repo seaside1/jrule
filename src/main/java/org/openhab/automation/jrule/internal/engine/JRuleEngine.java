@@ -56,10 +56,12 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedEx
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
-import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
+import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
 import org.openhab.automation.jrule.rules.JRuleDebounce;
+import org.openhab.automation.jrule.rules.JRuleDelayed;
 import org.openhab.automation.jrule.rules.JRuleLogName;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.JRuleName;
@@ -106,6 +108,8 @@ public class JRuleEngine implements PropertyChangeListener {
     protected JRuleLoadingStatistics ruleLoadingStatistics;
     private static volatile JRuleEngine instance;
 
+    private JRuleRuleProvider ruleProvider;
+
     public static JRuleEngine get() {
         if (instance == null) {
             synchronized (JRuleEngine.class) {
@@ -121,14 +125,14 @@ public class JRuleEngine implements PropertyChangeListener {
         this.ruleLoadingStatistics = new JRuleLoadingStatistics(null);
     }
 
-    public void add(JRule jRule) {
-        logDebug("Adding rule: {}", jRule);
+    public void add(JRule jRule, boolean enableRule) {
+        logDebug("Adding rule: {}, enabled: {}", jRule, enableRule);
         ruleLoadingStatistics.addRuleClass();
         Arrays.stream(jRule.getClass().getDeclaredMethods()).filter(method -> !method.getName().startsWith("lambda$"))
-                .forEach(method -> this.add(method, jRule));
+                .forEach(method -> this.add(method, jRule, enableRule));
     }
 
-    private void add(Method method, JRule jRule) {
+    private void add(Method method, JRule jRule, boolean enableRule) {
         logDebug("Adding rule method: {}", method.getName());
 
         if (!method.isAnnotationPresent(JRuleName.class)) {
@@ -153,6 +157,9 @@ public class JRuleEngine implements PropertyChangeListener {
         final String logName = Optional.ofNullable(method.getDeclaredAnnotation(JRuleLogName.class))
                 .map(JRuleLogName::value).orElse(method.getDeclaredAnnotation(JRuleName.class).value());
 
+        JRuleModuleEntry ruleModuleEntry = new JRuleModuleEntry(jRule, method,
+                method.getDeclaredAnnotation(JRuleName.class).value());
+
         List<JRulePreconditionContext> jRulePreconditionContexts = Arrays
                 .stream(method.getAnnotationsByType(JRulePrecondition.class)).map(jRulePrecondition -> {
                     JRuleCondition jRuleCondition = jRulePrecondition.condition();
@@ -167,6 +174,7 @@ public class JRuleEngine implements PropertyChangeListener {
 
         final String[] loggingTags = Optional.ofNullable(method.getDeclaredAnnotation(JRuleTag.class))
                 .map(JRuleTag::value).orElse(EMPTY_LOG_TAGS);
+        ruleModuleEntry.addTags(loggingTags);
 
         Duration timedLock = Optional.ofNullable(method.getDeclaredAnnotation(JRuleDebounce.class))
                 .filter(jRuleDebounce -> jRuleDebounce.value() > 0)
@@ -181,70 +189,85 @@ public class JRuleEngine implements PropertyChangeListener {
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedUpdate.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
-            addToContext(new JRuleItemReceivedUpdateExecutionContext(jRule, logName, loggingTags, method,
-                    jRuleWhen.item(), jRuleWhen.memberOf(),
+            JRuleItemReceivedUpdateExecutionContext context = new JRuleItemReceivedUpdateExecutionContext(jRule,
+                    logName, loggingTags, method, jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.state()).filter(StringUtils::isNotEmpty),
-                    timedLock, delayed));
+                    timedLock, delayed);
+            addToContext(context, enableRule);
             ruleLoadingStatistics.addItemStateTrigger();
+            ruleModuleEntry.addJRuleWhenItemReceivedUpdate(context);
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemReceivedCommand.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
-            addToContext(new JRuleItemReceivedCommandExecutionContext(jRule, logName, loggingTags, method,
-                    jRuleWhen.item(), jRuleWhen.memberOf(),
+            JRuleItemReceivedCommandExecutionContext context = new JRuleItemReceivedCommandExecutionContext(jRule,
+                    logName, loggingTags, method, jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.command()).filter(StringUtils::isNotEmpty),
-                    timedLock, delayed));
+                    timedLock, delayed);
+            addToContext(context, enableRule);
             ruleLoadingStatistics.addItemStateTrigger();
+            ruleModuleEntry.addJRuleWhenItemReceivedCommand(context);
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenItemChange.class)).forEach(jRuleWhen -> {
             JRuleCondition jRuleCondition = jRuleWhen.condition();
             JRuleCondition jRulePreviousCondition = jRuleWhen.previousCondition();
-            addToContext(new JRuleItemChangeExecutionContext(jRule, logName, loggingTags, method, jRuleWhen.item(),
-                    jRuleWhen.memberOf(),
+            JRuleItemChangeExecutionContext context = new JRuleItemChangeExecutionContext(jRule, logName, loggingTags,
+                    method, jRuleWhen.item(), jRuleWhen.memberOf(),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRuleCondition)),
                     Optional.of(new JRuleItemExecutionContext.JRuleConditionContext(jRulePreviousCondition)),
                     jRulePreconditionContexts, Optional.of(jRuleWhen.from()).filter(StringUtils::isNotEmpty),
-                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), timedLock, delayed));
+                    Optional.of(jRuleWhen.to()).filter(StringUtils::isNotEmpty), timedLock, delayed);
+            addToContext(context, enableRule);
             ruleLoadingStatistics.addItemStateTrigger();
+            ruleModuleEntry.addJRuleWhenItemChange(context);
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenChannelTrigger.class)).forEach(jRuleWhen -> {
-            addToContext(new JRuleChannelExecutionContext(jRule, logName, loggingTags, method,
+            JRuleChannelExecutionContext context = new JRuleChannelExecutionContext(jRule, logName, loggingTags, method,
                     jRulePreconditionContexts, jRuleWhen.channel(),
-                    Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty), timedLock, delayed));
+                    Optional.of(jRuleWhen.event()).filter(StringUtils::isNotEmpty), timedLock, delayed);
+            addToContext(context, enableRule);
             ruleLoadingStatistics.addChannelTrigger();
+            ruleModuleEntry.addJRuleWhenChannelTrigger(context);
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenCronTrigger.class)).forEach(jRuleWhen -> {
-            addToContext(new JRuleTimedCronExecutionContext(jRule, logName, loggingTags, method,
-                    jRulePreconditionContexts, jRuleWhen.cron()));
+            JRuleTimedCronExecutionContext context = new JRuleTimedCronExecutionContext(jRule, logName, loggingTags,
+                    method, jRulePreconditionContexts, jRuleWhen.cron());
+            addToContext(context, enableRule);
             ruleLoadingStatistics.addTimedTrigger();
+            ruleModuleEntry.addJRuleWhenCronTrigger(context);
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenTimeTrigger.class)).forEach(jRuleWhen -> {
-            addToContext(new JRuleTimeTimerExecutionContext(jRule, logName, loggingTags, method,
-                    jRulePreconditionContexts, Optional.of(jRuleWhen.hours()).filter(i -> i != -1),
+            JRuleTimeTimerExecutionContext context = new JRuleTimeTimerExecutionContext(jRule, logName, loggingTags,
+                    method, jRulePreconditionContexts, Optional.of(jRuleWhen.hours()).filter(i -> i != -1),
                     Optional.of(jRuleWhen.minutes()).filter(i -> i != -1),
-                    Optional.of(jRuleWhen.seconds()).filter(i -> i != -1)));
+                    Optional.of(jRuleWhen.seconds()).filter(i -> i != -1));
+            addToContext(context, enableRule);
             ruleLoadingStatistics.addTimedTrigger();
+            ruleModuleEntry.addJRuleWhenTimeTrigger(context);
             addedToContext.set(true);
         });
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenThingTrigger.class)).forEach(jRuleWhen -> {
             ruleLoadingStatistics.addThingTrigger();
-            addToContext(new JRuleThingExecutionContext(jRule, logName, loggingTags, method,
+            JRuleThingExecutionContext context = new JRuleThingExecutionContext(jRule, logName, loggingTags, method,
                     Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
                     Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
                     Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
-                    jRulePreconditionContexts, timedLock, delayed));
+                    jRulePreconditionContexts, timedLock, delayed);
+            addToContext(context, enableRule);
+            ruleLoadingStatistics.addThingTrigger();
+            ruleModuleEntry.addJRuleWhenThingTrigger(context);
             addedToContext.set(true);
         });
 
@@ -253,15 +276,19 @@ public class JRuleEngine implements PropertyChangeListener {
             logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
                     jRule.getClass().getName());
         }
+
+        ruleProvider.add(ruleModuleEntry);
     }
 
-    private boolean addToContext(JRuleExecutionContext context) {
+    private boolean addToContext(JRuleExecutionContext context, boolean enableRule) {
         logDebug("add to context: {}", context);
+        context.setEnabled(enableRule);
         if (context instanceof JRuleTimedExecutionContext) {
             timerExecutor.add(context);
         } else {
             contextList.add(context);
         }
+
         return true;
     }
 
@@ -367,6 +394,7 @@ public class JRuleEngine implements PropertyChangeListener {
         timerExecutor.clear();
 
         ruleLoadingStatistics = new JRuleLoadingStatistics(ruleLoadingStatistics);
+        ruleProvider.reset();
     }
 
     public boolean watchingForItem(String itemName) {
@@ -459,11 +487,17 @@ public class JRuleEngine implements PropertyChangeListener {
     }
 
     public void invokeRule(JRuleExecutionContext context, JRuleEvent event) {
-        if (config.isExecutorsEnabled()) {
-            ruleExecutorService.submit(() -> invokeDelayed(context, event,
-                    (jRuleExecutionContext, jRuleEvent) -> invokeRuleInternal(context, event)));
+        if (context.isEnabled()) {
+            if (config.isExecutorsEnabled()) {
+                ruleExecutorService.submit(() -> invokeDelayed(context, event,
+                        (jRuleExecutionContext, jRuleEvent) -> invokeRuleInternal(context, event)));
+            } else {
+                invokeDelayed(context, event,
+                        (jRuleExecutionContext, jRuleEvent) -> invokeRuleInternal(context, event));
+            }
         } else {
-            invokeDelayed(context, event, (jRuleExecutionContext, jRuleEvent) -> invokeRuleInternal(context, event));
+            JRuleLog.debug(logger, context.getLogName(), "Not invoking rule because context {} is disabled", context);
+
         }
     }
 
@@ -515,5 +549,9 @@ public class JRuleEngine implements PropertyChangeListener {
         } else {
             ruleInvoker.accept(context, event);
         }
+    }
+
+    public void setRuleProvider(JRuleRuleProvider ruleProvider) {
+        this.ruleProvider = ruleProvider;
     }
 }

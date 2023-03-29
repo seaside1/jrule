@@ -36,6 +36,7 @@ developer machine - like any other regular Java project - **recommended**).
         + [JRuleThings](#jrulethings)
         + [JRuleThingActions](#jrulethingactions)
     * [Other built-in actions](#other-built-in-actions)
+- [GUI support](#gui-support)
 - [Examples](#examples)
 
 ## Why
@@ -140,16 +141,19 @@ equal `/etc/openhab/automation/jrule` in the following table:
 ### Example scripts to easily handle the copy process
 
 #### Grab the jrule engine from the server
+
 ```shell
 scp <user>@<oh-server>:$JRULE_ROOT/jar/jrule.jar lib/jrule.jar
 ```
 
 #### Grab the generated jrule source
+
 ```shell
 scp <user>@<oh-server>:$JRULE_ROOT/jar/jrule-generated.jar lib/jrule-generated.jar
 ```
 
 #### Grab the generated jrule source
+
 ```shell
 scp target/openhab-rules-1.0-SNAPSHOT.jar <user>@<oh-server>:$JRULE_ROOT/rules-jar/openhab-rules-1.0-SNAPSHOT.jar
 ```
@@ -283,6 +287,19 @@ These are method inherited from the JRule superclass.
 | `sendCommand`                        | Send a command to an item                                               |
 | `postUpdate`                         | Post a state update to an item                                          |
 | `logXXX`                             | Log a Debug/Info/Warn/Error message                                     |
+
+## GUI support
+
+Rules are registered in the rule registry:
+
+![Rule registry](rules_ui.png)
+
+Rules can be **disabled** and **re-enabled** runtime, and this will persist across restarts as this is managed by
+openHAB.
+
+![Enable/disable rule](enable_disable_rule.png)
+
+> There is *no* support for neither writing nor executing rules directly from the GUI.
 
 # Examples
 

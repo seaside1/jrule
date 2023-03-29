@@ -49,7 +49,8 @@ public class JRule {
     public static final ThreadLocal<JRuleExecutionContext> JRULE_EXECUTION_CONTEXT = new ThreadLocal<>();
 
     public JRule() {
-        JRuleEngine.get().add(this);
+        // Add rules default disabled, let openHAB enable rules if not disabled in GUI
+        JRuleEngine.get().add(this, false);
     }
 
     protected void say(String text) {
