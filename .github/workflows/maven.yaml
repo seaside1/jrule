@@ -12,9 +12,9 @@ jobs:
         distribution: 'adopt'
         cache: 'maven'
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn --batch-mode --update-snapshots install
     - run: mkdir staging && cp target/org.openhab.automation.jrule*SNAPSHOT.jar staging
     - uses: actions/upload-artifact@v3
       with:
-        name: JRule-jar-zipped_branch_$GITHUB_REF_NAME
+        name: JRule-jar-zipped_branch_${{ env.GITHUB_REF_NAME }}
         path: staging
