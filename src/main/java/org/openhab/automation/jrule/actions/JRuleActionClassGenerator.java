@@ -159,7 +159,11 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
             freemarkerModel.put("imports", imports);
 
             Arrays.stream(thingActionsClass.getDeclaredMethods())
-                    .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
+                    .filter(method -> method.getAnnotation(RuleAction.class) != null)
+                    .filter(method -> method.getReturnType().isPrimitive()
+                            || method.getReturnType().getPackageName().equals("java.lang"))
+                    .collect(Collectors.toSet())
+
                     .forEach(method -> {
                         Map<Object, Object> methodMap = new HashMap<>();
                         methodMap.put("name", method.getName());
