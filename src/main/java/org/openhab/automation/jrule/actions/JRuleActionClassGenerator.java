@@ -161,8 +161,8 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
             Arrays.stream(thingActionsClass.getDeclaredMethods())
                     .filter(method -> method.getAnnotation(RuleAction.class) != null)
                     .filter(method -> method.getReturnType().isPrimitive()
-                            || "java.lang".equals(method.getReturnType().getPackageName())
-                            || "org.openhab.core.library.types".equals(method.getReturnType().getPackageName()))
+                            || "org.openhab.core.library.types".equals(method.getReturnType().getPackageName())
+                            || method.getReturnType().getPackageName().startsWith("java."))
                     .collect(Collectors.toSet())
 
                     .forEach(method -> {
