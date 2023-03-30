@@ -15,5 +15,5 @@ jobs:
     - run: mkdir staging && cp target/org.openhab.automation.jrule*SNAPSHOT.jar staging
     - uses: actions/upload-artifact@v3
       with:
-        name: JRule-jar-zipped
+        name: JRule-jar-zipped_branch_$GITHUB_REF_NAME
         path: staging
