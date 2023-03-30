@@ -161,7 +161,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
             Arrays.stream(thingActionsClass.getDeclaredMethods())
                     .filter(method -> method.getAnnotation(RuleAction.class) != null)
                     .filter(method -> method.getReturnType().isPrimitive()
-                            || method.getReturnType().getPackageName().equals("java.lang"))
+                            || "java.lang".equals(method.getReturnType().getPackageName()))
                     .collect(Collectors.toSet())
 
                     .forEach(method -> {
