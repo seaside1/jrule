@@ -81,7 +81,7 @@ public class JRuleModuleEntry extends SimpleRule {
     public void ruleEnabled() {
         if (!enabled) {
             JRuleEngine.get().getRuleLoadingStatistics().addEnabledRule();
-            logger.info("Enabling rule {} / {}", getName(), uid);
+            logger.debug("Enabling rule '{}' / {}", getName(), uid);
         }
         executionContextList.forEach(e -> e.setEnabled(true));
         enabled = true;
@@ -92,7 +92,7 @@ public class JRuleModuleEntry extends SimpleRule {
      */
     public void ruleDisabled() {
         if (enabled) {
-            logger.info("Disabling rule {} / {}", getName(), uid);
+            logger.debug("Disabling rule '{}' / {}", getName(), uid);
         }
         executionContextList.forEach(e -> e.setEnabled(false));
         enabled = false;
