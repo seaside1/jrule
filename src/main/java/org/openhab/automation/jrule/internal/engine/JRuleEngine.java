@@ -129,6 +129,7 @@ public class JRuleEngine implements PropertyChangeListener {
         logDebug("Adding rule: {}, enabled: {}", jRule, enableRule);
         ruleLoadingStatistics.addRuleClass();
         Arrays.stream(jRule.getClass().getDeclaredMethods()).filter(method -> !method.getName().startsWith("lambda$"))
+                .filter(method -> method.getDeclaringClass().equals(jRule.getClass())) // Skip inherited methods
                 .forEach(method -> this.add(method, jRule, enableRule));
     }
 
