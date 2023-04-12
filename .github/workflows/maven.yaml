@@ -17,5 +17,5 @@ jobs:
     - run: echo "JRule-jar-zipped_branch_$GITHUB_REF_NAME"
     - uses: actions/upload-artifact@v3
       with:
-        name: JRule-jar-zipped_branch_${{ github.ref_name }}
+        name: JRule-jar-zipped_branch_${{ github.run_id }}
         path: staging
