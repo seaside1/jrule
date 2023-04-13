@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -183,8 +182,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                                 arg.put("type", parameterType.getTypeName());
                                 arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType())
                                         .getTypeName().replaceFirst("java.lang.", ""));
-                                arg.put("name", Objects.requireNonNull(parameter.getAnnotation(ActionInput.class),
-                                        "ActionInput not set on action method parameter").name());
+                                arg.put("name", parameter.getAnnotation(ActionInput.class).name());
                                 args.add(arg);
                             }
                         });
