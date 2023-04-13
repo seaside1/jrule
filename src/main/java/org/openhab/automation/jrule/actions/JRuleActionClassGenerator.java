@@ -159,21 +159,27 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
             freemarkerModel.put("imports", imports);
 
             Arrays.stream(thingActionsClass.getDeclaredMethods())
-                    .filter(method -> method.getAnnotation(RuleAction.class) != null)
-                    .filter(method -> method.getReturnType().isPrimitive()
-                            || "org.openhab.core.library.types".equals(method.getReturnType().getPackageName())
-                            || method.getReturnType().getPackageName().startsWith("java."))
-                    .collect(Collectors.toSet())
+                    .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
 
                     .forEach(method -> {
+
+                        /*
+                         * .filter(method -> method.getReturnType().isPrimitive()
+                         * || "org.openhab.core.library.types".equals(method.getReturnType().getPackageName())
+                         * || method.getReturnType().getPackageName().startsWith("java."))
+                         * 
+                         */
+
                         Map<Object, Object> methodMap = new HashMap<>();
                         methodMap.put("name", method.getName());
-                        methodMap.put("returnType", method.getReturnType().getTypeName());
-                        methodMap.put("import", !method.getReturnType().isPrimitive());
-                        methodMap.put("hasReturnType", !method.getReturnType().getTypeName().equalsIgnoreCase("void"));
-                        if (!method.getReturnType().isPrimitive()
-                                && !method.getReturnType().getTypeName().equalsIgnoreCase("void")) {
-                            imports.add(method.getReturnType().getTypeName());
+
+                        Class<?> returnType = replaceTypeIfNecessary(method.getReturnType());
+
+                        methodMap.put("returnType", returnType.getTypeName());
+                        methodMap.put("import", !returnType.isPrimitive());
+                        methodMap.put("hasReturnType", !returnType.getTypeName().equalsIgnoreCase("void"));
+                        if (!returnType.isPrimitive() && !returnType.getTypeName().equalsIgnoreCase("void")) {
+                            imports.add(returnType.getTypeName());
                         }
 
                         List<Object> args = new ArrayList<>();
@@ -181,7 +187,8 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                         Arrays.stream(method.getParameters()).forEach(parameter -> {
                             if (parameter.getAnnotation(ActionInput.class) != null) {
                                 Map<Object, Object> arg = new HashMap<>();
-                                arg.put("type", parameter.getType().getTypeName());
+                                Class<?> parameterType = replaceTypeIfNecessary(parameter.getType());
+                                arg.put("type", parameterType.getTypeName());
                                 arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType())
                                         .getTypeName().replaceFirst("java.lang.", ""));
                                 arg.put("name", Objects.requireNonNull(parameter.getAnnotation(ActionInput.class),
@@ -193,6 +200,16 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                     });
         }
         return freemarkerModel;
+    }
+
+    private Class<?> replaceTypeIfNecessary(Class<?> type) {
+        if (type.isPrimitive() || "org.openhab.core.library.types".equals(type.getPackageName())
+                || "org.openhab.core.types".equals(type.getPackageName())
+                || type.getPackageName().startsWith("java.")) {
+            return type;
+        } else {
+            return Object.class;
+        }
     }
 
     public static String getActionFriendlyName(String thingUid) {

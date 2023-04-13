@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.internal.codegenerator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -29,7 +31,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import org.openhab.automation.jrule.actions.JRuleActionClassGenerator;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.internal.thingaction.MyThingActions;
+import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.library.types.StringType;
 import org.openhab.core.magic.binding.handler.MagicActionModuleThingHandler;
 import org.openhab.core.model.script.internal.engine.action.ThingActionService;
@@ -143,9 +145,19 @@ public class JRuleActionClassGeneratorTest {
         Object jRuleActions = aClass.getConstructor().newInstance();
         Field mybindingThingtypeId1 = aClass.getDeclaredField("mybindingThingtypeId1");
         Object action = mybindingThingtypeId1.get(jRuleActions);
+
+        // Verify methods exists
         Method doSomethingAbstract = action.getClass().getDeclaredMethod("doSomethingAbstract", Command.class);
         Object res = doSomethingAbstract.invoke(action, new StringType("blub"));
-        Assertions.assertEquals(10, res);
+        assertEquals(10, res);
+
+        // Verify method with unsupported types are mapped to Object
+        Method returnObjectOnUnsupportedClass = action.getClass().getDeclaredMethod("returnObjectOnUnsupportedClass",
+                Object.class);
+        assertNotNull(returnObjectOnUnsupportedClass);
+        assertEquals(Object.class, returnObjectOnUnsupportedClass.getReturnType());
+        JRule returnObject = (JRule) returnObjectOnUnsupportedClass.invoke(action, new JRule());
+        assertNotNull(returnObject);
     }
 
     private void generateAndCompile(Thing thing) {
