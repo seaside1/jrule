@@ -162,14 +162,6 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                     .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
 
                     .forEach(method -> {
-
-                        /*
-                         * .filter(method -> method.getReturnType().isPrimitive()
-                         * || "org.openhab.core.library.types".equals(method.getReturnType().getPackageName())
-                         * || method.getReturnType().getPackageName().startsWith("java."))
-                         * 
-                         */
-
                         Map<Object, Object> methodMap = new HashMap<>();
                         methodMap.put("name", method.getName());
 
