@@ -39,18 +39,22 @@ public interface JRuleGroupItem<I extends JRuleItem> extends JRuleItem {
     }
 
     default void sendUncheckedCommand(JRuleValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUncheckedUpdate(JRuleValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postUpdate(JRuleRefreshValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void postNullUpdate() {
+        JRuleEventHandler.get().postUpdate(getName(), null);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(JRuleItem::postNullUpdate);
     }
 

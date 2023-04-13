@@ -20,7 +20,9 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerGroupItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.rules.value.JRuleNextPreviousValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleRewindFastforwardValue;
 
 /**
  * The {@link JRulePlayerGroupItem} Items
@@ -46,18 +48,22 @@ public interface JRulePlayerGroupItem extends JRulePlayerItem, JRuleGroupItem<JR
     }
 
     default void sendCommand(JRulePlayPauseValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRulePlayPauseValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(JRuleRewindFastforwardValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void sendCommand(JRuleNextPreviousValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 }

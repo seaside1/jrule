@@ -12,16 +12,25 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Optional;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GenericItem;
+import org.openhab.core.items.GroupItem;
+import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.items.events.ItemCommandEvent;
 import org.openhab.core.items.events.ItemStateEvent;
 import org.openhab.core.types.State;
@@ -141,8 +150,8 @@ public abstract class JRuleItemTestBase {
 
     protected void verifyEventTypes(TestInfo testInfo, int wantedStateCalls, int wantedCommandCalls) {
         if (testInfo.getTestClass().orElseThrow().getSimpleName().contains("GroupItem")) {
-            Mockito.verify(eventPublisher, Mockito.times(wantedStateCalls * 3)).post(Mockito.any(ItemStateEvent.class));
-            Mockito.verify(eventPublisher, Mockito.times(wantedCommandCalls * 3))
+            Mockito.verify(eventPublisher, Mockito.times(wantedStateCalls * 5)).post(Mockito.any(ItemStateEvent.class));
+            Mockito.verify(eventPublisher, Mockito.times(wantedCommandCalls * 5))
                     .post(Mockito.any(ItemCommandEvent.class));
         } else {
             Mockito.verify(eventPublisher, Mockito.times(wantedStateCalls)).post(Mockito.any(ItemStateEvent.class));

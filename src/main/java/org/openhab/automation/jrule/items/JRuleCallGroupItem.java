@@ -46,6 +46,7 @@ public interface JRuleCallGroupItem extends JRuleCallItem, JRuleGroupItem<JRuleC
     }
 
     default void postUpdate(JRuleStringListValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }

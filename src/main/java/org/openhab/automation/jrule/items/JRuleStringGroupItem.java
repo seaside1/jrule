@@ -46,19 +46,23 @@ public interface JRuleStringGroupItem extends JRuleStringItem, JRuleGroupItem<JR
     }
 
     default void sendCommand(JRuleStringValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleStringValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(String command) {
+        JRuleEventHandler.get().sendCommand(getName(), new JRuleStringValue(command));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.sendUncheckedCommand(new JRuleStringValue(command)));
     }
 
     default void postUpdate(String state) {
+        JRuleEventHandler.get().postUpdate(getName(), new JRuleStringValue(state));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(m -> m.postUncheckedUpdate(new JRuleStringValue(state)));
     }
