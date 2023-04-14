@@ -66,18 +66,19 @@ Switch          Switch_Persistence
 Contact         Contact_Persistence
 
 // Persistence
-Switch          Switch_To_Persist
-Number          Number_To_Persist
-String          String_To_Persist
-DateTime        DateTime_To_Persist
-Player          Player_To_Persist
-Contact         Contact_To_Persist
-Image           Image_To_Persist
-Rollershutter   Rollershutter_To_Persist
-Dimmer          Dimmer_To_Persist
-Color           Color_To_Persist
-Location        Location_To_Persist
-Number:Power    Quantity_To_Persist
+Group           InfluxDbPersist
+Switch          Switch_To_Persist          (InfluxDbPersist)
+Number          Number_To_Persist          (InfluxDbPersist)
+String          String_To_Persist          (InfluxDbPersist)
+DateTime        DateTime_To_Persist        (InfluxDbPersist)
+Player          Player_To_Persist          (InfluxDbPersist)
+Contact         Contact_To_Persist         (InfluxDbPersist)
+Image           Image_To_Persist           (InfluxDbPersist)
+Rollershutter   Rollershutter_To_Persist   (InfluxDbPersist)
+Dimmer          Dimmer_To_Persist          (InfluxDbPersist)
+Color           Color_To_Persist           (InfluxDbPersist)
+Location        Location_To_Persist        (InfluxDbPersist)
+Number:Power    Quantity_To_Persist        (InfluxDbPersist)
 
 
 Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }

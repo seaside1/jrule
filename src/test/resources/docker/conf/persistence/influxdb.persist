@@ -1,0 +1,5 @@
+Strategies {
+}
+Items {
+	InfluxDbPersist* : strategy = everyChange
+}
