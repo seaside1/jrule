@@ -20,8 +20,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.core.automation.Rule;
-import org.openhab.core.automation.RuleProvider;
+import org.openhab.core.automation.*;
 import org.openhab.core.common.registry.ProviderChangeListener;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
