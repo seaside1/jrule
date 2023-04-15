@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.internal.thingaction;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.automation.annotation.ActionInput;
 import org.openhab.core.automation.annotation.RuleAction;
 import org.openhab.core.library.types.QuantityType;
@@ -41,6 +42,11 @@ public class MyThingActions implements ThingActions {
         return 0;
     }
 
+    @RuleAction(label = "noActionInput")
+    public int noActionInput(String value) {
+        return 0;
+    }
+
     @RuleAction(label = "doSomethingAbstract")
     public int doSomethingAbstract(@ActionInput(name = "value") Command value) {
         return 10;
@@ -53,5 +59,10 @@ public class MyThingActions implements ThingActions {
     @Override
     public @Nullable ThingHandler getThingHandler() {
         return null;
+    }
+
+    @RuleAction(label = "returnObjectOnUnsupportedClass")
+    public JRule returnObjectOnUnsupportedClass(@ActionInput(name = "value") JRule value) {
+        return value;
     }
 }

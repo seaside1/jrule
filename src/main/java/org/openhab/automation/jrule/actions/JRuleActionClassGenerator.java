@@ -21,7 +21,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -153,29 +154,52 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                     .orElseThrow(() -> new IllegalStateException("should not occur here"));
 
             freemarkerModel.put("type", thingActionsClass.getTypeName());
+            Set<String> imports = new TreeSet<>();
+            freemarkerModel.put("imports", imports);
+
             Arrays.stream(thingActionsClass.getDeclaredMethods())
                     .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
+
                     .forEach(method -> {
                         Map<Object, Object> methodMap = new HashMap<>();
                         methodMap.put("name", method.getName());
-                        methodMap.put("returnType", method.getReturnType().getTypeName());
-                        methodMap.put("import", !method.getReturnType().isPrimitive());
-                        methodMap.put("hasReturnType", !method.getReturnType().getTypeName().equalsIgnoreCase("void"));
+
+                        Class<?> returnType = replaceTypeIfNecessary(method.getReturnType());
+
+                        methodMap.put("returnType", returnType.getTypeName());
+                        methodMap.put("import", !returnType.isPrimitive());
+                        methodMap.put("hasReturnType", !returnType.getTypeName().equalsIgnoreCase("void"));
+                        if (!returnType.isPrimitive() && !returnType.getTypeName().equalsIgnoreCase("void")) {
+                            imports.add(returnType.getTypeName());
+                        }
+
                         List<Object> args = new ArrayList<>();
                         methodMap.put("args", args);
                         Arrays.stream(method.getParameters()).forEach(parameter -> {
-                            Map<Object, Object> arg = new HashMap<>();
-                            arg.put("type", parameter.getType().getTypeName());
-                            arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType()).getTypeName()
-                                    .replaceFirst("java.lang.", ""));
-                            arg.put("name", Objects.requireNonNull(parameter.getAnnotation(ActionInput.class),
-                                    "ActionInput not set on action method parameter").name());
-                            args.add(arg);
+                            if (parameter.getAnnotation(ActionInput.class) != null) {
+                                Map<Object, Object> arg = new HashMap<>();
+                                Class<?> parameterType = replaceTypeIfNecessary(parameter.getType());
+                                arg.put("type", parameterType.getTypeName());
+                                arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType())
+                                        .getTypeName().replaceFirst("java.lang.", ""));
+                                arg.put("name", parameter.getAnnotation(ActionInput.class).name());
+                                args.add(arg);
+                            }
                         });
                         methodList.add(methodMap);
                     });
         }
         return freemarkerModel;
+    }
+
+    private Class<?> replaceTypeIfNecessary(Class<?> type) {
+        if (type.isPrimitive() || "org.openhab.core.library.types".equals(type.getPackageName())
+                || "org.openhab.core.types".equals(type.getPackageName())
+                || type.getPackageName().startsWith("java.")) {
+            return type;
+        } else {
+            return Object.class;
+        }
     }
 
     public static String getActionFriendlyName(String thingUid) {
