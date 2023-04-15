@@ -48,29 +48,35 @@ public interface JRuleDateTimeGroupItem extends JRuleDateTimeItem, JRuleGroupIte
     }
 
     default void sendCommand(JRuleDateTimeValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleDateTimeValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(Date command) {
+        JRuleEventHandler.get().sendCommand(getName(), new JRuleDateTimeValue(command));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
     }
 
     default void sendCommand(ZonedDateTime command) {
+        JRuleEventHandler.get().sendCommand(getName(), new JRuleDateTimeValue(command));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.sendUncheckedCommand(new JRuleDateTimeValue(command)));
     }
 
     default void postUpdate(Date state) {
+        JRuleEventHandler.get().postUpdate(getName(), new JRuleDateTimeValue(state));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
     }
 
     default void postUpdate(ZonedDateTime state) {
+        JRuleEventHandler.get().postUpdate(getName(), new JRuleDateTimeValue(state));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.postUncheckedUpdate(new JRuleDateTimeValue(state)));
     }

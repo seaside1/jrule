@@ -46,6 +46,7 @@ public interface JRuleContactGroupItem extends JRuleContactItem, JRuleGroupItem<
     }
 
     default void postUpdate(JRuleOpenClosedValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }

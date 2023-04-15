@@ -46,19 +46,23 @@ public interface JRuleSwitchGroupItem extends JRuleSwitchItem, JRuleGroupItem<JR
     }
 
     default void sendCommand(JRuleOnOffValue command) {
+        JRuleEventHandler.get().sendCommand(getName(), command);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.sendUncheckedCommand(command));
     }
 
     default void postUpdate(JRuleOnOffValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 
     default void sendCommand(boolean command) {
+        JRuleEventHandler.get().sendCommand(getName(), JRuleOnOffValue.valueOf(command));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.sendUncheckedCommand(JRuleOnOffValue.valueOf(command)));
     }
 
     default void postUpdate(boolean state) {
+        JRuleEventHandler.get().postUpdate(getName(), JRuleOnOffValue.valueOf(state));
         JRuleEventHandler.get().getGroupMemberItems(getName(), false)
                 .forEach(i -> i.postUncheckedUpdate(JRuleOnOffValue.valueOf(state)));
     }

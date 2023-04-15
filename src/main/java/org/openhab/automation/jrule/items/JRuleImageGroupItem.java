@@ -46,6 +46,7 @@ public interface JRuleImageGroupItem extends JRuleImageItem, JRuleGroupItem<JRul
     }
 
     default void postUpdate(JRuleRawValue state) {
+        JRuleEventHandler.get().postUpdate(getName(), state);
         JRuleEventHandler.get().getGroupMemberItems(getName(), false).forEach(i -> i.postUncheckedUpdate(state));
     }
 }
