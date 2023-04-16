@@ -76,13 +76,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
-import org.openhab.core.automation.RuleStatus;
-import org.openhab.core.automation.RuleStatusDetail;
-import org.openhab.core.automation.RuleStatusInfo;
-import org.openhab.core.automation.events.RuleStatusInfoEvent;
-import org.openhab.core.automation.internal.RuleEventFactory;
 import org.openhab.core.events.AbstractEvent;
-import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -115,7 +109,6 @@ public class JRuleEngine implements PropertyChangeListener {
     private static volatile JRuleEngine instance;
 
     private JRuleRuleProvider ruleProvider;
-    private EventPublisher eventPublisher;
 
     public static JRuleEngine get() {
         if (instance == null) {
@@ -527,7 +520,7 @@ public class JRuleEngine implements PropertyChangeListener {
         final Method method = context.getMethod();
 
         try {
-            runRule(rule, method);
+            ruleProvider.runRule(rule, method);
             JRule.JRULE_EXECUTION_CONTEXT.set(context);
             JRuleLog.debug(logger, context.getMethod().getName(), "setting mdc tags: {}", context.getLoggingTags());
             MDC.put(MDC_KEY_RULE, context.getMethod().getName());
@@ -547,22 +540,8 @@ public class JRuleEngine implements PropertyChangeListener {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
             JRule.JRULE_EXECUTION_CONTEXT.remove();
-            stopRule(rule, method);
+            ruleProvider.stopRule(rule, method);
         }
-    }
-
-    private void runRule(JRule rule, Method method) {
-        RuleStatusInfoEvent ruleStatusInfoEvent = RuleEventFactory.createRuleStatusInfoEvent(
-                new RuleStatusInfo(RuleStatus.RUNNING, RuleStatusDetail.NONE, null),
-                JRuleModuleEntry.createUid(rule, method), "jRule");
-        eventPublisher.post(ruleStatusInfoEvent);
-    }
-
-    private void stopRule(JRule rule, Method method) {
-        RuleStatusInfoEvent ruleStatusInfoEvent = RuleEventFactory.createRuleStatusInfoEvent(
-                new RuleStatusInfo(RuleStatus.IDLE, RuleStatusDetail.NONE, null),
-                JRuleModuleEntry.createUid(rule, method), "jRule");
-        eventPublisher.post(ruleStatusInfoEvent);
     }
 
     private void invokeDelayed(JRuleExecutionContext context, JRuleEvent event,
@@ -577,9 +556,5 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public void setRuleProvider(JRuleRuleProvider ruleProvider) {
         this.ruleProvider = ruleProvider;
-    }
-
-    public void setEventPublisher(EventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
     }
 }

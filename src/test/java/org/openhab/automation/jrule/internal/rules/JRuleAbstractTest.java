@@ -68,8 +68,9 @@ public abstract class JRuleAbstractTest {
         itemRegistry = Mockito.mock(ItemRegistry.class);
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
         JRuleEngine.get().setItemRegistry(itemRegistry);
-        JRuleEngine.get().setRuleProvider(new JRuleRuleProvider());
-        JRuleEngine.get().setEventPublisher(Mockito.mock(EventPublisher.class));
+        JRuleRuleProvider ruleProvider = new JRuleRuleProvider();
+        ruleProvider.setEventPublisher(Mockito.mock(EventPublisher.class));
+        JRuleEngine.get().setRuleProvider(ruleProvider);
 
         JRuleItemRegistry.setMetadataRegistry(Mockito.mock(MetadataRegistry.class));
 

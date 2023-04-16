@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.module;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -20,10 +21,14 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.automation.*;
+import org.openhab.core.automation.events.RuleStatusInfoEvent;
 import org.openhab.core.common.registry.ProviderChangeListener;
+import org.openhab.core.events.EventPublisher;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The {@link JRuleRuleProvider} provides rules into openhab ecosystem
@@ -40,6 +45,9 @@ public class JRuleRuleProvider implements RuleProvider {
 
     private final Map<String, JRuleModuleEntry> rules = new ConcurrentHashMap<>();
 
+    @Nullable
+    private EventPublisher eventPublisher;
+
     @Override
     public Collection<Rule> getAll() {
         return rules.values().stream().map(e -> (Rule) e).collect(Collectors.toList());
@@ -53,6 +61,11 @@ public class JRuleRuleProvider implements RuleProvider {
     @Override
     public void removeProviderChangeListener(ProviderChangeListener<Rule> listener) {
         listeners.remove(listener);
+    }
+
+    @Reference
+    public void setEventPublisher(final EventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     @Deactivate
@@ -76,5 +89,19 @@ public class JRuleRuleProvider implements RuleProvider {
     @Nullable
     public JRuleModuleEntry getRule(String ruleUid) {
         return rules.get(ruleUid);
+    }
+
+    public void runRule(JRule rule, Method method) {
+        RuleStatusInfoEvent ruleStatusInfoEvent = RuleEventFactory.createRuleStatusInfoEvent(
+                new RuleStatusInfo(RuleStatus.RUNNING, RuleStatusDetail.NONE, null),
+                JRuleModuleEntry.createUid(rule, method), "jRule");
+        eventPublisher.post(ruleStatusInfoEvent);
+    }
+
+    public void stopRule(JRule rule, Method method) {
+        RuleStatusInfoEvent ruleStatusInfoEvent = RuleEventFactory.createRuleStatusInfoEvent(
+                new RuleStatusInfo(RuleStatus.IDLE, RuleStatusDetail.NONE, null),
+                JRuleModuleEntry.createUid(rule, method), "jRule");
+        eventPublisher.post(ruleStatusInfoEvent);
     }
 }
