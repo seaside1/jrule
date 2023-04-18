@@ -7,7 +7,7 @@
         <ns2:bundle>mvn:org.freemarker/freemarker/2.3.32</ns2:bundle>
         <ns2:bundle>mvn:org.openhab.addons.bundles/org.openhab.automation.jrule/4.0.0-SNAPSHOT</ns2:bundle>
         <ns2:bundle>wrap:mvn:javax.servlet/jsp-api/2.0</ns2:bundle>
-        <ns2:bundle>wrap:mvn:javax.servlet/servlet-api/2.5</ns2:bundle>
+        <ns2:bundle>wrap:mvn:javax.servlet/servlet-api/2.4</ns2:bundle>
         <ns2:bundle>wrap:mvn:org.lastnpe.eea/eea-all/2.2.1</ns2:bundle>
     </ns2:feature>
 </ns2:features>
