@@ -43,7 +43,7 @@ public class JRuleJarExtractor {
             copyJRulesJarToFolder(jarUrl, jarFilePath);
         } catch (MalformedURLException | URISyntaxException x) {
             JRuleLog.error(logger, LOG_NAME_JAR,
-                    "File to extract jar due to uri exception jarFilePath: {} to: {} exception: {}", jarFilePath,
+                    "Failed to extract jar due to uri exception jarFilePath: {} to: {} exception: {}", jarFilePath,
                     jarFilePath, x);
         }
     }
