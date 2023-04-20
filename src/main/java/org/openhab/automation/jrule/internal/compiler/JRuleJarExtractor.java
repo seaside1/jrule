@@ -42,9 +42,8 @@ public class JRuleJarExtractor {
             final URL jarUrl = JRule.class.getProtectionDomain().getCodeSource().getLocation().toURI().toURL();
             copyJRulesJarToFolder(jarUrl, jarFilePath);
         } catch (MalformedURLException | URISyntaxException x) {
-            JRuleLog.error(logger, LOG_NAME_JAR,
-                    "Failed to extract jar due to uri exception jarFilePath: {} to: {} exception: {}", jarFilePath,
-                    jarFilePath, x);
+            JRuleLog.error(logger, LOG_NAME_JAR, "Failed to extract jar due to uri exception jarFilePath: {} to: {}",
+                    jarFilePath, jarFilePath, x);
         }
     }
 
