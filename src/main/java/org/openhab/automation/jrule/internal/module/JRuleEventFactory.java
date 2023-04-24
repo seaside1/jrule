@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 @Component(service = EventFactory.class, immediate = true)
-public class RuleEventFactory extends AbstractEventFactory {
+public class JRuleEventFactory extends AbstractEventFactory {
 
-    private final Logger logger = LoggerFactory.getLogger(RuleEventFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(JRuleEventFactory.class);
 
     private static final String RULE_STATE_EVENT_TOPIC = "openhab/rules/{ruleID}/state";
 
@@ -46,7 +46,7 @@ public class RuleEventFactory extends AbstractEventFactory {
         SUPPORTED_TYPES.add(RuleStatusInfoEvent.TYPE);
     }
 
-    public RuleEventFactory() {
+    public JRuleEventFactory() {
         super(SUPPORTED_TYPES);
     }
 
