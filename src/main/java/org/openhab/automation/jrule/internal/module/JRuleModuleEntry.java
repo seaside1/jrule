@@ -59,8 +59,7 @@ public class JRuleModuleEntry extends SimpleRule {
     boolean enabled = false;
 
     public JRuleModuleEntry(JRule jRule, Method method, String ruleName) {
-        this.uid = jRule.getClass().getCanonicalName().replace("org.openhab.automation.jrule.rules.user.", "") + "."
-                + method.getName();
+        this.uid = createUid(jRule, method);
         tags.add("JRule");
         setTriggers(ruleTriggers);
         setConditions(List.of());
@@ -69,6 +68,11 @@ public class JRuleModuleEntry extends SimpleRule {
         setName(ruleName);
         setActions(List.of());
         setTags(tags);
+    }
+
+    public static String createUid(JRule jRule, Method method) {
+        return jRule.getClass().getCanonicalName().replace("org.openhab.automation.jrule.rules.user.", "") + "."
+                + method.getName();
     }
 
     public void dispose() {
