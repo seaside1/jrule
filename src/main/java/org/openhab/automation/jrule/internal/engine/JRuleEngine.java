@@ -547,7 +547,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private void invokeDelayed(JRuleExecutionContext context, JRuleEvent event,
             BiConsumer<JRuleExecutionContext, JRuleEvent> ruleInvoker) {
         if (context.getDelayed() != null) {
-            JRuleTimerHandler.get().createTimer(null, context.getDelayed(), () -> ruleInvoker.accept(context, event),
+            JRuleTimerHandler.get().createTimer(null, context.getDelayed(), t -> ruleInvoker.accept(context, event),
                     context);
         } else {
             ruleInvoker.accept(context, event);

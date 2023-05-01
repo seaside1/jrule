@@ -46,15 +46,15 @@ public class JRuleTimerTestRules extends JRule {
         stringItem.sendCommand("command");
         cancelTimer("NON_EXISTING_TIMER");
         createOrReplaceTimer("CREATE_OR_REPLACE_TIMER", Duration.ofSeconds(1),
-                () -> logInfo("Replaced timer completed"));
-        createTimer(null, Duration.ofSeconds(1), () -> {
+                t -> logInfo("Replaced timer completed"));
+        createTimer(null, Duration.ofSeconds(1), t -> {
             logInfo("log something");
             stringItem.sendCommand("unique timer");
         });
 
-        JRuleTimerHandler.JRuleTimer timer = createTimer("TimerName", Duration.ofMillis(500), () -> {
+        JRuleTimerHandler.JRuleTimer timer = createTimer("TimerName", Duration.ofMillis(500), t -> {
             stringItem.sendCommand("timedCommand");
-            createTimer("NestedTimer", Duration.ofMillis(500), () -> {
+            createTimer("NestedTimer", Duration.ofMillis(500), t2 -> {
                 stringItem.sendCommand("nestedTimedCommand");
             });
         });
@@ -62,20 +62,32 @@ public class JRuleTimerTestRules extends JRule {
         stringItem.sendCommand("timer2 done " + timer.isDone());
 
         final AtomicInteger chainedCounter = new AtomicInteger(0);
-        createTimer("inner-1", Duration.ofSeconds(1), () -> {
+        createTimer("inner-1", Duration.ofSeconds(1), t -> {
             logInfo("calling inner-1");
             chainedCounter.incrementAndGet();
-        }).createTimerAfter("inner-2", Duration.ofMillis(500), () -> {
+        }).createTimerAfter("inner-2", Duration.ofMillis(500), t -> {
             logInfo("calling inner-2");
             chainedCounter.incrementAndGet();
-        }).createTimerAfter("inner-3", Duration.ofMillis(200), () -> {
+        }).createTimerAfter("inner-3", Duration.ofMillis(200), t -> {
             logInfo("calling inner-3");
             stringItem.sendCommand("after the other one " + chainedCounter.incrementAndGet());
         });
 
         JRuleTimerHandler.JRuleTimer canceledTimer = createTimer(null, Duration.ofSeconds(1),
-                () -> stringItem.sendCommand("canceled timer"));
+                t -> stringItem.sendCommand("canceled timer"));
         canceledTimer.cancel();
+    }
+
+    @JRuleName("Reschedule Timer")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "reschedule")
+    public void testRescheduleTimers() {
+        JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
+        stringItem.sendCommand("command");
+
+        createTimer("TimerName", Duration.ofMillis(500), t -> {
+            stringItem.sendCommand("timedCommand");
+            t.rescheduleTimer(Duration.ofMillis(500));
+        });
     }
 
     @JRuleName("Repeating Timers")
@@ -88,17 +100,17 @@ public class JRuleTimerTestRules extends JRule {
 
         // with name
         final AtomicInteger repeatingWithNameCounter = new AtomicInteger(0);
-        createRepeatingTimer("repeating-with-name", Duration.ofMillis(500), 2, () -> repeatingWithNameItem
+        createRepeatingTimer("repeating-with-name", Duration.ofMillis(500), 2, t -> repeatingWithNameItem
                 .sendCommand("repeating-with-name-" + repeatingWithNameCounter.incrementAndGet()));
         final AtomicInteger repeatingWithNameReplacedCounter = new AtomicInteger(0);
         createOrReplaceRepeatingTimer("repeating-with-name-replaced", Duration.ofMillis(200), 5,
-                () -> repeatingWithNameReplacedItem.sendCommand(
+                t -> repeatingWithNameReplacedItem.sendCommand(
                         "repeating-with-name-replaced-" + repeatingWithNameReplacedCounter.incrementAndGet()));
 
         // without name
         final AtomicInteger repeatingCounter = new AtomicInteger(0);
         createRepeatingTimer(Duration.ofMillis(100), 10,
-                () -> repeatingItem.sendCommand("repeating-" + repeatingCounter.incrementAndGet()));
+                t -> repeatingItem.sendCommand("repeating-" + repeatingCounter.incrementAndGet()));
     }
 
     @JRuleName("Repeating Timers")
@@ -111,7 +123,7 @@ public class JRuleTimerTestRules extends JRule {
 
         final String TIMER_NAME = "repeating-with-name-replaced";
         createOrReplaceRepeatingTimer(TIMER_NAME, Duration.ofMillis(200), 5,
-                () -> repeatingWithNameReplacedItem.sendCommand(TIMER_NAME + "-" + counter.incrementAndGet()));
+                t -> repeatingWithNameReplacedItem.sendCommand(TIMER_NAME + "-" + counter.incrementAndGet()));
     }
 
     @JRuleName("Rule name")
