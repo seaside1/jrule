@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
@@ -192,7 +193,7 @@ public class JRule {
      * @return A handle for the timer.
      */
     protected JRuleTimerHandler.JRuleTimer createOrReplaceTimer(@Nullable String timerName, Duration delay,
-            Runnable function) {
+            Consumer<JRuleTimerHandler.JRuleTimer> function) {
         return JRuleTimerHandler.get().createOrReplaceTimer(timerName, delay, function, null);
     }
 
@@ -204,7 +205,8 @@ public class JRule {
      * @param function Code to execute.
      * @return A handle for the timer.
      */
-    protected JRuleTimerHandler.JRuleTimer createTimer(@Nullable String timerName, Duration delay, Runnable function) {
+    protected JRuleTimerHandler.JRuleTimer createTimer(@Nullable String timerName, Duration delay,
+            Consumer<JRuleTimerHandler.JRuleTimer> function) {
         return JRuleTimerHandler.get().createTimer(timerName, delay, function, null);
     }
 
@@ -215,7 +217,8 @@ public class JRule {
      * @param function Code to execute.
      * @return A handle for the timer.
      */
-    protected JRuleTimerHandler.JRuleTimer createTimer(Duration delay, Runnable function) {
+    protected JRuleTimerHandler.JRuleTimer createTimer(Duration delay,
+            Consumer<JRuleTimerHandler.JRuleTimer> function) {
         return JRuleTimerHandler.get().createTimer(null, delay, function, null);
     }
 
@@ -229,7 +232,7 @@ public class JRule {
      * @return A handle for the timer.
      */
     protected JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimer(@Nullable String timerName, Duration delay,
-            int numberOfRepeats, Runnable function) {
+            int numberOfRepeats, Consumer<JRuleTimerHandler.JRuleTimer> function) {
         return JRuleTimerHandler.get().createOrReplaceRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
     }
 
@@ -243,7 +246,7 @@ public class JRule {
      * @return A handle for the timer.
      */
     protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(@Nullable String timerName, Duration delay,
-            int numberOfRepeats, Runnable function) {
+            int numberOfRepeats, Consumer<JRuleTimerHandler.JRuleTimer> function) {
         return JRuleTimerHandler.get().createRepeatingTimer(timerName, delay, numberOfRepeats, function, null);
     }
 
@@ -256,7 +259,7 @@ public class JRule {
      * @return A handle for the timer.
      */
     protected JRuleTimerHandler.JRuleTimer createRepeatingTimer(Duration delay, int numberOfRepeats,
-            Runnable function) {
+            Consumer<JRuleTimerHandler.JRuleTimer> function) {
         return JRuleTimerHandler.get().createRepeatingTimer(null, delay, numberOfRepeats, function, null);
     }
 
