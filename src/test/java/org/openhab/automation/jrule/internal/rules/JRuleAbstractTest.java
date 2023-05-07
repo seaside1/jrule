@@ -30,6 +30,7 @@ import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.core.events.Event;
+import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
@@ -67,7 +68,9 @@ public abstract class JRuleAbstractTest {
         itemRegistry = Mockito.mock(ItemRegistry.class);
         JRuleEventHandler.get().setItemRegistry(itemRegistry);
         JRuleEngine.get().setItemRegistry(itemRegistry);
-        JRuleEngine.get().setRuleProvider(new JRuleRuleProvider());
+        JRuleRuleProvider ruleProvider = new JRuleRuleProvider();
+        ruleProvider.setEventPublisher(Mockito.mock(EventPublisher.class));
+        JRuleEngine.get().setRuleProvider(ruleProvider);
 
         JRuleItemRegistry.setMetadataRegistry(Mockito.mock(MetadataRegistry.class));
 
