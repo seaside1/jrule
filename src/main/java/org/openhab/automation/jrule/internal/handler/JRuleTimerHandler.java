@@ -24,6 +24,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,7 +69,7 @@ public class JRuleTimerHandler {
     }
 
     public synchronized JRuleTimer createOrReplaceTimer(@Nullable final String timerName, Duration delay,
-            Runnable function, @Nullable JRuleExecutionContext context) {
+            Consumer<JRuleTimer> function, @Nullable JRuleExecutionContext context) {
         final String newTimerName = Optional.ofNullable(timerName).orElse(UUID.randomUUID().toString());
         cancelTimer(newTimerName);
         return createTimer(newTimerName, delay, function, context);
@@ -88,7 +89,7 @@ public class JRuleTimerHandler {
                 .noneMatch(timer -> timer.futures.stream().anyMatch(CompletableFuture::isDone));
     }
 
-    public JRuleTimer createTimer(@Nullable final String timerName, Duration delay, Runnable function,
+    public JRuleTimer createTimer(@Nullable final String timerName, Duration delay, Consumer<JRuleTimer> function,
             @Nullable JRuleExecutionContext context) {
         final String newTimerName = Optional.ofNullable(timerName).orElse(UUID.randomUUID().toString());
         Optional<JRuleTimer> any = timers.stream().filter(timer -> Objects.equals(timer.name, newTimerName)).findAny();
@@ -98,7 +99,8 @@ public class JRuleTimerHandler {
         }
 
         CompletableFuture<?> future = delayedExecution(delay);
-        JRuleTimer timer = new JRuleTimer(newTimerName, future, context != null ? context : getCurrentContext(), delay);
+        JRuleTimer timer = new JRuleTimer(newTimerName, function, future,
+                context != null ? context : getCurrentContext(), delay);
         timers.add(timer);
 
         JRuleLog.info(logger, timer.getLogName(), "Start timer '{}' with delay: {}", newTimerName, delay);
@@ -107,14 +109,14 @@ public class JRuleTimerHandler {
     }
 
     public synchronized JRuleTimer createOrReplaceRepeatingTimer(@Nullable final String timerName, Duration delay,
-            int numberOfRepeats, Runnable function, @Nullable JRuleExecutionContext context) {
+            int numberOfRepeats, Consumer<JRuleTimer> function, @Nullable JRuleExecutionContext context) {
         final String newTimerName = Optional.ofNullable(timerName).orElse(UUID.randomUUID().toString());
         cancelTimer(newTimerName);
         return createRepeatingTimer(newTimerName, delay, numberOfRepeats, function, context);
     }
 
     public synchronized JRuleTimer createRepeatingTimer(@Nullable String timerName, Duration delay, int numberOfRepeats,
-            Runnable function, @Nullable JRuleExecutionContext context) {
+            Consumer<JRuleTimer> function, @Nullable JRuleExecutionContext context) {
         final String newTimerName = Optional.ofNullable(timerName).orElse(UUID.randomUUID().toString());
         Optional<JRuleTimer> any = timers.stream().filter(timer -> timer.name.equals(newTimerName)).findAny();
         if (any.isPresent()) {
@@ -123,8 +125,8 @@ public class JRuleTimerHandler {
 
         List<CompletableFuture<?>> newTimers = Stream.iterate(0, i -> i + 1).limit(numberOfRepeats)
                 .map(i -> delayedExecution(delay.multipliedBy(i).plus(delay))).collect(Collectors.toList());
-        JRuleTimer timer = new JRuleTimer(newTimerName, newTimers, context != null ? context : getCurrentContext(),
-                delay);
+        JRuleTimer timer = new JRuleTimer(newTimerName, function, newTimers,
+                context != null ? context : getCurrentContext(), delay);
         timers.add(timer);
         logger.trace("added repeating timers '{}': {}", newTimerName, newTimers.size());
         getTimers(newTimerName);
@@ -141,7 +143,7 @@ public class JRuleTimerHandler {
         CompletableFuture<?> future = delayedExecution(duration);
         future.thenRun(() -> removeTimer(LOCK_PREFIX + lockName)).thenRun(() -> JRuleLog.info(logger,
                 getCurrentContext().getLogName(), String.format("Timer '%s' completed! Releasing lock", lockName)));
-        timers.add(new JRuleTimer(LOCK_PREFIX + lockName, future, getCurrentContext(), duration));
+        timers.add(new JRuleTimer(LOCK_PREFIX + lockName, null, future, getCurrentContext(), duration));
         return true;
     }
 
@@ -156,7 +158,7 @@ public class JRuleTimerHandler {
         return list;
     }
 
-    private void invokeTimerInternal(JRuleTimer timer, Runnable runnable) {
+    private void invokeTimerInternal(JRuleTimer timer, Consumer<JRuleTimer> runnable) {
         try {
             JRule.JRULE_EXECUTION_CONTEXT.set(new JRuleLocalTimerExecutionContext(timer.context, timer.name));
             JRuleLog.debug(logger, timer.context.getMethod().getName(), "Invoking timer from context: {}",
@@ -167,7 +169,7 @@ public class JRuleTimerHandler {
             MDC.put(JRuleEngine.MDC_KEY_RULE, timer.context.getMethod().getName());
             MDC.put(JRuleEngine.MDC_KEY_TIMER, timer.name);
             Arrays.stream(timer.context.getLoggingTags()).forEach(s -> MDC.put(s, s));
-            runnable.run();
+            runnable.accept(timer);
         } catch (IllegalArgumentException | SecurityException e) {
             JRuleLog.error(logger, timer.context.getMethod().getName(), "Error {}", ExceptionUtils.getStackTrace(e));
         } finally {
@@ -203,17 +205,21 @@ public class JRuleTimerHandler {
         private final List<CompletableFuture<?>> futures;
 
         private final JRuleExecutionContext context;
+        private Consumer<JRuleTimer> function;
 
-        public JRuleTimer(String name, CompletableFuture<?> future, JRuleExecutionContext context, Duration delay) {
+        public JRuleTimer(String name, Consumer<JRuleTimer> function, CompletableFuture<?> future,
+                JRuleExecutionContext context, Duration delay) {
             this.name = name;
+            this.function = function;
             this.futures = List.of(future);
             this.context = context;
             this.delay = delay;
         }
 
-        public JRuleTimer(String name, List<CompletableFuture<?>> futures, JRuleExecutionContext context,
-                Duration delay) {
+        public JRuleTimer(String name, Consumer<JRuleTimer> function, List<CompletableFuture<?>> futures,
+                JRuleExecutionContext context, Duration delay) {
             this.name = name;
+            this.function = function;
             this.futures = futures;
             this.context = context;
             this.delay = delay;
@@ -234,35 +240,39 @@ public class JRuleTimerHandler {
         }
 
         public JRuleTimerHandler.JRuleTimer createTimerAfter(@Nullable String timerName, Duration delay,
-                Runnable function) {
+                Consumer<JRuleTimer> function) {
             return JRuleTimerHandler.this.createTimer(timerName, delay.plus(this.delay), function, context);
         }
 
-        public JRuleTimerHandler.JRuleTimer createTimerAfter(Duration delay, Runnable function) {
+        public JRuleTimerHandler.JRuleTimer createTimerAfter(Duration delay, Consumer<JRuleTimer> function) {
             return JRuleTimerHandler.this.createTimer(null, delay.plus(this.delay), function, context);
         }
 
         public JRuleTimerHandler.JRuleTimer createOrReplaceTimerAfter(@Nullable String timerName, Duration delay,
-                Runnable function) {
+                Consumer<JRuleTimer> function) {
             return JRuleTimerHandler.this.createOrReplaceTimer(timerName, delay.plus(this.delay), function, context);
         }
 
         public JRuleTimerHandler.JRuleTimer createOrReplaceRepeatingTimerAfter(@Nullable String timerName,
-                Duration delay, int numberOfRepeats, Runnable function) {
+                Duration delay, int numberOfRepeats, Consumer<JRuleTimer> function) {
             return JRuleTimerHandler.this.createOrReplaceRepeatingTimer(timerName, delay.plus(this.delay),
                     numberOfRepeats, function, context);
         }
 
         public JRuleTimerHandler.JRuleTimer createRepeatingTimerAfter(@Nullable String timerName, Duration delay,
-                int numberOfRepeats, Runnable function) {
+                int numberOfRepeats, Consumer<JRuleTimer> function) {
             return JRuleTimerHandler.this.createRepeatingTimer(timerName, delay.plus(this.delay), numberOfRepeats,
                     function, context);
         }
 
         public JRuleTimerHandler.JRuleTimer createRepeatingTimerAfter(Duration delay, int numberOfRepeats,
-                Runnable function) {
+                Consumer<JRuleTimer> function) {
             return JRuleTimerHandler.this.createRepeatingTimer(null, delay.plus(this.delay), numberOfRepeats, function,
                     context);
+        }
+
+        public JRuleTimerHandler.JRuleTimer rescheduleTimer(Duration delay) {
+            return JRuleTimerHandler.this.createOrReplaceTimer(this.name, delay, this.function, context);
         }
 
         public boolean isDone() {

@@ -360,29 +360,29 @@ public class TestRules extends JRule {
     @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_TIMERS))
     public void timers(JRuleItemEvent event) throws JRuleExecutionException {
         // normal timer
-        createTimer(Duration.ofSeconds(2), () -> logInfo("TIMER: '1'"));
+        createTimer(Duration.ofSeconds(2), t -> logInfo("TIMER: '1'"));
 
         // repeating timer
         AtomicInteger counter = new AtomicInteger(0);
         createRepeatingTimer(Duration.ofMillis(10), 20,
-                () -> logInfo("TIMER-REPEATING: '{}'", counter.getAndIncrement()));
+                t -> logInfo("TIMER-REPEATING: '{}'", counter.getAndIncrement()));
 
         // cancel normal timer
-        createTimer("CANCEL_ME", Duration.ofSeconds(2), () -> System.exit(-1));
+        createTimer("CANCEL_ME", Duration.ofSeconds(2), t -> System.exit(-1));
         cancelTimer("CANCEL_ME");
 
         // cancel repeating timer
-        createRepeatingTimer("CANCEL_ME_REPEATING", Duration.ofSeconds(2), 2, () -> System.exit(-1));
+        createRepeatingTimer("CANCEL_ME_REPEATING", Duration.ofSeconds(2), 2, t -> System.exit(-1));
         cancelTimer("CANCEL_ME_REPEATING");
 
         // replace timer
-        createTimer("REPLACE_TIMER", Duration.ofSeconds(2), () -> System.exit(-1));
-        createOrReplaceTimer("REPLACE_TIMER", Duration.ofSeconds(2), () -> logInfo("REPLACED TIMER: '1'"));
+        createTimer("REPLACE_TIMER", Duration.ofSeconds(2), t -> System.exit(-1));
+        createOrReplaceTimer("REPLACE_TIMER", Duration.ofSeconds(2), t -> logInfo("REPLACED TIMER: '1'"));
 
         // replace repeating timer
-        createRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(2), 2, () -> System.exit(-1));
+        createRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(2), 2, t -> System.exit(-1));
         createOrReplaceRepeatingTimer("REPLACE_REPEATING_TIMER", Duration.ofSeconds(1), 2,
-                () -> logInfo("REPLACED REPEATING TIMER: '1'"));
+                t -> logInfo("REPLACED REPEATING TIMER: '1'"));
     }
 
     private AtomicInteger debounceCounter = new AtomicInteger(0);
