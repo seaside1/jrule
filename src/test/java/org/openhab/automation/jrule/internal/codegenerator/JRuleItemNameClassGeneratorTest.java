@@ -106,7 +106,7 @@ public class JRuleItemNameClassGeneratorTest {
         generateAndCompile(decorate(new GroupItem("DimmerGroup", new DimmerItem("DimmerItem"))));
         generateAndCompile(decorate(new GroupItem("NumberGroup", new NumberItem("NumberItem"))));
         generateAndCompile(
-                decorate(new GroupItem("QuantityGroup", new NumberItem("Number:Temperature", "QuantityItem"))));
+                decorate(new GroupItem("QuantityGroup", new NumberItem("Number:Temperature", "QuantityItem", null))));
         generateAndCompile(decorate(new GroupItem("PlayerGroup", new PlayerItem("PlayerItem"))));
         generateAndCompile(decorate(new GroupItem("RollershutterGroup", new RollershutterItem("RollershutterItem"))));
         generateAndCompile(decorate(new GroupItem("StringGroup", new StringItem("StringItem"))));

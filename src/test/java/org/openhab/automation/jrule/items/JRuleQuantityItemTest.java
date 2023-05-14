@@ -84,7 +84,7 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
     @Override
     protected GenericItem getOhItem(String name) {
-        return new NumberItem("Number:ElectricPotential", name);
+        return new NumberItem("Number:ElectricPotential", name, null);
     }
 
     protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {
