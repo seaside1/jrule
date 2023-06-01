@@ -85,6 +85,10 @@ public class JRuleTimerHandler {
     }
 
     public synchronized boolean isTimerRunning(String timerName) {
+        boolean noTimerWithName = timers.stream().noneMatch(timer -> timer.name.equals(timerName));
+        if (noTimerWithName) {
+            return false;
+        }
         return timers.stream().filter(timer -> timer.name.equals(timerName))
                 .noneMatch(timer -> timer.futures.stream().anyMatch(CompletableFuture::isDone));
     }

@@ -149,6 +149,25 @@ public class JRuleTimerTest extends JRuleAbstractTest {
         assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "no debounce"));
     }
 
+    @Test
+    public void testIsTimerRunning() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "isTimerRunning")));
+        verify(rule, times(1)).testIsTimerRunning();
+        Thread.sleep(2000); // Wait for timer inside rule to execute
+        assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM,
+                "isTimerRunning (unknown-timer): false"));
+        assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM,
+                "isTimerRunning (known-timer): true"));
+        assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM,
+                "isTimerRunning (known-timer): false"));
+    }
+
     private Event itemChangeEvent(String item, String from, String to) {
         return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from));
     }

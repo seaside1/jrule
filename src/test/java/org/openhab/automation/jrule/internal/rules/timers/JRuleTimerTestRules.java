@@ -151,4 +151,21 @@ public class JRuleTimerTestRules extends JRule {
         JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
         stringItem.sendCommand("no debounce");
     }
+
+    @JRuleName("Rule name")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "isTimerRunning")
+    public void testIsTimerRunning() throws InterruptedException {
+        JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
+        String timerUnknown = "unknown-timer";
+        String timerKnown = "known-timer";
+
+        stringItem.sendCommand("isTimerRunning (" + timerUnknown + "): " + isTimerRunning(timerUnknown));
+
+        createTimer(timerKnown, Duration.ofSeconds(1), t -> {
+            // do just nothing, just run...
+        });
+        stringItem.sendCommand("isTimerRunning (known-timer): " + isTimerRunning(timerKnown));
+        Thread.sleep(1100);
+        stringItem.sendCommand("isTimerRunning (known-timer): " + isTimerRunning(timerKnown));
+    }
 }
