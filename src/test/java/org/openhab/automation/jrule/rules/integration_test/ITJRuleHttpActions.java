@@ -14,6 +14,7 @@ package org.openhab.automation.jrule.rules.integration_test;
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openhab.automation.jrule.rules.user.TestRulesHttpActions;
 
@@ -26,6 +27,11 @@ import com.github.tomakehurst.wiremock.client.WireMock;
  */
 // Please do not reuse items for testing, create new ones, otherwise every change will hurt sometimes
 public class ITJRuleHttpActions extends JRuleITBase {
+    @BeforeEach
+    public void init() {
+        WireMock.reset();
+    }
+
     @Test
     public void sendHttpGet() throws IOException {
         WireMock.stubFor(WireMock.get(WireMock.urlEqualTo(TestRulesHttpActions.HTTP_GET_SOMETHING))

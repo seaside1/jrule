@@ -7,6 +7,6 @@
 	<name>Java Rules Engine</name>
 	<description>
 		The JRule Automation Addon enables openHAB rule development using plain old Java.
-		<description>
-			<service-id>org.openhab.automation.jrule</service-id>
+	</description>
+	<service-id>org.openhab.automation.jrule</service-id>
 </addon:addon>

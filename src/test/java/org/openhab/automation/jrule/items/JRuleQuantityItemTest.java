@@ -23,6 +23,7 @@ import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.library.items.NumberItem;
 
@@ -44,8 +45,8 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
         // send quantity
         item.sendCommand(new JRuleQuantityValue("12mV"));
-        Assertions.assertEquals(12, item.getStateAsDecimal().intValue());
-        Assertions.assertEquals("mV", item.getStateAsQuantity().unit());
+        Assertions.assertEquals(0.012, item.getStateAsDecimal().doubleValue());
+        Assertions.assertEquals("V", item.getStateAsQuantity().unit());
 
         // verify event calls
         verifyEventTypes(testInfo, 0, 2);
@@ -63,8 +64,8 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
         // send quantity
         item.postUpdate(new JRuleQuantityValue("12mV"));
-        Assertions.assertEquals(12, item.getStateAsDecimal().intValue());
-        Assertions.assertEquals("mV", item.getStateAsQuantity().unit());
+        Assertions.assertEquals(0.012, item.getStateAsDecimal().doubleValue());
+        Assertions.assertEquals("V", item.getStateAsQuantity().unit());
 
         // verify event calls
         verifyEventTypes(testInfo, 2, 0);
@@ -79,12 +80,12 @@ class JRuleQuantityItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleValue getDefaultCommand() {
-        return new JRuleQuantityValue(10, "A");
+        return new JRuleQuantityValue(10, "V");
     }
 
     @Override
     protected GenericItem getOhItem(String name) {
-        return new NumberItem("Number:ElectricPotential", name);
+        return new NumberItem("Number:ElectricPotential", name, JRuleItemTestUtils.getI18nProvider());
     }
 
     protected <T extends JRuleGroupItem<? extends JRuleItem>> T groupForNameMethod(String name) {

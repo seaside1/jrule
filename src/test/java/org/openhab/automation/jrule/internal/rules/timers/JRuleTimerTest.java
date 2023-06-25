@@ -60,6 +60,21 @@ public class JRuleTimerTest extends JRuleAbstractTest {
     }
 
     @Test
+    public void testTimerReschedule() throws ItemNotFoundException, InterruptedException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "reschedule")));
+        verify(rule, times(1)).testRescheduleTimers();
+        Thread.sleep(1500); // Wait for timer inside rule to execute
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "command"));
+        assertTrue(eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "timedCommand") >= 2);
+    }
+
+    @Test
     public void testRepeatingTimer() throws ItemNotFoundException, InterruptedException {
         JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
         // Set item state in ItemRegistry

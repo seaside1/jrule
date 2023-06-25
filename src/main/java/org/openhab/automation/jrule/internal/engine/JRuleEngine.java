@@ -520,6 +520,7 @@ public class JRuleEngine implements PropertyChangeListener {
         final Method method = context.getMethod();
 
         try {
+            ruleProvider.runRule(rule, method);
             JRule.JRULE_EXECUTION_CONTEXT.set(context);
             JRuleLog.debug(logger, context.getMethod().getName(), "setting mdc tags: {}", context.getLoggingTags());
             MDC.put(MDC_KEY_RULE, context.getMethod().getName());
@@ -539,13 +540,14 @@ public class JRuleEngine implements PropertyChangeListener {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
             JRule.JRULE_EXECUTION_CONTEXT.remove();
+            ruleProvider.stopRule(rule, method);
         }
     }
 
     private void invokeDelayed(JRuleExecutionContext context, JRuleEvent event,
             BiConsumer<JRuleExecutionContext, JRuleEvent> ruleInvoker) {
         if (context.getDelayed() != null) {
-            JRuleTimerHandler.get().createTimer(null, context.getDelayed(), () -> ruleInvoker.accept(context, event),
+            JRuleTimerHandler.get().createTimer(null, context.getDelayed(), t -> ruleInvoker.accept(context, event),
                     context);
         } else {
             ruleInvoker.accept(context, event);
