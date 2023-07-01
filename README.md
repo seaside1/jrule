@@ -67,13 +67,13 @@ Beta, still major changes.
 
 ## Limitations
 
-- Not supporting OH3 GUI rules
+- Not supporting OH4 GUI rules
 
 # Getting started
 
 1. Install the addon by either
 
-- copying the `org.openhab.automation.jrule-3.x.x-BETAX.jar`
+- copying the `org.openhab.automation.jrule-4.x.x-BETAX.jar`
   from https://github.com/seaside1/jrule/releases to openhab-addons folder
 - or by installing form openHAB Addon Marketplace.
 
