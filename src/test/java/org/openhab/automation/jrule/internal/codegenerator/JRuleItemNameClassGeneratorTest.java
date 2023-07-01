@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
+ * Copyright (c) 2010-2023 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -37,6 +37,7 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -105,8 +106,8 @@ public class JRuleItemNameClassGeneratorTest {
         generateAndCompile(decorate(new GroupItem("DateTimeGroup", new DateTimeItem("DateTimeItem"))));
         generateAndCompile(decorate(new GroupItem("DimmerGroup", new DimmerItem("DimmerItem"))));
         generateAndCompile(decorate(new GroupItem("NumberGroup", new NumberItem("NumberItem"))));
-        generateAndCompile(
-                decorate(new GroupItem("QuantityGroup", new NumberItem("Number:Temperature", "QuantityItem"))));
+        generateAndCompile(decorate(new GroupItem("QuantityGroup",
+                new NumberItem("Number:Temperature", "QuantityItem", JRuleItemTestUtils.getI18nProvider()))));
         generateAndCompile(decorate(new GroupItem("PlayerGroup", new PlayerItem("PlayerItem"))));
         generateAndCompile(decorate(new GroupItem("RollershutterGroup", new RollershutterItem("RollershutterItem"))));
         generateAndCompile(decorate(new GroupItem("StringGroup", new StringItem("StringItem"))));

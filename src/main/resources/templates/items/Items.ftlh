@@ -3,6 +3,7 @@
 package ${packageName};
 
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 
 <#list items as item>
 import org.openhab.automation.jrule.internal.items.${item.internalClass};
@@ -42,7 +43,7 @@ public class JRuleItems {
   /**
   * Need this method for testing
   */
- private static void loadItems() {
+ private static void loadItems() throws JRuleItemNotFoundException {
     <#list items as item>
      ${item.name} = JRuleItemRegistry.get("${item.name}", ${item.internalClass}.class);
 

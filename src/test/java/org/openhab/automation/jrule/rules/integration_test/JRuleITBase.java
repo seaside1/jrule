@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
+ * Copyright (c) 2010-2023 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -50,7 +50,9 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.ToxiproxyContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.*;
+import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import org.testcontainers.utility.MountableFile;
 
@@ -100,7 +102,7 @@ public abstract class JRuleITBase {
 
     private static final ToxiproxyContainer toxiproxyContainer = new ToxiproxyContainer(
             "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer)
-                    .withReuse(true);
+            .withReuse(true);
 
     private static final GenericContainer<?> influxDbContainer = new GenericContainer<>("influxdb:2.0")
             .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup").withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
@@ -115,10 +117,11 @@ public abstract class JRuleITBase {
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
-    private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:3.3.0-debian")
+    private static final GenericContainer<?> openhabContainer = new GenericContainer<>(
+            "openhab/openhab:4.0.0-snapshot-debian")
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
             .withCopyFileToContainer(MountableFile.forHostPath("/etc/timezone"), "/etc/timezone")
-            .withCopyToContainer(MountableFile.forClasspathResource("docker/conf"), "/openhab/conf")
+            .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/users.json", 0777),

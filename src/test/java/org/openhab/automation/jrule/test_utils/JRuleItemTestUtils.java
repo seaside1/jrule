@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
+ * Copyright (c) 2010-2023 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -15,11 +15,16 @@ package org.openhab.automation.jrule.test_utils;
 import java.lang.reflect.InvocationTargetException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
 import org.openhab.automation.jrule.items.*;
+import org.openhab.core.i18n.UnitProvider;
+import org.openhab.core.internal.i18n.I18nProviderImpl;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
@@ -27,6 +32,8 @@ import org.openhab.core.library.items.*;
 import org.openhab.core.library.types.*;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.types.State;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 
 /**
  * The {@link JRuleItemTestUtils}
@@ -111,8 +118,9 @@ public class JRuleItemTestUtils {
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         GenericItem item;
         if (initialState instanceof QuantityType) {
-            item = clazz.getConstructor(String.class, String.class).newInstance("Number:Pressure",
-                    clazz.getSimpleName() + initialState.getClass().getSimpleName());
+            I18nProviderImpl i18nProvider = getI18nProvider();
+            item = clazz.getConstructor(String.class, String.class, UnitProvider.class).newInstance("Number:Pressure",
+                    clazz.getSimpleName() + initialState.getClass().getSimpleName(), i18nProvider);
         } else {
             item = clazz.getConstructor(String.class)
                     .newInstance(clazz.getSimpleName() + initialState.getClass().getSimpleName());
@@ -122,5 +130,13 @@ public class JRuleItemTestUtils {
         item.addTag("Tag1");
         item.addTag("Tag2");
         return item;
+    }
+
+    @NotNull
+    public static I18nProviderImpl getI18nProvider() {
+        ComponentContext componentContext = Mockito.mock(ComponentContext.class);
+        Mockito.when(componentContext.getProperties()).thenReturn(new Hashtable<>());
+        Mockito.when(componentContext.getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
+        return new I18nProviderImpl(componentContext);
     }
 }

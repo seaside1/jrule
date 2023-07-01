@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2022 Contributors to the openHAB project
+ * Copyright (c) 2010-2023 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,11 +17,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
-import java.util.Vector;
 
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.rules.JRule;
@@ -40,31 +38,13 @@ public class JRuleJarExtractor {
     private static final String LOG_NAME_JAR = "JRuleJar";
 
     public void extractJRuleJar(String jarFilePath) {
-        Vector<Class<?>> loadedClasses = getLoadedClasses(JRule.class.getClassLoader());
-        if (loadedClasses == null || loadedClasses.isEmpty()) {
-            JRuleLog.error(logger, LOG_NAME_JAR, "Failed to write and extract jar: {}", jarFilePath);
-            return;
-        }
-        Class<?> clazz = loadedClasses.get(0);
-        final URL jarUrl = getClassLocation(clazz);
-        copyJRulesJarToFolder(jarUrl, jarFilePath);
-    }
-
-    private Vector<Class<?>> getLoadedClasses(ClassLoader classLoader) {
-        Field field = null;
         try {
-            field = ClassLoader.class.getDeclaredField("classes");
-            field.setAccessible(true);
-        } catch (Throwable t) {
-            return null;
+            final URL jarUrl = JRule.class.getProtectionDomain().getCodeSource().getLocation().toURI().toURL();
+            copyJRulesJarToFolder(jarUrl, jarFilePath);
+        } catch (MalformedURLException | URISyntaxException x) {
+            JRuleLog.error(logger, LOG_NAME_JAR, "Failed to extract jar due to uri exception jarFilePath: {} to: {}",
+                    jarFilePath, jarFilePath, x);
         }
-        try {
-            @SuppressWarnings("unchecked")
-            final Vector<Class<?>> classes = (Vector<Class<?>>) field.get(classLoader);
-            return classes;
-        } catch (IllegalArgumentException | IllegalAccessException ignored) {
-        }
-        return null;
     }
 
     private void copyJRulesJarToFolder(URL jarUrl, String jarFilePath) {
@@ -78,16 +58,6 @@ public class JRuleJarExtractor {
         } catch (IOException x) {
             JRuleLog.error(logger, LOG_NAME_JAR, "Failed to write file to: {}", jarFilePath, x);
         }
-    }
-
-    private URL getClassLocation(Class<?> clazz) {
-        final ProtectionDomain pd = clazz.getProtectionDomain();
-        final CodeSource cs = pd.getCodeSource();
-        if (cs == null) {
-            JRuleLog.error(logger, LOG_NAME_JAR, "Code source is null failed to get location for jarClass: {}", clazz);
-            return null;
-        }
-        return cs.getLocation();
     }
 
     private void copyFile(URL source, String destFileName) throws IOException {
