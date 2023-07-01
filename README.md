@@ -67,7 +67,7 @@ Beta, still major changes.
 
 ## Limitations
 
-- Not supporting OH3 GUI rules
+- Not supporting OH4 GUI rules
 
 # Getting started
 
