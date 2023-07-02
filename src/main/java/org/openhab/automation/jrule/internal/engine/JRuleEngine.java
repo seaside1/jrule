@@ -535,7 +535,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     ExceptionUtils.getStackTrace(e));
         } catch (InvocationTargetException e) {
             JRuleLog.error(logger, context.getMethod().getName(), "Error in rule: {}",
-                    ExceptionUtils.getStackTrace(e.getCause()));
+                    ExceptionUtils.getStackTrace(e.getTargetException()));
         } finally {
             Arrays.stream(context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(MDC_KEY_RULE);
