@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -119,8 +120,6 @@ public abstract class JRuleITBase {
     @SuppressWarnings("resource")
     private static final GenericContainer<?> openhabContainer = new GenericContainer<>(
             "openhab/openhab:4.0.0-snapshot-debian")
-            .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
-            .withCopyFileToContainer(MountableFile.forHostPath("/etc/timezone"), "/etc/timezone")
             .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")
@@ -185,6 +184,7 @@ public abstract class JRuleITBase {
 
     @BeforeAll
     static void initClass() {
+        System.out.println("TIMEZONE = " + TimeZone.getDefault().getRawOffset());
         toxiproxyContainer.start();
         mqttProxy = toxiproxyContainer.getProxy(mqttContainer, 1883);
         System.out.println(mqttProxy.getOriginalProxyPort());
