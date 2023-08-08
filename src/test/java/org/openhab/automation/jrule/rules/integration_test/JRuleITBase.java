@@ -12,18 +12,23 @@
  */
 package org.openhab.automation.jrule.rules.integration_test;
 
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpGet;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpPost;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpPut;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.ParseException;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.EntityUtils;
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -51,22 +56,18 @@ import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import org.testcontainers.utility.MountableFile;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpGet;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpPost;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpPut;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.ParseException;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.EntityUtils;
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 /**
  * The {@link JRuleITBase}
@@ -90,9 +91,8 @@ public abstract class JRuleITBase {
     private final List<String> receivedMqttMessages = new ArrayList<>();
 
     @SuppressWarnings("resource")
-    private static final GenericContainer<?> mqttContainer = new GenericContainer<>(
-            "eclipse-mosquitto:2.0").withExposedPorts(1883, 9001)
-            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("docker.mqtt")))
+    private static final GenericContainer<?> mqttContainer = new GenericContainer<>("eclipse-mosquitto:2.0")
+            .withExposedPorts(1883, 9001).withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("docker.mqtt")))
             .withCopyFileToContainer(MountableFile.forClasspathResource("/docker/mosquitto/mosquitto.conf"),
                     "/mosquitto/config/mosquitto.conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/docker/mosquitto/default.acl"),
@@ -104,27 +104,30 @@ public abstract class JRuleITBase {
             "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer)
             .withReuse(true);
 
-    private static final GenericContainer<?> influxDbContainer = new GenericContainer<>("influxdb:2.0").withEnv(
-                    "DOCKER_INFLUXDB_INIT_MODE", "setup").withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
+    private static final GenericContainer<?> influxDbContainer = new GenericContainer<>("influxdb:2.0")
+            .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup").withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
             .withEnv("DOCKER_INFLUXDB_INIT_PASSWORD", "influxdb").withEnv("DOCKER_INFLUXDB_INIT_ORG", "openhab")
             .withEnv("DOCKER_INFLUXDB_INIT_BUCKET", "autogen").withEnv("DOCKER_INFLUXDB_INIT_RETENTION", "1w")
             .withEnv("DOCKER_INFLUXDB_INIT_ADMIN_TOKEN", "mytoken").withNetworkAliases("influxdb")
-            .withExposedPorts(8086).waitingFor(new LogMessageWaitStrategy().withRegEx(
-                    ".*service=tcp-listener transport=http addr=:8086 port=8086.*")).withNetwork(network)
-            .withReuse(true);
+            .withExposedPorts(8086)
+            .waitingFor(new LogMessageWaitStrategy()
+                    .withRegEx(".*service=tcp-listener transport=http addr=:8086 port=8086.*"))
+            .withNetwork(network).withReuse(true);
 
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
     private static final GenericContainer<?> openhabContainer = new GenericContainer<>(
-            "openhab/openhab:4.0.0-snapshot-debian").withCopyToContainer(
-                    MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
+            "openhab/openhab:4.0.0-snapshot-debian")
+            .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/users.json", 0777),
-                    "/openhab/userdata/jsondb/users.json").withCopyFileToContainer(
-                    MountableFile.forHostPath(String.format("target/org.openhab.automation.jrule-%s.jar", version),
-                            0777), "/openhab/addons/jrule-engine.jar").withCopyToContainer(
+                    "/openhab/userdata/jsondb/users.json")
+            .withCopyFileToContainer(MountableFile
+                    .forHostPath(String.format("target/org.openhab.automation.jrule-%s.jar", version), 0777),
+                    "/openhab/addons/jrule-engine.jar")
+            .withCopyToContainer(
                     MountableFile.forHostPath("src/test/java/org/openhab/automation/jrule/rules/user", 0777),
                     "/openhab/conf/automation/jrule/rules/org/openhab/automation/jrule/rules/user")
             .withExposedPorts(8080).withLogConsumer(outputFrame -> {
@@ -144,8 +147,8 @@ public abstract class JRuleITBase {
                     }
                 }
                 new Slf4jLogConsumer(LoggerFactory.getLogger("docker.openhab")).accept(outputFrame);
-            }).waitingFor(new WaitAllStrategy(WaitAllStrategy.Mode.WITH_MAXIMUM_OUTER_TIMEOUT).withStrategy(
-                    new AbstractWaitStrategy() {
+            }).waitingFor(new WaitAllStrategy(WaitAllStrategy.Mode.WITH_MAXIMUM_OUTER_TIMEOUT)
+                    .withStrategy(new AbstractWaitStrategy() {
                         @Override
                         protected void waitUntilReady() {
                             Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(TIMEOUT, TimeUnit.SECONDS)
@@ -158,22 +161,22 @@ public abstract class JRuleITBase {
                                     }, s -> s.equals("ONLINE"));
                         }
                     }).withStrategy(new AbstractWaitStrategy() {
-                @Override
-                protected void waitUntilReady() {
-                    Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(TIMEOUT, TimeUnit.SECONDS)
-                            .pollInterval(2, TimeUnit.SECONDS).await("items loaded").until(() -> {
-                                try {
-                                    return getItemCount();
-                                } catch (Exception e) {
-                                    return 0;
-                                }
-                            }, s -> s > 0);
-                }
-            }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))).withNetwork(network)
-            .dependsOn(influxDbContainer).withReuse(true);
+                        @Override
+                        protected void waitUntilReady() {
+                            Awaitility.await().with().pollDelay(10, TimeUnit.SECONDS).timeout(TIMEOUT, TimeUnit.SECONDS)
+                                    .pollInterval(2, TimeUnit.SECONDS).await("items loaded").until(() -> {
+                                        try {
+                                            return getItemCount();
+                                        } catch (Exception e) {
+                                            return 0;
+                                        }
+                                    }, s -> s > 0);
+                        }
+                    }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS)))
+            .withNetwork(network).dependsOn(influxDbContainer).withReuse(true);
 
-    protected static final GenericContainer<?> mockServer = new GenericContainer<>(
-            "wiremock/wiremock:2.32.0").withExposedPorts(8080).withNetwork(network).withNetworkAliases("http-mock");
+    protected static final GenericContainer<?> mockServer = new GenericContainer<>("wiremock/wiremock:2.32.0")
+            .withExposedPorts(8080).withNetwork(network).withNetworkAliases("http-mock");
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
     private @NotNull IMqttClient mqttClient;
@@ -253,8 +256,8 @@ public abstract class JRuleITBase {
     }
 
     private void subscribeMqtt(String topic) throws MqttException {
-        mqttClient.subscribe(topic, (s, mqttMessage) -> receivedMqttMessages.add(
-                new String(mqttMessage.getPayload(), StandardCharsets.UTF_8)));
+        mqttClient.subscribe(topic, (s, mqttMessage) -> receivedMqttMessages
+                .add(new String(mqttMessage.getPayload(), StandardCharsets.UTF_8)));
     }
 
     @NotNull
@@ -316,9 +319,8 @@ public abstract class JRuleITBase {
 
     private String getState(String itemName) throws IOException, ParseException {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-            HttpGet request = new HttpGet(
-                    String.format("http://%s:%s/rest/items/" + itemName + "/state", getOpenhabHost(),
-                            getOpenhabPort()));
+            HttpGet request = new HttpGet(String.format("http://%s:%s/rest/items/" + itemName + "/state",
+                    getOpenhabHost(), getOpenhabPort()));
             CloseableHttpResponse response = client.execute(request);
             Assertions.assertEquals(2, response.getCode() / 100);
             return Optional.of(EntityUtils.toString(response.getEntity())).filter(s -> !s.equals("NULL")).orElse(null);
@@ -327,9 +329,8 @@ public abstract class JRuleITBase {
 
     protected static String getThingState(String thing) throws IOException, ParseException {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-            HttpGet request = new HttpGet(
-                    String.format("http://%s:%s/rest/things/%s/status", getOpenhabHost(), getOpenhabPort(),
-                            URLEncoder.encode(thing, StandardCharsets.UTF_8)));
+            HttpGet request = new HttpGet(String.format("http://%s:%s/rest/things/%s/status", getOpenhabHost(),
+                    getOpenhabPort(), URLEncoder.encode(thing, StandardCharsets.UTF_8)));
             byte[] credentials = Base64.getEncoder().encode(("admin:admin").getBytes(StandardCharsets.UTF_8));
             request.setHeader("Authorization", "Basic " + new String(credentials, StandardCharsets.UTF_8));
             CloseableHttpResponse response = client.execute(request);
@@ -454,5 +455,4 @@ public abstract class JRuleITBase {
     protected void verifyMqttMessageReceived(String s) {
         Assertions.assertTrue(receivedMqttMessages.contains(s));
     }
-
 }
