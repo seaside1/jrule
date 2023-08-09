@@ -119,8 +119,6 @@ public abstract class JRuleITBase {
     @SuppressWarnings("resource")
     private static final GenericContainer<?> openhabContainer = new GenericContainer<>(
             "openhab/openhab:4.0.0-snapshot-debian")
-            .withCopyFileToContainer(MountableFile.forHostPath("/etc/localtime"), "/etc/localtime")
-            .withCopyFileToContainer(MountableFile.forHostPath("/etc/timezone"), "/etc/timezone")
             .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")

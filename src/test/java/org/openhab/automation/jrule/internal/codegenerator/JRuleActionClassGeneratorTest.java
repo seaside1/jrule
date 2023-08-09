@@ -56,7 +56,7 @@ import org.openhab.core.types.Command;
 /**
  * The {@link JRuleActionClassGeneratorTest}
  *
- * 
+ *
  * @author Robert Delbrück - Initial contribution
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -126,7 +126,8 @@ public class JRuleActionClassGeneratorTest {
         boolean success = sourceFileGenerator.generateActionsSource(things);
         assertTrue(success, "Failed to generate source file for things");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleActions.java")), "target/classes:target/gen");
+        compiler.compile(List.of(new File(targetFolder, "JRuleActions.java")),
+                "target/classes" + File.pathSeparator + "target/gen");
 
         File compiledClass = new File(targetFolder, "JRuleActions.class");
         assertTrue(compiledClass.exists());

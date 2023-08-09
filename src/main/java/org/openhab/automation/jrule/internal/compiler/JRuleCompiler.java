@@ -274,7 +274,9 @@ public class JRuleCompiler {
     private Optional<String> getOpenhabCoreJar() {
         if (!System.getProperties().containsKey(PROPERTY_KARAF_HOME_URI)
                 && !System.getProperties().containsKey(PROPERTY_KARAF_DEFAULT_REPOSITORY)) {
-            logWarn("required system properties does not exist");
+            logWarn("required system properties does not exist [{}]",
+                    !System.getProperties().containsKey(PROPERTY_KARAF_HOME_URI) ? PROPERTY_KARAF_HOME_URI
+                            : PROPERTY_KARAF_DEFAULT_REPOSITORY);
             return Optional.empty();
         }
         String openhabJars = System.getProperty(PROPERTY_KARAF_HOME_URI).replace("file:", "")

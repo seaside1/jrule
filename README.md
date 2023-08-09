@@ -44,7 +44,7 @@ developer machine - like any other regular Java project - **recommended**).
 - You will be able to use a standard Java IDE to develop your rules.
 - Full auto-completion (Shift space) in your IDE for all items, things and actions yields less chance of errors and
   typos
-- Take full advantage of all Java design patters
+- Take full advantage of all Java design patterns
 - Share and reuse code for you rules
 - Advanced timers and locks are built in and can be used without cluttering the code
 - Possibility to write junit-tests to test your rules
@@ -73,7 +73,7 @@ Beta, still major changes.
 
 1. Install the addon by either
 
-- copying the `org.openhab.automation.jrule-3.x.x-BETAX.jar`
+- copying the `org.openhab.automation.jrule-4.x.x-BETAX.jar`
   from https://github.com/seaside1/jrule/releases to openhab-addons folder
 - or by installing form openHAB Addon Marketplace.
 
@@ -112,6 +112,7 @@ public class MySwitchRule extends JRule {
     public void execOffToOnRule() {
         logInfo("||||| --> Hello World!");
     }
+
 }
 ```
 
