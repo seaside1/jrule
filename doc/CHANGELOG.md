@@ -1,3 +1,19 @@
+## BETA17
+
+-  Fix for thing actions without @ActionInput by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/143
+-  Store jar file as build artifact by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/144
+-  Merge test packages by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/145
+-  Only consider methods declared in rule class, not inherited methods by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/147
+-  Reduce loglevel to debug by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/148
+-  Send updates/commands to group items itself, not just members by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/150
+-  Reduce flawky builds by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/151
+-  Notify for rule runs by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/152
+-  Update to openhab 4.0.0 by [sealside1](https://github.com/sealside1) PR https://github.com/seaside1/jrule/pull/153
+-  Add reschedule by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/155
+-  Fix Timer:isRunning by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/157
+-  Print useful exception trace while InvocationTargetException by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/160
+-  Removed OS dependent configurations by [sfdumas](https://github.com/sfdumas) PR https://github.com/seaside1/jrule/pull/164
+
 ## BETA16
 
 - Enrich memberOf with options to just listen on items or groups by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/95 
