@@ -274,4 +274,14 @@ public class ITJRule extends JRuleITBase {
                 "Metadata: '{Speech=SetLightState, configuration={location=Livingroom}, semantics=Point_Control, configuration={relatesTo=Property_Light}}'");
         verifyNoError();
     }
+
+    @Test
+    public void triggerOnGroupStateChange() throws IOException {
+        sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
+        sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.OFF);
+        verifyRuleWasExecuted(TestRules.NAME_TRIGGER_ON_GROUP_STATE_CHANGE);
+        verifyLogEntry("rule trigger for change: ON");
+        verifyLogEntry("rule trigger for change: OFF");
+        verifyNoError();
+    }
 }

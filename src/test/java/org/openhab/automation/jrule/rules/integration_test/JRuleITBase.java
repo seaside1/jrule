@@ -117,8 +117,7 @@ public abstract class JRuleITBase {
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
-    private static final GenericContainer<?> openhabContainer = new GenericContainer<>(
-            "openhab/openhab:4.0.0-snapshot-debian")
+    private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:4.0.0-debian")
             .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")

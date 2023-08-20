@@ -47,6 +47,15 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     }
 
     @Test
+    public void testGroupAggregationItemChange() {
+        JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
+        // Only last event should trigger rule method
+        fireEvents(false, List.of(itemChangeEvent("other_item", "2", "1"),
+                groupAggregationItemChangeEvent(JRuleItemChangeRules.GROUP_AGGREGATION_ITEM, "2", "1")));
+        verify(rule, times(1)).groupItemAggregationChange(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
     public void testItemChange_no_from_to() {
         JRuleItemChangeRules rule = initRule(JRuleItemChangeRules.class);
         // Only last event should trigger rule method
@@ -94,5 +103,10 @@ public class JRuleItemChangeTest extends JRuleAbstractTest {
     // Syntactic sugar
     private Event itemChangeEvent(String item, String from, String to) {
         return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from));
+    }
+
+    private Event groupAggregationItemChangeEvent(String item, String from, String to) {
+        return ItemEventFactory.createGroupStateChangedEvent(item, "any_item", new StringType(to),
+                new StringType(from));
     }
 }

@@ -51,6 +51,7 @@ public class TestPersistence extends JRule {
     public void persistenceAllTypes() {
         Function<JRuleItem, Object> switchStateFunction = i -> ((JRuleSwitchItem) i).getStateAsOnOff();
         historicState(ITEM_SWITCH_TO_PERSIST, JRuleSwitchItem::forName, switchStateFunction);
+        previousState(ITEM_SWITCH_TO_PERSIST, JRuleSwitchItem::forName, switchStateFunction);
         sumSince(ITEM_SWITCH_TO_PERSIST, JRuleSwitchItem::forName, switchStateFunction);
         averageSince(ITEM_SWITCH_TO_PERSIST, JRuleSwitchItem::forName, switchStateFunction);
         minimumSince(ITEM_SWITCH_TO_PERSIST, JRuleSwitchItem::forName, switchStateFunction);
@@ -61,6 +62,7 @@ public class TestPersistence extends JRule {
 
         Function<JRuleItem, Object> numberStateFunction = i -> ((JRuleNumberItem) i).getStateAsDecimal();
         historicState(ITEM_NUMBER_TO_PERSIST, JRuleNumberItem::forName, numberStateFunction);
+        previousState(ITEM_NUMBER_TO_PERSIST, JRuleNumberItem::forName, numberStateFunction);
         sumSince(ITEM_NUMBER_TO_PERSIST, JRuleNumberItem::forName, numberStateFunction);
         averageSince(ITEM_NUMBER_TO_PERSIST, JRuleNumberItem::forName, numberStateFunction);
         minimumSince(ITEM_NUMBER_TO_PERSIST, JRuleNumberItem::forName, numberStateFunction);
@@ -71,6 +73,7 @@ public class TestPersistence extends JRule {
 
         Function<JRuleItem, Object> quantityStateFunction = i -> ((JRuleQuantityItem) i).getStateAsQuantity();
         historicState(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
+        previousState(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
         sumSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
         averageSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
         minimumSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
@@ -80,20 +83,26 @@ public class TestPersistence extends JRule {
         changedSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
 
         historicState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
+        previousState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
         changedSince(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
 
         historicState(ITEM_DATETIME_TO_PERSIST, JRuleDateTimeItem::forName,
+                i -> ((JRuleDateTimeItem) i).getStateAsDateTime());
+        previousState(ITEM_DATETIME_TO_PERSIST, JRuleDateTimeItem::forName,
                 i -> ((JRuleDateTimeItem) i).getStateAsDateTime());
         changedSince(ITEM_DATETIME_TO_PERSIST, JRuleDateTimeItem::forName,
                 i -> ((JRuleDateTimeItem) i).getStateAsDateTime());
 
         historicState(ITEM_PLAYER_TO_PERSIST, JRulePlayerItem::forName,
                 i -> ((JRulePlayerItem) i).getStateAsPlayPause());
+        previousState(ITEM_PLAYER_TO_PERSIST, JRulePlayerItem::forName,
+                i -> ((JRulePlayerItem) i).getStateAsPlayPause());
         changedSince(ITEM_PLAYER_TO_PERSIST, JRulePlayerItem::forName,
                 i -> ((JRulePlayerItem) i).getStateAsPlayPause());
 
         Function<JRuleItem, Object> contactStateFunction = i -> ((JRuleContactItem) i).getStateAsOpenClose();
         historicState(ITEM_CONTACT_TO_PERSIST, JRuleContactItem::forName, contactStateFunction);
+        previousState(ITEM_CONTACT_TO_PERSIST, JRuleContactItem::forName, contactStateFunction);
         sumSince(ITEM_CONTACT_TO_PERSIST, JRuleContactItem::forName, contactStateFunction);
         averageSince(ITEM_CONTACT_TO_PERSIST, JRuleContactItem::forName, contactStateFunction);
         minimumSince(ITEM_CONTACT_TO_PERSIST, JRuleContactItem::forName, contactStateFunction);
@@ -107,6 +116,7 @@ public class TestPersistence extends JRule {
 
         Function<JRuleItem, Object> rollershutterStateFunction = i -> ((JRuleRollershutterItem) i).getStateAsPercent();
         historicState(ITEM_ROLLERSHUTTER_TO_PERSIST, JRuleRollershutterItem::forName, rollershutterStateFunction);
+        previousState(ITEM_ROLLERSHUTTER_TO_PERSIST, JRuleRollershutterItem::forName, rollershutterStateFunction);
         sumSince(ITEM_ROLLERSHUTTER_TO_PERSIST, JRuleRollershutterItem::forName, rollershutterStateFunction);
         averageSince(ITEM_ROLLERSHUTTER_TO_PERSIST, JRuleRollershutterItem::forName, rollershutterStateFunction);
         minimumSince(ITEM_ROLLERSHUTTER_TO_PERSIST, JRuleRollershutterItem::forName, rollershutterStateFunction);
@@ -117,6 +127,7 @@ public class TestPersistence extends JRule {
 
         Function<JRuleItem, Object> dimmerStateFunction = i -> ((JRuleDimmerItem) i).getStateAsPercent();
         historicState(ITEM_DIMMER_TO_PERSIST, JRuleDimmerItem::forName, dimmerStateFunction);
+        previousState(ITEM_DIMMER_TO_PERSIST, JRuleDimmerItem::forName, dimmerStateFunction);
         sumSince(ITEM_DIMMER_TO_PERSIST, JRuleDimmerItem::forName, dimmerStateFunction);
         averageSince(ITEM_DIMMER_TO_PERSIST, JRuleDimmerItem::forName, dimmerStateFunction);
         minimumSince(ITEM_DIMMER_TO_PERSIST, JRuleDimmerItem::forName, dimmerStateFunction);
@@ -126,9 +137,12 @@ public class TestPersistence extends JRule {
         changedSince(ITEM_DIMMER_TO_PERSIST, JRuleDimmerItem::forName, dimmerStateFunction);
 
         historicState(ITEM_COLOR_TO_PERSIST, JRuleColorItem::forName, i -> ((JRuleColorItem) i).getStateAsHsb());
+        previousState(ITEM_COLOR_TO_PERSIST, JRuleColorItem::forName, i -> ((JRuleColorItem) i).getStateAsHsb());
         changedSince(ITEM_COLOR_TO_PERSIST, JRuleColorItem::forName, i -> ((JRuleColorItem) i).getStateAsHsb());
 
         historicState(ITEM_LOCATION_TO_PERSIST, JRuleLocationItem::forName,
+                i -> ((JRuleLocationItem) i).getStateAsPoint());
+        previousState(ITEM_LOCATION_TO_PERSIST, JRuleLocationItem::forName,
                 i -> ((JRuleLocationItem) i).getStateAsPoint());
         changedSince(ITEM_LOCATION_TO_PERSIST, JRuleLocationItem::forName,
                 i -> ((JRuleLocationItem) i).getStateAsPoint());
@@ -194,6 +208,13 @@ public class TestPersistence extends JRule {
         final String function = "historicState";
         printInfos(itemName, getItem, currentValue, function, (i, item) -> item
                 .getHistoricState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID).orElse(null));
+    }
+
+    private void previousState(String itemName, Function<String, JRuleItem> getItem,
+            Function<JRuleItem, Object> currentValue) {
+        final String function = "previousState";
+        printInfos(itemName, getItem, currentValue, function,
+                (i, item) -> item.getPreviousState(true, PERSISTENCE_SERVICE_ID).orElse(null));
     }
 
     private void printInfos(String itemName, Function<String, JRuleItem> getItem,

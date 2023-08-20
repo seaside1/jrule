@@ -138,6 +138,8 @@ public class TestRules extends JRule {
     public static final String NAME_DELAYED = "delayed";
     public static final String NAME_GET_GROUPS = "get groups";
     public static final String COMMAND_GROUPS = "groups";
+    public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
+    public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -268,6 +270,12 @@ public class TestRules extends JRule {
         }
         logInfo("contains members: {}", members.stream()
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
+    }
+
+    @JRuleName(NAME_TRIGGER_ON_GROUP_STATE_CHANGE)
+    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP_OR)
+    public void triggerOnGroupStateChange(JRuleItemEvent event) {
+        logInfo("rule trigger for change: {}", event.getState());
     }
 
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)

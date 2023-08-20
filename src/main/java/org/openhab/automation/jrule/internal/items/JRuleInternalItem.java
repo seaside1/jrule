@@ -23,6 +23,7 @@ import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.core.types.State;
 
 /**
  * The {@link JRuleInternalItem} Items
@@ -104,6 +105,11 @@ public abstract class JRuleInternalItem implements JRuleItem {
     @Override
     public Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.historicState(name, timestamp, persistenceServiceId);
+    }
+
+    @Override
+    public Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId) {
+        return JRulePersistenceExtensions.previousState(name, skipEquals, persistenceServiceId);
     }
 
     @Override

@@ -142,6 +142,16 @@ class JRulePersistenceExtensions {
                 : PersistenceExtensions.lastUpdate(item, serviceId));
     }
 
+    public static Optional<State> previousState(String itemName, boolean skipEquals) {
+        return previousState(itemName, skipEquals, null);
+    }
+
+    public static Optional<State> previousState(String itemName, boolean skipEquals, String serviceId) {
+        Item item = getItem(itemName);
+        return Optional.ofNullable(serviceId == null ? PersistenceExtensions.previousState(item, skipEquals)
+                : PersistenceExtensions.previousState(item, skipEquals, serviceId)).map(HistoricItem::getState);
+    }
+
     private static Item getItem(String itemName) {
         try {
             ItemRegistry itemRegistry = JRuleEventHandler.get().getItemRegistry();
