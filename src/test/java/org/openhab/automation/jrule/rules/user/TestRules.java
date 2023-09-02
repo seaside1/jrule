@@ -393,11 +393,11 @@ public class TestRules extends JRule {
                 t -> logInfo("REPLACED REPEATING TIMER: '1'"));
     }
 
-    private AtomicInteger debounceCounter = new AtomicInteger(0);
+    private final AtomicInteger debounceCounter = new AtomicInteger(0);
 
     @JRuleName(NAME_DEBOUNCE)
     @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_DEBOUNCE))
-    @JRuleDebounce(value = 2, unit = ChronoUnit.SECONDS)
+    @JRuleDebounce(value = 4, unit = ChronoUnit.SECONDS)
     public void debounce(JRuleItemEvent event) throws JRuleExecutionException {
         logInfo("Counted debounces: '{}'", debounceCounter.getAndIncrement());
     }
