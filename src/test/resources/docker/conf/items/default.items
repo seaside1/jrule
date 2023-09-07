@@ -2,9 +2,10 @@ Switch          Receiving_Command_Switch
 Switch          Mqtt_Action_Trigger
 Switch          Commandline_Exec_Trigger
 
+Group:Switch:OR(ON,OFF)     SwitchGroupOr
 Group           Switch_Group
-Switch          Switch_Group_Member1        (Switch_Group)
-Switch          Switch_Group_Member2        (Switch_Group)
+Switch          Switch_Group_Member1        (Switch_Group, SwitchGroupOr)
+Switch          Switch_Group_Member2        (Switch_Group, SwitchGroupOr)
 
 Number          Number_Condition
 String          Precondition_String
@@ -26,6 +27,8 @@ Group           String_Group_Member         (String_Group)
 String          String_Group_Member1        (String_Group)
 String          String_Group_Member2        (String_Group_Member)
 String          String_Group_Member3        (String_Group_Member)
+
+Group:Switch:OR(ON,OFF)     Presence_Phone_Unify
 
 Switch          Cast_All_Types_Switch
 Switch          Switch_To_Cast

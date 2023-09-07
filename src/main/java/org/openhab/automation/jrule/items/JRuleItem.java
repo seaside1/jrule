@@ -22,6 +22,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.core.types.State;
 
 /**
  * The {@link JRuleItem} JRule Item
@@ -121,6 +122,12 @@ public interface JRuleItem {
     }
 
     Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
+
+    default Optional<State> getPreviousState(boolean skipEquals) {
+        return getPreviousState(skipEquals, null);
+    }
+
+    Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId);
 
     default boolean isGroup() {
         return false;

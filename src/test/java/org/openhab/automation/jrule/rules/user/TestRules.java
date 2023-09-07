@@ -138,6 +138,8 @@ public class TestRules extends JRule {
     public static final String NAME_DELAYED = "delayed";
     public static final String NAME_GET_GROUPS = "get groups";
     public static final String COMMAND_GROUPS = "groups";
+    public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
+    public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -270,6 +272,12 @@ public class TestRules extends JRule {
                 .map(jRuleItem -> jRuleItem.getName() + ":" + jRuleItem.getType()).collect(Collectors.joining(", ")));
     }
 
+    @JRuleName(NAME_TRIGGER_ON_GROUP_STATE_CHANGE)
+    @JRuleWhenItemChange(item = ITEM_SWITCH_GROUP_OR)
+    public void triggerOnGroupStateChange(JRuleItemEvent event) {
+        logInfo("rule trigger for change: {}", event.getState());
+    }
+
     @JRuleName(NAME_GET_MEMBERS_OF_NUMBER_GROUP)
     @JRuleWhenItemReceivedCommand(item = ITEM_GET_MEMBERS_OF_GROUP_SWITCH)
     public void getMembersOfNumberGroup(JRuleItemEvent event) throws JRuleExecutionException {
@@ -385,11 +393,11 @@ public class TestRules extends JRule {
                 t -> logInfo("REPLACED REPEATING TIMER: '1'"));
     }
 
-    private AtomicInteger debounceCounter = new AtomicInteger(0);
+    private final AtomicInteger debounceCounter = new AtomicInteger(0);
 
     @JRuleName(NAME_DEBOUNCE)
     @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_DEBOUNCE))
-    @JRuleDebounce(value = 2, unit = ChronoUnit.SECONDS)
+    @JRuleDebounce(value = 4, unit = ChronoUnit.SECONDS)
     public void debounce(JRuleItemEvent event) throws JRuleExecutionException {
         logInfo("Counted debounces: '{}'", debounceCounter.getAndIncrement());
     }

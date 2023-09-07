@@ -25,11 +25,17 @@ import org.openhab.automation.jrule.rules.event.JRuleEvent;
  */
 public class JRuleItemChangeRules extends JRule {
 
+    public static final String GROUP_AGGREGATION_ITEM = "group_aggregation_item";
     public static final String ITEM = "item";
     public static final String ITEM_FROM = "item_from";
     public static final String ITEM_TO = "item_to";
     public static final String ITEM_FROM_TO = "item_from_to";
     public static final String ITEM_DUPLICATE = "item_duplicate";
+
+    @JRuleName("Test JRuleWhenGroupAggregationItemChange")
+    @JRuleWhenItemChange(item = GROUP_AGGREGATION_ITEM)
+    public void groupItemAggregationChange(JRuleEvent event) {
+    }
 
     @JRuleName("Test JRuleWhenItemChange")
     @JRuleWhenItemChange(item = ITEM)
