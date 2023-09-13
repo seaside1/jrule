@@ -292,9 +292,9 @@ public class JRuleHandler implements PropertyChangeListener {
         }
 
         // Load rules that refer to the items
-        compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), JRuleConfig.RULES_PACKAGE,
+        compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), config.getRulesPackage(),
                 true);
-        compiler.loadClassesFromJar(loader, new File(config.getJarRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
+        compiler.loadClassesFromJar(loader, new File(config.getJarRulesDirectory()), config.getRulesPackage(), true);
     }
 
     private boolean initializeFolder(String folder) {

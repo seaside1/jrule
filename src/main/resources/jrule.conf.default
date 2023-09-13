@@ -22,3 +22,6 @@
 # Number of seconds to wait after an item change or Java rule change before
 # recompilation and reloading starts
 # org.openhab.automation.jrule.engine.itemsrecompilationdelay=5
+
+#Package name for rules classes
+#org.openhab.automation.jrule.package=org.openhab.automation.jrule.rules.user

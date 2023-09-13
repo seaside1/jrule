@@ -38,7 +38,8 @@ public class JRuleConfig {
     private static final String JAR_DIR = "jar";
 
     public static final String GENERATED_PACKAGE = "org.openhab.automation.jrule.generated.";
-    public static final String RULES_PACKAGE = "org.openhab.automation.jrule.rules.user.";
+    public static final String DEFAULT_RULES_PACKAGE = "org.openhab.automation.jrule.rules.user";
+    private static final String RULES_PACKAGE_PROPERTY = "org.openhab.automation.jrule.package";
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
     private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
@@ -228,6 +229,14 @@ public class JRuleConfig {
             logger.error("Failed to load Max Executors {}", value);
         }
         return DEFAULT_MAX_EXECUTORS;
+    }
+
+    public String getRulesPackage() {
+        String value = getConfigPropertyOrDefaultValue(RULES_PACKAGE_PROPERTY, DEFAULT_RULES_PACKAGE);
+        if (value.lastIndexOf(".") != value.length()-1) {
+            value += ".";
+        }
+        return value;
     }
 
     public String getGeneratedItemPrefix() {
