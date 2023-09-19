@@ -184,8 +184,9 @@ public class JRuleHandler implements PropertyChangeListener {
 
         logInfo("Initializing JRule writing external Jars: {}", config.getJarDirectory());
 
-        // Extract and copy jrules.jar
+        // Extract and copy jrules.jar as well as openhab-core.jar
         jarExtractor.extractJRuleJar(compiler.getJarPath(JRuleCompiler.JAR_JRULE_NAME));
+        jarExtractor.extractOpenhabCoreJar(compiler.getJarPath(JRuleCompiler.JAR_OPENHAB_CORE_NAME));
 
         // Generate source files for all items and things
         Collection<Item> items = itemRegistry.getItems();

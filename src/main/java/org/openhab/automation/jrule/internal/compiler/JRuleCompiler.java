@@ -61,6 +61,7 @@ public class JRuleCompiler {
     private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
     private static final String CLASSPATH_OPTION = "-classpath";
     public static final String JAR_JRULE_NAME = "jrule.jar";
+    public static final String JAR_OPENHAB_CORE_NAME = "openhab-core.jar";
     public static final String JAR_JRULE_GENERATED_JAR_NAME = "jrule-generated.jar";
     private static final String LOG_NAME_COMPILER = "JRuleCompiler";
     private static final String FRONT_SLASH = "/";
