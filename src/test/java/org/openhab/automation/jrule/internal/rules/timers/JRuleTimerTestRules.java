@@ -132,15 +132,15 @@ public class JRuleTimerTestRules extends JRule {
     public void testLocks() throws InterruptedException {
         JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
 
-        boolean first = getTimedLock("MyLock", Duration.ofSeconds(1));
+        boolean first = getTimeLock("MyLock", Duration.ofSeconds(1));
         stringItem.sendCommand("first: " + first);
 
-        boolean second = getTimedLock("MyLock", Duration.ofSeconds(1));
+        boolean second = getTimeLock("MyLock", Duration.ofSeconds(1));
         stringItem.sendCommand("second: " + second);
 
         Thread.sleep(1100);
 
-        boolean third = getTimedLock("MyLock", Duration.ofSeconds(1));
+        boolean third = getTimeLock("MyLock", Duration.ofSeconds(1));
         stringItem.sendCommand("third: " + third);
     }
 
