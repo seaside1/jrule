@@ -2,7 +2,7 @@
 #org.openhab.automation.jrule.itemprefix=_
 
 # Working directory
-#org.openhab.automation.jrule.directory=/etc/openhab/automation/directory
+#org.openhab.automation.jrule.directory=/etc/openhab/automation/jrule
 
 ## Run rules in a separate threadpool
 #org.openhab.automation.jrule.engine.executors.enable=true
@@ -25,3 +25,6 @@
 
 #Package name for rules classes
 #org.openhab.automation.jrule.package=org.openhab.automation.jrule.rules.user
+
+#Default location for rule source files located under $org.openhab.automation.jrule.directory/rules/ 
+#org.openhab.automation.jrule.rules.directory=org/openhab/automation/jrule/rules/user

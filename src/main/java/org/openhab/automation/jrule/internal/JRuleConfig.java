@@ -40,6 +40,7 @@ public class JRuleConfig {
     public static final String GENERATED_PACKAGE = "org.openhab.automation.jrule.generated.";
     public static final String DEFAULT_RULES_PACKAGE = "org.openhab.automation.jrule.rules.user";
     private static final String RULES_PACKAGE_PROPERTY = "org.openhab.automation.jrule.package";
+    private static final String RULES_DIRECTORY_PROPERTY = "org.openhab.automation.jrule.rules.directory";
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
     private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
@@ -55,9 +56,8 @@ public class JRuleConfig {
     private static final boolean DEFAULT_ENABLE_EXECUTORS = true;
 
     public static final String RULES_DIR_START = "rules";
-    public static final String RULES_DIR = RULES_DIR_START + File.separator + "org" + File.separator + "openhab"
-            + File.separator + "automation" + File.separator + "jrule" + File.separator + "rules" + File.separator
-            + "user" + File.separator;
+    public static final String DEFAULT_RULES_DIR = "org" + File.separator + "openhab" + File.separator + "automation"
+            + File.separator + "jrule" + File.separator + "rules" + File.separator + "user" + File.separator;
 
     private static final String DEFAULT_WORKING_DIR = File.separator + "etc" + File.separator + "openhab"
             + File.separator + "automation" + File.separator + "jrule";
@@ -159,7 +159,8 @@ public class JRuleConfig {
     }
 
     public String getRulesDirectory() {
-        return new StringBuilder().append(getWorkingDirectory()).append(File.separator).append(RULES_DIR).toString();
+        return new StringBuilder().append(getRulesRootDirectory()).append(File.separator)
+                .append(getConfigPropertyOrDefaultValue(RULES_DIRECTORY_PROPERTY, DEFAULT_RULES_DIR)).toString();
     }
 
     public String getConfigFile() {
