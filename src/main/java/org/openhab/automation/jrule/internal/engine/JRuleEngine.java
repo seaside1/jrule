@@ -505,7 +505,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private void invokeRuleInternal(JRuleExecutionContext context, JRuleEvent event) {
         Duration timedLock = context.getTimedLock();
         if (timedLock != null) {
-            if (!JRuleTimerHandler.get().getTimedLock(
+            if (!JRuleTimerHandler.get().getTimeLock(
                     context.getMethod().getDeclaringClass().getName() + "#" + context.getMethod().getName(),
                     timedLock)) {
                 JRuleLog.debug(logger, context.getLogName(),

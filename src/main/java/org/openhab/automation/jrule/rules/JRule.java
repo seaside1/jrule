@@ -284,14 +284,18 @@ public class JRule {
     }
 
     /**
-     * Creating a timed look.
+     * Creating a timed lock.
      *
      * @param lockName Name of the lock. Must be unique over all rules.
      * @param duration Duration until the lock is held.
      * @return Returns true if the lock for this name is not held. false if the lock is held.
      */
-    protected boolean getTimedLock(@Nullable String lockName, Duration duration) {
-        return JRuleTimerHandler.get().getTimedLock(lockName, duration);
+    protected boolean getTimeLock(String lockName, Duration duration) {
+        return JRuleTimerHandler.get().getTimeLock(lockName, duration);
+    }
+
+    protected boolean isTimeLocked(String lockName) {
+        return JRuleTimerHandler.get().isTimeLocked(lockName);
     }
 
     protected void say(String text, String voiceId, String sinkId) {
