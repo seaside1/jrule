@@ -233,10 +233,7 @@ public class JRuleConfig {
 
     public String getRulesPackage() {
         String value = getConfigPropertyOrDefaultValue(RULES_PACKAGE_PROPERTY, DEFAULT_RULES_PACKAGE);
-        if (value.lastIndexOf(".") != value.length() - 1) {
-            value += ".";
-        }
-        return value;
+        return value.endsWith(".") ? value : value.concat(".");
     }
 
     public String getGeneratedItemPrefix() {
