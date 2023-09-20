@@ -1,7 +1,7 @@
-# Prefix to be used when generating items, files
+## Prefix to be used when generating items, files
 #org.openhab.automation.jrule.itemprefix=_
 
-# Working directory
+## Working directory
 #org.openhab.automation.jrule.directory=/etc/openhab/automation/jrule
 
 ## Run rules in a separate threadpool
@@ -14,17 +14,17 @@
 #org.openhab.automation.jrule.engine.executors.max=10
 
 ## Number of seconds before jrule engine is initialized
-# org.openhab.automation.jrule.engine.initdelay=5
+#org.openhab.automation.jrule.engine.initdelay=5
 
 ## Number of seconds before rules from jar and source files are loaded 
 #org.openhab.automation.jrule.engine.rulesdelay=2
 
-# Number of seconds to wait after an item change or Java rule change before
-# recompilation and reloading starts
-# org.openhab.automation.jrule.engine.itemsrecompilationdelay=5
+## Number of seconds to wait after an item change or Java rule change before
+## recompilation and reloading starts
+#org.openhab.automation.jrule.engine.itemsrecompilationdelay=5
 
-#Package name for rules classes
+## Package name for rules classes
 #org.openhab.automation.jrule.package=org.openhab.automation.jrule.rules.user
 
-#Default location for rule source files located under $org.openhab.automation.jrule.directory/rules/ 
+## Default location for rule source files located under $org.openhab.automation.jrule.directory/rules/ 
 #org.openhab.automation.jrule.rules.directory=org/openhab/automation/jrule/rules/user
