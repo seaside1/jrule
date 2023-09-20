@@ -153,9 +153,10 @@ public class JRuleHandler implements PropertyChangeListener {
     }
 
     public synchronized final void initialize() {
-        logInfo("Start Initializing JRule Automation");
-        logDebug("SettingConfig name: {} config: {}", config.getClass(), config.toString());
+        logInfo("Initializing Start Initializing JRule Automation");
+        logDebug("Initializing SettingConfig name: {} config: {}", config.getClass(), config.toString());
         logDebug("Initializing JRule automation folder: {}", config.getWorkingDirectory());
+        logDebug("Initializing JRule Rules folder: {}", config.getRulesDirectory());
         if (!initializeFolder(config.getWorkingDirectory())) {
             return;
         }
@@ -293,9 +294,9 @@ public class JRuleHandler implements PropertyChangeListener {
         }
 
         // Load rules that refer to the items
-        compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), JRuleConfig.RULES_PACKAGE,
+        compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), config.getRulesPackage(),
                 true);
-        compiler.loadClassesFromJar(loader, new File(config.getJarRulesDirectory()), JRuleConfig.RULES_PACKAGE, true);
+        compiler.loadClassesFromJar(loader, new File(config.getJarRulesDirectory()), config.getRulesPackage(), true);
     }
 
     private boolean initializeFolder(String folder) {
@@ -452,7 +453,8 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private void startDirectoryWatcher() {
         List<Path> paths = new ArrayList<>();
-        final Path pathRules = new File(config.getWorkingDirectory() + File.separator + JRuleConfig.RULES_DIR).toPath();
+        final Path pathRules = new File(config.getWorkingDirectory() + File.separator + config.getRulesDirectory())
+                .toPath();
         final Path pathJarRules = new File(config.getWorkingDirectory() + File.separator + JRuleConfig.JAR_RULES_DIR)
                 .toPath();
         paths.add(pathRules);
