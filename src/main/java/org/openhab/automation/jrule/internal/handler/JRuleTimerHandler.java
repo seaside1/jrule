@@ -140,8 +140,12 @@ public class JRuleTimerHandler {
         return timer;
     }
 
-    public boolean getTimedLock(String lockName, Duration duration) {
-        if (getTimers(LOCK_PREFIX + lockName).size() > 0) {
+    public boolean isTimeLocked(String lockName) {
+        return getTimers(LOCK_PREFIX + lockName).size() > 0;
+    }
+
+    public boolean getTimeLock(String lockName, Duration duration) {
+        if (isTimeLocked(lockName)) {
             return false;
         }
         CompletableFuture<?> future = delayedExecution(duration);
