@@ -453,8 +453,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
     private void startDirectoryWatcher() {
         List<Path> paths = new ArrayList<>();
-        final Path pathRules = new File(config.getWorkingDirectory() + File.separator + config.getRulesDirectory())
-                .toPath();
+        final Path pathRules = new File(config.getRulesDirectory()).toPath();
         final Path pathJarRules = new File(config.getWorkingDirectory() + File.separator + JRuleConfig.JAR_RULES_DIR)
                 .toPath();
         paths.add(pathRules);
