@@ -1,3 +1,9 @@
+## BETA18
+
+-  Refactored timers and added method for checking for timer lock by [seaside1](https://github.com/seaside1) PR https://github.com/seaside1/jrule/pull/171
+-  Added the ability to configure the name of the package in jrule.conf by [kuimovvg](https://github.com/kuimovvg) PR https://github.com/seaside1/jrule/pull/170
+-  Add previousState and a test by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/168
+
 ## BETA17
 
 -  Fix for thing actions without @ActionInput by [seime](https://github.com/seime)PR https://github.com/seaside1/jrule/pull/143
