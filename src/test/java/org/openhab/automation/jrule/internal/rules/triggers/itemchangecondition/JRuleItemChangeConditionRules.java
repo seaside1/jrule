@@ -27,6 +27,7 @@ import org.openhab.automation.jrule.rules.event.JRuleEvent;
 public class JRuleItemChangeConditionRules extends JRule {
     public static final String ITEM_FROM_TO = "item_from_to";
     public static final String ITEM_FROM_TO_2 = "item_from_to_2";
+    public static final String ITEM_FROM_TO_3 = "item_from_to_3";
 
     @JRuleName("Test JRuleWhenItemChange/from/to")
     @JRuleWhenItemChange(item = ITEM_FROM_TO, previousCondition = @JRuleCondition(lt = 12), condition = @JRuleCondition(gte = 12))
@@ -36,5 +37,10 @@ public class JRuleItemChangeConditionRules extends JRule {
     @JRuleName("Test JRuleWhenItemChange/from/to")
     @JRuleWhenItemChange(item = ITEM_FROM_TO_2, previousCondition = @JRuleCondition(lt = 10), condition = @JRuleCondition(gt = 20))
     public void itemChangeFromTo2(JRuleEvent event) {
+    }
+
+    @JRuleName("Test JRuleWhenItemChange/from/to Quantity")
+    @JRuleWhenItemChange(item = ITEM_FROM_TO_3, previousCondition = @JRuleCondition(lt = 40), condition = @JRuleCondition(gt = 40))
+    public void itemChangeFromTo3(JRuleEvent event) {
     }
 }

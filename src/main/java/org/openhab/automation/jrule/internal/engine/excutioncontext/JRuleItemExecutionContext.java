@@ -112,20 +112,22 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
             if (neq.isPresent() && neq.filter(ref -> !state.equals(ref)).isEmpty()) {
                 return false;
             }
-            if (lt.isPresent() && (!NumberUtils.isCreatable(state)
-                    || lt.filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty())) {
+            // the following must be a number
+            Optional<Double> stateNumberOpt = getNumber(state);
+            if (stateNumberOpt.isEmpty()) {
                 return false;
             }
-            if (lte.isPresent() && (!NumberUtils.isCreatable(state)
-                    || lte.filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty())) {
+            Double stateNumber = stateNumberOpt.get();
+            if (lt.isPresent() && lt.filter(ref -> stateNumber < ref).isEmpty()) {
                 return false;
             }
-            if (gt.isPresent() && (!NumberUtils.isCreatable(state)
-                    || gt.filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty())) {
+            if (lte.isPresent() && lte.filter(ref -> stateNumber <= ref).isEmpty()) {
                 return false;
             }
-            if (gte.isPresent() && (!NumberUtils.isCreatable(state)
-                    || gte.filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty())) {
+            if (gt.isPresent() && gt.filter(ref -> stateNumber > ref).isEmpty()) {
+                return false;
+            }
+            if (gte.isPresent() && gte.filter(ref -> stateNumber >= ref).isEmpty()) {
                 return false;
             }
             return true;
@@ -135,6 +137,18 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
         public String toString() {
             return "JRuleConditionContext{" + "gt=" + gt + ", gte=" + gte + ", lt=" + lt + ", lte=" + lte + ", eq=" + eq
                     + ", neq=" + neq + '}';
+        }
+    }
+
+    private static Optional<Double> getNumber(String state) {
+        try {
+            return Optional.of(QuantityType.valueOf(state).doubleValue());
+        } catch (IllegalArgumentException e) {
+            if (NumberUtils.isParsable(state)) {
+                return Optional.of(Double.parseDouble(state));
+            } else {
+                return Optional.empty();
+            }
         }
     }
 }
