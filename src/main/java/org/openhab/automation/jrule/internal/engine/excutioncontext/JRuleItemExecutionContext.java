@@ -112,22 +112,16 @@ public abstract class JRuleItemExecutionContext extends JRuleExecutionContext {
             if (neq.isPresent() && neq.filter(ref -> !state.equals(ref)).isEmpty()) {
                 return false;
             }
-            // the following must be a number
-            Optional<Double> stateNumberOpt = getNumber(state);
-            if (stateNumberOpt.isEmpty()) {
+            if (lt.isPresent() && lt.filter(ref -> getNumber(state).filter(a -> a < ref).isPresent()).isEmpty()) {
                 return false;
             }
-            Double stateNumber = stateNumberOpt.get();
-            if (lt.isPresent() && lt.filter(ref -> stateNumber < ref).isEmpty()) {
+            if (lte.isPresent() && lte.filter(ref -> getNumber(state).filter(a -> a <= ref).isPresent()).isEmpty()) {
                 return false;
             }
-            if (lte.isPresent() && lte.filter(ref -> stateNumber <= ref).isEmpty()) {
+            if (gt.isPresent() && gt.filter(ref -> getNumber(state).filter(a -> a > ref).isPresent()).isEmpty()) {
                 return false;
             }
-            if (gt.isPresent() && gt.filter(ref -> stateNumber > ref).isEmpty()) {
-                return false;
-            }
-            if (gte.isPresent() && gte.filter(ref -> stateNumber >= ref).isEmpty()) {
+            if (gte.isPresent() && gte.filter(ref -> getNumber(state).filter(a -> a >= ref).isPresent()).isEmpty()) {
                 return false;
             }
             return true;
