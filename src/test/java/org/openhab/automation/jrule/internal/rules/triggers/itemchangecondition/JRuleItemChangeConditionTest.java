@@ -29,6 +29,7 @@ import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.items.StringItem;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.types.StringType;
 
 /**
@@ -66,8 +67,41 @@ public class JRuleItemChangeConditionTest extends JRuleAbstractTest {
         verify(rule, times(1)).itemChangeFromTo2(Mockito.any(JRuleEvent.class));
     }
 
+    @Test
+    public void testItemChange_from_to_quantity() {
+        JRuleItemChangeConditionRules rule = initRule(JRuleItemChangeConditionRules.class);
+        // Only last event should trigger rule method
+        fireEvents(false,
+                List.of(itemQuantityChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO_3, "30 lx", "50 lx")));
+        verify(rule, times(1)).itemChangeFromTo3(Mockito.any(JRuleEvent.class));
+    }
+
+    // no conversion to base unit
+    @Test
+    public void testItemChange_from_to_quantity2() {
+        JRuleItemChangeConditionRules rule = initRule(JRuleItemChangeConditionRules.class);
+        // Only last event should trigger rule method
+        fireEvents(false,
+                List.of(itemQuantityChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO_3, "30000 mV", "50000 mV")));
+        verify(rule, times(0)).itemChangeFromTo3(Mockito.any(JRuleEvent.class));
+    }
+
+    @Test
+    public void testItemChange_from_to_notANumber() {
+        JRuleItemChangeConditionRules rule = initRule(JRuleItemChangeConditionRules.class);
+        // Only last event should trigger rule method
+        fireEvents(false, List.of(itemChangeEvent(JRuleItemChangeConditionRules.ITEM_FROM_TO_2, "foo", "bar")));
+        verify(rule, times(0)).itemChangeFromTo(Mockito.any(JRuleEvent.class));
+        verify(rule, times(0)).itemChangeFromTo2(Mockito.any(JRuleEvent.class));
+        verify(rule, times(0)).itemChangeFromTo3(Mockito.any(JRuleEvent.class));
+    }
+
     // Syntactic sugar
     private Event itemChangeEvent(String item, String from, String to) {
         return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from));
+    }
+
+    private Event itemQuantityChangeEvent(String item, String from, String to) {
+        return ItemEventFactory.createStateChangedEvent(item, new QuantityType<>(to), new QuantityType<>(from));
     }
 }

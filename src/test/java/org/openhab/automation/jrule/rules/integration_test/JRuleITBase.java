@@ -36,11 +36,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.TestRules;
 import org.slf4j.Logger;
@@ -190,7 +186,7 @@ public abstract class JRuleITBase {
     }
 
     @BeforeEach
-    void initTest() throws IOException, InterruptedException, MqttException {
+    void initTest(TestInfo testInfo) throws IOException, InterruptedException, MqttException {
         mqttProxy.setConnectionCut(false);
         Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
                 .pollInterval(200, TimeUnit.MILLISECONDS).await("thing online")
@@ -214,10 +210,14 @@ public abstract class JRuleITBase {
 
         WireMock.configureFor(mockServer.getHost(), mockServer.getFirstMappedPort());
         WireMock.reset();
+
+        log.info("=== starting test '{}'", testInfo.getTestMethod());
     }
 
     @AfterEach
-    void unloadTest() throws MqttException {
+    void unloadTest(TestInfo testInfo) throws MqttException {
+        log.info("=== stopped test '{}'", testInfo.getTestMethod());
+
         if (mqttClient != null && mqttClient.isConnected()) {
             mqttClient.disconnect();
         }
