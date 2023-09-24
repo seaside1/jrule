@@ -284,7 +284,7 @@ These are method inherited from the JRule superclass.
 | `createOrReplaceRepeatingTimer`      | Schedule repeating future callbacks, cancel existing callback if exists |
 | `cancelTimer`                        | Cancel an existing future callback                                      |
 | `isTimerRunning`                     | Check if existing future callback exist                                 |
-| `getTimedLock`                       | Create a lock to be held for a certain amount of time                   |
+| `getTimeLock`                       | Create a lock to be held for a certain amount of time                   |
 | `sendCommand`                        | Send a command to an item                                               |
 | `postUpdate`                         | Post a state update to an item                                          |
 | `logXXX`                             | Log a Debug/Info/Warn/Error message                                     |
