@@ -123,6 +123,12 @@ public interface JRuleItem {
 
     Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
 
+    default Optional<JRuleValue> getStateAt(ZonedDateTime timestamp) {
+        return getStateAt(timestamp, null);
+    }
+
+    Optional<JRuleValue> getStateAt(ZonedDateTime timestamp, String persistenceServiceId);
+
     default Optional<State> getPreviousState(boolean skipEquals) {
         return getPreviousState(skipEquals, null);
     }

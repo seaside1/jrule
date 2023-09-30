@@ -71,6 +71,10 @@ public class TestPersistence extends JRule {
         logInfo("now: {}", jRuleNumberItem.getHistoricState(now, PERSISTENCE_SERVICE_ID).get());
         logInfo("now +1: {}", jRuleNumberItem.getHistoricState(now.plusHours(1), PERSISTENCE_SERVICE_ID).get());
         logInfo("now +2: {}", jRuleNumberItem.getHistoricState(now.plusHours(2), PERSISTENCE_SERVICE_ID).get());
+
+        logInfo("now stateAt: {}", jRuleNumberItem.getStateAt(now, PERSISTENCE_SERVICE_ID).get());
+        logInfo("now stateAt +1: {}", jRuleNumberItem.getStateAt(now.plusHours(1), PERSISTENCE_SERVICE_ID).get());
+        logInfo("now stateAt +2: {}", jRuleNumberItem.getStateAt(now.plusHours(2), PERSISTENCE_SERVICE_ID).get());
     }
 
     @JRuleName(NAME_PERSIST_ALL_TYPES)
