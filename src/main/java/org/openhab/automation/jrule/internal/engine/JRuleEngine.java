@@ -83,6 +83,7 @@ import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemEvent;
 import org.openhab.core.library.types.QuantityType;
+import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.scheduler.CronScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +110,7 @@ public class JRuleEngine implements PropertyChangeListener {
     private static volatile JRuleEngine instance;
 
     private JRuleRuleProvider ruleProvider;
+    private PersistenceServiceRegistry persistenceServiceRegistry;
 
     public static JRuleEngine get() {
         if (instance == null) {
@@ -556,5 +558,13 @@ public class JRuleEngine implements PropertyChangeListener {
 
     public void setRuleProvider(JRuleRuleProvider ruleProvider) {
         this.ruleProvider = ruleProvider;
+    }
+
+    public void setPersistenceServiceRegistry(PersistenceServiceRegistry persistenceServiceRegistry) {
+        this.persistenceServiceRegistry = persistenceServiceRegistry;
+    }
+
+    public PersistenceServiceRegistry getPersistenceServiceRegistry() {
+        return persistenceServiceRegistry;
     }
 }

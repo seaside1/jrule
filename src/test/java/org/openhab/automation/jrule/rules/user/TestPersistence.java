@@ -43,8 +43,35 @@ public class TestPersistence extends JRule {
     public static final String ITEM_LOCATION_TO_PERSIST = "Location_To_Persist";
     public static final String ITEM_TRIGGER_RULE = "Trigger_Rule";
     public static final String NAME_PERSIST_ALL_TYPES = "persist all types";
-    public static final String COMMMAND_PERISTENCE = "peristence";
+    public static final String NAME_PERSIST_IN_FUTURE = "persist in future";
+    public static final String NAME_QUERY_IN_FUTURE = "query in future";
+    public static final String COMMMAND_PERISTENCE = "persistence";
+    public static final String COMMMAND_PERISTENCE_IN_FUTURE = "persistence_in_future";
+    public static final String COMMMAND_QUERY_IN_FUTURE = "query_in_future";
     public static final String PERSISTENCE_SERVICE_ID = "influxdb";
+    public static final String ITEM_NUMBER_TO_PERSIST_FUTURE = "Number_To_Persist_Future";
+
+    private final ZonedDateTime now = ZonedDateTime.now();
+
+    @JRuleName(NAME_PERSIST_IN_FUTURE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMMAND_PERISTENCE_IN_FUTURE))
+    public void persistFuture() {
+        JRuleNumberItem jRuleNumberItem = JRuleNumberItem.forName(ITEM_NUMBER_TO_PERSIST_FUTURE);
+
+        jRuleNumberItem.persist(new JRuleDecimalValue(10), now, PERSISTENCE_SERVICE_ID);
+        jRuleNumberItem.persist(new JRuleDecimalValue(20), now.plusHours(1), PERSISTENCE_SERVICE_ID);
+        jRuleNumberItem.persist(new JRuleDecimalValue(30), now.plusHours(2), PERSISTENCE_SERVICE_ID);
+    }
+
+    @JRuleName(NAME_QUERY_IN_FUTURE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMMAND_QUERY_IN_FUTURE))
+    public void queryFuture() {
+        JRuleNumberItem jRuleNumberItem = JRuleNumberItem.forName(ITEM_NUMBER_TO_PERSIST_FUTURE);
+
+        logInfo("now: {}", jRuleNumberItem.getHistoricState(now, PERSISTENCE_SERVICE_ID).get());
+        logInfo("now +1: {}", jRuleNumberItem.getHistoricState(now.plusHours(1), PERSISTENCE_SERVICE_ID).get());
+        logInfo("now +2: {}", jRuleNumberItem.getHistoricState(now.plusHours(2), PERSISTENCE_SERVICE_ID).get());
+    }
 
     @JRuleName(NAME_PERSIST_ALL_TYPES)
     @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMMAND_PERISTENCE))

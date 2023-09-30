@@ -113,6 +113,11 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
+    public void persist(JRuleValue state, ZonedDateTime time, String persistenceServiceId) {
+        JRulePersistenceExtensions.persist(name, time, state, persistenceServiceId);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
