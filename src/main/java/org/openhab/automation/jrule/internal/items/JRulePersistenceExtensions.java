@@ -49,6 +49,33 @@ class JRulePersistenceExtensions {
         }
     }
 
+    public static Optional<JRuleValue> stateAt(String itemName, ZonedDateTime timestamp, String serviceId) {
+        Item item = getItem(itemName);
+        JRuleEngine jRuleEngine = JRuleEngine.get();
+        PersistenceServiceRegistry persistenceServiceRegistry = jRuleEngine.getPersistenceServiceRegistry();
+        PersistenceService persistenceService = persistenceServiceRegistry
+                .get(Optional.ofNullable(serviceId).orElse(persistenceServiceRegistry.getDefaultId()));
+        if (persistenceService instanceof QueryablePersistenceService queryablePersistenceService) {
+            FilterCriteria filter = new FilterCriteria();
+            filter.setBeginDate(timestamp.minusSeconds(1));
+            filter.setEndDate(timestamp.plusSeconds(1));
+            filter.setItemName(item.getName());
+            filter.setPageSize(1);
+            filter.setOrdering(FilterCriteria.Ordering.DESCENDING);
+            Iterable<HistoricItem> result = queryablePersistenceService.query(filter);
+            if (result.iterator().hasNext()) {
+                return Optional.of(result.iterator().next()).map(HistoricItem::getState)
+                        .map(state -> JRuleEventHandler.get().toValue(state));
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            JRuleLog.warn(LoggerFactory.getLogger(JRulePersistenceExtensions.class), JRuleEngine.class.getSimpleName(),
+                    "cannot persist item state, persistence service not modifiable");
+            return Optional.empty();
+        }
+    }
+
     public static Optional<JRuleValue> historicState(String itemName, ZonedDateTime timestamp) {
         return historicState(itemName, timestamp, null);
     }

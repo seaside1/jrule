@@ -129,6 +129,10 @@ public class ITJRulePersistence extends JRuleITBase {
         verifyLogEntry("now: 10");
         verifyLogEntry("now +1: 20");
         verifyLogEntry("now +2: 30");
+
+        verifyLogEntry("now stateAt: 10");
+        verifyLogEntry("now stateAt +1: 20");
+        verifyLogEntry("now stateAt +2: 30");
     }
 
     private void verifyNumber() {

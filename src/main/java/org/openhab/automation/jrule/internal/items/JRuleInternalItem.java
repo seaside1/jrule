@@ -108,6 +108,11 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
+    public Optional<JRuleValue> getStateAt(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.stateAt(name, timestamp, persistenceServiceId);
+    }
+
+    @Override
     public Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId) {
         return JRulePersistenceExtensions.previousState(name, skipEquals, persistenceServiceId);
     }
