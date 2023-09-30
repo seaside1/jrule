@@ -129,6 +129,12 @@ public interface JRuleItem {
 
     Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId);
 
+    default void persist(JRuleValue state, ZonedDateTime time) {
+        persist(state, time, null);
+    }
+
+    void persist(JRuleValue state, ZonedDateTime time, String persistenceServiceId);
+
     default boolean isGroup() {
         return false;
     }

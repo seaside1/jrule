@@ -114,6 +114,23 @@ public class ITJRulePersistence extends JRuleITBase {
         // verifyDimmer();
     }
 
+    @Test
+    public void persistFuture() throws IOException, InterruptedException {
+        sendCommand(TestPersistence.ITEM_TRIGGER_RULE, TestPersistence.COMMMAND_PERISTENCE_IN_FUTURE);
+        verifyRuleWasExecuted(TestPersistence.NAME_PERSIST_IN_FUTURE);
+        verifyNoError();
+
+        Thread.sleep(3000);
+
+        sendCommand(TestPersistence.ITEM_TRIGGER_RULE, TestPersistence.COMMMAND_QUERY_IN_FUTURE);
+        verifyRuleWasExecuted(TestPersistence.NAME_QUERY_IN_FUTURE);
+        verifyNoError();
+
+        verifyLogEntry("now: 10");
+        verifyLogEntry("now +1: 20");
+        verifyLogEntry("now +2: 30");
+    }
+
     private void verifyNumber() {
         verifyPersistence("historicState", "Number_To_Persist", 7, null, 10);
         verifyPersistence("historicState", "Number_To_Persist", 5, 20.0, 10);

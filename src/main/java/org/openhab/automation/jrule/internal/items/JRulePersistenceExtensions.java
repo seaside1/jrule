@@ -16,15 +16,18 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.persistence.HistoricItem;
+import org.openhab.core.persistence.*;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
 import org.openhab.core.types.State;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRulePersistenceExtensions}
@@ -32,6 +35,20 @@ import org.openhab.core.types.State;
  * @author Arne Seime - Initial contribution
  */
 class JRulePersistenceExtensions {
+    public static void persist(String itemName, ZonedDateTime timestamp, JRuleValue state, String serviceId) {
+        Item item = getItem(itemName);
+        JRuleEngine jRuleEngine = JRuleEngine.get();
+        PersistenceServiceRegistry persistenceServiceRegistry = jRuleEngine.getPersistenceServiceRegistry();
+        PersistenceService persistenceService = persistenceServiceRegistry
+                .get(Optional.ofNullable(serviceId).orElse(persistenceServiceRegistry.getDefaultId()));
+        if (persistenceService instanceof ModifiablePersistenceService modifiablePersistenceService) {
+            modifiablePersistenceService.store(item, timestamp, state.toOhState());
+        } else {
+            JRuleLog.warn(LoggerFactory.getLogger(JRulePersistenceExtensions.class), JRuleEngine.class.getSimpleName(),
+                    "cannot persist item state, persistence service not modifiable");
+        }
+    }
+
     public static Optional<JRuleValue> historicState(String itemName, ZonedDateTime timestamp) {
         return historicState(itemName, timestamp, null);
     }
