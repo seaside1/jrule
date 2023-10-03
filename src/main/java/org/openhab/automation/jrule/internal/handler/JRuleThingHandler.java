@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
+import java.util.Collection;
+
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingManager;
@@ -61,7 +63,12 @@ public class JRuleThingHandler {
         setEnabled(thingUID, true);
     }
 
+    public Collection<Thing> getThings() {
+        return thingRegistry.getAll();
+    }
+
     private void setEnabled(String thingUID, boolean enabled) {
+        thingRegistry.getAll().forEach(t -> t.getBridgeUID());
         Thing thing = thingRegistry.get(new ThingUID(thingUID));
         if (thing != null) {
             thingManager.setEnabled(new ThingUID(thingUID), enabled);
