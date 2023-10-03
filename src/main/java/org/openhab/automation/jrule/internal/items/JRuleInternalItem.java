@@ -137,4 +137,9 @@ public abstract class JRuleInternalItem implements JRuleItem {
     public int hashCode() {
         return Objects.hash(name, label, type, id);
     }
+
+    @Override
+    public String toString() {
+        return "%s:%s".formatted(name, type);
+    }
 }

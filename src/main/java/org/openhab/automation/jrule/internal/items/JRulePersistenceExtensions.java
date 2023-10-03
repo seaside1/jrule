@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
-import org.openhab.automation.jrule.internal.JRuleLog;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -32,7 +32,6 @@ import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.persistence.QueryablePersistenceService;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
 import org.openhab.core.types.State;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link JRulePersistenceExtensions}
@@ -49,8 +48,8 @@ class JRulePersistenceExtensions {
         if (persistenceService instanceof ModifiablePersistenceService modifiablePersistenceService) {
             modifiablePersistenceService.store(item, timestamp, state.toOhState());
         } else {
-            JRuleLog.warn(LoggerFactory.getLogger(JRulePersistenceExtensions.class), JRuleEngine.class.getSimpleName(),
-                    "cannot persist item state, persistence service not modifiable");
+            throw new JRuleRuntimeException("cannot persist item state, persistence service (%s) not modifiable"
+                    .formatted(persistenceService.getId()));
         }
     }
 
@@ -75,9 +74,8 @@ class JRulePersistenceExtensions {
                 return Optional.empty();
             }
         } else {
-            JRuleLog.warn(LoggerFactory.getLogger(JRulePersistenceExtensions.class), JRuleEngine.class.getSimpleName(),
-                    "cannot persist item state, persistence service not modifiable");
-            return Optional.empty();
+            throw new JRuleRuntimeException("cannot get state at for item, persistence service (%s) not queryable"
+                    .formatted(persistenceService.getId()));
         }
     }
 
