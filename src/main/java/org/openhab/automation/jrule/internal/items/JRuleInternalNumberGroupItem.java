@@ -19,7 +19,7 @@ import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 
 /**
- * The {@link JRuleInternalColorGroupItem} Items
+ * The {@link JRuleInternalNumberGroupItem} Items
  *
  * @author Arne Seime - Initial contribution
  */

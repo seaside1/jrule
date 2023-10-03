@@ -43,6 +43,7 @@
     + [Example 39 - HTTP requests](#example-39---http-requests)
     + [Example 40 - Delay rule execution](#example-40---delay-rule-execution)
     + [Example 41 - Get Metadata and Tags](#example-41---get-metadata-and-tags)
+    + [Example 42 - Persist future data](#example-42---persist-future-data)
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1061,6 +1062,35 @@ public class DemoRule extends JRule {
     logInfo("Metadata: '{}'", item.getMetadata());
     logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
     logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
+  }
+}
+```
+
+## Example 42 - Persist future data
+
+Use case: Persist future data for e.g. Tibber future prices
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleDelayed;
+
+public class DemoRule extends JRule {
+  @JRuleName("persist new tibber prices")
+  @JRuleWhenTimeTrigger(hours = 13, minutes = 30)
+  public void persistNewPrices() {
+    var availPrices = getPrices();  
+    availPrices.forEach(t -> {
+      ZonedDateTime zonedDateTime = t.getStartsAt().atZone(ZoneId.systemDefault());
+      Optional<JRuleValue> historicState = JRuleItems.Tibber_Hourly_Cost_Future.getStateAt(zonedDateTime, PERSISTENCE);
+      logDebug("adding available price for: {}, existing: {}", zonedDateTime, historicState);
+      if (historicState.isEmpty()) {
+        JRuleItems.Tibber_Hourly_Cost_Future.persist(new JRuleDecimalValue(t.getTotal()), zonedDateTime, PERSISTENCE);
+      }
+    });
   }
 }
 ```

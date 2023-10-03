@@ -69,6 +69,13 @@ Beta, still major changes.
 
 - Not supporting OH4 GUI rules
 
+### Database
+
+- Using persist is just support for `org.openhab.core.persistence.ModifiablePersistenceService`. Currently these are
+  - Influx
+  - JDBC
+  - InMemory
+
 # Getting started
 
 1. Install the addon by either
