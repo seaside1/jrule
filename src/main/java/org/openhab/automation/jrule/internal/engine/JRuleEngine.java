@@ -18,7 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +96,7 @@ import org.slf4j.MDC;
  */
 public class JRuleEngine implements PropertyChangeListener {
     public static final String MDC_KEY_TIMER = "timer";
-    public static final String[] EMPTY_LOG_TAGS = new String[0];
+    private static final String[] EMPTY_LOG_TAGS = new String[0];
     private static final int AWAIT_TERMINATION_THREAD_SECONDS = 2;
     private List<JRuleExecutionContext> contextList = new CopyOnWriteArrayList<>();
     private JRuleTimerExecutor timerExecutor = new JRuleTimerExecutor(this);
@@ -132,24 +131,6 @@ public class JRuleEngine implements PropertyChangeListener {
         Arrays.stream(jRule.getClass().getDeclaredMethods()).filter(method -> !method.getName().startsWith("lambda$"))
                 .filter(method -> method.getDeclaringClass().equals(jRule.getClass())) // Skip inherited methods
                 .forEach(method -> this.add(method, jRule, enableRule));
-    }
-
-    public void addDynamicWhenReceivedCommand(Method method, JRule jRule, String ruleName, List<String> items) {
-        JRuleModuleEntry ruleModuleEntry = new JRuleModuleEntry(jRule, method, ruleName);
-        List<JRulePreconditionContext> emptyPreconditionContextList = new ArrayList<>(0);
-        for (String itemName : items) {
-            JRuleItemReceivedCommandExecutionContext context = new JRuleItemReceivedCommandExecutionContext(jRule,
-                    ruleName, JRuleEngine.EMPTY_LOG_TAGS, method, itemName, JRuleMemberOf.None, Optional.empty(),
-                    emptyPreconditionContextList, Optional.empty(), null, null);
-
-            addToContext(context, false);
-            ruleLoadingStatistics.addItemStateTrigger();
-            ruleModuleEntry.addJRuleWhenItemReceivedCommand(context);
-
-            logInfo("Adding Dynamic Rule Name: {} item: {}", ruleName, itemName);
-        }
-        ruleLoadingStatistics.addRuleClass();
-        ruleProvider.add(ruleModuleEntry);
     }
 
     private void add(Method method, JRule jRule, boolean enableRule) {

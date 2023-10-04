@@ -58,8 +58,6 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleCompiler {
 
-    private static final String ORG_OPENHAB_CORE = "org.openhab.core-";
-    private static final String ORG_OPENHAB_CORE_THING = "org.openhab.core.thing-";
     private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
     private static final String CLASSPATH_OPTION = "-classpath";
     public static final String JAR_JRULE_NAME = "jrule.jar";
@@ -151,8 +149,7 @@ public class JRuleCompiler {
                     final Object obj = loadedClass.getDeclaredConstructor().newInstance();
                     logDebug("Created instance: {} obj: {}", className, obj);
                 } catch (Exception x) {
-                    logError("Could not create create instance using default constructor: {}", className);
-                    logger.error("Failed to load class", x);
+                    logError("Could not create create instance using default constructor: {}: {}", className, x);
                 }
             }
         }
@@ -244,14 +241,11 @@ public class JRuleCompiler {
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
         optionList.add(CLASSPATH_OPTION);
-        final String openhabCoreJar = getOpenhabCoreJar().map(s -> s + File.pathSeparator).orElse("");
+        String openhabCoreJar = getOpenhabCoreJar().map(s -> s + File.pathSeparator).orElse("");
         logDebug("Openhab-Core Jar: {}", openhabCoreJar);
-        final String openhabCoreThingJar = getOpenhabCoreThingJar().map(s -> s + File.pathSeparator).orElse("");
-        logDebug("Openhab-Core-Thing Jar: {}", openhabCoreThingJar);
-        String cp = openhabCoreJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
-                + openhabCoreThingJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
+        String cp = openhabCoreJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
         optionList.add(cp);
-        logDebug("1337Compiling classes using classpath: {}", cp);
+        logDebug("Compiling classes using classpath: {}", cp);
         javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
                 .forEach(javaSourceFile -> logDebug("Compiling java Source file: {}", javaSourceFile));
 
@@ -279,14 +273,6 @@ public class JRuleCompiler {
     }
 
     private Optional<String> getOpenhabCoreJar() {
-        return getOpenHABJar(ORG_OPENHAB_CORE);
-    }
-
-    private Optional<String> getOpenhabCoreThingJar() {
-        return getOpenHABJar(ORG_OPENHAB_CORE_THING);
-    }
-
-    private Optional<String> getOpenHABJar(String jarPrefix) {
         if (!System.getProperties().containsKey(PROPERTY_KARAF_HOME_URI)
                 && !System.getProperties().containsKey(PROPERTY_KARAF_DEFAULT_REPOSITORY)) {
             logWarn("required system properties does not exist [{}]",
@@ -298,10 +284,9 @@ public class JRuleCompiler {
                 + System.getProperty(PROPERTY_KARAF_DEFAULT_REPOSITORY);
         logDebug("Openhab Jars path: {}", openhabJars);
         Optional<String> coreJarPath;
-
         try (Stream<Path> stream = Files.walk(Paths.get(openhabJars))) {
             coreJarPath = stream.filter(path -> path.getFileName().toString().endsWith(JRuleConstants.JAR_FILE_TYPE))
-                    .filter(path -> path.getFileName().toString().startsWith(jarPrefix))
+                    .filter(path -> path.getFileName().toString().startsWith("org.openhab.core-"))
                     .map(path -> path.toFile().getAbsolutePath()).findFirst();
         } catch (IOException e) {
             logError(e.getMessage());
