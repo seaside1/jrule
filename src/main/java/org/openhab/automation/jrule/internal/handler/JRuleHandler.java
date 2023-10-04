@@ -136,21 +136,18 @@ public class JRuleHandler implements PropertyChangeListener {
         actionGenerator = new JRuleActionClassGenerator(config);
         compiler = new JRuleCompiler(config);
 
-        final JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
+        JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
         eventSubscriber.addPropertyChangeListener(this);
-        final JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
+        JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
-        final JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
+        JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
         jRuleTransformationHandler.setBundleContext(bundleContext);
 
-        final JRuleThingHandler thingHandler = JRuleThingHandler.get();
+        JRuleThingHandler thingHandler = JRuleThingHandler.get();
         thingHandler.setThingManager(thingManager);
         thingHandler.setThingRegistry(thingRegistry);
-
-        final JRuleItemHandler itemHandler = JRuleItemHandler.get();
-        itemHandler.setItemRegistry(itemRegistry);
 
         logDebug("JRuleHandler()");
     }
