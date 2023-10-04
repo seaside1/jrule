@@ -71,7 +71,7 @@ Beta, still major changes.
 
 ### Database
 
-- Using persist is just support for `org.openhab.core.persistence.ModifiablePersistenceService`. Currently these are
+- JRule persist is a utility for supporting `org.openhab.core.persistence.ModifiablePersistenceService`.  Currently these Persistance Services are supported:
   - Influx
   - JDBC
   - InMemory
