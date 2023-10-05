@@ -16,13 +16,20 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.persistence.FilterCriteria;
 import org.openhab.core.persistence.HistoricItem;
+import org.openhab.core.persistence.ModifiablePersistenceService;
+import org.openhab.core.persistence.PersistenceService;
+import org.openhab.core.persistence.PersistenceServiceRegistry;
+import org.openhab.core.persistence.QueryablePersistenceService;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
 import org.openhab.core.types.State;
 
@@ -32,6 +39,46 @@ import org.openhab.core.types.State;
  * @author Arne Seime - Initial contribution
  */
 class JRulePersistenceExtensions {
+    public static void persist(String itemName, ZonedDateTime timestamp, JRuleValue state, String serviceId) {
+        Item item = getItem(itemName);
+        JRuleEngine jRuleEngine = JRuleEngine.get();
+        PersistenceServiceRegistry persistenceServiceRegistry = jRuleEngine.getPersistenceServiceRegistry();
+        PersistenceService persistenceService = persistenceServiceRegistry
+                .get(Optional.ofNullable(serviceId).orElse(persistenceServiceRegistry.getDefaultId()));
+        if (persistenceService instanceof ModifiablePersistenceService modifiablePersistenceService) {
+            modifiablePersistenceService.store(item, timestamp, state.toOhState());
+        } else {
+            throw new JRuleRuntimeException("cannot persist item state, persistence service (%s) not modifiable"
+                    .formatted(persistenceService.getId()));
+        }
+    }
+
+    public static Optional<JRuleValue> stateAt(String itemName, ZonedDateTime timestamp, String serviceId) {
+        Item item = getItem(itemName);
+        JRuleEngine jRuleEngine = JRuleEngine.get();
+        PersistenceServiceRegistry persistenceServiceRegistry = jRuleEngine.getPersistenceServiceRegistry();
+        PersistenceService persistenceService = persistenceServiceRegistry
+                .get(Optional.ofNullable(serviceId).orElse(persistenceServiceRegistry.getDefaultId()));
+        if (persistenceService instanceof QueryablePersistenceService queryablePersistenceService) {
+            FilterCriteria filter = new FilterCriteria();
+            filter.setBeginDate(timestamp.minusSeconds(1));
+            filter.setEndDate(timestamp.plusSeconds(1));
+            filter.setItemName(item.getName());
+            filter.setPageSize(1);
+            filter.setOrdering(FilterCriteria.Ordering.DESCENDING);
+            Iterable<HistoricItem> result = queryablePersistenceService.query(filter);
+            if (result.iterator().hasNext()) {
+                return Optional.of(result.iterator().next()).map(HistoricItem::getState)
+                        .map(state -> JRuleEventHandler.get().toValue(state));
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            throw new JRuleRuntimeException("cannot get state at for item, persistence service (%s) not queryable"
+                    .formatted(persistenceService.getId()));
+        }
+    }
+
     public static Optional<JRuleValue> historicState(String itemName, ZonedDateTime timestamp) {
         return historicState(itemName, timestamp, null);
     }

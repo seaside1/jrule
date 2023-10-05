@@ -108,8 +108,18 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
+    public Optional<JRuleValue> getStateAt(ZonedDateTime timestamp, String persistenceServiceId) {
+        return JRulePersistenceExtensions.stateAt(name, timestamp, persistenceServiceId);
+    }
+
+    @Override
     public Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId) {
         return JRulePersistenceExtensions.previousState(name, skipEquals, persistenceServiceId);
+    }
+
+    @Override
+    public void persist(JRuleValue state, ZonedDateTime time, String persistenceServiceId) {
+        JRulePersistenceExtensions.persist(name, time, state, persistenceServiceId);
     }
 
     @Override
@@ -126,5 +136,10 @@ public abstract class JRuleInternalItem implements JRuleItem {
     @Override
     public int hashCode() {
         return Objects.hash(name, label, type, id);
+    }
+
+    @Override
+    public String toString() {
+        return "%s:%s".formatted(name, type);
     }
 }

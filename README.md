@@ -69,6 +69,13 @@ Beta, still major changes.
 
 - Not supporting OH4 GUI rules
 
+### Database
+
+- JRule persist is a utility for supporting `org.openhab.core.persistence.ModifiablePersistenceService`.  Currently these Persistance Services are supported:
+  - Influx
+  - JDBC
+  - InMemory
+
 # Getting started
 
 1. Install the addon by either

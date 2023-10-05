@@ -83,5 +83,7 @@ Color           Color_To_Persist           (InfluxDbPersist)
 Location        Location_To_Persist        (InfluxDbPersist)
 Number:Power    Quantity_To_Persist        (InfluxDbPersist)
 
+Number          Number_To_Persist_Future   (InfluxDbPersist)
+
 
 Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }

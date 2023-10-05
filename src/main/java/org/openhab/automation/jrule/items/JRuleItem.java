@@ -123,11 +123,23 @@ public interface JRuleItem {
 
     Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
 
+    default Optional<JRuleValue> getStateAt(ZonedDateTime timestamp) {
+        return getStateAt(timestamp, null);
+    }
+
+    Optional<JRuleValue> getStateAt(ZonedDateTime timestamp, String persistenceServiceId);
+
     default Optional<State> getPreviousState(boolean skipEquals) {
         return getPreviousState(skipEquals, null);
     }
 
     Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId);
+
+    default void persist(JRuleValue state, ZonedDateTime time) {
+        persist(state, time, null);
+    }
+
+    void persist(JRuleValue state, ZonedDateTime time, String persistenceServiceId);
 
     default boolean isGroup() {
         return false;

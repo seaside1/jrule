@@ -25,6 +25,7 @@ import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
@@ -63,10 +64,12 @@ public class JRuleFactory {
             final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
             final @Reference VoiceManager voiceManager, final ComponentContext componentContext,
             final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry,
-            @Reference JRuleRuleProvider ruleProvider) {
+            final @Reference JRuleRuleProvider ruleProvider,
+            @Reference final PersistenceServiceRegistry persistenceServiceRegistry) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
+        jRuleEngine.setPersistenceServiceRegistry(persistenceServiceRegistry);
         jRuleEngine.setConfig(config);
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleEngine.setCronScheduler(cronScheduler);
