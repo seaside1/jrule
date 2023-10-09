@@ -26,4 +26,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 public @interface JRuleName {
     String value() default "";
+
+    boolean isDynamic() default false;
 }

@@ -18,7 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -136,30 +135,26 @@ public class JRuleEngine implements PropertyChangeListener {
                 .forEach(method -> this.add(method, jRule, enableRule));
     }
 
-    public void addDynamicWhenReceivedCommand(Method method, JRule jRule, String ruleName, List<String> items) {
-        JRuleModuleEntry ruleModuleEntry = new JRuleModuleEntry(jRule, method, ruleName);
-        List<JRulePreconditionContext> emptyPreconditionContextList = new ArrayList<>(0);
-        for (String itemName : items) {
-            JRuleItemReceivedCommandExecutionContext context = new JRuleItemReceivedCommandExecutionContext(jRule,
-                    ruleName, JRuleEngine.EMPTY_LOG_TAGS, method, itemName, JRuleMemberOf.None, Optional.empty(),
-                    emptyPreconditionContextList, Optional.empty(), null, null);
-
-            addToContext(context, false);
-            ruleLoadingStatistics.addItemStateTrigger();
-            ruleModuleEntry.addJRuleWhenItemReceivedCommand(context);
-
-            logInfo("Adding Dynamic Rule Name: {} item: {}", ruleName, itemName);
-        }
-        ruleLoadingStatistics.addRuleClass();
-        ruleProvider.add(ruleModuleEntry);
+    public void addDynamic(Method method, JRule jRule) {
+        add(method, jRule, false, true);
     }
 
     private void add(Method method, JRule jRule, boolean enableRule) {
+        add(method, jRule, enableRule, false);
+    }
+
+    private void add(Method method, JRule jRule, boolean enableRule, boolean isDynamic) {
         logDebug("Adding rule method: {}", method.getName());
 
         if (!method.isAnnotationPresent(JRuleName.class)) {
             logDebug("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
                     jRule.getClass().getName());
+            return;
+        }
+
+        if (!isDynamic && method.getAnnotation(JRuleName.class).isDynamic()) {
+            logDebug("Skipping method {} on class {} since JRuleName annotated as not create at startUp",
+                    method.getName(), jRule.getClass().getName());
             return;
         }
 
