@@ -85,6 +85,14 @@ public class JRuleRuleProvider implements RuleProvider {
         rules.clear();
     }
 
+    public void remove(JRule rule, Method method) {
+        JRuleModuleEntry entry = rules.get(JRuleModuleEntry.createUid(rule, method));
+        if (entry != null) {
+            listeners.stream().forEach(e -> e.removed(this, entry));
+            entry.dispose();
+        }
+    }
+
     public void add(JRuleModuleEntry entry) {
         rules.put(entry.getUID(), entry);
         listeners.stream().forEach(e -> e.added(this, entry));

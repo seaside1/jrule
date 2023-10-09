@@ -414,6 +414,11 @@ public class JRuleEngine implements PropertyChangeListener {
         ruleProvider.reset();
     }
 
+    public void removeDynamic(Method method, JRule jRule) {
+        contextList.removeIf((executionContext) -> executionContext.getMethod().equals(method));
+        ruleProvider.remove(jRule, method);
+    }
+
     public boolean watchingForItem(String itemName) {
         if (itemRegistry == null) {
             // JRuleEngine not completely initialized
