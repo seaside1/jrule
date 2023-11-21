@@ -250,7 +250,7 @@ public class JRuleCompiler {
         String cp = openhabCoreJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
                 + openhabCoreThingJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
         optionList.add(cp);
-        logDebug("1337Compiling classes using classpath: {}", cp);
+        logDebug("Compiling classes using classpath: {}", cp);
         javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
                 .forEach(javaSourceFile -> logDebug("Compiling java Source file: {}", javaSourceFile));
 
