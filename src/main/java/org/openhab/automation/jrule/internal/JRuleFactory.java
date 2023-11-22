@@ -22,9 +22,11 @@ import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.core.audio.AudioHTTPServer;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.net.NetworkAddressService;
 import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.ThingManager;
@@ -62,7 +64,8 @@ public class JRuleFactory {
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
             final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
-            final @Reference VoiceManager voiceManager, final ComponentContext componentContext,
+            final @Reference VoiceManager voiceManager, final @Reference AudioHTTPServer audioHTTPServer,
+            final @Reference NetworkAddressService networkAddressService, final ComponentContext componentContext,
             final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry,
             final @Reference JRuleRuleProvider ruleProvider,
             @Reference final PersistenceServiceRegistry persistenceServiceRegistry) {
@@ -74,10 +77,12 @@ public class JRuleFactory {
         jRuleEngine.setItemRegistry(itemRegistry);
         jRuleEngine.setCronScheduler(cronScheduler);
         jRuleEngine.setRuleProvider(ruleProvider);
+
         jRuleEngine.initialize();
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
-                eventSubscriber, voiceManager, cronScheduler, componentContext.getBundleContext(), metadataRegistry);
+                eventSubscriber, voiceManager, audioHTTPServer, networkAddressService, cronScheduler,
+                componentContext.getBundleContext(), metadataRegistry);
         delayedInit.call(this::init);
     }
 

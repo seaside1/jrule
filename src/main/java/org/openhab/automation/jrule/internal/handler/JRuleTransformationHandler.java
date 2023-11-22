@@ -50,9 +50,13 @@ public class JRuleTransformationHandler {
         this.bundleContext = bundleContext;
     }
 
+    public BundleContext getBundleContext() {
+        return bundleContext;
+    }
+
     /**
      * Transforms the given state with the transformation pattern.
-     * 
+     *
      * @param stateDescPattern The transformation pattern
      * @param state State which should be converted
      * @return The transformation result
