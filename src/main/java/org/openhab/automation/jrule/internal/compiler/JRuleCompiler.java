@@ -58,6 +58,8 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleCompiler {
 
+    private static final String ORG_OPENHAB_CORE = "org.openhab.core-";
+    private static final String ORG_OPENHAB_CORE_THING = "org.openhab.core.thing-";
     private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
     private static final String CLASSPATH_OPTION = "-classpath";
     public static final String JAR_JRULE_NAME = "jrule.jar";
@@ -108,12 +110,12 @@ public class JRuleCompiler {
                         loadClass(classLoader, relativePathToFullClassname(jarEntryName), createInstance);
                     }
                 } catch (IllegalArgumentException | SecurityException | IOException e) {
-                    logError("Error loading classes from jarfile {} due to {}", jarItem.getAbsolutePath(), e);
+                    logError(e, "Error loading classes from jarfile {}", jarItem.getAbsolutePath());
                 }
                 // Best effort
             });
         } catch (Exception e) {
-            logError("Error loading classes from jarfile: {}", e);
+            logError(e, "Error loading classes from jarfile: {}");
         }
     }
 
@@ -149,7 +151,7 @@ public class JRuleCompiler {
                     final Object obj = loadedClass.getDeclaredConstructor().newInstance();
                     logDebug("Created instance: {} obj: {}", className, obj);
                 } catch (Exception x) {
-                    logError("Could not create create instance using default constructor: {}: {}", className, x);
+                    logError(x, "Could not create create instance using default constructor: {}", className);
                 }
             }
         }
@@ -169,7 +171,7 @@ public class JRuleCompiler {
                     .map(this::relativePathToFullClassname).filter(e -> e.startsWith(onlyInRootPackage))
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            logError("Error loading classes in {} due to {}", rootFolder.getAbsolutePath(), e);
+            logError(e, "Error loading classes in {} due to {}", rootFolder.getAbsolutePath());
         }
 
         // classFiles is now in the form "packageRoot.subPackage.classname", filtered by prefix in onlyInRootPackage
@@ -202,14 +204,14 @@ public class JRuleCompiler {
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.JAVA_FILE_TYPE)).map(Path::toFile)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            logError("Error listing source files in folder: {}", sourceFolder.getAbsolutePath(), e);
+            logError(e, "Error listing source files in folder: {}", sourceFolder.getAbsolutePath());
         }
         try (Stream<Path> paths = Files.walk(Paths.get(sourceFolder.toURI()))) {
             javaClassFiles = paths.filter(Files::isRegularFile) // is a file
                     .filter(f -> f.getFileName().toString().endsWith(JRuleConstants.CLASS_FILE_TYPE)).map(Path::toFile)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            logError("Error listing class files in folder: {}", sourceFolder.getAbsolutePath(), e);
+            logError(e, "Error listing class files in folder: {}", sourceFolder.getAbsolutePath());
         }
 
         Map<String, File> classFiles = new HashMap<>();
@@ -241,9 +243,12 @@ public class JRuleCompiler {
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
         final List<String> optionList = new ArrayList<>();
         optionList.add(CLASSPATH_OPTION);
-        String openhabCoreJar = getOpenhabCoreJar().map(s -> s + File.pathSeparator).orElse("");
+        final String openhabCoreJar = getOpenhabCoreJar().map(s -> s + File.pathSeparator).orElse("");
         logDebug("Openhab-Core Jar: {}", openhabCoreJar);
-        String cp = openhabCoreJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
+        final String openhabCoreThingJar = getOpenhabCoreThingJar().map(s -> s + File.pathSeparator).orElse("");
+        logDebug("Openhab-Core-Thing Jar: {}", openhabCoreThingJar);
+        String cp = openhabCoreJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator
+                + openhabCoreThingJar + System.getProperty(JAVA_CLASS_PATH_PROPERTY) + File.pathSeparator + classPath;
         optionList.add(cp);
         logDebug("Compiling classes using classpath: {}", cp);
         javaSourceFiles.stream().filter(javaSourceFile -> javaSourceFile.exists() && javaSourceFile.canRead())
@@ -266,13 +271,21 @@ public class JRuleCompiler {
             }
             fileManager.close();
         } catch (Exception x) {
-            logError("Compiler threw error {}", x.toString());
+            logError(x, "Compiler threw error {}");
         }
 
         return false;
     }
 
     private Optional<String> getOpenhabCoreJar() {
+        return getOpenHABJar(ORG_OPENHAB_CORE);
+    }
+
+    private Optional<String> getOpenhabCoreThingJar() {
+        return getOpenHABJar(ORG_OPENHAB_CORE_THING);
+    }
+
+    private Optional<String> getOpenHABJar(String jarPrefix) {
         if (!System.getProperties().containsKey(PROPERTY_KARAF_HOME_URI)
                 && !System.getProperties().containsKey(PROPERTY_KARAF_DEFAULT_REPOSITORY)) {
             logWarn("required system properties does not exist [{}]",
@@ -284,12 +297,13 @@ public class JRuleCompiler {
                 + System.getProperty(PROPERTY_KARAF_DEFAULT_REPOSITORY);
         logDebug("Openhab Jars path: {}", openhabJars);
         Optional<String> coreJarPath;
+
         try (Stream<Path> stream = Files.walk(Paths.get(openhabJars))) {
             coreJarPath = stream.filter(path -> path.getFileName().toString().endsWith(JRuleConstants.JAR_FILE_TYPE))
-                    .filter(path -> path.getFileName().toString().startsWith("org.openhab.core-"))
+                    .filter(path -> path.getFileName().toString().startsWith(jarPrefix))
                     .map(path -> path.toFile().getAbsolutePath()).findFirst();
         } catch (IOException e) {
-            logError(e.getMessage());
+            logError(e, "Failed to get CoreJar");
             return Optional.empty();
         }
         return coreJarPath;
@@ -323,7 +337,7 @@ public class JRuleCompiler {
                 logWarn("Found no java rules to compile and use in folder {}", jRuleConfig.getRulesDirectory());
             }
         } catch (IOException e) {
-            logError("Error listing java files in folder: {}", jRuleConfig.getRulesDirectory(), e);
+            logError(e, "Error listing java files in folder: {}", jRuleConfig.getRulesDirectory());
 
         }
         return false;
@@ -334,7 +348,7 @@ public class JRuleCompiler {
             final File[] extLibsFiles = getExtLibsAsFiles();
             return Arrays.stream(extLibsFiles).map(this::getUrl).collect(Collectors.toList());
         } catch (Exception x) {
-            logError("Failed to get extLib urls");
+            logError(x, "Failed to get extLib urls");
             return new ArrayList<>();
         }
     }
@@ -344,7 +358,7 @@ public class JRuleCompiler {
             final File[] jarRulesFiles = getJarRulesAsFiles();
             return Arrays.stream(jarRulesFiles).map(this::getUrl).collect(Collectors.toList());
         } catch (Exception x) {
-            logError("Failed to get jar-rules urls");
+            logError(x, "Failed to get jar-rules urls");
             return new ArrayList<>();
         }
     }
@@ -353,7 +367,7 @@ public class JRuleCompiler {
         try {
             return f.toURI().toURL();
         } catch (MalformedURLException e) {
-            logError("Failed to convert to URL: {}", f.getAbsolutePath(), e);
+            logError(e, "Failed to convert to URL: {}", f.getAbsolutePath());
         }
         return null;
     }
@@ -411,6 +425,10 @@ public class JRuleCompiler {
 
     private void logError(String message, Object... parameters) {
         JRuleLog.error(logger, LOG_NAME_COMPILER, message, parameters);
+    }
+
+    private void logError(Throwable t, String message, Object... parameters) {
+        JRuleLog.error(logger, LOG_NAME_COMPILER, t, message);
     }
 
     private void logWarn(String message, Object... parameters) {

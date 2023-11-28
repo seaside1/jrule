@@ -12,7 +12,9 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
+import org.openhab.core.audio.AudioHTTPServer;
 import org.openhab.core.library.types.PercentType;
+import org.openhab.core.net.NetworkAddressService;
 import org.openhab.core.voice.VoiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,12 @@ public class JRuleVoiceHandler {
     private static volatile JRuleVoiceHandler instance;
 
     private VoiceManager voiceManager;
+    private AudioHTTPServer audioHTTPServer;
+    private NetworkAddressService networkAddressService;
+
+    public VoiceManager getVoiceManager() {
+        return voiceManager;
+    }
 
     private final Logger logger = LoggerFactory.getLogger(JRuleVoiceHandler.class);
 
@@ -65,5 +73,21 @@ public class JRuleVoiceHandler {
     public void say(String text, String voiceId, String sinkId, int volumePercent) {
         final PercentType volume = new PercentType(volumePercent);
         voiceManager.say(text, voiceId, sinkId, volume);
+    }
+
+    public AudioHTTPServer getAudioHTTPServer() {
+        return audioHTTPServer;
+    }
+
+    public void setAudioHTTPServer(AudioHTTPServer audioHTTPServer) {
+        this.audioHTTPServer = audioHTTPServer;
+    }
+
+    public NetworkAddressService getNetworkAddressService() {
+        return networkAddressService;
+    }
+
+    public void setNetworkAddressService(NetworkAddressService networkAddressService) {
+        this.networkAddressService = networkAddressService;
     }
 }

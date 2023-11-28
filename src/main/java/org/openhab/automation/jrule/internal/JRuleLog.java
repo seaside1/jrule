@@ -46,6 +46,17 @@ public class JRuleLog {
         logger.warn(PREFIX_WARN_LOG, logPrefix, logMessage.getMessage());
     }
 
+    public static void error(Logger logger, String logPrefix, Throwable t, String message, Object... parameters) {
+        final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
+        final FormattingTuple finalLogmessage = MessageFormatter.format(PREFIX_ERROR_LOG,
+                new String[] { logPrefix, logMessage.getMessage() });
+        error(logger, t, finalLogmessage.getMessage());
+    }
+
+    private static void error(Logger logger, Throwable t, String message) {
+        logger.error(message, t);
+    }
+
     public static void error(Logger logger, String logPrefix, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
         logger.error(PREFIX_ERROR_LOG, logPrefix, logMessage.getMessage());

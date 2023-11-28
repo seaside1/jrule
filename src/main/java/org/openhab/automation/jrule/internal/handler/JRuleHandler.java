@@ -50,6 +50,7 @@ import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.things.JRuleThingClassGenerator;
 import org.openhab.automation.jrule.things.JRuleThingRegistry;
+import org.openhab.core.audio.AudioHTTPServer;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.Item;
@@ -59,6 +60,7 @@ import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemRemovedEvent;
 import org.openhab.core.items.events.ItemUpdatedEvent;
+import org.openhab.core.net.NetworkAddressService;
 import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingManager;
@@ -119,8 +121,8 @@ public class JRuleHandler implements PropertyChangeListener {
 
     public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, ThingRegistry thingRegistry,
             ThingManager thingManager, EventPublisher eventPublisher, JRuleEventSubscriber eventSubscriber,
-            VoiceManager voiceManager, CronScheduler cronScheduler, BundleContext bundleContext,
-            MetadataRegistry metadataRegistry) {
+            VoiceManager voiceManager, AudioHTTPServer audioHTTPServer, NetworkAddressService networkAddressService,
+            CronScheduler cronScheduler, BundleContext bundleContext, MetadataRegistry metadataRegistry) {
         this.itemRegistry = itemRegistry;
         this.thingRegistry = thingRegistry;
         this.metadataRegistry = metadataRegistry;
@@ -136,18 +138,23 @@ public class JRuleHandler implements PropertyChangeListener {
         actionGenerator = new JRuleActionClassGenerator(config);
         compiler = new JRuleCompiler(config);
 
-        JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
+        final JRuleEventHandler jRuleEventHandler = JRuleEventHandler.get();
         jRuleEventHandler.setEventPublisher(eventPublisher);
         jRuleEventHandler.setItemRegistry(itemRegistry);
         eventSubscriber.addPropertyChangeListener(this);
-        JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
+        final JRuleVoiceHandler jRuleVoiceHandler = JRuleVoiceHandler.get();
         jRuleVoiceHandler.setVoiceManager(voiceManager);
-        JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
+        jRuleVoiceHandler.setAudioHTTPServer(audioHTTPServer);
+        jRuleVoiceHandler.setNetworkAddressService(networkAddressService);
+        final JRuleTransformationHandler jRuleTransformationHandler = JRuleTransformationHandler.get();
         jRuleTransformationHandler.setBundleContext(bundleContext);
 
-        JRuleThingHandler thingHandler = JRuleThingHandler.get();
+        final JRuleThingHandler thingHandler = JRuleThingHandler.get();
         thingHandler.setThingManager(thingManager);
         thingHandler.setThingRegistry(thingRegistry);
+
+        final JRuleItemHandler itemHandler = JRuleItemHandler.get();
+        itemHandler.setItemRegistry(itemRegistry);
 
         logDebug("JRuleHandler()");
     }
