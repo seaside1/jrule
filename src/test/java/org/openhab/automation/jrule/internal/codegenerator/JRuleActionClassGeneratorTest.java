@@ -153,7 +153,7 @@ public class JRuleActionClassGeneratorTest {
         assertEquals(10, res);
 
         Method doSomething = action.getClass().getDeclaredMethod("doSomething", String.class, int.class, Float.class);
-        doSomething.invoke(action, "hi", 5, 3.7f);
+        doSomething.invoke(action, "hi", (int) 5, 3.7f);
         assertEquals(10, res);
 
         // Verify method with unsupported types are mapped to Object
