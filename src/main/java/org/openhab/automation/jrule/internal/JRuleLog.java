@@ -22,14 +22,11 @@ import org.slf4j.helpers.MessageFormatter;
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
 public class JRuleLog {
-    private static final String PREFIX_INFO_LOG = "[{}] {}";
-    private static final String PREFIX_DEBUG_LOG = "[+{}+] {}";
-    private static final String PREFIX_WARN_LOG = "[{}] {}";
-    private static final String PREFIX_ERROR_LOG = "[{}] {}";
+    private static final String LOG_FORMAT = "{}{}";
 
     public static void debug(Logger logger, String logPrefix, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        logger.debug(PREFIX_DEBUG_LOG, logPrefix, logMessage.getMessage());
+        logger.debug(LOG_FORMAT, getPrefix(logPrefix, true), logMessage.getMessage());
     }
 
     public static void debug(Logger logger, String logPrefix, String message, String... parameters) {
@@ -38,17 +35,17 @@ public class JRuleLog {
 
     public static void info(Logger logger, String logPrefix, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        logger.info(PREFIX_INFO_LOG, logPrefix, logMessage.getMessage());
+        logger.info(LOG_FORMAT, getPrefix(logPrefix, false), logMessage.getMessage());
     }
 
     public static void warn(Logger logger, String logPrefix, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        logger.warn(PREFIX_WARN_LOG, logPrefix, logMessage.getMessage());
+        logger.warn(LOG_FORMAT, getPrefix(logPrefix, false), logMessage.getMessage());
     }
 
     public static void error(Logger logger, String logPrefix, Throwable t, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        final FormattingTuple finalLogmessage = MessageFormatter.format(PREFIX_ERROR_LOG,
+        final FormattingTuple finalLogmessage = MessageFormatter.format(LOG_FORMAT,
                 new String[] { logPrefix, logMessage.getMessage() });
         error(logger, t, finalLogmessage.getMessage());
     }
@@ -59,6 +56,17 @@ public class JRuleLog {
 
     public static void error(Logger logger, String logPrefix, String message, Object... parameters) {
         final FormattingTuple logMessage = MessageFormatter.arrayFormat(message, parameters);
-        logger.error(PREFIX_ERROR_LOG, logPrefix, logMessage.getMessage());
+        logger.error(LOG_FORMAT, getPrefix(logPrefix, false), logMessage.getMessage());
+    }
+
+    private static String getPrefix(String logPrefix, boolean debug) {
+        if (logPrefix.isBlank()) {
+            return "";
+        }
+        if (debug) {
+            return "[+%s+] ".formatted(logPrefix);
+        } else {
+            return "[%s] ".formatted(logPrefix);
+        }
     }
 }
