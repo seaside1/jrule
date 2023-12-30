@@ -14,12 +14,11 @@ package org.openhab.automation.jrule.items;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.*;
-import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.items.*;
 import org.openhab.core.library.CoreItemFactory;
@@ -92,22 +91,16 @@ public class JRuleItemRegistry {
 
             try {
                 Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
-                        String.class, String.class, String.class, Map.class, List.class);
+                        String.class, String.class, String.class, JRuleMetadataRegistry.class, List.class);
                 constructor.setAccessible(true);
                 jRuleItem = constructor.newInstance(itemName, item.getLabel(), item.getType(), item.getUID(),
-                        getAllMetadata(item, metadataRegistry), new ArrayList<>(item.getTags()));
+                        new JRuleMetadataRegistry(metadataRegistry), new ArrayList<>(item.getTags()));
                 itemRegistry.put(itemName, jRuleItem);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
         return jRuleItem;
-    }
-
-    public static Map<String, JRuleItemMetadata> getAllMetadata(Item item, MetadataRegistry metadataRegistry) {
-        return metadataRegistry.stream().filter(metadata -> metadata.getUID().getItemName().equals(item.getName()))
-                .collect(Collectors.toMap(metadata -> metadata.getUID().getNamespace(),
-                        metadata -> new JRuleItemMetadata(metadata.getValue(), metadata.getConfiguration())));
     }
 
     public static <T> T get(String itemName, Class<? extends JRuleItem> jRuleItemClass)
@@ -118,9 +111,9 @@ public class JRuleItemRegistry {
 
             try {
                 Constructor<? extends JRuleItem> constructor = jRuleItemClass.getDeclaredConstructor(String.class,
-                        String.class, String.class, String.class, Map.class, List.class);
+                        String.class, String.class, String.class, JRuleMetadataRegistry.class, List.class);
                 jruleItem = constructor.newInstance(item.getName(), item.getLabel(), item.getType(), item.getUID(),
-                        getAllMetadata(item, metadataRegistry), new ArrayList<>(item.getTags()));
+                        new JRuleMetadataRegistry(metadataRegistry), new ArrayList<>(item.getTags()));
                 itemRegistry.put(itemName, jruleItem);
             } catch (Exception ex) {
                 throw new RuntimeException(String.format("cannot create item '%s' for type '%s'", itemName,

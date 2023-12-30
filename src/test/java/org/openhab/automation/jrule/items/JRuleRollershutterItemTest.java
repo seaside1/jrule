@@ -13,7 +13,6 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.TestInfo;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
-import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 import org.openhab.automation.jrule.rules.value.JRulePercentValue;
 import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
@@ -86,8 +84,7 @@ class JRuleRollershutterItemTest extends JRuleItemTestBase {
 
     @Override
     protected JRuleItem getJRuleItem() {
-        return new JRuleInternalRollershutterItem(ITEM_NAME, "Label", "Type", "Id",
-                Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))),
+        return new JRuleInternalRollershutterItem(ITEM_NAME, "Label", "Type", "Id", mock,
                 List.of("Lighting", "Inside"));
     }
 

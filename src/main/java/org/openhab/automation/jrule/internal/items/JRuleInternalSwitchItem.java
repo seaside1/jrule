@@ -14,11 +14,10 @@ package org.openhab.automation.jrule.internal.items;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.core.library.types.DecimalType;
 
 /**
@@ -28,8 +27,8 @@ import org.openhab.core.library.types.DecimalType;
  */
 public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleSwitchItem {
     public JRuleInternalSwitchItem(String name, String label, String type, String id,
-            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
-        super(name, label, type, id, metadata, tags);
+            JRuleMetadataRegistry metadataRegistry, List<String> tags) {
+        super(name, label, type, id, metadataRegistry, tags);
     }
 
     public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
