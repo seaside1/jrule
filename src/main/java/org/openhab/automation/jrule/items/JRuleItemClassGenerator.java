@@ -27,6 +27,7 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.MetadataRegistry;
@@ -56,14 +57,14 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
     public boolean generateItemsSource(Collection<Item> items, MetadataRegistry metadataRegistry) {
         try {
             List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
-                    .map(item -> createItemModel(item, JRuleItemRegistry.getAllMetadata(item, metadataRegistry)))
+                    .map(item -> createItemModel(item,
+                            JRuleMetadataRegistry.getAllMetadata(item.getName(), metadataRegistry)))
                     .collect(Collectors.toList());
             Map<String, Object> processingModel = new HashMap<>();
             processingModel.put("items", model);
             processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
 
-            File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
-                    .append(File.separator).append("JRuleItems.java").toString());
+            File targetSourceFile = new File(jRuleConfig.getItemsDirectory() + File.separator + "JRuleItems.java");
 
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
                 Template template = freemarkerConfiguration.getTemplate("items/Items" + TEMPLATE_SUFFIX);
@@ -117,8 +118,7 @@ public class JRuleItemClassGenerator extends JRuleAbstractClassGenerator {
             if (item == null) {
                 return ITEM_GROUP_TYPE_UNSPECIFIED;
             }
-            List<String> childItemTypes = item.getAllMembers().stream().map(Item::getType).distinct()
-                    .collect(Collectors.toList());
+            List<String> childItemTypes = item.getAllMembers().stream().map(Item::getType).distinct().toList();
             if (childItemTypes.size() == 1) {
                 return getPlainType(childItemTypes.get(0));
             } else {

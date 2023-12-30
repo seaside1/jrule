@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.items.metadata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,6 +27,10 @@ public class JRuleItemMetadata {
     public JRuleItemMetadata(String value, Map<String, Object> configuration) {
         this.value = value;
         this.configuration = configuration;
+    }
+
+    public JRuleItemMetadata(String value) {
+        this(value, new HashMap<>());
     }
 
     public String getValue() {
