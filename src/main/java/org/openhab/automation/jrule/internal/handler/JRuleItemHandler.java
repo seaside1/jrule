@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
+import java.util.Arrays;
+
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.items.NumberItem;
@@ -56,15 +58,55 @@ public class JRuleItemHandler {
         return itemRegistry.get(itemName) != null;
     }
 
-    public Item addNumberItem(String name, int value) {
+    public Item addNumberItem(String name) {
+        return addNumberItem(name, null, null, null);
+    }
+
+    public Item addNumberItem(String name, Double value) {
+        return addNumberItem(name, value, null, null);
+    }
+
+    public Item addNumberItem(String name, Double value, String label) {
+        return addNumberItem(name, value, label, null);
+    }
+
+    public Item addNumberItem(String name, Double value, String label, String[] groupNames) {
         final NumberItem numberItem = new NumberItem(name);
-        numberItem.setState(new DecimalType(value));
+        if (value != null) {
+            numberItem.setState(new DecimalType(value));
+        }
+        if (label != null) {
+            numberItem.setLabel(label);
+        }
+        if (groupNames != null && groupNames.length > 0) {
+            Arrays.stream(groupNames).forEach(g -> numberItem.addGroupName(g));
+        }
         return itemRegistry.add(numberItem);
     }
 
+    public Item addStringItem(String name) {
+        return addStringItem(name, null, null, null);
+    }
+
     public Item addStringItem(String name, String value) {
+        return addStringItem(name, value, null, null);
+    }
+
+    public Item addStringItem(String name, String value, String label) {
+        return addStringItem(name, value, label, null);
+    }
+
+    public Item addStringItem(String name, String value, String label, String[] groupNames) {
         final StringItem stringItem = new StringItem(name);
-        stringItem.setState(new StringType(value));
+        if (value != null) {
+            stringItem.setState(new StringType(value));
+        }
+        if (label != null) {
+            stringItem.setLabel(label);
+        }
+        if (groupNames != null && groupNames.length > 0) {
+            Arrays.stream(groupNames).forEach(g -> stringItem.addGroupName(g));
+        }
         return itemRegistry.add(stringItem);
     }
 }
