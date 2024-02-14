@@ -22,6 +22,11 @@ import org.openhab.automation.jrule.rules.event.JRuleStartupEvent;
 import org.openhab.core.events.AbstractEvent;
 import org.openhab.core.events.system.StartlevelEvent;
 
+/**
+ * The {@link JRuleStartupExecutionContext} - execution context for startup triggers
+ *
+ * @author Robert Delbrück
+ */
 public class JRuleStartupExecutionContext extends JRuleExecutionContext {
 
     private final int startupLevel;
