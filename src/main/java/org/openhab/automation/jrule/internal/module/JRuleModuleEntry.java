@@ -23,14 +23,8 @@ import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
-import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleStartupExecutionContext;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.core.automation.Action;
 import org.openhab.core.automation.Trigger;
 import org.openhab.core.automation.module.script.rulesupport.shared.simple.SimpleRule;
@@ -156,6 +150,14 @@ public class JRuleModuleEntry extends SimpleRule {
         executionContextList.add(context);
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
                 .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenThingTrigger.class));
+
+        ruleTriggers.add(triggerBuilder.build());
+    }
+
+    public void addJRuleWhenStartupTrigger(JRuleStartupExecutionContext context) {
+        executionContextList.add(context);
+        TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
+                .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenStartup.class));
 
         ruleTriggers.add(triggerBuilder.build());
     }
