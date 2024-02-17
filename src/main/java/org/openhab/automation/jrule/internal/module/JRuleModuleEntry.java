@@ -58,8 +58,8 @@ public class JRuleModuleEntry extends SimpleRule {
 
     boolean enabled = false;
 
-    public JRuleModuleEntry(JRule jRule, Method method, String ruleName) {
-        this.uid = createUid(jRule, method);
+    public JRuleModuleEntry(String uid, String ruleName) {
+        this.uid = uid;
         tags.add("JRule");
         setTriggers(ruleTriggers);
         setConditions(List.of());
@@ -143,6 +143,13 @@ public class JRuleModuleEntry extends SimpleRule {
         TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
                 .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenTimeTrigger.class));
         ruleTriggers.add(triggerBuilder.build());
+    }
+
+    public void addJRuleWhenStartupTrigger(JRuleExecutionContext context) {
+        executionContextList.add(context);
+        // TriggerBuilder triggerBuilder = TriggerBuilder.create().withId("" + (triggerCounter++))
+        // .withTypeUID(JRuleModuleUtil.toTriggerModuleUID(JRuleWhenTimeTrigger.class));
+        // ruleTriggers.add(triggerBuilder.build());
     }
 
     public void addJRuleWhenThingTrigger(JRuleExecutionContext context) {

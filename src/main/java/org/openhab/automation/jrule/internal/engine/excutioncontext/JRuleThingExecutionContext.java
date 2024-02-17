@@ -12,13 +12,12 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
@@ -35,10 +34,11 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     private final Optional<JRuleThingStatus> from;
     private final Optional<JRuleThingStatus> to;
 
-    public JRuleThingExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            Optional<String> thing, Optional<JRuleThingStatus> from, Optional<JRuleThingStatus> to,
-            List<JRulePreconditionContext> preconditions, Duration timedLock, Duration delayed) {
-        super(jRule, logName, loggingTags, method, preconditions, timedLock, delayed);
+    public JRuleThingExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, Optional<String> thing, Optional<JRuleThingStatus> from,
+            Optional<JRuleThingStatus> to, List<JRulePreconditionContext> preconditions, Duration timedLock,
+            Duration delayed) {
+        super(uid, logName, loggingTags, invocationCallback, preconditions, timedLock, delayed);
         this.thing = thing;
         this.from = from;
         this.to = to;
@@ -71,7 +71,7 @@ public class JRuleThingExecutionContext extends JRuleExecutionContext {
     @Override
     public String toString() {
         return "JRuleThingExecutionContext{" + "thing=" + thing + ", from=" + from + ", to=" + to + ", logName='"
-                + logName + '\'' + ", jRule=" + rule + ", method=" + method + ", loggingTags="
+                + logName + '\'' + ", uid=" + uid + ", invocationCallback=" + invocationCallback + ", loggingTags="
                 + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }

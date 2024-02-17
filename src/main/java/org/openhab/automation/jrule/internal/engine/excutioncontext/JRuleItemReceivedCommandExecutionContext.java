@@ -12,15 +12,14 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItem;
-import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
@@ -39,12 +38,12 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     private static final Logger log = LoggerFactory.getLogger(JRuleItemReceivedCommandExecutionContext.class);
     protected final Optional<String> command;
 
-    public JRuleItemReceivedCommandExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            String itemName, JRuleMemberOf memberOf, Optional<JRuleConditionContext> conditionContext,
-            List<JRulePreconditionContext> preconditionContextList, Optional<String> command, Duration timedLock,
-            Duration delayed) {
-        super(jRule, logName, loggingTags, method, itemName, memberOf, conditionContext, preconditionContextList,
-                timedLock, delayed);
+    public JRuleItemReceivedCommandExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, String itemName, JRuleMemberOf memberOf,
+            Optional<JRuleConditionContext> conditionContext, List<JRulePreconditionContext> preconditionContextList,
+            Optional<String> command, Duration timedLock, Duration delayed) {
+        super(uid, logName, loggingTags, invocationCallback, itemName, memberOf, conditionContext,
+                preconditionContextList, timedLock, delayed);
         this.command = command;
     }
 
@@ -96,7 +95,7 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
     public String toString() {
         return "JRuleItemReceivedCommandExecutionContext{" + "command=" + command + ", itemName='" + itemName + '\''
                 + ", memberOf=" + memberOf + ", conditionContext=" + conditionContext + ", logName='" + logName + '\''
-                + ", jRule=" + rule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
-                + ", preconditionContextList=" + preconditionContextList + '}';
+                + ", uid=" + uid + ", invocationCallback=" + invocationCallback + ", loggingTags="
+                + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
