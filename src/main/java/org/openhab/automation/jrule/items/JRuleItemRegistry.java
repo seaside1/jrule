@@ -13,14 +13,48 @@
 package org.openhab.automation.jrule.items;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
-import org.openhab.automation.jrule.internal.items.*;
+import org.openhab.automation.jrule.internal.items.JRuleInternalCallGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalCallItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalColorGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalContactItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDateTimeItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalDimmerItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalImageGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalImageItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalLocationGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalLocationItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalNumberGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalNumberItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalQuantityItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalStringItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchGroupItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalSwitchItem;
+import org.openhab.automation.jrule.internal.items.JRuleInternalUnspecifiedGroupItem;
 import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.items.*;
+import org.openhab.core.items.GroupItem;
+import org.openhab.core.items.Item;
+import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.CoreItemFactory;
 
 /**
