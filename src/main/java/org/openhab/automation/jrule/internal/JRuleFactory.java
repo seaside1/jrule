@@ -31,6 +31,7 @@ import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.scheduler.CronScheduler;
 import org.openhab.core.thing.ThingManager;
 import org.openhab.core.thing.ThingRegistry;
+import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentContext;
@@ -62,9 +63,11 @@ public class JRuleFactory {
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
-            final @Reference ItemRegistry itemRegistry, final @Reference ThingRegistry thingRegistry,
-            final @Reference ThingManager thingManager, final @Reference EventPublisher eventPublisher,
-            final @Reference VoiceManager voiceManager, final @Reference AudioHTTPServer audioHTTPServer,
+            final @Reference ItemRegistry itemRegistry,
+            final @Reference ItemChannelLinkRegistry itemChannelLinkRegistry,
+            final @Reference ThingRegistry thingRegistry, final @Reference ThingManager thingManager,
+            final @Reference EventPublisher eventPublisher, final @Reference VoiceManager voiceManager,
+            final @Reference AudioHTTPServer audioHTTPServer,
             final @Reference NetworkAddressService networkAddressService, final ComponentContext componentContext,
             final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry,
             final @Reference JRuleRuleProvider ruleProvider,
@@ -80,8 +83,8 @@ public class JRuleFactory {
 
         jRuleEngine.initialize();
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
-        jRuleHandler = new JRuleHandler(config, itemRegistry, thingRegistry, thingManager, eventPublisher,
-                eventSubscriber, voiceManager, audioHTTPServer, networkAddressService, cronScheduler,
+        jRuleHandler = new JRuleHandler(config, itemRegistry, itemChannelLinkRegistry, thingRegistry, thingManager,
+                eventPublisher, eventSubscriber, voiceManager, audioHTTPServer, networkAddressService, cronScheduler,
                 componentContext.getBundleContext(), metadataRegistry);
         delayedInit.call(this::init);
     }

@@ -14,12 +14,18 @@ package org.openhab.automation.jrule.internal.handler;
 
 import java.util.Arrays;
 
+import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.items.NumberItem;
 import org.openhab.core.library.items.StringItem;
+import org.openhab.core.library.items.SwitchItem;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.StringType;
+import org.openhab.core.thing.ChannelUID;
+import org.openhab.core.thing.link.ItemChannelLink;
+import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 
 /**
  * The {@link JRuleItemHandler} provides access to item Registry
@@ -34,9 +40,14 @@ public class JRuleItemHandler {
     }
 
     private ItemRegistry itemRegistry;
+    private ItemChannelLinkRegistry itemChannelLinkRegistry;
 
     public void setItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = itemRegistry;
+    }
+
+    public void setItemChannelLinkRegistry(ItemChannelLinkRegistry itemChannelLinkRegistry) {
+        this.itemChannelLinkRegistry = itemChannelLinkRegistry;
     }
 
     public static JRuleItemHandler get() {
@@ -56,6 +67,18 @@ public class JRuleItemHandler {
 
     public boolean itemRegistryContainsItem(String itemName) {
         return itemRegistry.get(itemName) != null;
+    }
+
+    public Item addSwitchItem(String name) {
+        return addSwitchItem(name, null, null, null);
+    }
+
+    public Item addSwitchItem(String name, Boolean value) {
+        return addSwitchItem(name, value, null, null);
+    }
+
+    public Item addSwitchItem(String name, Boolean value, String label) {
+        return addSwitchItem(name, value, label, null);
     }
 
     public Item addNumberItem(String name) {
@@ -96,6 +119,30 @@ public class JRuleItemHandler {
         return addStringItem(name, value, label, null);
     }
 
+    public Item addSwitchItem(String name, Boolean value, String label, String[] groupNames) {
+        final SwitchItem switchItem = new SwitchItem(name);
+        if (value != null) {
+            switchItem.setState(OnOffType.from(value));
+        }
+        if (label != null) {
+            switchItem.setLabel(label);
+        }
+        if (groupNames != null && groupNames.length > 0) {
+            Arrays.stream(groupNames).forEach(g -> switchItem.addGroupName(g));
+        }
+        return itemRegistry.add(switchItem);
+    }
+
+    public GroupItem addGroupItem(String name, String label) {
+        GroupItem groupItem = new GroupItem(name);
+        groupItem.setLabel(label);
+        return (GroupItem) itemRegistry.add(groupItem);
+    }
+
+    public void removeItem(String name) {
+        itemRegistry.remove(name, true);
+    }
+
     public Item addStringItem(String name, String value, String label, String[] groupNames) {
         final StringItem stringItem = new StringItem(name);
         if (value != null) {
@@ -108,5 +155,10 @@ public class JRuleItemHandler {
             Arrays.stream(groupNames).forEach(g -> stringItem.addGroupName(g));
         }
         return itemRegistry.add(stringItem);
+    }
+
+    public void linkItemWithChannel(String itemName, ChannelUID uid) {
+        ItemChannelLink link = new ItemChannelLink(itemName, uid);
+        itemChannelLinkRegistry.add(link);
     }
 }
