@@ -1,3 +1,16 @@
+## BETA20
+- Quantity item should extend number item by [querdenker2k](https://github.com/querdenker2k)  PR https://github.com/seaside1/jrule/pull/189
+- InvocationTargetException the get stacktrace has changed by [querdenker2k](https://github.com/querdenker2k)  PR https://github.com/seaside1/jrule/pull/188  
+- Add option to add metadata by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/187
+- Do not use logprefix when empty by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/185
+- MethodNotFound fix for primitive action parameters by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/184
+
+## BETA19
+-  Dynamic Rules by [seaside1](https://github.com/seaside1) PR https://github.com/seaside1/jrule/pull/177
+-  Add persist by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/174
+-  Updated Readme.md by [seime](https://github.com/seime) PR https://github.com/seaside1/jrule/pull/173
+-  handle quantity types for item-change-conditions by [querdenker2k](https://github.com/querdenker2k) PR https://github.com/seaside1/jrule/pull/172
+
 ## BETA18
 
 -  Refactored timers and added method for checking for timer lock by [seaside1](https://github.com/seaside1) PR https://github.com/seaside1/jrule/pull/171
