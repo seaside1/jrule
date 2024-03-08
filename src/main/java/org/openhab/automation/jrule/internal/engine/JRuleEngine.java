@@ -133,6 +133,7 @@ public class JRuleEngine implements PropertyChangeListener {
             logInfo("Adding Dynamic Rule Name: {} item: {}", ruleName, itemName);
         }
         jRuleBuilder.build();
+        ruleLoadingStatistics.addRuleClass();
     }
 
     private void add(Method method, JRule jRule, boolean enableRule) {
