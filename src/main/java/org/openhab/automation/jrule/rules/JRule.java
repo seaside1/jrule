@@ -12,6 +12,8 @@
  */
 package org.openhab.automation.jrule.rules;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -136,7 +138,26 @@ public class JRule {
      */
     protected String sendHttpPutRequest(String url, String contentType, String content, Map<String, String> headers,
             @Nullable Duration timeout) {
-        return JRuleActionHandler.get().sendHttpPutRequest(url, contentType, content, headers, timeout);
+        return JRuleActionHandler.get().sendHttpPutRequest(url, contentType,
+                content != null ? new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)) : null, headers,
+                timeout);
+    }
+
+    /**
+     * Sends a PUT-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     *
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPutRequest(String url, String contentType, byte[] content, Map<String, String> headers,
+            @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPutRequest(url, contentType,
+                content != null ? new ByteArrayInputStream(content) : null, headers, timeout);
     }
 
     /**
@@ -164,7 +185,27 @@ public class JRule {
      */
     protected String sendHttpPostRequest(String url, String contentType, String content, Map<String, String> headers,
             @Nullable Duration timeout) {
-        return JRuleActionHandler.get().sendHttpPostRequest(url, contentType, content, headers, timeout);
+        return JRuleActionHandler.get().sendHttpPostRequest(url, contentType,
+                content != null ? new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)) : null, headers,
+                timeout);
+    }
+
+    /**
+     * Sends a POST-HTTP request with the given content, request headers, and timeout in ms, and returns the result as a
+     * String
+     * <br/>
+     *
+     * @param url Target URL
+     * @param contentType @see javax.ws.rs.core.MediaType
+     * @param content Request content
+     * @param headers Header parameters for the request
+     * @param timeout Time after the request will be canceled, or null then it will never be canceled
+     * @return Result as String
+     */
+    protected String sendHttpPostRequest(String url, String contentType, byte[] content, Map<String, String> headers,
+            @Nullable Duration timeout) {
+        return JRuleActionHandler.get().sendHttpPostRequest(url, contentType,
+                content != null ? new ByteArrayInputStream(content) : null, headers, timeout);
     }
 
     /**

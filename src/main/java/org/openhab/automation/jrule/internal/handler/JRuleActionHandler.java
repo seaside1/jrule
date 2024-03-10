@@ -12,9 +12,8 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
@@ -86,12 +85,11 @@ public class JRuleActionHandler {
      * @param timeout Time after the request will be canceled
      * @return Result as String
      */
-    public String sendHttpPutRequest(String url, String contentType, @Nullable String content,
+    public String sendHttpPutRequest(String url, String contentType, @Nullable InputStream content,
             Map<String, String> headers, @Nullable Duration timeout) {
         try {
-            return HttpUtil.executeUrl(HttpMethod.PUT, url, mapToProperties(headers),
-                    content != null ? new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)) : null,
-                    contentType, getTimeoutAsInt(timeout));
+            return HttpUtil.executeUrl(HttpMethod.PUT, url, mapToProperties(headers), content, contentType,
+                    getTimeoutAsInt(timeout));
         } catch (IOException e) {
             throw new JRuleRuntimeException("Error executing Http action", e);
         }
@@ -109,12 +107,11 @@ public class JRuleActionHandler {
      * @param timeout Time after the request will be canceled
      * @return Result as String
      */
-    public String sendHttpPostRequest(String url, String contentType, @Nullable String content,
+    public String sendHttpPostRequest(String url, String contentType, @Nullable InputStream content,
             Map<String, String> headers, @Nullable Duration timeout) {
         try {
-            return HttpUtil.executeUrl(HttpMethod.POST, url, mapToProperties(headers),
-                    content != null ? new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)) : null,
-                    contentType, getTimeoutAsInt(timeout));
+            return HttpUtil.executeUrl(HttpMethod.POST, url, mapToProperties(headers), content, contentType,
+                    getTimeoutAsInt(timeout));
         } catch (IOException e) {
             throw new JRuleRuntimeException("Error executing Http action", e);
         }
