@@ -12,7 +12,6 @@
  */
 package org.openhab.automation.jrule.internal.module;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.core.automation.Rule;
 import org.openhab.core.automation.RuleProvider;
 import org.openhab.core.automation.RuleStatus;
@@ -95,17 +94,15 @@ public class JRuleRuleProvider implements RuleProvider {
         return rules.get(ruleUid);
     }
 
-    public void runRule(JRule rule, Method method) {
+    public void runRule(JRuleExecutionContext context) {
         RuleStatusInfoEvent ruleStatusInfoEvent = JRuleEventFactory.createRuleStatusInfoEvent(
-                new RuleStatusInfo(RuleStatus.RUNNING, RuleStatusDetail.NONE, null),
-                JRuleModuleEntry.createUid(rule, method), "jRule");
+                new RuleStatusInfo(RuleStatus.RUNNING, RuleStatusDetail.NONE, null), context.getUid(), "jRule");
         eventPublisher.post(ruleStatusInfoEvent);
     }
 
-    public void stopRule(JRule rule, Method method) {
+    public void stopRule(JRuleExecutionContext context) {
         RuleStatusInfoEvent ruleStatusInfoEvent = JRuleEventFactory.createRuleStatusInfoEvent(
-                new RuleStatusInfo(RuleStatus.IDLE, RuleStatusDetail.NONE, null),
-                JRuleModuleEntry.createUid(rule, method), "jRule");
+                new RuleStatusInfo(RuleStatus.IDLE, RuleStatusDetail.NONE, null), context.getUid(), "jRule");
         eventPublisher.post(ruleStatusInfoEvent);
     }
 }

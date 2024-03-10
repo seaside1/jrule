@@ -12,10 +12,9 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 
 /**
  * The {@link JRuleTimedExecutionContext}
@@ -23,8 +22,8 @@ import org.openhab.automation.jrule.rules.JRule;
  * @author Robert Delbrück - Initial contribution
  */
 public abstract class JRuleTimedExecutionContext extends JRuleExecutionContext {
-    public JRuleTimedExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList) {
-        super(jRule, logName, loggingTags, method, preconditionContextList, null, null);
+    public JRuleTimedExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, List<JRulePreconditionContext> preconditionContextList) {
+        super(uid, logName, loggingTags, invocationCallback, preconditionContextList, null, null);
     }
 }

@@ -169,17 +169,15 @@ public class JRuleTimerHandler {
     private void invokeTimerInternal(JRuleTimer timer, Consumer<JRuleTimer> runnable) {
         try {
             JRule.JRULE_EXECUTION_CONTEXT.set(new JRuleLocalTimerExecutionContext(timer.context, timer.name));
-            JRuleLog.debug(logger, timer.context.getMethod().getName(), "Invoking timer from context: {}",
-                    timer.context);
+            JRuleLog.debug(logger, timer.context.getLogName(), "Invoking timer from context: {}", timer.context);
 
-            JRuleLog.debug(logger, timer.context.getMethod().getName(), "setting mdc tags: {}",
-                    timer.context.getLoggingTags());
-            MDC.put(JRuleEngine.MDC_KEY_RULE, timer.context.getMethod().getName());
+            JRuleLog.debug(logger, timer.context.getLogName(), "setting mdc tags: {}", timer.context.getLoggingTags());
+            MDC.put(JRuleEngine.MDC_KEY_RULE, timer.context.getLogName());
             MDC.put(JRuleEngine.MDC_KEY_TIMER, timer.name);
             Arrays.stream(timer.context.getLoggingTags()).forEach(s -> MDC.put(s, s));
             runnable.accept(timer);
         } catch (IllegalArgumentException | SecurityException e) {
-            JRuleLog.error(logger, timer.context.getMethod().getName(), "Error {}", ExceptionUtils.getStackTrace(e));
+            JRuleLog.error(logger, timer.context.getLogName(), "Error {}", ExceptionUtils.getStackTrace(e));
         } finally {
             Arrays.stream(timer.context.getLoggingTags()).forEach(MDC::remove);
             MDC.remove(JRuleEngine.MDC_KEY_RULE);

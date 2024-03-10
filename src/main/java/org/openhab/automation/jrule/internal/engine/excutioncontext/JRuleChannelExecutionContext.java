@@ -12,13 +12,12 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -33,10 +32,10 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     private final String channel;
     private final Optional<String> event;
 
-    public JRuleChannelExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList, String channel, Optional<String> event,
-            Duration timedLock, Duration delayed) {
-        super(jRule, logName, loggingTags, method, preconditionContextList, timedLock, delayed);
+    public JRuleChannelExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, List<JRulePreconditionContext> preconditionContextList,
+            String channel, Optional<String> event, Duration timedLock, Duration delayed) {
+        super(uid, logName, loggingTags, invocationCallback, preconditionContextList, timedLock, delayed);
         this.channel = channel;
         this.event = event;
     }
@@ -65,7 +64,7 @@ public class JRuleChannelExecutionContext extends JRuleExecutionContext {
     @Override
     public String toString() {
         return "JRuleChannelExecutionContext{" + "channel='" + channel + '\'' + ", event=" + event + ", logName='"
-                + logName + '\'' + ", jRule=" + rule + ", method=" + method + ", loggingTags="
+                + logName + '\'' + ", uid=" + uid + ", invocationCallback=" + invocationCallback + ", loggingTags="
                 + Arrays.toString(loggingTags) + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
