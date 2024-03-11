@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2010-2023 Contributors to the openHAB project
- *
+ * <p>
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- *
+ * <p>
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- *
+ * <p>
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.automation.jrule.internal.engine;
@@ -39,32 +39,13 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleCondition;
-import org.openhab.automation.jrule.rules.JRuleDebounce;
-import org.openhab.automation.jrule.rules.JRuleDelayed;
-import org.openhab.automation.jrule.rules.JRuleLogName;
-import org.openhab.automation.jrule.rules.JRuleMemberOf;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
-import org.openhab.automation.jrule.rules.JRuleTag;
-import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
-import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
@@ -223,34 +204,9 @@ public class JRuleEngine implements PropertyChangeListener {
                                 .orElse(null),
                         Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN).orElse(null),
                         Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN).orElse(null)));
-        Arrays.stream(method.getAnnotationsByType(JRuleWhenThingTrigger.class)).forEach(jRuleWhen -> {
-            JRuleThingExecutionContext context = new JRuleThingExecutionContext(jRule, logName, loggingTags, method,
-                    Optional.of(jRuleWhen.thing()).filter(StringUtils::isNotEmpty).filter(s -> !s.equals("*")),
-                    Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
-                    Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN),
-                    jRulePreconditionContexts, timedLock, delayed);
-            addToContext(context, enableRule);
-            ruleLoadingStatistics.addThingTrigger();
-            ruleModuleEntry.addJRuleWhenThingTrigger(context);
-            addedToContext.set(true);
-        });
 
-        // Check if rule was actually activated, i.e. if triggers are present
-        if (!jRuleBuilder.build()) {
-        Arrays.stream(method.getAnnotationsByType(JRuleWhenStartup.class)).forEach(jRuleWhen -> {
-            JRuleStartupExecutionContext context = new JRuleStartupExecutionContext(jRule, logName, loggingTags, method,
-                    jRulePreconditionContexts, timedLock, delayed, jRuleWhen.level());
-            addToContext(context, enableRule);
-            ruleLoadingStatistics.addStartupTrigger();
-            ruleModuleEntry.addJRuleWhenStartupTrigger(context);
-            addedToContext.set(true);
-        });
-
-        // Check if any rule triggers are present
-        if (!addedToContext.get()) {
-            logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
-                    jRule.getClass().getName());
-        }
+        Arrays.stream(method.getAnnotationsByType(JRuleWhenStartup.class))
+                .forEach(jRuleWhen -> jRuleBuilder.whenStartupTrigger(jRuleWhen.level()));
     }
 
     boolean addToContext(JRuleExecutionContext context, boolean enableRule) {

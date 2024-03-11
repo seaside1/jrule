@@ -12,11 +12,10 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.List;
 
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleStartupEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -31,10 +30,10 @@ public class JRuleStartupExecutionContext extends JRuleExecutionContext {
 
     private final int startupLevel;
 
-    public JRuleStartupExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList, Duration timedLock, Duration delayed,
-            int startupLevel) {
-        super(rule, logName, loggingTags, method, preconditionContextList, timedLock, delayed);
+    public JRuleStartupExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, List<JRulePreconditionContext> preconditionContextList,
+            Duration timedLock, Duration delayed, int startupLevel) {
+        super(uid, logName, loggingTags, invocationCallback, preconditionContextList, timedLock, delayed);
         this.startupLevel = startupLevel;
     }
 
