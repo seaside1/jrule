@@ -23,15 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemChangeExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedCommandExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedUpdateExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRulePreconditionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
 import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
@@ -56,6 +48,7 @@ public class JRuleBuilder {
 
     final private List<PreCondition> preConditions = new ArrayList<>();
 
+    final private List<WhenStartupTrigger> whenStartupTriggers = new ArrayList<>();
     final private List<WhenThingTrigger> whenThingTriggers = new ArrayList<>();
     final private List<WhenChannelTrigger> whenChannelTriggers = new ArrayList<>();
     final private List<WhenItemReceivedCommand> whenItemReceivedCommandTriggers = new ArrayList<>();
@@ -102,6 +95,11 @@ public class JRuleBuilder {
 
     public JRuleBuilder preCondition(String itemName, Condition condition) {
         preConditions.add(new PreCondition(itemName, condition));
+        return this;
+    }
+
+    public JRuleBuilder whenStartupTrigger(int level) {
+        whenStartupTriggers.add(new WhenStartupTrigger(level));
         return this;
     }
 
@@ -164,6 +162,15 @@ public class JRuleBuilder {
                         Optional.ofNullable(data.condition.gte), Optional.ofNullable(data.condition.eq),
                         Optional.ofNullable(data.condition.neq)))
                 .toList();
+
+        whenStartupTriggers.forEach(data -> {
+            JRuleStartupExecutionContext context = new JRuleStartupExecutionContext(uid, logName, loggingTags,
+                    invocationCallback, preconditionContexts, timedLock, delayed, data.level);
+            jRuleEngine.addToContext(context, enableRule);
+            jRuleEngine.ruleLoadingStatistics.addStartupTrigger();
+            ruleModuleEntry.addJRuleWhenStartupTrigger(context);
+            addedToContext.set(true);
+        });
 
         whenThingTriggers.forEach(data -> {
             JRuleThingExecutionContext context = new JRuleThingExecutionContext(uid, logName, loggingTags,
@@ -259,6 +266,9 @@ public class JRuleBuilder {
     }
 
     private record PreCondition(String itemName, Condition condition) {
+    }
+
+    private record WhenStartupTrigger(int level) {
     }
 
     private record WhenThingTrigger(String thingName, JRuleThingStatus from, JRuleThingStatus to) {
