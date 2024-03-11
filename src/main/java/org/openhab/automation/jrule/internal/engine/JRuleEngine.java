@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2010-2023 Contributors to the openHAB project
- * <p>
+ *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
- * <p>
+ *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0
- * <p>
+ *
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.automation.jrule.internal.engine;
@@ -132,7 +132,7 @@ public class JRuleEngine implements PropertyChangeListener {
             logWarn("Skipping non-public method {} on class {}", method.getName(), jRule.getClass().getName());
             return;
         }
-        // Check if method is has none or a single parameter
+        // Check if method has none or a single parameter
         if (method.getParameterCount() > 1) {
             logWarn("Skipping method {} on class {}. Rule methods should have none or a single parameter",
                     method.getName(), jRule.getClass().getName());

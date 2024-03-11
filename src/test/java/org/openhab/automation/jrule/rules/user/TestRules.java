@@ -56,10 +56,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
-import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
-import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
-import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
-import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
+import org.openhab.automation.jrule.rules.event.*;
 import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 
@@ -142,6 +139,7 @@ public class TestRules extends JRule {
     public static final String COMMAND_GROUPS = "groups";
     public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
     public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
+    public static final String NAME_STARTUP_TRIGGERED = "startup triggered";
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -418,6 +416,12 @@ public class TestRules extends JRule {
         logInfo("Metadata: '{}'", item.getMetadata());
         logInfo("Metadata Value: '{}'", item.getMetadata().get("VoiceSystem").getValue());
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("VoiceSystem").getConfiguration());
+    }
+
+    @JRuleName(NAME_STARTUP_TRIGGERED)
+    @JRuleWhenStartup(level = 50)
+    public void startupTriggered(JRuleStartupEvent evt) {
+        logInfo("Startup Event: '{}'", evt.getStartupLevel());
     }
 
     private static void castLocation() {
