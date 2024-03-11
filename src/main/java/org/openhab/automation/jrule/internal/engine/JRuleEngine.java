@@ -207,6 +207,12 @@ public class JRuleEngine implements PropertyChangeListener {
 
         Arrays.stream(method.getAnnotationsByType(JRuleWhenStartup.class))
                 .forEach(jRuleWhen -> jRuleBuilder.whenStartupTrigger(jRuleWhen.level()));
+
+        // Check if rule was actually activated, i.e. if triggers are present
+        if (!jRuleBuilder.build()) {
+            logWarn("Skipping rule method {} on class {} with no JRuleWhenXXX annotation triggers", method.getName(),
+                    jRule.getClass().getName());
+        }
     }
 
     boolean addToContext(JRuleExecutionContext context, boolean enableRule) {
