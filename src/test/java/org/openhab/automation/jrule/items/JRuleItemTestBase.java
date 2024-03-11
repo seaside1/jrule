@@ -13,6 +13,7 @@
 package org.openhab.automation.jrule.items;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -23,6 +24,8 @@ import org.junit.jupiter.api.TestInfo;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventPublisher;
@@ -52,6 +55,8 @@ public abstract class JRuleItemTestBase {
     public static final String SUB_ITEM_NAME = "NameSub";
 
     protected EventPublisher eventPublisher;
+
+    protected final JRuleMetadataRegistry mock = Mockito.mock(JRuleMetadataRegistry.class);
 
     @BeforeEach
     public void init() throws ItemNotFoundException {
@@ -83,8 +88,7 @@ public abstract class JRuleItemTestBase {
                 ohItem.setState(state);
                 ohGroupItem.setState(state);
             } else if (event instanceof ItemCommandEvent) {
-                if (((ItemCommandEvent) event).getItemCommand() instanceof State) {
-                    State state = (State) ((ItemCommandEvent) event).getItemCommand();
+                if (((ItemCommandEvent) event).getItemCommand() instanceof State state) {
                     ohItem.setState(state);
                     ohGroupItem.setState(state);
                 } else {
@@ -98,6 +102,9 @@ public abstract class JRuleItemTestBase {
 
         MetadataRegistry metadataRegistry = Mockito.mock(MetadataRegistry.class);
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
+
+        Mockito.when(mock.getAllMetadata(Mockito.anyString()))
+                .thenReturn(Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))));
     }
 
     protected abstract JRuleItem getJRuleItem();
@@ -126,6 +133,12 @@ public abstract class JRuleItemTestBase {
         Assertions.assertEquals("SetLightState", item.getMetadata().get("Speech").getValue());
         Assertions.assertEquals(1, item.getMetadata().get("Speech").getConfiguration().size());
         Assertions.assertEquals("Livingroom", item.getMetadata().get("Speech").getConfiguration().get("location"));
+    }
+
+    @Test
+    public void testAddMetadata() {
+        JRuleItem item = getJRuleItem();
+        item.addMetadata("voiceSystem", new JRuleItemMetadata("what's the time"));
     }
 
     @Test

@@ -27,8 +27,8 @@ public class JRuleLocalTimerExecutionContext extends JRuleExecutionContext {
     private String timerName;
 
     public JRuleLocalTimerExecutionContext(JRuleExecutionContext parentContext, String timerName) {
-        super(parentContext.getRule(), parentContext.getLogName(), parentContext.getLoggingTags(),
-                parentContext.getMethod(), parentContext.getPreconditionContextList(), null, null);
+        super(parentContext.getUid(), parentContext.getLogName(), parentContext.getLoggingTags(),
+                parentContext.getInvocationCallback(), parentContext.getPreconditionContextList(), null, null);
         this.parentContext = parentContext;
         this.timerName = timerName;
     }

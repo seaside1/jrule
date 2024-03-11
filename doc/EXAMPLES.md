@@ -44,6 +44,7 @@
     + [Example 40 - Delay rule execution](#example-40---delay-rule-execution)
     + [Example 41 - Get Metadata and Tags](#example-41---get-metadata-and-tags)
     + [Example 42 - Persist future data](#example-42---persist-future-data)
+    + [Example 43 - Creating a rule dynamically using JRuleBuilder](#example-43---creating-a-rule-dynamically-using-jrulebuilder)
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1092,5 +1093,35 @@ public class DemoRule extends JRule {
       }
     });
   }
+}
+```
+
+## Example 43 - Creating a rule dynamically using JRuleBuilder
+
+Use case: Build a rule dynamically during runtime without static annotations. Can be used when rule parameters are not
+known at compile time, e.g. when they are read from a configuration file
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
+
+public class DynamicRuleModule extends JRule {
+
+    public DynamicRuleModule() {
+        registerDynamicRules();
+    }
+
+    private void registerDynamicRules() {
+        logInfo("Registering Dynamic JRules");
+
+        JRuleEngine.get().createJRuleBuilder("Example dynamic rule", event ->
+                        logInfo("Received command {}", event)
+                )
+                .whenItemChange("MyItem", JRuleMemberOf.None, "OFF", "ON", null, null)
+                .build();
+    }
 }
 ```

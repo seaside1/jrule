@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.types.State;
@@ -35,16 +36,16 @@ public abstract class JRuleInternalItem implements JRuleItem {
     protected final String label;
     protected final String type;
     protected final String id;
-    protected final Map<String, JRuleItemMetadata> metadata;
+    protected final JRuleMetadataRegistry metadataRegistry;
     protected final List<String> tags;
 
-    public JRuleInternalItem(String name, String label, String type, String id, Map<String, JRuleItemMetadata> metadata,
+    public JRuleInternalItem(String name, String label, String type, String id, JRuleMetadataRegistry metadataRegistry,
             List<String> tags) {
         this.name = name;
         this.label = label;
         this.type = type;
         this.id = id;
-        this.metadata = metadata;
+        this.metadataRegistry = metadataRegistry;
         this.tags = tags;
     }
 
@@ -79,7 +80,12 @@ public abstract class JRuleInternalItem implements JRuleItem {
 
     @Override
     public Map<String, JRuleItemMetadata> getMetadata() {
-        return metadata;
+        return metadataRegistry.getAllMetadata(name);
+    }
+
+    @Override
+    public void addMetadata(String namespace, JRuleItemMetadata metadata) {
+        this.metadataRegistry.addMetadata(namespace, name, metadata);
     }
 
     @Override

@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
@@ -42,6 +43,7 @@ import org.openhab.automation.jrule.items.JRuleRollershutterItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleCondition;
@@ -410,6 +412,12 @@ public class TestRules extends JRule {
         logInfo("Metadata: '{}'", item.getMetadata());
         logInfo("Metadata Value: '{}'", item.getMetadata().get("Speech").getValue());
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
+
+        // add something new and check it
+        item.addMetadata("VoiceSystem", new JRuleItemMetadata("myNewValue", Map.of("mykey", "myvalue")));
+        logInfo("Metadata: '{}'", item.getMetadata());
+        logInfo("Metadata Value: '{}'", item.getMetadata().get("VoiceSystem").getValue());
+        logInfo("Metadata Configuration: '{}'", item.getMetadata().get("VoiceSystem").getConfiguration());
     }
 
     private static void castLocation() {

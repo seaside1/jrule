@@ -12,12 +12,11 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.core.events.AbstractEvent;
 
@@ -28,8 +27,8 @@ import org.openhab.core.events.AbstractEvent;
  */
 public abstract class JRuleExecutionContext {
     protected final String logName;
-    protected final JRule rule;
-    protected final Method method;
+    protected final String uid;
+    protected final JRuleInvocationCallback invocationCallback;
     protected final String[] loggingTags;
     protected final List<JRulePreconditionContext> preconditionContextList;
     protected final Duration timedLock;
@@ -38,28 +37,24 @@ public abstract class JRuleExecutionContext {
     // If this rule is enabled or disabled in openHAB rules engine
     private boolean enabled = false;
 
-    public JRuleExecutionContext(JRule rule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList, Duration timedLock, Duration delayed) {
+    public JRuleExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, List<JRulePreconditionContext> preconditionContextList,
+            Duration timedLock, Duration delayed) {
         this.logName = logName;
         this.loggingTags = loggingTags;
-        this.rule = rule;
-        this.method = method;
+        this.uid = uid;
+        this.invocationCallback = invocationCallback;
         this.preconditionContextList = preconditionContextList;
         this.timedLock = timedLock;
         this.delayed = delayed;
     }
 
-    public JRule getRule() {
-        return rule;
+    public String getUid() {
+        return uid;
     }
 
-    public Method getMethod() {
-        return method;
-    }
-
-    public boolean hasEventParameterPresent() {
-        return Arrays.stream(method.getParameters())
-                .anyMatch(param -> (JRuleEvent.class.isAssignableFrom(param.getType())));
+    public JRuleInvocationCallback getInvocationCallback() {
+        return invocationCallback;
     }
 
     public String getLogName() {
@@ -80,8 +75,8 @@ public abstract class JRuleExecutionContext {
 
     @Override
     public String toString() {
-        return "JRuleExecutionContext{" + "logName='" + logName + '\'' + ", jRule=" + rule + ", method=" + method
-                + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
+        return "JRuleExecutionContext{" + "logName='" + logName + '\'' + ", uid=" + uid + ", invocationCallback="
+                + invocationCallback + ", loggingTags=" + Arrays.toString(loggingTags) + ", preconditionContextList="
                 + preconditionContextList + '}';
     }
 

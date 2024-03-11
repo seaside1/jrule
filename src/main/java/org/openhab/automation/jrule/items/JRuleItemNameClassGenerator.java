@@ -27,6 +27,7 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.MetadataRegistry;
 import org.slf4j.Logger;
@@ -52,15 +53,14 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
     }
 
     public boolean generateItemNamesSource(Collection<Item> items, MetadataRegistry metadataRegistry) {
-        List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName))
-                .map(item -> createItemModel(item, JRuleItemRegistry.getAllMetadata(item, metadataRegistry)))
+        List<Map<String, Object>> model = items.stream().sorted(Comparator.comparing(Item::getName)).map(
+                item -> createItemModel(item, JRuleMetadataRegistry.getAllMetadata(item.getName(), metadataRegistry)))
                 .collect(Collectors.toList());
         Map<String, Object> processingModel = new HashMap<>();
         processingModel.put("itemNames", model);
         processingModel.put("packageName", jRuleConfig.getGeneratedItemPackage());
 
-        File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getItemsDirectory())
-                .append(File.separator).append("JRuleItemNames.java").toString());
+        File targetSourceFile = new File(jRuleConfig.getItemsDirectory() + File.separator + "JRuleItemNames.java");
 
         try {
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {

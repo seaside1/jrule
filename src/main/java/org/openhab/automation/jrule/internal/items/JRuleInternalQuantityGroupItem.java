@@ -13,10 +13,9 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.util.List;
-import java.util.Map;
 
 import org.openhab.automation.jrule.items.JRuleQuantityGroupItem;
-import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 
 /**
  * The {@link JRuleInternalColorGroupItem} Items
@@ -26,7 +25,7 @@ import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 public class JRuleInternalQuantityGroupItem extends JRuleInternalQuantityItem implements JRuleQuantityGroupItem {
 
     public JRuleInternalQuantityGroupItem(String name, String label, String type, String id,
-            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
-        super(name, label, type, id, metadata, tags);
+            JRuleMetadataRegistry metadataRegistry, List<String> tags) {
+        super(name, label, type, id, metadataRegistry, tags);
     }
 }

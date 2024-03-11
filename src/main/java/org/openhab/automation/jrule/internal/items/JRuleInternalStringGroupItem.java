@@ -13,10 +13,9 @@
 package org.openhab.automation.jrule.internal.items;
 
 import java.util.List;
-import java.util.Map;
 
 import org.openhab.automation.jrule.items.JRuleStringGroupItem;
-import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 
 /**
  * The {@link JRuleInternalStringGroupItem} Items
@@ -26,7 +25,7 @@ import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 public class JRuleInternalStringGroupItem extends JRuleInternalStringItem implements JRuleStringGroupItem {
 
     public JRuleInternalStringGroupItem(String name, String label, String type, String id,
-            Map<String, JRuleItemMetadata> metadata, List<String> tags) {
-        super(name, label, type, id, metadata, tags);
+            JRuleMetadataRegistry metadataRegistry, List<String> tags) {
+        super(name, label, type, id, metadataRegistry, tags);
     }
 }

@@ -49,6 +49,8 @@ public interface JRuleItem {
     @NonNullByDefault
     Map<String, JRuleItemMetadata> getMetadata();
 
+    void addMetadata(String namespace, JRuleItemMetadata metadata);
+
     @NonNullByDefault
     List<String> getTags();
 

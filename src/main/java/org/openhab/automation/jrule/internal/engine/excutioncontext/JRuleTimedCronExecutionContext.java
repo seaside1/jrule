@@ -12,11 +12,10 @@
  */
 package org.openhab.automation.jrule.internal.engine.excutioncontext;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.internal.engine.JRuleInvocationCallback;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
 import org.openhab.core.events.AbstractEvent;
@@ -29,9 +28,10 @@ import org.openhab.core.events.AbstractEvent;
 public class JRuleTimedCronExecutionContext extends JRuleTimedExecutionContext {
     private final String cron;
 
-    public JRuleTimedCronExecutionContext(JRule jRule, String logName, String[] loggingTags, Method method,
-            List<JRulePreconditionContext> preconditionContextList, String cron) {
-        super(jRule, logName, loggingTags, method, preconditionContextList);
+    public JRuleTimedCronExecutionContext(String uid, String logName, String[] loggingTags,
+            JRuleInvocationCallback invocationCallback, List<JRulePreconditionContext> preconditionContextList,
+            String cron) {
+        super(uid, logName, loggingTags, invocationCallback, preconditionContextList);
         this.cron = cron;
     }
 
@@ -51,8 +51,8 @@ public class JRuleTimedCronExecutionContext extends JRuleTimedExecutionContext {
 
     @Override
     public String toString() {
-        return "JRuleTimedCronExecutionContext{" + "cron='" + cron + '\'' + ", logName='" + logName + '\'' + ", jRule="
-                + rule + ", method=" + method + ", loggingTags=" + Arrays.toString(loggingTags)
+        return "JRuleTimedCronExecutionContext{" + "cron='" + cron + '\'' + ", logName='" + logName + '\'' + ", uid="
+                + uid + ", invocationCallback=" + invocationCallback + ", loggingTags=" + Arrays.toString(loggingTags)
                 + ", preconditionContextList=" + preconditionContextList + '}';
     }
 }
