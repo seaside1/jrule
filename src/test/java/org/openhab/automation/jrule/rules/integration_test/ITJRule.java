@@ -285,4 +285,11 @@ public class ITJRule extends JRuleITBase {
         verifyLogEntry("rule trigger for change: OFF");
         verifyNoError();
     }
+
+    @Test
+    public void startupTriggered() throws IOException {
+        verifyRuleWasExecuted(TestRules.NAME_STARTUP_TRIGGERED);
+        verifyLogEntry("Startup Event: '50'");
+        verifyNoError();
+    }
 }
