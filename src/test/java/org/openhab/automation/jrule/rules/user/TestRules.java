@@ -140,6 +140,11 @@ public class TestRules extends JRule {
     public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
     public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
     public static final String NAME_STARTUP_TRIGGERED = "startup triggered";
+    private boolean startupTriggerWasCalled;
+
+    public TestRules() {
+        System.out.println("CONSTRUCTOR");
+    }
 
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -237,6 +242,7 @@ public class TestRules extends JRule {
     @JRuleWhenCronTrigger(cron = "*/5 * * * * *")
     public void cronEvery5Sec(JRuleTimerEvent event) {
         logInfo("cron triggered", event);
+        logInfo("startup level 50 triggered: {}", startupTriggerWasCalled);
     }
 
     @JRulePrecondition(item = ITEM_PRECONDITION_STRING, condition = @JRuleCondition(eq = "that matches"))
@@ -422,6 +428,7 @@ public class TestRules extends JRule {
     @JRuleWhenStartup(level = 50)
     public void startupTriggered(JRuleStartupEvent evt) {
         logInfo("Startup Event: '{}'", evt.getStartupLevel());
+        startupTriggerWasCalled = true;
     }
 
     private static void castLocation() {

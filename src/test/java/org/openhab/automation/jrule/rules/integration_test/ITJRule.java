@@ -288,7 +288,7 @@ public class ITJRule extends JRuleITBase {
     @Test
     public void startupTriggered() throws IOException {
         verifyRuleWasExecuted(TestRules.NAME_STARTUP_TRIGGERED);
-        verifyLogEntry("Startup Event: '50'");
+        verifyLogEntry("startup level 50 triggered: true");
         verifyNoError();
     }
 }
