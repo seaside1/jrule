@@ -512,11 +512,12 @@ public class JRuleEngine implements PropertyChangeListener {
                 } else {
                     method.invoke(jRule);
                 }
-            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
-                logError("Error calling rule method: {}", ExceptionUtils.getStackTrace(e));
             } catch (InvocationTargetException e) {
                 logError("Error in rule: {}\ntarget: {}", ExceptionUtils.getStackTrace(e),
                         ExceptionUtils.getStackTrace(e.getCause()));
+            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
+                logError("Error calling rule method '{}#{}': {}", method.getDeclaringClass().getName(),
+                        method.getName(), ExceptionUtils.getStackTrace(e));
             }
         }).uid(JRuleModuleEntry.createUid(jRule, method));
     }
