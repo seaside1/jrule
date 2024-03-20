@@ -23,7 +23,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemChangeExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedCommandExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedUpdateExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRulePreconditionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleStartupExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
 import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
@@ -46,16 +55,16 @@ public class JRuleBuilder {
     private Duration timedLock = null;
     private Duration delayed = null;
 
-    final private List<PreCondition> preConditions = new ArrayList<>();
+    private final List<PreCondition> preConditions = new ArrayList<>();
 
-    final private List<WhenStartupTrigger> whenStartupTriggers = new ArrayList<>();
-    final private List<WhenThingTrigger> whenThingTriggers = new ArrayList<>();
-    final private List<WhenChannelTrigger> whenChannelTriggers = new ArrayList<>();
-    final private List<WhenItemReceivedCommand> whenItemReceivedCommandTriggers = new ArrayList<>();
-    final private List<WhenItemChanged> whenItemChangedTriggers = new ArrayList<>();
-    final private List<WhenItemReceivedUpdate> whenItemReceivedUpdateTriggers = new ArrayList<>();
-    final private List<WhenCronTrigger> whenCronTriggers = new ArrayList<>();
-    final private List<WhenTimeTrigger> whenTimeTriggers = new ArrayList<>();
+    private final List<WhenStartupTrigger> whenStartupTriggers = new ArrayList<>();
+    private final List<WhenThingTrigger> whenThingTriggers = new ArrayList<>();
+    private final List<WhenChannelTrigger> whenChannelTriggers = new ArrayList<>();
+    private final List<WhenItemReceivedCommand> whenItemReceivedCommandTriggers = new ArrayList<>();
+    private final List<WhenItemChanged> whenItemChangedTriggers = new ArrayList<>();
+    private final List<WhenItemReceivedUpdate> whenItemReceivedUpdateTriggers = new ArrayList<>();
+    private final List<WhenCronTrigger> whenCronTriggers = new ArrayList<>();
+    private final List<WhenTimeTrigger> whenTimeTriggers = new ArrayList<>();
 
     JRuleBuilder(JRuleEngine jRuleEngine, String ruleName, JRuleInvocationCallback invocationCallback) {
         this.jRuleEngine = jRuleEngine;
