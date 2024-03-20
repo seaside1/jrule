@@ -103,7 +103,7 @@ public abstract class JRuleITBase {
 
     private static final ToxiproxyContainer toxiproxyContainer = new ToxiproxyContainer(
             "ghcr.io/shopify/toxiproxy:2.5.0").withNetworkAliases("mqtt").withNetwork(network).dependsOn(mqttContainer)
-                    .withReuse(true);
+            .withReuse(true);
 
     protected static final GenericContainer<?> influxDbContainer = new GenericContainer<>("influxdb:2.0")
             .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup").withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
