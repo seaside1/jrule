@@ -13,7 +13,11 @@
 package org.openhab.automation.jrule.items;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
@@ -56,7 +60,7 @@ public interface JRuleItem {
 
     /**
      * Returns all GroupItems, which this item belongs to -> this item is a member of the returning result
-     * 
+     *
      * @return GroupItems which this items belongs to
      */
     default Set<JRuleGroupItem<? extends JRuleItem>> getGroupItems() {

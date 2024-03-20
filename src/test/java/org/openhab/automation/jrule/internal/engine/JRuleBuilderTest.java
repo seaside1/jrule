@@ -27,13 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.engine.JRuleBuilder.Condition;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemChangeExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedCommandExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedUpdateExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.internal.rules.JRuleAbstractTest;
 import org.openhab.automation.jrule.rules.JRuleMemberOf;
@@ -204,6 +198,16 @@ public class JRuleBuilderTest extends JRuleAbstractTest {
                                         && c.getNeq().orElse("").equals("2"))),
                 eq(false));
         verify(ruleProvider, times(1)).add(argThat(entry -> entry.getTriggers().size() == 1));
+    }
+
+    @Test
+    public void testWhenStartupTrigger() {
+
+        boolean result = jRuleBuilder.whenStartupTrigger(10).whenStartupTrigger(30).build();
+
+        Assertions.assertTrue(result);
+        verify(jRuleEngine, times(2)).addToContext(isA(JRuleStartupExecutionContext.class), eq(false));
+        verify(ruleProvider, times(1)).add(argThat(entry -> entry.getTriggers().size() == 2));
     }
 
     @Test

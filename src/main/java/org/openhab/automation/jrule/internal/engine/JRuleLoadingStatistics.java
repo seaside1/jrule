@@ -18,6 +18,7 @@ package org.openhab.automation.jrule.internal.engine;
  * @author Arne Seime - Initial contribution
  */
 public class JRuleLoadingStatistics {
+    private int numStartupTriggers;
     private int numChannelTriggers;
     private int numItemStateTriggers;
     private int numTimedTriggers;
@@ -43,6 +44,10 @@ public class JRuleLoadingStatistics {
 
     public void addItemStateTrigger() {
         numItemStateTriggers++;
+    }
+
+    public void addStartupTrigger() {
+        numStartupTriggers++;
     }
 
     public void addTimedTrigger() {
@@ -93,6 +98,11 @@ public class JRuleLoadingStatistics {
         b.append("********   ");
         b.append(String.format("Loaded %d thing triggers, change %d", numThingTriggers,
                 previous == null ? 0 : numThingTriggers - previous.numThingTriggers));
+
+        b.append("\n");
+        b.append("********   ");
+        b.append(String.format("Loaded %d startup triggers, change %d", numStartupTriggers,
+                previous == null ? 0 : numStartupTriggers - previous.numStartupTriggers));
 
         int numDisabledRules = numRuleMethods - numEnabledRules;
 

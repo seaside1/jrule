@@ -18,7 +18,7 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 
 /**
  * The {@link JRuleColorItem} JRule Item
@@ -36,7 +36,7 @@ public interface JRuleColorItem extends JRuleDimmerItem {
 
     /**
      * Sends a hsb command
-     * 
+     *
      * @param command command to send.
      */
     default void sendCommand(JRuleHsbValue command) {
@@ -45,7 +45,7 @@ public interface JRuleColorItem extends JRuleDimmerItem {
 
     /**
      * Sends a hsb update
-     * 
+     *
      * @param state update to send
      */
     default void postUpdate(JRuleHsbValue state) {
