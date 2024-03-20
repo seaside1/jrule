@@ -34,6 +34,7 @@ public class ITJRule extends JRuleITBase {
         verifyRuleWasExecuted(TestRules.NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND);
         verifyRuleWasExecuted(TestRules.NAME_SWITCH_ITEM_RECEIVED_ANY_UPDATE);
         verifyRuleWasExecuted(TestRules.NAME_SWITCH_ITEM_CHANGED);
+        verifyLogEntry("[%s/%s]".formatted(TestRules.NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND, TestRules.TAG_CUSTOM));
     }
 
     @Test

@@ -142,7 +142,9 @@ public class TestRules extends JRule {
     public static final String COMMAND_GROUPS = "groups";
     public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
     public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
+    public static final String TAG_CUSTOM = "custom";
 
+    @JRuleTag({ TAG_CUSTOM })
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedCommand(JRuleItemEvent event) {
