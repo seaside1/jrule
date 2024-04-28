@@ -29,6 +29,7 @@ import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExe
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedCommandExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemReceivedUpdateExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRulePreconditionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleStartupExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimeTimerExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedCronExecutionContext;
@@ -54,15 +55,16 @@ public class JRuleBuilder {
     private Duration timedLock = null;
     private Duration delayed = null;
 
-    final private List<PreCondition> preConditions = new ArrayList<>();
+    private final List<PreCondition> preConditions = new ArrayList<>();
 
-    final private List<WhenThingTrigger> whenThingTriggers = new ArrayList<>();
-    final private List<WhenChannelTrigger> whenChannelTriggers = new ArrayList<>();
-    final private List<WhenItemReceivedCommand> whenItemReceivedCommandTriggers = new ArrayList<>();
-    final private List<WhenItemChanged> whenItemChangedTriggers = new ArrayList<>();
-    final private List<WhenItemReceivedUpdate> whenItemReceivedUpdateTriggers = new ArrayList<>();
-    final private List<WhenCronTrigger> whenCronTriggers = new ArrayList<>();
-    final private List<WhenTimeTrigger> whenTimeTriggers = new ArrayList<>();
+    private final List<WhenStartupTrigger> whenStartupTriggers = new ArrayList<>();
+    private final List<WhenThingTrigger> whenThingTriggers = new ArrayList<>();
+    private final List<WhenChannelTrigger> whenChannelTriggers = new ArrayList<>();
+    private final List<WhenItemReceivedCommand> whenItemReceivedCommandTriggers = new ArrayList<>();
+    private final List<WhenItemChanged> whenItemChangedTriggers = new ArrayList<>();
+    private final List<WhenItemReceivedUpdate> whenItemReceivedUpdateTriggers = new ArrayList<>();
+    private final List<WhenCronTrigger> whenCronTriggers = new ArrayList<>();
+    private final List<WhenTimeTrigger> whenTimeTriggers = new ArrayList<>();
 
     JRuleBuilder(JRuleEngine jRuleEngine, String ruleName, JRuleInvocationCallback invocationCallback) {
         this.jRuleEngine = jRuleEngine;
@@ -102,6 +104,11 @@ public class JRuleBuilder {
 
     public JRuleBuilder preCondition(String itemName, Condition condition) {
         preConditions.add(new PreCondition(itemName, condition));
+        return this;
+    }
+
+    public JRuleBuilder whenStartupTrigger(int level) {
+        whenStartupTriggers.add(new WhenStartupTrigger(level));
         return this;
     }
 
@@ -164,6 +171,15 @@ public class JRuleBuilder {
                         Optional.ofNullable(data.condition.gte), Optional.ofNullable(data.condition.eq),
                         Optional.ofNullable(data.condition.neq)))
                 .toList();
+
+        whenStartupTriggers.forEach(data -> {
+            JRuleStartupExecutionContext context = new JRuleStartupExecutionContext(uid, logName, loggingTags,
+                    invocationCallback, preconditionContexts, timedLock, delayed, data.level);
+            jRuleEngine.addToContext(context, enableRule);
+            jRuleEngine.ruleLoadingStatistics.addStartupTrigger();
+            ruleModuleEntry.addJRuleWhenStartupTrigger(context);
+            addedToContext.set(true);
+        });
 
         whenThingTriggers.forEach(data -> {
             JRuleThingExecutionContext context = new JRuleThingExecutionContext(uid, logName, loggingTags,
@@ -259,6 +275,9 @@ public class JRuleBuilder {
     }
 
     private record PreCondition(String itemName, Condition condition) {
+    }
+
+    private record WhenStartupTrigger(int level) {
     }
 
     private record WhenThingTrigger(String thingName, JRuleThingStatus from, JRuleThingStatus to) {

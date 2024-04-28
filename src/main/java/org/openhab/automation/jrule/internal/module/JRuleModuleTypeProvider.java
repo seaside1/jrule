@@ -24,6 +24,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenStartup;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.core.automation.type.ModuleType;
@@ -52,7 +53,8 @@ public class JRuleModuleTypeProvider implements ModuleTypeProvider {
             JRuleModuleUtil.toTriggerModuleUID(JRuleWhenTimeTrigger.class),
             new JRuleTriggerType(JRuleWhenTimeTrigger.class),
             JRuleModuleUtil.toTriggerModuleUID(JRuleWhenThingTrigger.class),
-            new JRuleTriggerType(JRuleWhenThingTrigger.class));
+            new JRuleTriggerType(JRuleWhenThingTrigger.class),
+            JRuleModuleUtil.toTriggerModuleUID(JRuleWhenStartup.class), new JRuleTriggerType(JRuleWhenStartup.class));
 
     @SuppressWarnings("unchecked")
     @Override

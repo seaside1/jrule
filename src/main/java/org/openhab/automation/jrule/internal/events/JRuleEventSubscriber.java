@@ -27,6 +27,7 @@ import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.core.events.Event;
 import org.openhab.core.events.EventFilter;
 import org.openhab.core.events.EventSubscriber;
+import org.openhab.core.events.system.StartlevelEvent;
 import org.openhab.core.items.events.GroupItemStateChangedEvent;
 import org.openhab.core.items.events.ItemAddedEvent;
 import org.openhab.core.items.events.ItemCommandEvent;
@@ -63,6 +64,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
     public static final String PROPERTY_THING_STATUS_EVENT = "THING_STATUS_EVENT";
 
     private static final String LOG_NAME_SUBSCRIBER = "JRuleSubscriber";
+    public static final String PROPERTY_STARTUP_EVENT = "STARTUP_EVENT";
     // status changes
 
     private final Logger logger = LoggerFactory.getLogger(JRuleEventSubscriber.class);
@@ -92,6 +94,7 @@ public class JRuleEventSubscriber implements EventSubscriber {
         // subscribedEventTypes.add(ThingUpdatedEvent.TYPE);
         subscribedEventTypes.add(ThingRemovedEvent.TYPE);
         subscribedEventTypes.add(ThingStatusInfoChangedEvent.TYPE);
+        subscribedEventTypes.add(StartlevelEvent.TYPE);
     }
 
     @Override
@@ -187,6 +190,13 @@ public class JRuleEventSubscriber implements EventSubscriber {
                 JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
                         PROPERTY_THING_STATUS_EVENT, event.getTopic(), event.getPayload());
                 propertyChangeSupport.firePropertyChange(PROPERTY_THING_STATUS_EVENT, null, event);
+            }
+        } else if (event.getType().equals(StartlevelEvent.TYPE)) {
+            StartlevelEvent startlevelEvent = (StartlevelEvent) event;
+            if (jRuleEngine.watchingForStartlevel(startlevelEvent.getStartlevel())) {
+                JRuleLog.debug(logger, LOG_NAME_SUBSCRIBER, "Event processed as {}: topic {} payload: {}",
+                        PROPERTY_STARTUP_EVENT, event.getTopic(), event.getPayload());
+                propertyChangeSupport.firePropertyChange(PROPERTY_STARTUP_EVENT, null, event);
             }
         }
     }

@@ -42,6 +42,7 @@ import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleStartupExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
@@ -63,6 +64,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenStartup;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
@@ -82,6 +84,7 @@ import org.slf4j.MDC;
 
 /**
  * The {@link JRuleEngine}
+ * O *
  *
  * @author Joseph (Seaside) Hagberg - Initial Contribution
  * @author Robert Delbrück - Refactoring
@@ -151,7 +154,7 @@ public class JRuleEngine implements PropertyChangeListener {
             logWarn("Skipping non-public method {} on class {}", method.getName(), jRule.getClass().getName());
             return;
         }
-        // Check if method is has none or a single parameter
+        // Check if method has none or a single parameter
         if (method.getParameterCount() > 1) {
             logWarn("Skipping method {} on class {}. Rule methods should have none or a single parameter",
                     method.getName(), jRule.getClass().getName());
@@ -223,6 +226,8 @@ public class JRuleEngine implements PropertyChangeListener {
                                 .orElse(null),
                         Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN).orElse(null),
                         Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN).orElse(null)));
+        Arrays.stream(method.getAnnotationsByType(JRuleWhenStartup.class))
+                .forEach(jRuleWhen -> jRuleBuilder.whenStartupTrigger(jRuleWhen.level()));
 
         // Check if rule was actually activated, i.e. if triggers are present
         if (!jRuleBuilder.build()) {
@@ -324,7 +329,8 @@ public class JRuleEngine implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_ITEM_EVENT)
                 || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_CHANNEL_EVENT)
-                || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_THING_STATUS_EVENT)) {
+                || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_THING_STATUS_EVENT)
+                || evt.getPropertyName().equals(JRuleEventSubscriber.PROPERTY_STARTUP_EVENT)) {
             fire((AbstractEvent) evt.getNewValue());
         }
     }
@@ -362,6 +368,14 @@ public class JRuleEngine implements PropertyChangeListener {
                         || (parentGroups.contains(context.getItemName())
                                 && context.getMemberOf() != JRuleMemberOf.None));
         logDebug("watching for item: '{}'? -> {}", itemName, b);
+        return b;
+    }
+
+    public boolean watchingForStartlevel(Integer startlevel) {
+        boolean b = this.contextList.stream().filter(context -> context instanceof JRuleStartupExecutionContext)
+                .map(context -> ((JRuleStartupExecutionContext) context))
+                .anyMatch(context -> context.getStartupLevel() == startlevel);
+        logDebug("watching for startup: '{}'? -> {}", startlevel, b);
         return b;
     }
 
