@@ -14,11 +14,7 @@ package org.openhab.automation.jrule.items;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -87,7 +83,7 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
         itemModel.put("type", item.getType());
         itemModel.put("metadata", metadata.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", ")));
-        itemModel.put("tags", StringUtils.join(item.getTags(), ", "));
+        itemModel.put("tags", StringUtils.join(item.getTags().stream().sorted().toList(), ", "));
         return itemModel;
     }
 }
