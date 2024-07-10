@@ -25,6 +25,8 @@
       org.zeroturnaround.javarebel.*;resolution:=optional,\
       org.apache.tools.ant.*;resolution:=optional
     </bnd.importpackage>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
   </properties>
   <build>
     <testResources>
