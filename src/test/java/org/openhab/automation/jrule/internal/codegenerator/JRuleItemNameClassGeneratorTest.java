@@ -20,53 +20,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.Metadata;
-import org.openhab.core.items.MetadataKey;
-import org.openhab.core.items.MetadataRegistry;
-import org.openhab.core.library.items.CallItem;
-import org.openhab.core.library.items.ColorItem;
-import org.openhab.core.library.items.ContactItem;
-import org.openhab.core.library.items.DateTimeItem;
-import org.openhab.core.library.items.DimmerItem;
-import org.openhab.core.library.items.ImageItem;
-import org.openhab.core.library.items.LocationItem;
-import org.openhab.core.library.items.NumberItem;
-import org.openhab.core.library.items.PlayerItem;
-import org.openhab.core.library.items.RollershutterItem;
-import org.openhab.core.library.items.StringItem;
-import org.openhab.core.library.items.SwitchItem;
-import org.openhab.core.library.types.DateTimeType;
-import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.library.types.HSBType;
-import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.OpenClosedType;
-import org.openhab.core.library.types.PercentType;
-import org.openhab.core.library.types.PlayPauseType;
-import org.openhab.core.library.types.PointType;
-import org.openhab.core.library.types.RawType;
-import org.openhab.core.library.types.StringType;
+import org.openhab.core.items.*;
+import org.openhab.core.library.items.*;
+import org.openhab.core.library.types.*;
 import org.openhab.core.types.State;
 
 /**
@@ -177,7 +143,7 @@ public class JRuleItemNameClassGeneratorTest {
         // assertTrue(compiledClass.exists());
         //
         // URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
-        // JRuleActionClassGeneratorTest.class.getClassLoader());
+        // JRuleThingActionClassGeneratorTest.class.getClassLoader());
         // final String className = "org.openhab.automation.jrule.generated.items.JRuleItems";
         // Class<?> aClass = classLoader.loadClass(className);
         // Object jRuleItems = aClass.getConstructor().newInstance();
