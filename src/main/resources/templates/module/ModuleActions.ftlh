@@ -19,13 +19,12 @@ public class JRuleModuleActions {
 <#list methods as action>
 
     /**
-     * ${action.label}  - ${action.description}
+     * ${action.description}
     <#list action.args as arg>
      * @param ${arg.name} : ${arg.label} - ${arg.description}
     </#list>
      * @return Map<String, Object> - The result of the action
     */
-
     public static Map <String,Object> ${action.name} (<#list action.args as arg>${arg.type} ${arg.name}<#sep>, </#sep></#list>) {
         Map<String, Object> context = new HashMap<>();
         <#list action.args as arg>
