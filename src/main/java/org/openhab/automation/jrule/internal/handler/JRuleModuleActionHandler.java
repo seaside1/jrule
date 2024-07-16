@@ -51,7 +51,7 @@ public class JRuleModuleActionHandler {
 
         // Find module
         ActionType actionType = moduleTypeRegistry.getActions().stream().filter(type -> type.getUID().equals(uid))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Action not found: "+uid));
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Action not found: " + uid));
 
         Action module = new Action() {
 
@@ -91,7 +91,7 @@ public class JRuleModuleActionHandler {
         // Find handler for this action
         ModuleHandlerFactory handlerFactory = moduleHandlerFactories.stream()
                 .filter(factory -> factory.getTypes().contains(uid)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Module Action Handler not found: "+uid));
+                .orElseThrow(() -> new IllegalArgumentException("Module Action Handler not found: " + uid));
 
         ActionHandler moduleHandler = null;
 
