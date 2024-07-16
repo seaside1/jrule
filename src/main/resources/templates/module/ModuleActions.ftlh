@@ -19,8 +19,10 @@ public class JRuleModuleActions {
 <#list methods as action>
 
     /**
-     * ${action.label}
-     * ${action.description}
+     * ${action.label}  - ${action.description}
+    <#list action.args as arg>
+     * @param ${arg.name} : ${arg.label} - ${arg.description}
+    </#list>
      * @return Map<String, Object> - The result of the action
     */
 
