@@ -12,9 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.codegenerator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -23,11 +21,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.openhab.automation.jrule.actions.JRuleActionClassGenerator;
+import org.openhab.automation.jrule.actions.JRuleThingActionClassGenerator;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
 import org.openhab.automation.jrule.internal.thingaction.MyThingActions;
@@ -54,15 +48,15 @@ import org.openhab.core.thing.internal.ThingImpl;
 import org.openhab.core.types.Command;
 
 /**
- * The {@link JRuleActionClassGeneratorTest}
+ * The {@link JRuleThingActionClassGeneratorTest}
  *
  *
  * @author Robert Delbrück - Initial contribution
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JRuleActionClassGeneratorTest {
+public class JRuleThingActionClassGeneratorTest {
 
-    private JRuleActionClassGenerator sourceFileGenerator;
+    private JRuleThingActionClassGenerator sourceFileGenerator;
     private File targetFolder;
     private JRuleCompiler compiler;
 
@@ -74,7 +68,7 @@ public class JRuleActionClassGeneratorTest {
         Map<String, Object> map = new HashMap<>();
         map.put("org.openhab.automation.jrule.directory", "target");
         JRuleConfig config = new JRuleConfig(map);
-        sourceFileGenerator = new JRuleActionClassGenerator(config);
+        sourceFileGenerator = new JRuleThingActionClassGenerator(config);
         compiler = new JRuleCompiler(config);
     }
 
@@ -139,7 +133,7 @@ public class JRuleActionClassGeneratorTest {
         Mockito.when(Mockito.mock(ThingRegistry.class).get(Mockito.any())).thenReturn(thingMock);
 
         URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
-                JRuleActionClassGeneratorTest.class.getClassLoader());
+                JRuleThingActionClassGeneratorTest.class.getClassLoader());
         final String className = "org.openhab.automation.jrule.generated.actions.JRuleActions";
         // compiler.loadClass(classLoader, className, true);
         Class<?> aClass = classLoader.loadClass(className);
