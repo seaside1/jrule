@@ -108,8 +108,8 @@ public class JRuleModuleActionClassGenerator extends JRuleAbstractClassGenerator
             configMap.put("name", config.getName());
             configMap.put("type", toJavaType(config.getType()));
             configMap.put("default", config.getDefault());
-            configMap.put("label", config.getLabel());
-            configMap.put("description", config.getDescription());
+            configMap.put("label", StringUtils.trimToEmpty(config.getLabel()));
+            configMap.put("description", StringUtils.trimToEmpty(config.getDescription()));
             args.add(configMap);
         });
 
