@@ -29,11 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
@@ -41,12 +37,7 @@ import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItemClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.ItemRegistry;
-import org.openhab.core.items.Metadata;
-import org.openhab.core.items.MetadataKey;
-import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.items.*;
 
 /**
  * The {@link JRuleItemClassGeneratorTest}
@@ -113,7 +104,7 @@ public class JRuleItemClassGeneratorTest {
         assertTrue(compiledClass.exists());
 
         URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
-                JRuleActionClassGeneratorTest.class.getClassLoader());
+                JRuleThingActionClassGeneratorTest.class.getClassLoader());
         final String className = "org.openhab.automation.jrule.generated.items.JRuleItems";
         Class<?> aClass = classLoader.loadClass(className);
         Object jRuleItems = aClass.getConstructor().newInstance();

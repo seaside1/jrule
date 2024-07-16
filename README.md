@@ -35,6 +35,7 @@ developer machine - like any other regular Java project - **recommended**).
         + [JRuleItems and JRuleItemNames](#jruleitems-and-jruleitemnames)
         + [JRuleThings](#jrulethings)
         + [JRuleThingActions](#jrulethingactions)
+        + [JRuleModuleActions](#jrulemoduleactions)
     * [Other built-in actions](#other-built-in-actions)
 - [GUI support](#gui-support)
 - [Examples](#examples)
@@ -273,6 +274,12 @@ Logging from rule can be done in 3 different ways
   actions
 
 See example #34
+
+### JRuleModuleActions
+
+* `org.openhab.automation.jrule.generated.moduleactions` package contains a class with methods for each rule module action available. 
+Note that these are not specific to any item or thing, but are supplied by core and addon modules such as myopenhab.
+
 
 ## Other built-in actions
 

@@ -229,7 +229,8 @@ public class JRuleCompiler {
         return compile(List.of(new File(jRuleConfig.getItemsDirectory(), "JRuleItems.java"),
                 new File(jRuleConfig.getItemsDirectory(), "JRuleItemNames.java"),
                 new File(jRuleConfig.getThingsDirectory(), "JRuleThings.java"),
-                new File(jRuleConfig.getActionsDirectory(), "JRuleActions.java")), genClassPath);
+                new File(jRuleConfig.getActionsDirectory(), "JRuleActions.java"),
+                new File(jRuleConfig.getModuleActionsDirectory(), "JRuleModuleActions.java")), genClassPath);
     }
 
     public boolean compile(List<File> javaSourceFiles, String classPath) {

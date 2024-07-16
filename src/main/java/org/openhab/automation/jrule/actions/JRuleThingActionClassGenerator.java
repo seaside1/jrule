@@ -14,15 +14,7 @@ package org.openhab.automation.jrule.actions;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -44,19 +36,19 @@ import org.slf4j.LoggerFactory;
 import freemarker.template.Template;
 
 /**
- * The {@link JRuleActionClassGenerator} Class Generator for actions
+ * The {@link JRuleThingActionClassGenerator} Class Generator for Thing actions
  *
  * @author Robert Delbrück - Initial contribution
  */
-public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
+public class JRuleThingActionClassGenerator extends JRuleAbstractClassGenerator {
 
     private static final String TEMPLATE_SUFFIX = ".ftlh";
 
     protected static final String LOG_NAME_CLASS_GENERATOR = "JRuleActionClassGen";
 
-    private final Logger logger = LoggerFactory.getLogger(JRuleActionClassGenerator.class);
+    private final Logger logger = LoggerFactory.getLogger(JRuleThingActionClassGenerator.class);
 
-    public JRuleActionClassGenerator(JRuleConfig jRuleConfig) {
+    public JRuleThingActionClassGenerator(JRuleConfig jRuleConfig) {
         super(jRuleConfig);
     }
 
@@ -74,7 +66,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
 
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
                 Template template = freemarkerConfiguration
-                        .getTemplate("actions/" + actionModel.get("templateName") + TEMPLATE_SUFFIX);
+                        .getTemplate("things/actions/" + actionModel.get("templateName") + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
             }
 
@@ -105,7 +97,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
                     .append(File.separator).append("JRuleActions.java").toString());
 
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
-                Template template = freemarkerConfiguration.getTemplate("actions/Actions" + TEMPLATE_SUFFIX);
+                Template template = freemarkerConfiguration.getTemplate("things/actions/Actions" + TEMPLATE_SUFFIX);
                 template.process(processingModel, fileWriter);
             }
 
