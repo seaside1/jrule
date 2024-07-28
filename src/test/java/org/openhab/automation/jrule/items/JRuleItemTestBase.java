@@ -53,6 +53,8 @@ public abstract class JRuleItemTestBase {
     public static final String ITEM_NAME_2 = "Name2";
     public static final String GROUP_NAME_2 = "Group2";
     public static final String SUB_ITEM_NAME = "NameSub";
+    public static final String METADATA_WHAT_S_THE_TIME = "what's the time";
+    public static final String METADATA_VOICE_SYSTEM = "voiceSystem";
 
     protected EventPublisher eventPublisher;
 
@@ -104,7 +106,8 @@ public abstract class JRuleItemTestBase {
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
 
         Mockito.when(mock.getAllMetadata(Mockito.anyString()))
-                .thenReturn(Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom"))));
+                .thenReturn(Map.of("Speech", new JRuleItemMetadata("SetLightState", Map.of("location", "Livingroom")),
+                        METADATA_VOICE_SYSTEM, new JRuleItemMetadata(METADATA_WHAT_S_THE_TIME)));
     }
 
     protected abstract JRuleItem getJRuleItem();
@@ -129,7 +132,7 @@ public abstract class JRuleItemTestBase {
     @Test
     public void testGetMetadata() {
         JRuleItem item = getJRuleItem();
-        Assertions.assertEquals(1, item.getMetadata().size());
+        Assertions.assertEquals(2, item.getMetadata().size());
         Assertions.assertEquals("SetLightState", item.getMetadata().get("Speech").getValue());
         Assertions.assertEquals(1, item.getMetadata().get("Speech").getConfiguration().size());
         Assertions.assertEquals("Livingroom", item.getMetadata().get("Speech").getConfiguration().get("location"));
@@ -138,7 +141,15 @@ public abstract class JRuleItemTestBase {
     @Test
     public void testAddMetadata() {
         JRuleItem item = getJRuleItem();
-        item.addMetadata("voiceSystem", new JRuleItemMetadata("what's the time"));
+        item.addMetadata(METADATA_VOICE_SYSTEM, new JRuleItemMetadata(METADATA_WHAT_S_THE_TIME), false);
+        Assertions.assertEquals(METADATA_WHAT_S_THE_TIME, item.getMetadata().get(METADATA_VOICE_SYSTEM).getValue());
+
+        item.addMetadata(METADATA_VOICE_SYSTEM, new JRuleItemMetadata("something else"), false);
+        Assertions.assertEquals(METADATA_WHAT_S_THE_TIME, item.getMetadata().get(METADATA_VOICE_SYSTEM).getValue());
+
+        // not handled by the mock, therefor it's ok here
+        item.addMetadata(METADATA_VOICE_SYSTEM, new JRuleItemMetadata("something else"), true);
+        Assertions.assertEquals(METADATA_WHAT_S_THE_TIME, item.getMetadata().get(METADATA_VOICE_SYSTEM).getValue());
     }
 
     @Test

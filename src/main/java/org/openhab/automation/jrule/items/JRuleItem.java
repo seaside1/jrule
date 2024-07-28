@@ -49,7 +49,7 @@ public interface JRuleItem {
     @NonNullByDefault
     Map<String, JRuleItemMetadata> getMetadata();
 
-    void addMetadata(String namespace, JRuleItemMetadata metadata);
+    void addMetadata(String namespace, JRuleItemMetadata metadata, boolean override);
 
     @NonNullByDefault
     List<String> getTags();

@@ -391,7 +391,7 @@ public class TestRules extends JRule {
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
 
         // add something new and check it
-        item.addMetadata("VoiceSystem", new JRuleItemMetadata("myNewValue", Map.of("mykey", "myvalue")));
+        item.addMetadata("VoiceSystem", new JRuleItemMetadata("myNewValue", Map.of("mykey", "myvalue")), false);
         logInfo("Metadata: '{}'", item.getMetadata());
         logInfo("Metadata Value: '{}'", item.getMetadata().get("VoiceSystem").getValue());
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("VoiceSystem").getConfiguration());
