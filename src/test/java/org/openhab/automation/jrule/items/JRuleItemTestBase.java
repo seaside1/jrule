@@ -132,7 +132,7 @@ public abstract class JRuleItemTestBase {
     @Test
     public void testGetMetadata() {
         JRuleItem item = getJRuleItem();
-        Assertions.assertEquals(1, item.getMetadata().size());
+        Assertions.assertEquals(2, item.getMetadata().size());
         Assertions.assertEquals("SetLightState", item.getMetadata().get("Speech").getValue());
         Assertions.assertEquals(1, item.getMetadata().get("Speech").getConfiguration().size());
         Assertions.assertEquals("Livingroom", item.getMetadata().get("Speech").getConfiguration().get("location"));
