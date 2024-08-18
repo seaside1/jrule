@@ -86,8 +86,8 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public void addMetadata(String namespace, JRuleItemMetadata metadata) {
-        this.metadataRegistry.addMetadata(namespace, name, metadata);
+    public void addMetadata(String namespace, JRuleItemMetadata metadata, boolean override) {
+        this.metadataRegistry.addMetadata(namespace, name, metadata, override);
     }
 
     @Override
