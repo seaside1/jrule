@@ -45,6 +45,7 @@ public class JRuleConfig {
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
     private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
     private static final String GENERATED_THING_PACKAGE_PROPERTY = "org.openhab.automation.jrule.thingpackage";
+    private static final String GENERATED_MODULE_ACTION_PACKAGE_PROPERTY = "org.openhab.automation.jrule.moduleactionpackage";
     private static final String EXECUTORS_MIN_PROPERTY = "org.openhab.automation.jrule.engine.executors.min";
     private static final String EXECUTORS_MAX_PROPERTY = "org.openhab.automation.jrule.engine.executors.max";
     private static final String EXECUTORS_ENABLE_PROPERTY = "org.openhab.automation.jrule.engine.executors.enable";
@@ -65,6 +66,7 @@ public class JRuleConfig {
     private static final String DEFAULT_GENERATED_ITEM_PACKAGE = "org.openhab.automation.jrule.generated.items";
     private static final String DEFAULT_GENERATED_THING_PACKAGE = "org.openhab.automation.jrule.generated.things";
     private static final String DEFAULT_GENERATED_ACTION_PACKAGE = "org.openhab.automation.jrule.generated.actions";
+    private static final String DEFAULT_GENERATED_MODULE_ACTION_PACKAGE = "org.openhab.automation.jrule.generated.moduleactions";
 
     private static final String CLASS_DIR = "class";
 
@@ -150,6 +152,14 @@ public class JRuleConfig {
         final StringBuilder sb = new StringBuilder(getWorkingDirectory());
         sb.append(File.separator).append(GEN).append(File.separator);
         final String p = JRuleUtil.packageNameToPath(getGeneratedActionPackage());
+        sb.append(p);
+        return sb.toString();
+    }
+
+    public String getModuleActionsDirectory() {
+        final StringBuilder sb = new StringBuilder(getWorkingDirectory());
+        sb.append(File.separator).append(GEN).append(File.separator);
+        final String p = JRuleUtil.packageNameToPath(getGeneratedModuleActionPackage());
         sb.append(p);
         return sb.toString();
     }
@@ -251,6 +261,11 @@ public class JRuleConfig {
 
     public String getGeneratedActionPackage() {
         return getConfigPropertyOrDefaultValue(GENERATED_THING_PACKAGE_PROPERTY, DEFAULT_GENERATED_ACTION_PACKAGE);
+    }
+
+    public String getGeneratedModuleActionPackage() {
+        return getConfigPropertyOrDefaultValue(GENERATED_MODULE_ACTION_PACKAGE_PROPERTY,
+                DEFAULT_GENERATED_MODULE_ACTION_PACKAGE);
     }
 
     public int getRulesInitDelaySeconds() {
