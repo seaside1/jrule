@@ -12,46 +12,32 @@
  */
 package org.openhab.automation.jrule.internal.codegenerator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.actions.JRuleActionClassGenerator;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
-import org.openhab.automation.jrule.internal.thingaction.MyThingActions;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.core.library.types.StringType;
-import org.openhab.core.magic.binding.handler.MagicActionModuleThingHandler;
-import org.openhab.core.model.script.internal.engine.action.ThingActionService;
-import org.openhab.core.thing.Thing;
-import org.openhab.core.thing.ThingRegistry;
-import org.openhab.core.thing.ThingTypeUID;
-import org.openhab.core.thing.ThingUID;
-import org.openhab.core.thing.binding.ThingHandlerService;
-import org.openhab.core.thing.internal.ThingImpl;
-import org.openhab.core.types.Command;
+import org.openhab.core.audio.AudioManager;
+import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.library.types.PercentType;
+import org.openhab.core.model.script.engine.action.ActionService;
+import org.openhab.core.model.script.internal.engine.action.AudioActionService;
+import org.openhab.core.model.script.internal.engine.action.SemanticsActionService;
 
 /**
  * The {@link JRuleActionClassGeneratorTest}
@@ -86,45 +72,27 @@ public class JRuleActionClassGeneratorTest {
 
     @Test
     public void testGenerateAndCompileActionFile() {
+        ActionService actionService = new SemanticsActionService(Mockito.mock(ItemRegistry.class));
 
-        ThingImpl thing = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
-                new ThingUID("mybinding", "thingtype", "id"));
-        thing.setHandler(new MagicActionModuleThingHandler(thing) {
-            @Override
-            public Collection<Class<? extends ThingHandlerService>> getServices() {
-                return List.of(MyThingActions.class);
-            }
-        });
-        generateAndCompile(thing);
+        generateAndCompile(actionService);
     }
 
     @Test
-    public void testGenerateActionsFile() throws ClassNotFoundException, MalformedURLException, NoSuchFieldException,
+    public void testGenerateActionsFile() throws ClassNotFoundException, IOException, NoSuchFieldException,
             NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Thing thing1 = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
-                new ThingUID("mybinding", "thingtype", "id1"));
-        thing1.setHandler(new MagicActionModuleThingHandler(thing1) {
-            @Override
-            public Collection<Class<? extends ThingHandlerService>> getServices() {
-                return List.of(MyThingActions.class);
-            }
-        });
-        generateAndCompile(thing1);
 
-        Thing thing2 = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
-                new ThingUID("mybinding", "thingtype", "id2"));
-        thing2.setHandler(new MagicActionModuleThingHandler(thing2) {
-            @Override
-            public Collection<Class<? extends ThingHandlerService>> getServices() {
-                return List.of(MyThingActions.class);
-            }
-        });
-        generateAndCompile(thing2);
+        ActionService actionService = new SemanticsActionService(Mockito.mock(ItemRegistry.class));
+        generateAndCompile(actionService);
 
-        List<Thing> things = List.of(thing1, thing2);
+        AudioManager mock = Mockito.mock(AudioManager.class);
+        Mockito.when(mock.getVolume(Mockito.any())).thenReturn(PercentType.HUNDRED);
+        ActionService actionService2 = new AudioActionService(mock);
+        generateAndCompile(actionService2);
 
-        boolean success = sourceFileGenerator.generateActionsSource(things);
-        assertTrue(success, "Failed to generate source file for things");
+        List<ActionService> actionServices = List.of(actionService, actionService2);
+
+        boolean success = sourceFileGenerator.generateActionsSource(actionServices);
+        assertTrue(success, "Failed to generate source file for actions");
 
         compiler.compile(List.of(new File(targetFolder, "JRuleActions.java")),
                 "target/classes" + File.pathSeparator + "target/gen");
@@ -132,48 +100,39 @@ public class JRuleActionClassGeneratorTest {
         File compiledClass = new File(targetFolder, "JRuleActions.class");
         assertTrue(compiledClass.exists());
 
-        MockedStatic<ThingActionService> thingActionServiceMock = Mockito.mockStatic(ThingActionService.class);
-        Mockito.when(ThingActionService.getActions(Mockito.any(), Mockito.any())).thenReturn(new MyThingActions());
-        Thing thingMock = Mockito.mock(Thing.class);
-        Mockito.when(thingMock.getHandler()).thenReturn(new MagicActionModuleThingHandler(thingMock));
-        Mockito.when(Mockito.mock(ThingRegistry.class).get(Mockito.any())).thenReturn(thingMock);
-
         URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
                 JRuleActionClassGeneratorTest.class.getClassLoader());
         final String className = "org.openhab.automation.jrule.generated.actions.JRuleActions";
         // compiler.loadClass(classLoader, className, true);
         Class<?> aClass = classLoader.loadClass(className);
         Object jRuleActions = aClass.getConstructor().newInstance();
-        Field mybindingThingtypeId1 = aClass.getDeclaredField("mybindingThingtypeId1");
-        Object action = mybindingThingtypeId1.get(jRuleActions);
+        Field audioActionField = aClass.getDeclaredField("audio");
+        Object action = audioActionField.get(jRuleActions);
 
         // Verify methods exists
-        Method doSomethingAbstract = action.getClass().getDeclaredMethod("doSomethingAbstract", Command.class);
-        Object res = doSomethingAbstract.invoke(action, new StringType("blub"));
-        assertEquals(10, res);
+        Method getMasterVolume = action.getClass().getDeclaredMethod("getMasterVolume");
+        Object res = getMasterVolume.invoke(action);
+        assertEquals(1F, res);
 
-        // Verify method with unsupported types are mapped to Object
-        Method returnObjectOnUnsupportedClass = action.getClass().getDeclaredMethod("returnObjectOnUnsupportedClass",
-                Object.class);
-        assertNotNull(returnObjectOnUnsupportedClass);
-        assertEquals(Object.class, returnObjectOnUnsupportedClass.getReturnType());
-        JRule returnObject = (JRule) returnObjectOnUnsupportedClass.invoke(action, new JRule());
-        assertNotNull(returnObject);
+        // Verify methods exists
+        Method playSound = action.getClass().getDeclaredMethod("playSound", String.class, String.class,
+                PercentType.class);
+        playSound.invoke(action, "param1", "param2", PercentType.ZERO);
     }
 
-    private void generateAndCompile(Thing thing) {
-        boolean success = sourceFileGenerator.generateActionSource(thing);
-        assertTrue(success, "Failed to generate source file for " + thing);
+    private void generateAndCompile(ActionService actionService) {
+        boolean success = sourceFileGenerator.generateActionSource(actionService);
+        assertTrue(success, "Failed to generate source file for " + actionService);
 
-        compiler.compile(List.of(new File(targetFolder, "_" + getActionFriendlyName(thing) + ".java")),
+        compiler.compile(
+                List.of(new File(targetFolder, "_" + actionService.getActionClass().getSimpleName() + ".java")),
                 "target/classes");
 
-        File compiledClass = new File(targetFolder, "_" + getActionFriendlyName(thing) + ".class");
+        File compiledClass = new File(targetFolder, "_" + actionService.getActionClass().getSimpleName() + ".class");
         assertTrue(compiledClass.exists());
     }
 
-    public static String getActionFriendlyName(Thing thing) {
-        return Arrays.stream(thing.getUID().toString().split("[:\\-]")).map(StringUtils::capitalize)
-                .collect(Collectors.joining(""));
+    public static String getActionFriendlyName(Class<?> actionClass) {
+        return StringUtils.uncapitalize(actionClass.getSimpleName());
     }
 }

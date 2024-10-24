@@ -18,10 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -513,8 +510,8 @@ public class JRuleEngine implements PropertyChangeListener {
                     method.invoke(jRule);
                 }
             } catch (InvocationTargetException e) {
-                logError("Error in rule: {}\ntarget: {}", ExceptionUtils.getStackTrace(e),
-                        ExceptionUtils.getStackTrace(e.getCause()));
+                logError("Error in rule method '{}#{}': {}\ntarget: {}", method.getDeclaringClass().getName(),
+                        method.getName(), ExceptionUtils.getStackTrace(e), ExceptionUtils.getStackTrace(e.getCause()));
             } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
                 logError("Error calling rule method '{}#{}': {}", method.getDeclaringClass().getName(),
                         method.getName(), ExceptionUtils.getStackTrace(e));

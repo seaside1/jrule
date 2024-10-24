@@ -14,15 +14,7 @@ package org.openhab.automation.jrule.actions;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
@@ -32,11 +24,8 @@ import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleConstants;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.generator.JRuleAbstractClassGenerator;
-import org.openhab.core.automation.annotation.ActionInput;
-import org.openhab.core.automation.annotation.RuleAction;
-import org.openhab.core.thing.Thing;
-import org.openhab.core.thing.binding.ThingActions;
-import org.openhab.core.thing.binding.ThingHandlerService;
+import org.openhab.core.model.script.engine.action.ActionDoc;
+import org.openhab.core.model.script.engine.action.ActionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,16 +48,16 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
         super(jRuleConfig);
     }
 
-    public boolean generateActionSource(Thing thing) {
+    public boolean generateActionSource(ActionService actionService) {
         try {
             Map<String, Object> processingModel = new HashMap<>();
 
-            Map<String, Object> actionModel = createActionModel(thing);
+            Map<String, Object> actionModel = createActionModel(actionService);
             processingModel.put("action", actionModel);
 
             File targetSourceFile = new File(new StringBuilder().append(jRuleConfig.getActionsDirectory())
                     .append(File.separator).append(jRuleConfig.getGeneratedItemPrefix())
-                    .append(getActionFriendlyName(thing.getUID().toString())).append(JRuleConstants.JAVA_FILE_TYPE)
+                    .append(actionService.getActionClass().getSimpleName()).append(JRuleConstants.JAVA_FILE_TYPE)
                     .toString());
 
             try (FileWriter fileWriter = new FileWriter(targetSourceFile)) {
@@ -83,7 +72,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
 
         } catch (Exception e) {
             JRuleLog.error(logger, LOG_NAME_CLASS_GENERATOR,
-                    "Internal error when generating java source for action {}: {}", thing.getUID().toString(),
+                    "Internal error when generating java source for action {}: {}", actionService.getActionClass(),
                     ExceptionUtils.getStackTrace(e));
 
         }
@@ -91,11 +80,11 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
         return false;
     }
 
-    public boolean generateActionsSource(Collection<Thing> things) {
+    public boolean generateActionsSource(Collection<ActionService> actionServices) {
         try {
-            List<Map<String, Object>> model = things.stream()
-                    .sorted(Comparator.comparing(e -> getActionFriendlyName(e.getUID().toString())))
-                    .map(this::createActionsModel).collect(Collectors.toList());
+            List<Map<String, Object>> model = actionServices.stream()
+                    .sorted(Comparator.comparing(e -> e.getActionClass().getSimpleName())).map(this::createActionsModel)
+                    .collect(Collectors.toList());
             Map<String, Object> processingModel = new HashMap<>();
             processingModel.put("actions", model);
             processingModel.put("packageName", jRuleConfig.getGeneratedActionPackage());
@@ -120,89 +109,81 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
         return false;
     }
 
-    private Map<String, Object> createActionsModel(Thing thing) {
+    private Map<String, Object> createActionsModel(ActionService actionService) {
         Map<String, Object> freemarkerModel = new HashMap<>();
-        freemarkerModel.put("id", thing.getUID().toString());
-        freemarkerModel.put("scope", thing.getUID().getBindingId());
-        freemarkerModel.put("name", StringUtils.uncapitalize(getActionFriendlyName(thing.getUID().toString())));
+        freemarkerModel.put("name",
+                StringUtils.uncapitalize(StringUtils.uncapitalize(actionService.getActionClass().getSimpleName())));
         freemarkerModel.put("package", jRuleConfig.getGeneratedActionPackage());
         freemarkerModel.put("class",
-                jRuleConfig.getGeneratedItemPrefix() + getActionFriendlyName(thing.getUID().toString()));
-        freemarkerModel.put("label", thing.getLabel());
+                jRuleConfig.getGeneratedItemPrefix() + actionService.getActionClass().getSimpleName());
+        freemarkerModel.put("actionClass", actionService.getActionClass().getSimpleName());
+        freemarkerModel.put("label", actionService.getActionClass());
         freemarkerModel.put("templateName", "Actions");
-        freemarkerModel.put("parentClass", "JRuleAbstractAction");
         return freemarkerModel;
     }
 
-    private Map<String, Object> createActionModel(Thing thing) {
+    private Map<String, Object> createActionModel(ActionService actionService) {
         Map<String, Object> freemarkerModel = new HashMap<>();
-        freemarkerModel.put("id", thing.getUID().toString());
-        freemarkerModel.put("name", getActionFriendlyName(thing.getUID().toString()));
+        freemarkerModel.put("id", actionService.getActionClass());
+        freemarkerModel.put("name", actionService.getActionClass().getSimpleName());
         freemarkerModel.put("package", jRuleConfig.getGeneratedActionPackage());
         freemarkerModel.put("class",
-                jRuleConfig.getGeneratedItemPrefix() + getActionFriendlyName(thing.getUID().toString()));
-        freemarkerModel.put("label", thing.getLabel());
+                jRuleConfig.getGeneratedItemPrefix() + actionService.getActionClass().getSimpleName());
+        freemarkerModel.put("actionClass", actionService.getActionClass().getSimpleName());
+        freemarkerModel.put("actionClassFqn", actionService.getActionClass().getName());
+        freemarkerModel.put("label", actionService.getActionClass());
         freemarkerModel.put("templateName", "Action");
-        freemarkerModel.put("parentClass", "JRuleAbstractAction");
 
         List<Object> methodList = new ArrayList<>();
         freemarkerModel.put("methods", methodList);
 
-        if (thing.getHandler() != null) {
-            Class<? extends ThingHandlerService> thingActionsClass = thing.getHandler().getServices().stream()
-                    .filter(ThingActions.class::isAssignableFrom).findFirst()
-                    .orElseThrow(() -> new IllegalStateException("should not occur here"));
+        Class<?> actionsClass = actionService.getActionClass();
 
-            freemarkerModel.put("type", thingActionsClass.getTypeName());
-            Set<String> imports = new TreeSet<>();
-            freemarkerModel.put("imports", imports);
+        freemarkerModel.put("type", actionsClass.getTypeName());
+        Set<String> imports = new TreeSet<>();
+        // imports.add(actionService.getActionClass().getName());
+        freemarkerModel.put("imports", imports);
 
-            Arrays.stream(thingActionsClass.getDeclaredMethods())
-                    .filter(method -> method.getAnnotation(RuleAction.class) != null).collect(Collectors.toSet())
+        Arrays.stream(actionsClass.getDeclaredMethods()).filter(method -> method.getAnnotation(ActionDoc.class) != null)
+                .collect(Collectors.toSet())
 
-                    .forEach(method -> {
-                        Map<Object, Object> methodMap = new HashMap<>();
-                        methodMap.put("name", method.getName());
+                .forEach(method -> {
+                    Map<Object, Object> methodMap = new HashMap<>();
+                    methodMap.put("name", method.getName());
 
-                        Class<?> returnType = replaceTypeIfNecessary(method.getReturnType());
+                    Class<?> returnType = replaceTypeIfNecessary(method.getReturnType());
 
-                        methodMap.put("returnType", returnType.getTypeName());
-                        methodMap.put("import", !returnType.isPrimitive());
-                        methodMap.put("hasReturnType", !returnType.getTypeName().equalsIgnoreCase("void"));
-                        if (!returnType.isPrimitive() && !returnType.getTypeName().equalsIgnoreCase("void")) {
-                            imports.add(returnType.getTypeName());
-                        }
+                    methodMap.put("returnType", returnType.getTypeName());
+                    methodMap.put("import", !returnType.isPrimitive());
+                    methodMap.put("hasReturnType", !returnType.getTypeName().equalsIgnoreCase("void"));
+                    if (!returnType.isPrimitive() && !returnType.getTypeName().equalsIgnoreCase("void")) {
+                        imports.add(returnType.getTypeName());
+                    }
 
-                        List<Object> args = new ArrayList<>();
-                        methodMap.put("args", args);
-                        Arrays.stream(method.getParameters()).forEach(parameter -> {
-                            if (parameter.getAnnotation(ActionInput.class) != null) {
-                                Map<Object, Object> arg = new HashMap<>();
-                                Class<?> parameterType = replaceTypeIfNecessary(parameter.getType());
-                                arg.put("type", parameterType.getTypeName());
-                                arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType())
-                                        .getTypeName().replaceFirst("java.lang.", ""));
-                                arg.put("name", parameter.getAnnotation(ActionInput.class).name());
-                                args.add(arg);
-                            }
-                        });
-                        methodList.add(methodMap);
+                    List<Object> args = new ArrayList<>();
+                    methodMap.put("args", args);
+                    Arrays.stream(method.getParameters()).forEach(parameter -> {
+                        Map<Object, Object> arg = new HashMap<>();
+                        Class<?> parameterType = replaceTypeIfNecessary(parameter.getType());
+                        arg.put("type", parameterType.getTypeName());
+                        arg.put("reflectionType", ClassUtils.primitiveToWrapper(parameter.getType()).getTypeName()
+                                .replaceFirst("java.lang.", ""));
+                        arg.put("name", parameter.getName());
+                        args.add(arg);
                     });
-        }
+                    methodList.add(methodMap);
+                });
         return freemarkerModel;
     }
 
     private Class<?> replaceTypeIfNecessary(Class<?> type) {
         if (type.isPrimitive() || "org.openhab.core.library.types".equals(type.getPackageName())
+                || "org.openhab.core.items".equals(type.getPackageName())
                 || "org.openhab.core.types".equals(type.getPackageName())
                 || type.getPackageName().startsWith("java.")) {
             return type;
         } else {
             return Object.class;
         }
-    }
-
-    public static String getActionFriendlyName(String thingUid) {
-        return Arrays.stream(thingUid.split("[:\\-]")).map(StringUtils::capitalize).collect(Collectors.joining(""));
     }
 }
