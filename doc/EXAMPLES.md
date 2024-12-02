@@ -991,7 +991,7 @@ import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleDebounce;
 
 public class DemoRule extends JRule {
-    @JRuleDebounce(10)
+    @JRuleDebounce(unit = ChronoUnit.MINUTES, value = 60)
     @JRuleName("Notify if thing stays offline")
     @JRuleWhenItemChange(item = MySwitchGroup)
     public void debounceMethod() {
