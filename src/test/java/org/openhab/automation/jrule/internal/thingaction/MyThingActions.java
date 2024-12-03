@@ -52,6 +52,11 @@ public class MyThingActions implements ThingActions {
         return 10;
     }
 
+    @RuleAction(label = "doWithVarArgs")
+    public int doWithVarArgs(@ActionInput(name = "value") String value, String... args) {
+        return 15;
+    }
+
     @Override
     public void setThingHandler(ThingHandler handler) {
     }

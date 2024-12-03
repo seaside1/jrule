@@ -14,21 +14,35 @@ package org.openhab.automation.jrule.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
+import org.openhab.core.model.script.actions.Things;
 import org.openhab.core.model.script.scoping.ActionClassLoader;
+import org.openhab.core.thing.binding.ThingActions;
 
 /**
- * The {@link JRuleAbstractAction}
+ * The {@link JRuleAbstractThingAction}
  *
  * @author Robert Delbrück - Initial contribution
  */
-public abstract class JRuleAbstractAction {
-    protected Object invokeMethod(String clazzName, String methodName, Class<?>[] classes, Object... args) {
+public abstract class JRuleAbstractThingAction {
+    private final ThingActions thingActions;
+    private final String scope;
+    private final String thingUID;
+
+    protected JRuleAbstractThingAction(String scope, String thingUID) {
+        this.scope = scope;
+        this.thingUID = thingUID;
+        thingActions = Objects.requireNonNull(Things.getActions(scope, thingUID),
+                String.format("action for '%s' with uid '%s' could not be found", scope, thingUID));
+    }
+
+    protected Object invokeMethod(String methodName, Class<?>[] classes, Object... args) {
         try {
-            ActionClassLoader cl = new ActionClassLoader(JRuleAbstractAction.class.getClassLoader());
-            Class<?> clazz = Class.forName(clazzName, true, cl);
+            ActionClassLoader cl = new ActionClassLoader(JRuleAbstractThingAction.class.getClassLoader());
+            Class<?> clazz = Class.forName(thingActions.getClass().getName(), true, cl);
             Method method = clazz.getDeclaredMethod(methodName, classes);
-            return method.invoke(null, args);
+            return method.invoke(thingActions, args);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("method not found", e);
         } catch (InvocationTargetException e) {
@@ -38,5 +52,13 @@ public abstract class JRuleAbstractAction {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("cannot found class", e);
         }
+    }
+
+    public String getThingUID() {
+        return thingUID;
+    }
+
+    public String getScope() {
+        return scope;
     }
 }

@@ -12,7 +12,9 @@
  */
 package org.openhab.automation.jrule.internal;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -26,6 +28,7 @@ import org.openhab.core.audio.AudioHTTPServer;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.model.script.engine.action.ActionService;
 import org.openhab.core.net.NetworkAddressService;
 import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.scheduler.CronScheduler;
@@ -35,10 +38,7 @@ import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +60,7 @@ public class JRuleFactory {
     private static final String LOG_NAME_FACTORY = "JRuleFactory";
 
     private final JRuleDelayedDebouncingExecutor delayedInit = new JRuleDelayedDebouncingExecutor(5, TimeUnit.SECONDS);
+    private final List<ActionService> actionServices = new CopyOnWriteArrayList<>();
 
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
@@ -71,7 +72,7 @@ public class JRuleFactory {
             final @Reference NetworkAddressService networkAddressService, final ComponentContext componentContext,
             final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry,
             final @Reference JRuleRuleProvider ruleProvider,
-            @Reference final PersistenceServiceRegistry persistenceServiceRegistry) {
+            final @Reference PersistenceServiceRegistry persistenceServiceRegistry) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
@@ -85,7 +86,7 @@ public class JRuleFactory {
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, itemChannelLinkRegistry, thingRegistry, thingManager,
                 eventPublisher, eventSubscriber, voiceManager, audioHTTPServer, networkAddressService, cronScheduler,
-                componentContext.getBundleContext(), metadataRegistry);
+                componentContext.getBundleContext(), metadataRegistry, actionServices);
         delayedInit.call(this::init);
     }
 
@@ -104,5 +105,14 @@ public class JRuleFactory {
     public synchronized void dispose() {
         delayedInit.cancel();
         jRuleHandler.dispose();
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+    public void addActionService(ActionService actionService) {
+        this.actionServices.add(actionService);
+    }
+
+    public void removeActionService(ActionService actionService) {
+        this.actionServices.remove(actionService);
     }
 }

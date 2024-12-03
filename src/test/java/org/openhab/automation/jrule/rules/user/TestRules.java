@@ -580,7 +580,7 @@ public class TestRules extends JRule {
 
     private static void invokeAction(String fieldName, String methodName, Object... args) throws ClassNotFoundException,
             NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Class<?> jRuleActionsClass = Class.forName("org.openhab.automation.jrule.generated.actions.JRuleActions");
+        Class<?> jRuleActionsClass = Class.forName("org.openhab.automation.jrule.generated.actions.JRuleThingActions");
         Field mqttBrokerMqttField = jRuleActionsClass.getDeclaredField(fieldName);
         Object fieldInstance = mqttBrokerMqttField.get(null);
         Method actionMethod = fieldInstance.getClass().getDeclaredMethod(methodName,

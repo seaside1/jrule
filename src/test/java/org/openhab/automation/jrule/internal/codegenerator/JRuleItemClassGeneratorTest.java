@@ -113,7 +113,7 @@ public class JRuleItemClassGeneratorTest {
         assertTrue(compiledClass.exists());
 
         URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
-                JRuleActionClassGeneratorTest.class.getClassLoader());
+                JRuleThingActionClassGeneratorTest.class.getClassLoader());
         final String className = "org.openhab.automation.jrule.generated.items.JRuleItems";
         Class<?> aClass = classLoader.loadClass(className);
         Object jRuleItems = aClass.getConstructor().newInstance();
