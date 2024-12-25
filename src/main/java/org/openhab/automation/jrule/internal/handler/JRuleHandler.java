@@ -284,6 +284,8 @@ public class JRuleHandler implements PropertyChangeListener {
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
                 | InvocationTargetException e) {
             logger.error("Could not instantiate JRuleItems file", e);
+        } catch (Error e) {
+            logger.error("Could not instantiate JRuleItems file", e);
         }
 
         // Reload Things class - this will also instantiate all things and load them to the registry
@@ -294,6 +296,8 @@ public class JRuleHandler implements PropertyChangeListener {
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
                 | InvocationTargetException e) {
             logger.error("Could not instantiate JRuleThings file", e);
+        } catch (Error error) {
+            logger.error("Could not instantiate JRuleThings file", error);
         }
 
         // Reload Actions class - this will also instantiate all actions
@@ -304,6 +308,8 @@ public class JRuleHandler implements PropertyChangeListener {
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
                 | InvocationTargetException e) {
             logger.error("Could not instantiate JRuleActions file", e);
+        } catch (Error error) {
+            logger.error("Could not instantiate JRuleActions file", error);
         }
 
         // Load rules that refer to the items
