@@ -15,6 +15,7 @@ package org.openhab.automation.jrule.actions;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -51,7 +52,8 @@ public class JRuleModuleActionClassGenerator extends JRuleAbstractClassGenerator
     }
 
     public boolean generateActionSources() {
-        Collection<ActionType> actions = moduleTypeRegistry.getActions();
+        Collection<ActionType> actions = moduleTypeRegistry.getActions().stream()
+                .filter(actionType -> actionType.getUID().lastIndexOf("#") == -1).collect(Collectors.toList());
         return generateActionSource(actions);
     }
 
