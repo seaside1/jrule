@@ -19,10 +19,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
@@ -36,6 +33,9 @@ import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
 import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
 import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.things.JRuleChannel;
+import org.openhab.automation.jrule.things.JRuleSubThing;
+import org.openhab.automation.jrule.things.JRuleThingRegistry;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 
 /**
@@ -57,6 +57,8 @@ public class TestRules extends JRule {
     public static final String NAME_EXEC_COMMAND_LINE = "Exec Command Line";
     public static final String NAME_MQTT_CHANNEL_TRIGGERED = "Mqtt Channel Triggered";
     public static final String NAME_MQTT_THING_CHANGED_TO_OFFLINE = "Mqtt Thing Changed To Offline";
+    public static final String NAME_MQTT_THING_CHANGED_FROM_ONLINE = "Mqtt Thing Changed From Online";
+    public static final String ITEM_MQTT_TOPIC_FROM_ONLINE_TEST = "ItemToUndef";
     public static final String NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND = "Member Of Group Received Command";
     public static final String NAME_MEMBER_OF_GROUP_RECEIVED_UPDATE = "Member Of Group Received Update";
     public static final String NAME_MEMBER_OF_GROUP_CHANGED = "Member Of Group Changed";
@@ -182,6 +184,24 @@ public class TestRules extends JRule {
     @JRuleWhenThingTrigger(to = JRuleThingStatus.OFFLINE)
     public void mqttThingChangedToOffline(JRuleThingEvent event) {
         logInfo("thing '{}' goes '{}'", event.getThing(), event.getStatus());
+    }
+
+    @JRuleName(NAME_MQTT_THING_CHANGED_FROM_ONLINE)
+    @JRuleWhenThingTrigger(thing = "mqtt:topic:mqtt:fromonlinetest", from = JRuleThingStatus.ONLINE)
+    public void mqttThingChangedFromOnline(JRuleThingEvent event) {
+        logInfo("Thing '{}' goes '{}'", event.getThing(), event.getStatus());
+        String thing = event.getThing();
+        JRuleSubThing mqttTopicThing = JRuleThingRegistry.get(thing, JRuleSubThing.class);
+        List<JRuleChannel> channels = mqttTopicThing.getChannels();
+        logInfo("Channels size: {}", channels.size());
+        channels.stream().forEach(channel -> {
+            Set<JRuleItem> linkedItems = mqttTopicThing.getLinkedItems(channel);
+            logInfo("Linked items size: {}", linkedItems.size());
+            linkedItems.stream().forEach(item -> {
+                logInfo("Linked item: {}, setting to UNDEF", item.getName());
+                item.postUndefUpdate();
+            });
+        });
     }
 
     @JRuleName(NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND)
