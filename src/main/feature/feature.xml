@@ -4,6 +4,6 @@
 
 	<feature name="openhab-automation-jrule" description="JRule Automation" version="${project.version}">
 		<feature>openhab-runtime-base</feature>
-		<bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.automation.jrule/${project.version}</bundle>
+		<bundle start-level="90">mvn:org.openhab.addons.bundles/org.openhab.automation.jrule/${project.version}</bundle>
 	</feature>
 </features>
