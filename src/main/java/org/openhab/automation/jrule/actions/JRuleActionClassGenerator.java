@@ -192,7 +192,7 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
         return freemarkerModel;
     }
 
-    private Class<?> replaceTypeIfNecessary(Class<?> type) {
+    public static Class<?> replaceTypeIfNecessary(Class<?> type) {
         if (type.isPrimitive() || "org.openhab.core.library.types".equals(type.getPackageName())
                 || "org.openhab.core.types".equals(type.getPackageName())
                 || type.getPackageName().startsWith("java.")) {

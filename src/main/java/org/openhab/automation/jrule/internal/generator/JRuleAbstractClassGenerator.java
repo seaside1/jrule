@@ -26,11 +26,9 @@ import freemarker.template.TemplateExceptionHandler;
  */
 public abstract class JRuleAbstractClassGenerator {
     protected final JRuleConfig jRuleConfig;
-    protected final Configuration freemarkerConfiguration;
+    public static final Configuration freemarkerConfiguration;
 
-    public JRuleAbstractClassGenerator(JRuleConfig jRuleConfig) {
-        this.jRuleConfig = jRuleConfig;
-
+    static {
         // Create your Configuration instance, and specify if up to what FreeMarker
         // version (here 2.3.29) do you want to apply the fixes that are not 100%
         // backward-compatible. See the Configuration JavaDoc for details.
@@ -38,7 +36,7 @@ public abstract class JRuleAbstractClassGenerator {
 
         // Specify the source where the template files come from. Here I set a
         // plain directory for it, but non-file-system sources are possible too:
-        freemarkerConfiguration.setClassForTemplateLoading(this.getClass(), "/templates");
+        freemarkerConfiguration.setClassForTemplateLoading(JRuleAbstractClassGenerator.class, "/templates");
         // From here we will set the settings recommended for new projects. These
         // aren't the defaults for backward compatibilty.
 
@@ -58,5 +56,9 @@ public abstract class JRuleAbstractClassGenerator {
 
         // Do not fall back to higher scopes when reading a null loop variable:
         freemarkerConfiguration.setFallbackOnNullLoopVariable(false);
+    }
+
+    public JRuleAbstractClassGenerator(JRuleConfig jRuleConfig) {
+        this.jRuleConfig = jRuleConfig;
     }
 }
