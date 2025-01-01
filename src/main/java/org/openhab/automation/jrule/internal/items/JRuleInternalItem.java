@@ -182,55 +182,55 @@ public abstract class JRuleInternalItem implements JRuleItem {
 
     @Deprecated
     @Override
-    public @Nullable Optional<JRuleHistoricState> historicState(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> historicState(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.historicState(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> persistedState(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> persistedState(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.persistedState(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<ZonedDateTime> lastUpdate(@Nullable String serviceId) {
+    public Optional<ZonedDateTime> lastUpdate(@Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.lastUpdate(item, serviceId));
     }
 
     @Override
-    public @Nullable Optional<ZonedDateTime> nextUpdate(@Nullable String serviceId) {
+    public Optional<ZonedDateTime> nextUpdate(@Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.nextUpdate(item, serviceId));
     }
 
     @Override
-    public @Nullable Optional<ZonedDateTime> lastChange(@Nullable String serviceId) {
+    public Optional<ZonedDateTime> lastChange(@Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.lastChange(item, serviceId));
     }
 
     @Override
-    public @Nullable Optional<ZonedDateTime> nextChange(@Nullable String serviceId) {
+    public Optional<ZonedDateTime> nextChange(@Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.nextChange(item, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> previousState(@Nullable String serviceId) {
+    public Optional<JRuleHistoricState> previousState(@Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.previousState(item, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> previousState(boolean skipEqual, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> previousState(boolean skipEqual, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.previousState(item, skipEqual, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> nextState(@Nullable String serviceId) {
+    public Optional<JRuleHistoricState> nextState(@Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.nextState(item, serviceId));
     }
@@ -254,7 +254,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<Boolean> changedSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<Boolean> changedSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.changedSince(item, timestamp, serviceId));
     }
@@ -272,125 +272,121 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<Boolean> updatedUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<Boolean> updatedUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.updatedUntil(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> maximumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> maximumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.maximumSince(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> maximumUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> maximumUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.maximumUntil(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> maximumBetween(ZonedDateTime begin, ZonedDateTime end,
+    public Optional<JRuleHistoricState> maximumBetween(ZonedDateTime begin, ZonedDateTime end,
             @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.maximumBetween(item, begin, end, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> minimumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> minimumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.minimumSince(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> minimumUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleHistoricState> minimumUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.minimumUntil(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleHistoricState> minimumBetween(ZonedDateTime begin, ZonedDateTime end,
+    public Optional<JRuleHistoricState> minimumBetween(ZonedDateTime begin, ZonedDateTime end,
             @Nullable String serviceId) {
         Item item = getItem(name);
         return mapHistoricItem(PersistenceExtensions.minimumBetween(item, begin, end, serviceId));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> varianceBetween(ZonedDateTime begin, ZonedDateTime end,
-            @Nullable String serviceId) {
+    public Optional<JRuleValue> varianceBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.varianceBetween(item, begin, end, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> varianceSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> varianceSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.varianceSince(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> sumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> sumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.sumSince(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> varianceUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> varianceUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.varianceUntil(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> deviationBetween(ZonedDateTime begin, ZonedDateTime end,
-            @Nullable String serviceId) {
+    public Optional<JRuleValue> deviationBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.deviationBetween(item, begin, end, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> deviationSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> deviationSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.deviationSince(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> deviationUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> deviationUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.deviationUntil(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> averageBetween(ZonedDateTime begin, ZonedDateTime end,
-            @Nullable String serviceId) {
+    public Optional<JRuleValue> averageBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.averageBetween(item, begin, end, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> averageSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> averageSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.averageSince(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> averageUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> averageUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.averageUntil(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> medianBetween(ZonedDateTime begin, ZonedDateTime end,
-            @Nullable String serviceId) {
+    public Optional<JRuleValue> medianBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         throw new IllegalStateException("available in oh 4.3");
         // Item item = getItem(name);
         // return Optional.ofNullable(PersistenceExtensions.medianBetween(item, begin, end, serviceId))
@@ -398,7 +394,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> medianSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> medianSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         throw new IllegalStateException("available in oh 4.3");
         // Item item = getItem(name);
         // return Optional.ofNullable(PersistenceExtensions.medianSince(item, timestamp, serviceId))
@@ -406,7 +402,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> medianUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> medianUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         throw new IllegalStateException("available in oh 4.3");
         // Item item = getItem(name);
         // return Optional.ofNullable(PersistenceExtensions.medianUntil(item, timestamp, serviceId))
@@ -414,14 +410,14 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> deltaSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> deltaSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.deltaSince(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
     @Override
-    public @Nullable Optional<JRuleValue> deltaUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> deltaUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.deltaUntil(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
@@ -429,23 +425,21 @@ public abstract class JRuleInternalItem implements JRuleItem {
 
     @Deprecated
     @Override
-    public @Nullable Optional<JRuleDecimalValue> evolutionRate(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleDecimalValue> evolutionRate(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.evolutionRate(item, timestamp, serviceId))
                 .map(v -> new JRuleDecimalValue(v.doubleValue()));
     }
 
     @Override
-    public @Nullable Optional<JRuleDecimalValue> evolutionRateSince(ZonedDateTime timestamp,
-            @Nullable String serviceId) {
+    public Optional<JRuleDecimalValue> evolutionRateSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.evolutionRateSince(item, timestamp, serviceId))
                 .map(v -> new JRuleDecimalValue(v.doubleValue()));
     }
 
     @Override
-    public @Nullable Optional<JRuleDecimalValue> evolutionRateUntil(ZonedDateTime timestamp,
-            @Nullable String serviceId) {
+    public Optional<JRuleDecimalValue> evolutionRateUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.evolutionRateUntil(item, timestamp, serviceId))
                 .map(v -> new JRuleDecimalValue(v.doubleValue()));
@@ -453,7 +447,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
 
     @Deprecated
     @Override
-    public @Nullable Optional<JRuleDecimalValue> evolutionRate(ZonedDateTime begin, ZonedDateTime end,
+    public Optional<JRuleDecimalValue> evolutionRate(ZonedDateTime begin, ZonedDateTime end,
             @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.evolutionRate(item, begin, end, serviceId))
@@ -461,7 +455,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<JRuleDecimalValue> evolutionRateBetween(ZonedDateTime begin, ZonedDateTime end,
+    public Optional<JRuleDecimalValue> evolutionRateBetween(ZonedDateTime begin, ZonedDateTime end,
             @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.evolutionRateBetween(item, begin, end, serviceId))
@@ -469,45 +463,43 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<Long> countBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
+    public Optional<Long> countBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.countBetween(item, begin, end, serviceId));
     }
 
     @Override
-    public @Nullable Optional<Long> countSince(ZonedDateTime begin, @Nullable String serviceId) {
+    public Optional<Long> countSince(ZonedDateTime begin, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.countSince(item, begin, serviceId));
     }
 
     @Override
-    public @Nullable Optional<Long> countUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<Long> countUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.countUntil(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<Long> countStateChangesSince(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<Long> countStateChangesSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.countStateChangesSince(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<Long> countStateChangesUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<Long> countStateChangesUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.countStateChangesUntil(item, timestamp, serviceId));
     }
 
     @Override
-    public @Nullable Optional<Long> countStateChangesBetween(ZonedDateTime begin, ZonedDateTime end,
-            @Nullable String serviceId) {
+    public Optional<Long> countStateChangesBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.countStateChangesBetween(item, begin, end, serviceId));
     }
 
     @Override
-    public @Nullable Optional<List<JRuleHistoricState>> getAllStatesSince(ZonedDateTime timestamp,
-            @Nullable String serviceId) {
+    public Optional<List<JRuleHistoricState>> getAllStatesSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.getAllStatesSince(item, timestamp, serviceId))
                 .map(i -> StreamSupport.stream(i.spliterator(), false).map(this::mapHistoricItem)
@@ -515,8 +507,7 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public @Nullable Optional<List<JRuleHistoricState>> getAllStatesUntil(ZonedDateTime timestamp,
-            @Nullable String serviceId) {
+    public Optional<List<JRuleHistoricState>> getAllStatesUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.getAllStatesUntil(item, timestamp, serviceId))
                 .map(i -> StreamSupport.stream(i.spliterator(), false).map(this::mapHistoricItem)
