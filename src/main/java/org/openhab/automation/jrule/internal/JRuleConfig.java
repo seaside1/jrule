@@ -44,7 +44,6 @@ public class JRuleConfig {
     private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
     private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
     private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
-    private static final String GENERATED_PERSISTENCE_PACKAGE_PROPERTY = "org.openhab.automation.jrule.persistencepackage";
     private static final String GENERATED_THING_PACKAGE_PROPERTY = "org.openhab.automation.jrule.thingpackage";
     private static final String EXECUTORS_MIN_PROPERTY = "org.openhab.automation.jrule.engine.executors.min";
     private static final String EXECUTORS_MAX_PROPERTY = "org.openhab.automation.jrule.engine.executors.max";
@@ -64,7 +63,6 @@ public class JRuleConfig {
             + File.separator + "automation" + File.separator + "jrule";
     private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
     private static final String DEFAULT_GENERATED_ITEM_PACKAGE = "org.openhab.automation.jrule.generated.items";
-    private static final String DEFAULT_GENERATED_PERSISTENCE_PACKAGE = "org.openhab.automation.jrule.generated.persistence";
     private static final String DEFAULT_GENERATED_THING_PACKAGE = "org.openhab.automation.jrule.generated.things";
     private static final String DEFAULT_GENERATED_ACTION_PACKAGE = "org.openhab.automation.jrule.generated.actions";
 
@@ -136,14 +134,6 @@ public class JRuleConfig {
         final StringBuilder sb = new StringBuilder(getWorkingDirectory());
         sb.append(File.separator).append(GEN).append(File.separator);
         final String p = JRuleUtil.packageNameToPath(getGeneratedItemPackage());
-        sb.append(p);
-        return sb.toString();
-    }
-
-    public String getPersistenceDirectory() {
-        final StringBuilder sb = new StringBuilder(getWorkingDirectory());
-        sb.append(File.separator).append(GEN).append(File.separator);
-        final String p = JRuleUtil.packageNameToPath(getGeneratedPersistencePackage());
         sb.append(p);
         return sb.toString();
     }
@@ -253,11 +243,6 @@ public class JRuleConfig {
 
     public String getGeneratedItemPackage() {
         return getConfigPropertyOrDefaultValue(GENERATED_ITEM_PACKAGE_PROPERTY, DEFAULT_GENERATED_ITEM_PACKAGE);
-    }
-
-    public String getGeneratedPersistencePackage() {
-        return getConfigPropertyOrDefaultValue(GENERATED_PERSISTENCE_PACKAGE_PROPERTY,
-                DEFAULT_GENERATED_PERSISTENCE_PACKAGE);
     }
 
     public String getGeneratedThingPackage() {
