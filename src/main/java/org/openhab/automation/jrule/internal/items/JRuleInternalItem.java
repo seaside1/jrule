@@ -522,6 +522,15 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
+    public Optional<List<JRuleHistoricState>> getAllStatesBetween(ZonedDateTime begin, ZonedDateTime end,
+            @Nullable String serviceId) {
+        Item item = getItem(name);
+        return Optional.ofNullable(PersistenceExtensions.getAllStatesBetween(item, begin, end, serviceId))
+                .map(i -> StreamSupport.stream(i.spliterator(), false).map(this::mapHistoricItem)
+                        .filter(Optional::isPresent).map(Optional::get).toList());
+    }
+
+    @Override
     public void removeAllStatesBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
         Item item = getItem(name);
         PersistenceExtensions.removeAllStatesBetween(item, begin, end, serviceId);

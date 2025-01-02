@@ -23,10 +23,9 @@ import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.types.TimeSeries;
 
 /**
- * Automatically Generated Class for Items - DO NOT EDIT!
+ * The {@link JRulePersistence}. Defines all openHAB core persistence in this interface.
  *
  * @author Robert Delbrück - Initial contribution
- *         Collect all from PersistenceExtension with regex: (.* )?.* .*\(((.* )?.* .*,?)+\)
  */
 public interface JRulePersistence {
     default void persist() {
@@ -554,6 +553,13 @@ public interface JRulePersistence {
     }
 
     Optional<List<JRuleHistoricState>> getAllStatesUntil(ZonedDateTime timestamp, @Nullable String serviceId);
+
+    default Optional<List<JRuleHistoricState>> getAllStatesBetween(ZonedDateTime begin, ZonedDateTime end) {
+        return getAllStatesBetween(begin, end, null);
+    }
+
+    Optional<List<JRuleHistoricState>> getAllStatesBetween(ZonedDateTime begin, ZonedDateTime end,
+            @Nullable String serviceId);
 
     default void removeAllStatesSince(ZonedDateTime timestamp) {
         removeAllStatesSince(timestamp, null);
