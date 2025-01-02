@@ -423,6 +423,13 @@ public abstract class JRuleInternalItem implements JRuleItem {
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
+    @Override
+    public Optional<JRuleValue> deltaBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
+        Item item = getItem(name);
+        return Optional.ofNullable(PersistenceExtensions.deltaBetween(item, begin, end, serviceId))
+                .map(v -> JRuleEventHandler.get().toValue(v));
+    }
+
     @Deprecated
     @Override
     public Optional<JRuleDecimalValue> evolutionRate(ZonedDateTime timestamp, @Nullable String serviceId) {

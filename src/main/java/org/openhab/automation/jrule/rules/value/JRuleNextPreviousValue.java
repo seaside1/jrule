@@ -57,6 +57,11 @@ public enum JRuleNextPreviousValue implements JRuleValue {
     }
 
     @Override
+    public JRuleValue as(Class<? extends JRuleValue> target) {
+        throw new IllegalStateException("cannot cast");
+    }
+
+    @Override
     public String toString() {
         return ohType.toString();
     }

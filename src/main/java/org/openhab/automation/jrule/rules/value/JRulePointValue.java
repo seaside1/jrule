@@ -17,7 +17,6 @@ import java.util.Objects;
 
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.PointType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
@@ -25,7 +24,7 @@ import org.openhab.core.types.State;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public class JRulePointValue implements JRuleValue {
+public class JRulePointValue extends JRuleValueBase implements JRuleValue {
     private final PointType ohType;
 
     public JRulePointValue(BigDecimal latitude, BigDecimal longitude, BigDecimal altitude) {
@@ -61,18 +60,8 @@ public class JRulePointValue implements JRuleValue {
     }
 
     @Override
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
-    public Command toOhCommand() {
-        return this.ohType;
-    }
-
-    @Override
-    public State toOhState() {
-        return this.ohType;
+    public State getOhType() {
+        return ohType;
     }
 
     @Override
