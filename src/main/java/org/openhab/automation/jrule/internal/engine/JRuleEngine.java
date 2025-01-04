@@ -159,7 +159,9 @@ public class JRuleEngine implements PropertyChangeListener {
         }
 
         final String logName = Optional.ofNullable(method.getDeclaredAnnotation(JRuleLogName.class))
-                .map(JRuleLogName::value).orElse(method.getDeclaredAnnotation(JRuleName.class).value());
+                .map(JRuleLogName::value)
+                .or(() -> Optional.ofNullable(method.getDeclaredAnnotation(JRuleName.class).value()))
+                .orElse(method.getName());
 
         JRuleBuilder jRuleBuilder = createJRuleBuilder(method.getDeclaredAnnotation(JRuleName.class).value(), jRule,
                 method).logName(logName);
