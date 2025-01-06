@@ -19,7 +19,9 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalRollershutterItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.JRuleStopMoveValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 
 /**
  * The {@link JRuleRollershutterItem} JRule Item
@@ -42,7 +44,7 @@ public interface JRuleRollershutterItem extends JRuleItem {
 
     /**
      * Sends a percent command
-     * 
+     *
      * @param command command to send.
      */
     default void sendCommand(JRulePercentValue command) {
@@ -51,7 +53,7 @@ public interface JRuleRollershutterItem extends JRuleItem {
 
     /**
      * Sends a percent update
-     * 
+     *
      * @param state update to send
      */
     default void postUpdate(JRulePercentValue state) {
@@ -60,7 +62,7 @@ public interface JRuleRollershutterItem extends JRuleItem {
 
     /**
      * Sends a percent command.
-     * 
+     *
      * @param command as number via JRulePercentValue will be send.
      */
     default void sendCommand(int command) {
@@ -96,7 +98,7 @@ public interface JRuleRollershutterItem extends JRuleItem {
 
     /**
      * Sends a percent update.
-     * 
+     *
      * @param state as number via JRulePercentValue will be send.
      */
     default void postUpdate(int state) {
