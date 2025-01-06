@@ -39,13 +39,34 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleStartupExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
-import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleDebounce;
+import org.openhab.automation.jrule.rules.JRuleDelayed;
+import org.openhab.automation.jrule.rules.JRuleLogName;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.JRuleTag;
+import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenStartup;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
@@ -204,7 +225,6 @@ public class JRuleEngine implements PropertyChangeListener {
                                 .orElse(null),
                         Optional.of(jRuleWhen.from()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN).orElse(null),
                         Optional.of(jRuleWhen.to()).filter(s -> s != JRuleThingStatus.THING_UNKNOWN).orElse(null)));
-
         Arrays.stream(method.getAnnotationsByType(JRuleWhenStartup.class))
                 .forEach(jRuleWhen -> jRuleBuilder.whenStartupTrigger(jRuleWhen.level()));
 

@@ -17,7 +17,14 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenStartup;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.core.automation.Module;
 import org.openhab.core.automation.Trigger;
 import org.openhab.core.automation.handler.BaseModuleHandlerFactory;

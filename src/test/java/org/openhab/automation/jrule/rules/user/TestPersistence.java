@@ -19,9 +19,24 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.openhab.automation.jrule.items.*;
-import org.openhab.automation.jrule.rules.*;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.items.JRuleColorItem;
+import org.openhab.automation.jrule.items.JRuleContactItem;
+import org.openhab.automation.jrule.items.JRuleDateTimeItem;
+import org.openhab.automation.jrule.items.JRuleDimmerItem;
+import org.openhab.automation.jrule.items.JRuleImageItem;
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleLocationItem;
+import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRulePlayerItem;
+import org.openhab.automation.jrule.items.JRuleQuantityItem;
+import org.openhab.automation.jrule.items.JRuleRollershutterItem;
+import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 
 /**
  * The {@link TestPersistence}
