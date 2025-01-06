@@ -282,9 +282,7 @@ public class JRuleHandler implements PropertyChangeListener {
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated JRuleItems class");
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
-                | InvocationTargetException e) {
-            logger.error("Could not instantiate JRuleItems file", e);
-        } catch (Error e) {
+                | InvocationTargetException | Error e) {
             logger.error("Could not instantiate JRuleItems file", e);
         }
 
@@ -293,11 +291,9 @@ public class JRuleHandler implements PropertyChangeListener {
             Class<?> cls = Class.forName(config.getGeneratedThingPackage() + ".JRuleThings", true, loader);
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated JRuleThings class");
-        } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
-                | InvocationTargetException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException |
+                 InvocationTargetException | Error e) {
             logger.error("Could not instantiate JRuleThings file", e);
-        } catch (Error error) {
-            logger.error("Could not instantiate JRuleThings file", error);
         }
 
         // Reload Actions class - this will also instantiate all actions
@@ -305,11 +301,9 @@ public class JRuleHandler implements PropertyChangeListener {
             Class<?> cls = Class.forName(config.getGeneratedActionPackage() + ".JRuleActions", true, loader);
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated JRuleActions class");
-        } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
-                | InvocationTargetException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException |
+                 InvocationTargetException | Error e) {
             logger.error("Could not instantiate JRuleActions file", e);
-        } catch (Error error) {
-            logger.error("Could not instantiate JRuleActions file", error);
         }
 
         // Load rules that refer to the items
