@@ -41,8 +41,13 @@ public class JRuleMetadataRegistry {
                         metadata -> new JRuleItemMetadata(metadata.getValue(), metadata.getConfiguration())));
     }
 
-    public void addMetadata(String namespace, String itemName, JRuleItemMetadata metadata) {
-        metadataRegistry.add(
-                new Metadata(new MetadataKey(namespace, itemName), metadata.getValue(), metadata.getConfiguration()));
+    public void addMetadata(String namespace, String itemName, JRuleItemMetadata metadata, boolean override) {
+        MetadataKey key = new MetadataKey(namespace, itemName);
+        Metadata foundMetadata = metadataRegistry.get(key);
+        if (foundMetadata != null && override) {
+            metadataRegistry.remove(key);
+        }
+
+        metadataRegistry.add(new Metadata(key, metadata.getValue(), metadata.getConfiguration()));
     }
 }

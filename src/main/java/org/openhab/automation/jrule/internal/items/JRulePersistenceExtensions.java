@@ -24,12 +24,7 @@ import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.persistence.FilterCriteria;
-import org.openhab.core.persistence.HistoricItem;
-import org.openhab.core.persistence.ModifiablePersistenceService;
-import org.openhab.core.persistence.PersistenceService;
-import org.openhab.core.persistence.PersistenceServiceRegistry;
-import org.openhab.core.persistence.QueryablePersistenceService;
+import org.openhab.core.persistence.*;
 import org.openhab.core.persistence.extensions.PersistenceExtensions;
 import org.openhab.core.types.State;
 
@@ -138,45 +133,50 @@ class JRulePersistenceExtensions {
                 .map(historicItem -> historicItem.getState().as(DecimalType.class));
     }
 
-    public static Optional<DecimalType> varianceSince(String itemName, ZonedDateTime timestamp)
+    public static Optional<State> varianceSince(String itemName, ZonedDateTime timestamp)
             throws JRuleItemNotFoundException {
         return varianceSince(itemName, timestamp, null);
     }
 
-    public static Optional<DecimalType> varianceSince(String itemName, ZonedDateTime timestamp, String serviceId) {
+    public static Optional<State> varianceSince(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
         return Optional.ofNullable(serviceId == null ? PersistenceExtensions.varianceSince(item, timestamp)
                 : PersistenceExtensions.varianceSince(item, timestamp, serviceId));
     }
 
-    public static Optional<DecimalType> deviationSince(String itemName, ZonedDateTime timestamp) {
+    public static Optional<State> deviationSince(String itemName, ZonedDateTime timestamp) {
         return deviationSince(itemName, timestamp, null);
     }
 
-    public static Optional<DecimalType> deviationSince(String itemName, ZonedDateTime timestamp, String serviceId) {
+    public static Optional<State> deviationSince(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
         return Optional.ofNullable(serviceId == null ? PersistenceExtensions.deviationSince(item, timestamp)
                 : PersistenceExtensions.deviationSince(item, timestamp, serviceId));
     }
 
-    public static Optional<DecimalType> averageSince(String itemName, ZonedDateTime timestamp) {
+    public static Optional<State> averageSince(String itemName, ZonedDateTime timestamp) {
         return averageSince(itemName, timestamp, null);
     }
 
-    public static Optional<DecimalType> averageSince(String itemName, ZonedDateTime timestamp, String serviceId) {
+    public static Optional<State> averageSince(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
         return Optional.ofNullable(serviceId == null ? PersistenceExtensions.averageSince(item, timestamp)
                 : PersistenceExtensions.averageSince(item, timestamp, serviceId));
     }
 
-    public static Optional<DecimalType> sumSince(String itemName, ZonedDateTime timestamp) {
+    public static Optional<State> sumSince(String itemName, ZonedDateTime timestamp) {
         return sumSince(itemName, timestamp, null);
     }
 
-    public static Optional<DecimalType> sumSince(String itemName, ZonedDateTime timestamp, String serviceId) {
+    public static Optional<State> sumSince(String itemName, ZonedDateTime timestamp, String serviceId) {
         Item item = getItem(itemName);
-        return Optional.of(serviceId == null ? PersistenceExtensions.sumSince(item, timestamp)
-                : PersistenceExtensions.sumSince(item, timestamp, serviceId));
+        State state;
+        if (serviceId == null) {
+            state = PersistenceExtensions.sumSince(item, timestamp);
+        } else {
+            state = PersistenceExtensions.sumSince(item, timestamp, serviceId);
+        }
+        return state != null ? Optional.of(state) : Optional.empty();
     }
 
     public static Optional<ZonedDateTime> lastUpdate(String itemName) {
@@ -185,8 +185,13 @@ class JRulePersistenceExtensions {
 
     public static Optional<ZonedDateTime> lastUpdate(String itemName, String serviceId) {
         Item item = getItem(itemName);
-        return Optional.ofNullable(serviceId == null ? PersistenceExtensions.lastUpdate(item)
-                : PersistenceExtensions.lastUpdate(item, serviceId));
+        ZonedDateTime state;
+        if (serviceId == null) {
+            state = PersistenceExtensions.lastUpdate(item);
+        } else {
+            state = PersistenceExtensions.lastUpdate(item, serviceId);
+        }
+        return state != null ? Optional.of(state) : Optional.empty();
     }
 
     public static Optional<State> previousState(String itemName, boolean skipEquals) {

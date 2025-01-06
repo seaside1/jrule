@@ -29,33 +29,8 @@ import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
 import org.openhab.automation.jrule.items.*;
-import org.openhab.automation.jrule.items.JRuleColorItem;
-import org.openhab.automation.jrule.items.JRuleContactItem;
-import org.openhab.automation.jrule.items.JRuleDateTimeItem;
-import org.openhab.automation.jrule.items.JRuleDimmerItem;
-import org.openhab.automation.jrule.items.JRuleImageItem;
-import org.openhab.automation.jrule.items.JRuleItem;
-import org.openhab.automation.jrule.items.JRuleLocationItem;
-import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
-import org.openhab.automation.jrule.items.JRuleNumberItem;
-import org.openhab.automation.jrule.items.JRulePlayerItem;
-import org.openhab.automation.jrule.items.JRuleRollershutterItem;
-import org.openhab.automation.jrule.items.JRuleStringItem;
-import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.*;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleCondition;
-import org.openhab.automation.jrule.rules.JRuleMemberOf;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
-import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
-import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.event.*;
 import org.openhab.automation.jrule.rules.value.*;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
@@ -139,6 +114,7 @@ public class TestRules extends JRule {
     public static final String COMMAND_GROUPS = "groups";
     public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
     public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
+    public static final String TAG_CUSTOM = "custom";
     public static final String NAME_STARTUP_TRIGGERED = "startup triggered";
     private boolean startupTriggerWasCalled;
 
@@ -146,6 +122,7 @@ public class TestRules extends JRule {
         System.out.println("CONSTRUCTOR");
     }
 
+    @JRuleTag({ TAG_CUSTOM })
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
     public void switchItemReceivedCommand(JRuleItemEvent event) {
@@ -418,7 +395,7 @@ public class TestRules extends JRule {
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("Speech").getConfiguration());
 
         // add something new and check it
-        item.addMetadata("VoiceSystem", new JRuleItemMetadata("myNewValue", Map.of("mykey", "myvalue")));
+        item.addMetadata("VoiceSystem", new JRuleItemMetadata("myNewValue", Map.of("mykey", "myvalue")), false);
         logInfo("Metadata: '{}'", item.getMetadata());
         logInfo("Metadata Value: '{}'", item.getMetadata().get("VoiceSystem").getValue());
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("VoiceSystem").getConfiguration());

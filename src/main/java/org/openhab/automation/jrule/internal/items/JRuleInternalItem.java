@@ -24,6 +24,8 @@ import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
+import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.types.State;
 
 /**
@@ -84,8 +86,8 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public void addMetadata(String namespace, JRuleItemMetadata metadata) {
-        this.metadataRegistry.addMetadata(namespace, name, metadata);
+    public void addMetadata(String namespace, JRuleItemMetadata metadata, boolean override) {
+        this.metadataRegistry.addMetadata(namespace, name, metadata, override);
     }
 
     @Override
@@ -137,6 +139,16 @@ public abstract class JRuleInternalItem implements JRuleItem {
         JRuleInternalItem that = (JRuleInternalItem) o;
         return name.equals(that.name) && Objects.equals(label, that.label) && type.equals(that.type)
                 && id.equals(that.id);
+    }
+
+    protected Double getNumericValue(State state) {
+        if (state instanceof DecimalType) {
+            return ((DecimalType) state).doubleValue();
+        } else if (state instanceof QuantityType<?>) {
+            return ((QuantityType<?>) state).doubleValue();
+        } else {
+            return null;
+        }
     }
 
     @Override

@@ -44,20 +44,21 @@ public class JRuleInternalRollershutterItem extends JRuleInternalItem implements
 
     public Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.varianceSince(name, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
+                .map(state -> getNumericValue(state));
     }
 
     public Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.deviationSince(name, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
+                .map(state -> getNumericValue(state));
     }
 
     public Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
         return JRulePersistenceExtensions.averageSince(name, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
+                .map(state -> getNumericValue(state));
     }
 
     public Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.sumSince(name, timestamp, persistenceServiceId).map(DecimalType::doubleValue);
+        return JRulePersistenceExtensions.sumSince(name, timestamp, persistenceServiceId)
+                .map(state -> getNumericValue(state));
     }
 }

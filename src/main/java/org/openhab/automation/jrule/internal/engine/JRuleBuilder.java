@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
 import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
@@ -146,7 +147,7 @@ public class JRuleBuilder {
             uid = UUID.randomUUID().toString();
         }
 
-        if (logName == null) {
+        if (StringUtils.isEmpty(logName)) {
             logName = ruleName;
         }
 

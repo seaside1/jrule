@@ -70,6 +70,7 @@ import org.openhab.core.thing.binding.ThingActions;
 import org.openhab.core.thing.events.ThingAddedEvent;
 import org.openhab.core.thing.events.ThingRemovedEvent;
 import org.openhab.core.thing.events.ThingUpdatedEvent;
+import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -88,6 +89,9 @@ public class JRuleHandler implements PropertyChangeListener {
 
     @NonNullByDefault({})
     private final ItemRegistry itemRegistry;
+
+    @NonNullByDefault({})
+    private final ItemChannelLinkRegistry itemChannelLinkRegistry;
 
     @NonNullByDefault({})
     private final ThingRegistry thingRegistry;
@@ -119,11 +123,13 @@ public class JRuleHandler implements PropertyChangeListener {
     private final JRuleDelayedDebouncingExecutor delayedRulesReloader;
     private final JRuleDelayedDebouncingExecutor delayedItemsCompiler;
 
-    public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, ThingRegistry thingRegistry,
-            ThingManager thingManager, EventPublisher eventPublisher, JRuleEventSubscriber eventSubscriber,
-            VoiceManager voiceManager, AudioHTTPServer audioHTTPServer, NetworkAddressService networkAddressService,
-            CronScheduler cronScheduler, BundleContext bundleContext, MetadataRegistry metadataRegistry) {
+    public JRuleHandler(JRuleConfig config, ItemRegistry itemRegistry, ItemChannelLinkRegistry itemChannelLinkRegistry,
+            ThingRegistry thingRegistry, ThingManager thingManager, EventPublisher eventPublisher,
+            JRuleEventSubscriber eventSubscriber, VoiceManager voiceManager, AudioHTTPServer audioHTTPServer,
+            NetworkAddressService networkAddressService, CronScheduler cronScheduler, BundleContext bundleContext,
+            MetadataRegistry metadataRegistry) {
         this.itemRegistry = itemRegistry;
+        this.itemChannelLinkRegistry = itemChannelLinkRegistry;
         this.thingRegistry = thingRegistry;
         this.metadataRegistry = metadataRegistry;
         this.eventSubscriber = eventSubscriber;
@@ -155,7 +161,7 @@ public class JRuleHandler implements PropertyChangeListener {
 
         final JRuleItemHandler itemHandler = JRuleItemHandler.get();
         itemHandler.setItemRegistry(itemRegistry);
-
+        itemHandler.setItemChannelLinkRegistry(itemChannelLinkRegistry);
         logDebug("JRuleHandler()");
     }
 

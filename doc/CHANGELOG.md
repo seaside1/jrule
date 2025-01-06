@@ -1,3 +1,9 @@
+## BETA21
+- Fixed MDC 'tag' rule by [querdenker2k](https://github.com/querdenker2k)  PR https://github.com/seaside1/jrule/pull/198
+- Allow byte[] for http request by [querdenker2k](https://github.com/querdenker2k)  PR https://github.com/seaside1/jrule/pull/196 
+- Dynamic rule builder by [rsopp](https://github.com/rsopp) PR https://github.com/seaside1/jrule/pull/195
+- Added more methods (Dynamic rules) by [seaside1](https://github.com/seaside1) PR https://github.com/seaside1/jrule/pull/193
+
 ## BETA20
 - Quantity item should extend number item by [querdenker2k](https://github.com/querdenker2k)  PR https://github.com/seaside1/jrule/pull/189
 - InvocationTargetException the get stacktrace has changed by [querdenker2k](https://github.com/querdenker2k)  PR https://github.com/seaside1/jrule/pull/188  

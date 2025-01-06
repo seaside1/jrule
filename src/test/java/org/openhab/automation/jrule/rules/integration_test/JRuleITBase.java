@@ -30,11 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
@@ -113,7 +109,7 @@ public abstract class JRuleITBase {
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
-    private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:4.0.0-debian")
+    private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:4.2.0-debian")
             .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")
@@ -170,7 +166,7 @@ public abstract class JRuleITBase {
                     }).withStartupTimeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS)))
             .withNetwork(network).dependsOn(influxDbContainer).withReuse(true);
 
-    protected static final GenericContainer<?> mockServer = new GenericContainer<>("wiremock/wiremock:2.32.0")
+    protected static final GenericContainer<?> mockServer = new GenericContainer<>("wiremock/wiremock:3.8.0")
             .withExposedPorts(8080).withNetwork(network).withNetworkAliases("http-mock");
 
     protected static ToxiproxyContainer.ContainerProxy mqttProxy;
