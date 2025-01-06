@@ -159,6 +159,8 @@ public class TestRules extends JRule {
     public static final String TAG_CUSTOM = "custom";
     public static final String NAME_STARTUP_TRIGGERED = "startup triggered";
 
+    private boolean startupTriggerWasCalled;
+
     @JRuleTag({ TAG_CUSTOM })
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_RECEIVING_COMMAND_SWITCH)
@@ -441,6 +443,7 @@ public class TestRules extends JRule {
     @JRuleName(NAME_STARTUP_TRIGGERED)
     @JRuleWhenStartup(level = 50)
     public void startupTriggered(JRuleStartupEvent evt) {
+        startupTriggerWasCalled = true;
         logInfo("Startup Event: '{}'", evt.getStartupLevel());
     }
 

@@ -526,7 +526,7 @@ public class JRuleEngine implements PropertyChangeListener {
                     method.invoke(jRule);
                 }
             } catch (InvocationTargetException e) {
-                logError("Error in rule: {}\ntarget: {}", ExceptionUtils.getStackTrace(e),
+                logError("Error in rule: {}k\ntarget: {}", ExceptionUtils.getStackTrace(e),
                         ExceptionUtils.getStackTrace(e.getCause()));
             } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
                 logError("Error calling rule method '{}#{}': {}", method.getDeclaringClass().getName(),
