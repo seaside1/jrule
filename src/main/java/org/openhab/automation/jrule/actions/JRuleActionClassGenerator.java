@@ -121,18 +121,24 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
         return false;
     }
 
-    private Map<String, Object> createActionsModel(Thing thing) {
-        Map<String, Object> freemarkerModel = new HashMap<>();
-        freemarkerModel.put("id", thing.getUID().toString());
-        freemarkerModel.put("scope", thing.getUID().getBindingId());
+    String getActionsScope(Thing thing) {
         if (thing.getHandler() != null) {
+            // Check if the ThingHandlerService has a ThingActionsScope annotation
             Class<? extends ThingHandlerService> thingActionsClass = thing.getHandler().getServices().stream()
                     .filter(ThingActions.class::isAssignableFrom).findFirst()
                     .orElseThrow(() -> new IllegalStateException("should not occur here"));
             if (thingActionsClass.getAnnotation(ThingActionsScope.class) != null) {
-                freemarkerModel.put("scope", thingActionsClass.getAnnotation(ThingActionsScope.class).name());
+                return thingActionsClass.getAnnotation(ThingActionsScope.class).name();
             }
         }
+        // Else default to the binding id
+        return thing.getUID().getBindingId();
+    }
+
+    private Map<String, Object> createActionsModel(Thing thing) {
+        Map<String, Object> freemarkerModel = new HashMap<>();
+        freemarkerModel.put("id", thing.getUID().toString());
+        freemarkerModel.put("scope", getActionsScope(thing));
         freemarkerModel.put("name", StringUtils.uncapitalize(getActionFriendlyName(thing.getUID().toString())));
         freemarkerModel.put("package", jRuleConfig.getGeneratedActionPackage());
         freemarkerModel.put("class",
