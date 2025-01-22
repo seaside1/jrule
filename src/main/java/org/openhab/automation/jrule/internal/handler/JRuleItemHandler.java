@@ -13,10 +13,17 @@
 package org.openhab.automation.jrule.internal.handler;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.items.Metadata;
+import org.openhab.core.items.MetadataKey;
+import org.openhab.core.items.MetadataRegistry;
 import org.openhab.core.library.items.NumberItem;
 import org.openhab.core.library.items.StringItem;
 import org.openhab.core.library.items.SwitchItem;
@@ -41,6 +48,12 @@ public class JRuleItemHandler {
 
     private ItemRegistry itemRegistry;
     private ItemChannelLinkRegistry itemChannelLinkRegistry;
+
+    private MetadataRegistry metadataRegistry;
+
+    public void setMetadataRegistry(MetadataRegistry metadataRegistry) {
+        this.metadataRegistry = metadataRegistry;
+    }
 
     public void setItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = itemRegistry;
@@ -160,5 +173,32 @@ public class JRuleItemHandler {
     public void linkItemWithChannel(String itemName, ChannelUID uid) {
         ItemChannelLink link = new ItemChannelLink(itemName, uid);
         itemChannelLinkRegistry.add(link);
+    }
+
+    public Collection<ItemChannelLink> getChannelLinks(String itemName) {
+        return itemChannelLinkRegistry.getLinks(itemName);
+    }
+
+    public void unlinkItemFromChannel(String itemName) {
+        itemChannelLinkRegistry.removeLinksForItem(itemName);
+    }
+
+    public Collection<Item> getItemsWithMetadata(String namespace, String value) {
+        Set<Item> itemsWithMatchingMetadata = itemRegistry.getItems().stream().filter(item -> {
+            MetadataKey key = new MetadataKey(namespace, item.getName());
+            Metadata metadata = metadataRegistry.get(key);
+            return metadata != null && metadata.getValue().equals(value);
+        }).collect(Collectors.toSet());
+        return itemsWithMatchingMetadata;
+    }
+
+    public Map<String, Object> getItemMetadataConfiguration(String namespace, String value, Item item) {
+        MetadataKey key = new MetadataKey(namespace, item.getName());
+        Metadata metadata = metadataRegistry.get(key);
+        if (metadata != null && metadata.getValue().equals(value)) {
+            return metadata.getConfiguration();
+        } else {
+            return null;
+        }
     }
 }

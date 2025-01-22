@@ -162,6 +162,7 @@ public class JRuleHandler implements PropertyChangeListener {
         final JRuleItemHandler itemHandler = JRuleItemHandler.get();
         itemHandler.setItemRegistry(itemRegistry);
         itemHandler.setItemChannelLinkRegistry(itemChannelLinkRegistry);
+        itemHandler.setMetadataRegistry(metadataRegistry);
         logDebug("JRuleHandler()");
     }
 
