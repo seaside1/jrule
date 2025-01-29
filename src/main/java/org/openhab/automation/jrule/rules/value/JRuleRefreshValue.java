@@ -31,11 +31,10 @@ public enum JRuleRefreshValue implements JRuleValue {
     }
 
     public static JRuleRefreshValue getValueFromString(String value) {
-        switch (value) {
-            case "REFRESH":
-                return REFRESH;
-        }
-        return null;
+        return switch (value) {
+            case "REFRESH" -> REFRESH;
+            default -> null;
+        };
     }
 
     @Override
@@ -51,6 +50,11 @@ public enum JRuleRefreshValue implements JRuleValue {
     @Override
     public State toOhState() {
         throw new IllegalStateException("not a state type");
+    }
+
+    @Override
+    public JRuleValue as(Class<? extends JRuleValue> target) {
+        throw new IllegalStateException("cannot cast");
     }
 
     @Override

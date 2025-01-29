@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import org.openhab.core.library.types.PercentType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
@@ -24,7 +23,7 @@ import org.openhab.core.types.State;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRulePercentValue implements JRuleValue {
+public class JRulePercentValue extends JRuleValueBase implements JRuleValue {
     private final PercentType ohType;
 
     public JRulePercentValue(int value) {
@@ -43,21 +42,6 @@ public class JRulePercentValue implements JRuleValue {
         this.ohType = new PercentType(value ? 100 : 0);
     }
 
-    @Override
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
-    public Command toOhCommand() {
-        return this.ohType;
-    }
-
-    @Override
-    public State toOhState() {
-        return this.ohType;
-    }
-
     public double doubleValue() {
         return this.ohType.doubleValue();
     }
@@ -72,6 +56,11 @@ public class JRulePercentValue implements JRuleValue {
 
     public long longValue() {
         return this.ohType.longValue();
+    }
+
+    @Override
+    public State getOhType() {
+        return ohType;
     }
 
     @Override

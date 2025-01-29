@@ -57,6 +57,11 @@ public enum JRuleStopMoveValue implements JRuleValue {
     }
 
     @Override
+    public JRuleValue as(Class<? extends JRuleValue> target) {
+        return null;
+    }
+
+    @Override
     public String toString() {
         return ohType.toString();
     }

@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.openhab.core.library.types.DateTimeType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
@@ -26,7 +25,7 @@ import org.openhab.core.types.State;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDateTimeValue implements JRuleValue {
+public class JRuleDateTimeValue extends JRuleValueBase implements JRuleValue {
     private final DateTimeType ohType;
 
     public JRuleDateTimeValue(ZonedDateTime value) {
@@ -46,18 +45,8 @@ public class JRuleDateTimeValue implements JRuleValue {
     }
 
     @Override
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
-    public Command toOhCommand() {
-        return this.ohType;
-    }
-
-    @Override
-    public State toOhState() {
-        return this.ohType;
+    protected State getOhType() {
+        return ohType;
     }
 
     @Override

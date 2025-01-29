@@ -12,7 +12,6 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
@@ -46,42 +45,6 @@ public interface JRuleContactItem extends JRuleItem {
     default void postUpdate(JRuleOpenClosedValue state) {
         postUncheckedUpdate(state);
     }
-
-    default Optional<Double> maximumSince(ZonedDateTime timestamp) {
-        return maximumSince(timestamp, null);
-    }
-
-    Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<Double> minimumSince(ZonedDateTime timestamp) {
-        return minimumSince(timestamp, null);
-    }
-
-    Optional<Double> minimumSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<Double> varianceSince(ZonedDateTime timestamp) {
-        return varianceSince(timestamp, null);
-    }
-
-    Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<Double> deviationSince(ZonedDateTime timestamp) {
-        return deviationSince(timestamp, null);
-    }
-
-    Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<Double> averageSince(ZonedDateTime timestamp) {
-        return averageSince(timestamp, null);
-    }
-
-    Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<Double> sumSince(ZonedDateTime timestamp) {
-        return sumSince(timestamp, null);
-    }
-
-    Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId);
 
     default JRuleOpenClosedValue getStateAsOpenClose() {
         return JRuleEventHandler.get().getValue(getName(), JRuleOpenClosedValue.class);
