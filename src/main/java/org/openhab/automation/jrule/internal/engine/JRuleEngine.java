@@ -121,7 +121,7 @@ public class JRuleEngine implements PropertyChangeListener {
     public void add(JRule jRule, boolean enableRule) {
         logDebug("Adding rule: {}, enabled: {}", jRule, enableRule);
         ruleLoadingStatistics.addRuleClass();
-        Arrays.stream(jRule.getClass().getDeclaredMethods()).filter(method -> !method.getName().startsWith("lambda$"))
+        Arrays.stream(jRule.getClass().getMethods()).filter(method -> !method.getName().startsWith("lambda$"))
                 .filter(method -> method.isAnnotationPresent(JRuleName.class))
                 .forEach(method -> this.add(method, jRule, enableRule));
     }
