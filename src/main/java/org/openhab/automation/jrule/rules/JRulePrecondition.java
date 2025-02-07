@@ -12,17 +12,14 @@
  */
 package org.openhab.automation.jrule.rules;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * The {@link JRulePrecondition}
  *
  * @author Arne Seime- Initial contribution
  */
+@Inherited
 @Repeatable(JRulePreconditions.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
