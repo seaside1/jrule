@@ -49,7 +49,7 @@ public interface JRuleNumberItem extends JRuleItem {
      * @param command command to send.
      */
     default void sendCommandIfDifferent(JRuleDecimalValue command) {
-        if(!command.equals(getState())) {
+        if (!command.equals(getState())) {
             sendUncheckedCommand(command);
         }
     }

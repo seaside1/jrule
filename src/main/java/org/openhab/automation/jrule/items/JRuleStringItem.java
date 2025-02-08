@@ -74,9 +74,6 @@ public interface JRuleStringItem extends JRuleItem {
         }
     }
 
-
-
-
     /**
      * Sends a string command
      *
