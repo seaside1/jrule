@@ -44,12 +44,34 @@ public interface JRuleNumberItem extends JRuleItem {
     }
 
     /**
+     * Sends a decimal command only if current state is different
+     *
+     * @param command command to send.
+     */
+    default void sendCommandIfDifferent(JRuleDecimalValue command) {
+        if(!command.equals(getState())) {
+            sendUncheckedCommand(command);
+        }
+    }
+
+    /**
      * Sends a decimal update
      * 
      * @param state update to send
      */
     default void postUpdate(JRuleDecimalValue state) {
         postUncheckedUpdate(state);
+    }
+
+    /**
+     * Sends a decimal update
+     *
+     * @param state update to send
+     */
+    default void postUpdateIfDifferent(JRuleDecimalValue state) {
+        if (!state.equals(getState())) {
+            postUncheckedUpdate(state);
+        }
     }
 
     /**
@@ -62,12 +84,30 @@ public interface JRuleNumberItem extends JRuleItem {
     }
 
     /**
+     * Sends a number command only if current state is different
+     *
+     * @param command as number via JRuleDecimalValue will be send.
+     */
+    default void sendCommandIfDifferent(double command) {
+        sendCommandIfDifferent(new JRuleDecimalValue(command));
+    }
+
+    /**
      * Sends a number command.
      *
      * @param command as number via JRuleDecimalValue will be send.
      */
     default void sendCommand(int command) {
         sendUncheckedCommand(new JRuleDecimalValue(command));
+    }
+
+    /**
+     * Sends a number command only if current state is different
+     *
+     * @param command as number via JRuleDecimalValue will be send.
+     */
+    default void sendCommandIfDifferent(int command) {
+        sendCommandIfDifferent(new JRuleDecimalValue(command));
     }
 
     /**
@@ -80,12 +120,30 @@ public interface JRuleNumberItem extends JRuleItem {
     }
 
     /**
+     * Sends a number update only if current state is different
+     *
+     * @param value as number via JRuleDecimalValue will be send.
+     */
+    default void postUpdateIfDifferent(double value) {
+        postUpdateIfDifferent(new JRuleDecimalValue(value));
+    }
+
+    /**
      * Sends a number update.
      *
      * @param state as number via JRuleDecimalValue will be send.
      */
     default void postUpdate(int state) {
         postUncheckedUpdate(new JRuleDecimalValue(state));
+    }
+
+    /**
+     * Sends a number update only if current state is different
+     *
+     * @param value as number via JRuleDecimalValue will be send.
+     */
+    default void postUpdateIfDifferent(int value) {
+        postUpdateIfDifferent(new JRuleDecimalValue(value));
     }
 
     default JRuleDecimalValue getStateAsDecimal() {

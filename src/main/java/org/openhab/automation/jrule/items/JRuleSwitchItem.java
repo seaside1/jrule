@@ -89,7 +89,7 @@ public interface JRuleSwitchItem extends JRuleItem {
     }
 
     /**
-     * Sends an on/off command
+     * Sends an on/off command only if current state is different
      *
      * @param command command to send.
      */
@@ -108,7 +108,7 @@ public interface JRuleSwitchItem extends JRuleItem {
     }
 
     /**
-     * Sends an on/off update
+     * Sends an on/off update only if current state is different
      *
      * @param state update to send
      */
