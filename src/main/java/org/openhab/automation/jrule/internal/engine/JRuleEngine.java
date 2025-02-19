@@ -151,18 +151,19 @@ public class JRuleEngine implements PropertyChangeListener {
             logWarn("Skipping non-public method {} on class {}", method.getName(), jRule.getClass().getName());
             return;
         }
-        // Check if method is has none or a single parameter
+        // Check if method has none or a single parameter
         if (method.getParameterCount() > 1) {
             logWarn("Skipping method {} on class {}. Rule methods should have none or a single parameter",
                     method.getName(), jRule.getClass().getName());
             return;
         }
 
+        String jRuleName = Optional.ofNullable(method.getDeclaredAnnotation(JRuleName.class).value())
+                .filter(n -> !StringUtils.isBlank(n)).orElse(method.getName());
         final String logName = Optional.ofNullable(method.getDeclaredAnnotation(JRuleLogName.class))
-                .map(JRuleLogName::value).orElse(method.getDeclaredAnnotation(JRuleName.class).value());
+                .map(JRuleLogName::value).filter(n -> !StringUtils.isBlank(n)).orElse(jRuleName);
 
-        JRuleBuilder jRuleBuilder = createJRuleBuilder(method.getDeclaredAnnotation(JRuleName.class).value(), jRule,
-                method).logName(logName);
+        JRuleBuilder jRuleBuilder = createJRuleBuilder(jRuleName, jRule, method).logName(logName);
 
         ruleLoadingStatistics.addRuleMethod();
 

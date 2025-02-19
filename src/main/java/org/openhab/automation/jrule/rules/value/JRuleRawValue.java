@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.rules.value;
 import java.util.Objects;
 
 import org.openhab.core.library.types.RawType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
@@ -23,7 +22,7 @@ import org.openhab.core.types.State;
  *
  * @author Arne Seime - Initial contribution
  */
-public class JRuleRawValue implements JRuleValue {
+public class JRuleRawValue extends JRuleValueBase implements JRuleValue {
     private final RawType ohType;
 
     public JRuleRawValue(String mimeType, byte[] data) {
@@ -43,18 +42,8 @@ public class JRuleRawValue implements JRuleValue {
     }
 
     @Override
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
-    public Command toOhCommand() {
-        throw new IllegalStateException("not a command type");
-    }
-
-    @Override
-    public State toOhState() {
-        return this.ohType;
+    public State getOhType() {
+        return ohType;
     }
 
     @Override

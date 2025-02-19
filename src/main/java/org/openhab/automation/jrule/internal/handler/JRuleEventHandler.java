@@ -78,6 +78,10 @@ public class JRuleEventHandler {
         stateMapping.put(JRuleStringListValue.class, StringListType.class);
     }
 
+    public static Class<? extends State> mapJRuleToOhType(Class<? extends JRuleValue> type) {
+        return stateMapping.get(type);
+    }
+
     private static final String LOG_NAME_EVENT = "JRuleEvent";
 
     private static volatile JRuleEventHandler instance;

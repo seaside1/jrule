@@ -57,6 +57,11 @@ public enum JRuleRewindFastforwardValue implements JRuleValue {
     }
 
     @Override
+    public <T extends JRuleValue> T as(Class<T> target) {
+        throw new IllegalStateException("cannot cast");
+    }
+
+    @Override
     public String toString() {
         return ohType.toString();
     }

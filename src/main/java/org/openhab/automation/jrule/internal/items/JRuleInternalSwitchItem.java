@@ -12,13 +12,10 @@
  */
 package org.openhab.automation.jrule.internal.items;
 
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.items.metadata.JRuleMetadataRegistry;
-import org.openhab.core.library.types.DecimalType;
 
 /**
  * The {@link JRuleInternalSwitchItem} Items
@@ -29,35 +26,5 @@ public class JRuleInternalSwitchItem extends JRuleInternalItem implements JRuleS
     public JRuleInternalSwitchItem(String name, String label, String type, String id,
             JRuleMetadataRegistry metadataRegistry, List<String> tags) {
         super(name, label, type, id, metadataRegistry, tags);
-    }
-
-    public Optional<Double> maximumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.maximumSince(name, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
-    }
-
-    public Optional<Double> minimumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.minimumSince(name, timestamp, persistenceServiceId)
-                .map(DecimalType::doubleValue);
-    }
-
-    public Optional<Double> varianceSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.varianceSince(name, timestamp, persistenceServiceId)
-                .map(state -> getNumericValue(state));
-    }
-
-    public Optional<Double> deviationSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.deviationSince(name, timestamp, persistenceServiceId)
-                .map(state -> getNumericValue(state));
-    }
-
-    public Optional<Double> averageSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.averageSince(name, timestamp, persistenceServiceId)
-                .map(state -> getNumericValue(state));
-    }
-
-    public Optional<Double> sumSince(ZonedDateTime timestamp, String persistenceServiceId) {
-        return JRulePersistenceExtensions.sumSince(name, timestamp, persistenceServiceId)
-                .map(state -> getNumericValue(state));
     }
 }

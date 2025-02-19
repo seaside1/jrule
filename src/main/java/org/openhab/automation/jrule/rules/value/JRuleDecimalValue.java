@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import org.openhab.core.library.types.DecimalType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
@@ -24,7 +23,7 @@ import org.openhab.core.types.State;
  *
  * @author Joseph (Seaside) Hagberg - Initial contribution
  */
-public class JRuleDecimalValue implements JRuleValue {
+public class JRuleDecimalValue extends JRuleValueBase implements JRuleValue {
     private final DecimalType ohType;
 
     public JRuleDecimalValue(BigDecimal value) {
@@ -44,18 +43,8 @@ public class JRuleDecimalValue implements JRuleValue {
     }
 
     @Override
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
-    public Command toOhCommand() {
-        return this.ohType;
-    }
-
-    @Override
-    public State toOhState() {
-        return this.ohType;
+    public State getOhType() {
+        return ohType;
     }
 
     @Override
