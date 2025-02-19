@@ -29,5 +29,5 @@ public interface JRuleValue {
 
     State toOhState();
 
-    JRuleValue as(Class<? extends JRuleValue> target);
+    <T extends JRuleValue> T as(Class<T> target);
 }
