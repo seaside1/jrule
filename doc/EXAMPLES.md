@@ -510,10 +510,10 @@ public class DemoRule extends JRule {
 
 ### Example 19 - Persistence and lastUpdated
 
-Use case: getLastUpdated for an item
-Note that `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated("mapdb");`
+Use case: lastUpdate for an item
+Note that `ZonedDateTime lastUpdate = JRuleItems.MyCoolItem.lastUpdate("mapdb");`
 can be called without serviceId
-argument: `ZonedDateTime lastUpdate = JRuleStringItem.forName(_MyCoolItem.ITEM).getLastUpdated();`
+argument: `ZonedDateTime lastUpdate = JRuleItems.MyCoolItem.lastUpdate();`
 
 ```java
 package org.openhab.automation.jrule.rules.user;
@@ -528,7 +528,7 @@ public class DemoRule extends JRule {
     @JRuleWhenCronTrigger(cron = "4 * * * * *")
     public void testLastUpdate(JRuleEvent event) {
         logInfo("CRON: Running cron from string: {}", event.getState().getValue());
-        ZonedDateTime lastUpdate = JRuleItems.MyCoolItem.getLastUpdated("mapdb");
+        ZonedDateTime lastUpdate = JRuleItems.MyCoolItem.lastUpdate("mapdb");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss Z");
         String lastUpdateFormatted = lastUpdate.format(formatter);
         logInfo("Last Update: {}", lastUpdateFormatted);
@@ -796,7 +796,7 @@ public class DemoRule extends JRule {
     @JRuleName("testAverageLastHour")
     @JRuleWhenCronTrigger(cron = "4 * * * * *")
     public void testAverage(JRuleEvent event) {
-        Double average = JRuleNumberItem.forName(_MyNumberItem.ITEM).averageSince(ZonedDateTime.now().minus(1, ChronoUnit.HOURS));
+        Double average = JRuleItems.MyNumberItem.averageSince(ZonedDateTime.now().minus(1, ChronoUnit.HOURS));
         logInfo("Average value last hour: {}", average);
     }
 }
@@ -1086,7 +1086,7 @@ public class DemoRule extends JRule {
     var availPrices = getPrices();  
     availPrices.forEach(t -> {
       ZonedDateTime zonedDateTime = t.getStartsAt().atZone(ZoneId.systemDefault());
-      Optional<JRuleValue> historicState = JRuleItems.Tibber_Hourly_Cost_Future.getStateAt(zonedDateTime, PERSISTENCE);
+      Optional<Double> historicState = JRuleItems.Tibber_Hourly_Cost_Future.historicStateAsDecimal(zonedDateTime, PERSISTENCE);
       logDebug("adding available price for: {}, existing: {}", zonedDateTime, historicState);
       if (historicState.isEmpty()) {
         JRuleItems.Tibber_Hourly_Cost_Future.persist(new JRuleDecimalValue(t.getTotal()), zonedDateTime, PERSISTENCE);
