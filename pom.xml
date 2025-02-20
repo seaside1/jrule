@@ -13,6 +13,7 @@
   <version>4.2.1-SNAPSHOT</version>
 
   <properties>
+    <testcontainers.version>1.20.4</testcontainers.version>
     <bnd.importpackage>com.sun.org.apache.xml.internal.utils.*;resolution:=optional,\
       com.sun.org.apache.xpath.internal.*;resolution:=optional,\
       org.apache.log.*;resolution:=optional,\
@@ -77,19 +78,19 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>1.17.6</version>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>toxiproxy</artifactId>
-      <version>1.17.6</version>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mockserver</artifactId>
-      <version>1.17.6</version>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

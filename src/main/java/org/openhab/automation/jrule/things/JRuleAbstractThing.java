@@ -12,7 +12,11 @@
  */
 package org.openhab.automation.jrule.things;
 
+import java.util.List;
+import java.util.Set;
+
 import org.openhab.automation.jrule.internal.handler.JRuleThingHandler;
+import org.openhab.automation.jrule.items.JRuleItem;
 
 /**
  * The {@link JRuleAbstractThing} represents a thing that is either a bridge, a bridged (sub thing of a bridge) or a
@@ -48,5 +52,13 @@ public abstract class JRuleAbstractThing {
     public void restart() {
         disable();
         enable();
+    }
+
+    public List<JRuleChannel> getChannels() {
+        return JRuleThingHandler.get().getChannels(thingUID);
+    }
+
+    public Set<JRuleItem> getLinkedItems(JRuleChannel channel) {
+        return JRuleThingHandler.get().getLinkedItems(channel);
     }
 }
