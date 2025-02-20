@@ -18,7 +18,9 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalPlayerItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.rules.value.JRuleNextPreviousValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRuleRewindFastforwardValue;
 
 /**
  * The {@link JRulePlayerItem} JRule Item
@@ -43,7 +45,7 @@ public interface JRulePlayerItem extends JRuleItem {
 
     /**
      * Sends a play/pause command
-     * 
+     *
      * @param command command to send.
      */
     default void sendCommand(JRulePlayPauseValue command) {
@@ -52,7 +54,7 @@ public interface JRulePlayerItem extends JRuleItem {
 
     /**
      * Sends a play/pause update
-     * 
+     *
      * @param state update to send
      */
     default void postUpdate(JRulePlayPauseValue state) {

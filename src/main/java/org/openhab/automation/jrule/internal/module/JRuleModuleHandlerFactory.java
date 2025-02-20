@@ -22,6 +22,7 @@ import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
 import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenStartup;
 import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
 import org.openhab.core.automation.Module;
@@ -47,7 +48,8 @@ public class JRuleModuleHandlerFactory extends BaseModuleHandlerFactory {
             JRuleModuleUtil.toTriggerModuleUID(JRuleWhenChannelTrigger.class),
             JRuleModuleUtil.toTriggerModuleUID(JRuleWhenCronTrigger.class),
             JRuleModuleUtil.toTriggerModuleUID(JRuleWhenTimeTrigger.class),
-            JRuleModuleUtil.toTriggerModuleUID(JRuleWhenThingTrigger.class));
+            JRuleModuleUtil.toTriggerModuleUID(JRuleWhenThingTrigger.class),
+            JRuleModuleUtil.toTriggerModuleUID(JRuleWhenStartup.class));
     private JRuleRuleProvider jRuleRuleProvider;
 
     @Activate

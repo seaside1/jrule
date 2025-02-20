@@ -28,14 +28,53 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.openhab.automation.jrule.exception.JRuleExecutionException;
-import org.openhab.automation.jrule.items.*;
+import org.openhab.automation.jrule.items.JRuleColorItem;
+import org.openhab.automation.jrule.items.JRuleContactItem;
+import org.openhab.automation.jrule.items.JRuleDateTimeItem;
+import org.openhab.automation.jrule.items.JRuleDimmerItem;
+import org.openhab.automation.jrule.items.JRuleGroupItem;
+import org.openhab.automation.jrule.items.JRuleImageItem;
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleLocationItem;
+import org.openhab.automation.jrule.items.JRuleNumberGroupItem;
+import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRulePlayerItem;
+import org.openhab.automation.jrule.items.JRuleQuantityItem;
+import org.openhab.automation.jrule.items.JRuleRollershutterItem;
+import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.items.JRuleSwitchGroupItem;
+import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
-import org.openhab.automation.jrule.rules.*;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleCondition;
+import org.openhab.automation.jrule.rules.JRuleDebounce;
+import org.openhab.automation.jrule.rules.JRuleMemberOf;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRulePrecondition;
+import org.openhab.automation.jrule.rules.JRuleTag;
+import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
+import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
+import org.openhab.automation.jrule.rules.JRuleWhenStartup;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
 import org.openhab.automation.jrule.rules.event.JRuleChannelEvent;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
+import org.openhab.automation.jrule.rules.event.JRuleStartupEvent;
 import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
 import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.value.JRuleOpenClosedValue;
+import org.openhab.automation.jrule.rules.value.JRulePercentValue;
+import org.openhab.automation.jrule.rules.value.JRulePlayPauseValue;
+import org.openhab.automation.jrule.rules.value.JRulePointValue;
+import org.openhab.automation.jrule.rules.value.JRuleQuantityValue;
+import org.openhab.automation.jrule.rules.value.JRuleRawValue;
+import org.openhab.automation.jrule.rules.value.JRuleStringValue;
+import org.openhab.automation.jrule.rules.value.JRuleUpDownValue;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 
 /**
@@ -118,6 +157,9 @@ public class TestRules extends JRule {
     public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
     public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
     public static final String TAG_CUSTOM = "custom";
+    public static final String NAME_STARTUP_TRIGGERED = "startup triggered";
+
+    private boolean startupTriggerWasCalled;
 
     @JRuleTag({ TAG_CUSTOM })
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
@@ -216,6 +258,7 @@ public class TestRules extends JRule {
     @JRuleWhenCronTrigger(cron = "*/5 * * * * *")
     public void cronEvery5Sec(JRuleTimerEvent event) {
         logInfo("cron triggered", event);
+        logInfo("startup level 50 triggered: {}", startupTriggerWasCalled);
     }
 
     @JRulePrecondition(item = ITEM_PRECONDITION_STRING, condition = @JRuleCondition(eq = "that matches"))
@@ -395,6 +438,13 @@ public class TestRules extends JRule {
         logInfo("Metadata: '{}'", item.getMetadata());
         logInfo("Metadata Value: '{}'", item.getMetadata().get("VoiceSystem").getValue());
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("VoiceSystem").getConfiguration());
+    }
+
+    @JRuleName(NAME_STARTUP_TRIGGERED)
+    @JRuleWhenStartup(level = 50)
+    public void startupTriggered(JRuleStartupEvent evt) {
+        startupTriggerWasCalled = true;
+        logInfo("Startup Event: '{}'", evt.getStartupLevel());
     }
 
     private static void castLocation() {
