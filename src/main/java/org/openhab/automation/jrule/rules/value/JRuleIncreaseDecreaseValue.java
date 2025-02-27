@@ -58,7 +58,7 @@ public enum JRuleIncreaseDecreaseValue implements JRuleValue {
 
     @Override
     public <T extends JRuleValue> T as(Class<T> target) {
-        throw new IllegalStateException("cannot cast");
+        throw new IllegalStateException("cannot cast to '%s'".formatted(target));
     }
 
     @Override
