@@ -32,13 +32,11 @@ public enum JRuleOnOffValue implements JRuleValue {
     }
 
     public static JRuleOnOffValue getValueFromString(String value) {
-        switch (value) {
-            case "ON":
-                return ON;
-            case "OFF":
-                return OFF;
-        }
-        return null;
+        return switch (value) {
+            case "ON" -> ON;
+            case "OFF" -> OFF;
+            default -> null;
+        };
     }
 
     public static JRuleValue valueOf(boolean command) {
@@ -58,6 +56,11 @@ public enum JRuleOnOffValue implements JRuleValue {
     @Override
     public State toOhState() {
         return this.ohType;
+    }
+
+    @Override
+    public <T extends JRuleValue> T as(Class<T> target) {
+        throw new IllegalStateException("cannot cast to '%s'".formatted(target));
     }
 
     @Override
