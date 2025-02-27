@@ -198,7 +198,7 @@ public class TestPersistence extends JRule {
         final String function = "averageSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> averageSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(JRuleDecimalValue::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void sumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -206,7 +206,7 @@ public class TestPersistence extends JRule {
         final String function = "sumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> sumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(JRuleDecimalValue::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void minimumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -230,7 +230,7 @@ public class TestPersistence extends JRule {
         final String function = "varianceSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> varianceSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(JRuleDecimalValue::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void deviationSince(String itemName, Function<String, JRuleItem> getItem,
@@ -238,7 +238,7 @@ public class TestPersistence extends JRule {
         final String function = "deviationSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> deviationSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(JRuleDecimalValue::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void historicState(String itemName, Function<String, JRuleItem> getItem,
