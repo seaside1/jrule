@@ -36,6 +36,7 @@ import org.openhab.core.automation.annotation.ActionInput;
 import org.openhab.core.automation.annotation.RuleAction;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.binding.ThingActions;
+import org.openhab.core.thing.binding.ThingActionsScope;
 import org.openhab.core.thing.binding.ThingHandlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,10 +121,24 @@ public class JRuleActionClassGenerator extends JRuleAbstractClassGenerator {
         return false;
     }
 
+    String getActionsScope(Thing thing) {
+        if (thing.getHandler() != null) {
+            // Check if the ThingHandlerService has a ThingActionsScope annotation
+            Class<? extends ThingHandlerService> thingActionsClass = thing.getHandler().getServices().stream()
+                    .filter(ThingActions.class::isAssignableFrom).findFirst()
+                    .orElseThrow(() -> new IllegalStateException("should not occur here"));
+            if (thingActionsClass.getAnnotation(ThingActionsScope.class) != null) {
+                return thingActionsClass.getAnnotation(ThingActionsScope.class).name();
+            }
+        }
+        // Else default to the binding id
+        return thing.getUID().getBindingId();
+    }
+
     private Map<String, Object> createActionsModel(Thing thing) {
         Map<String, Object> freemarkerModel = new HashMap<>();
         freemarkerModel.put("id", thing.getUID().toString());
-        freemarkerModel.put("scope", thing.getUID().getBindingId());
+        freemarkerModel.put("scope", getActionsScope(thing));
         freemarkerModel.put("name", StringUtils.uncapitalize(getActionFriendlyName(thing.getUID().toString())));
         freemarkerModel.put("package", jRuleConfig.getGeneratedActionPackage());
         freemarkerModel.put("class",

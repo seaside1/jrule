@@ -162,6 +162,7 @@ public class JRuleHandler implements PropertyChangeListener {
         final JRuleItemHandler itemHandler = JRuleItemHandler.get();
         itemHandler.setItemRegistry(itemRegistry);
         itemHandler.setItemChannelLinkRegistry(itemChannelLinkRegistry);
+        itemHandler.setMetadataRegistry(metadataRegistry);
         logDebug("JRuleHandler()");
     }
 
@@ -282,7 +283,7 @@ public class JRuleHandler implements PropertyChangeListener {
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated JRuleItems class");
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
-                | InvocationTargetException e) {
+                | InvocationTargetException | Error e) {
             logger.error("Could not instantiate JRuleItems file", e);
         }
 
@@ -292,7 +293,7 @@ public class JRuleHandler implements PropertyChangeListener {
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated JRuleThings class");
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
-                | InvocationTargetException e) {
+                | InvocationTargetException | Error e) {
             logger.error("Could not instantiate JRuleThings file", e);
         }
 
@@ -302,7 +303,7 @@ public class JRuleHandler implements PropertyChangeListener {
             cls.getDeclaredConstructor().newInstance();
             logger.info("Instantiated JRuleActions class");
         } catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InstantiationException
-                | InvocationTargetException e) {
+                | InvocationTargetException | Error e) {
             logger.error("Could not instantiate JRuleActions file", e);
         }
 
