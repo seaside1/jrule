@@ -107,7 +107,7 @@ public class JRuleTimerHandler {
                 context != null ? context : getCurrentContext(), delay);
         timers.add(timer);
 
-        JRuleLog.info(logger, timer.getLogName(), "Start timer '{}' with delay: {}", newTimerName, delay);
+        JRuleLog.debug(logger, timer.getLogName(), "Start timer '{}' with delay: {}", newTimerName, delay);
         future.thenAccept(s -> executorService.submit(() -> invokeTimerInternal(timer, function)));
         return timer;
     }
