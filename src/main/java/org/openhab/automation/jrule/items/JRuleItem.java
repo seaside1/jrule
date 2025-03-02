@@ -98,7 +98,11 @@ public interface JRuleItem {
     }
 
     default void postNullUpdate() {
-        JRuleEventHandler.get().postUpdate(getName(), null);
+        JRuleEventHandler.get().postNull(getName());
+    }
+
+    default void postUndefUpdate() {
+        JRuleEventHandler.get().postUndef(getName());
     }
 
     default Optional<ZonedDateTime> lastUpdated() {
