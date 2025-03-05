@@ -288,40 +288,37 @@ public class TestPersistence extends JRule {
         }
     }
 
-    private Optional<JRuleDecimalValue> varianceSince(JRuleItem jRuleItem, ZonedDateTime time,
-            String persistenceServiceId) {
+    private Optional<JRuleValue> varianceSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("varianceSince", ZonedDateTime.class, String.class);
-            return (Optional<JRuleDecimalValue>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing varianceSince", e);
         }
     }
 
-    private Optional<JRuleDecimalValue> deviationSince(JRuleItem jRuleItem, ZonedDateTime time,
-            String persistenceServiceId) {
+    private Optional<JRuleValue> deviationSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("deviationSince", ZonedDateTime.class, String.class);
-            return (Optional<JRuleDecimalValue>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing deviationSince", e);
         }
     }
 
-    private Optional<JRuleDecimalValue> averageSince(JRuleItem jRuleItem, ZonedDateTime time,
-            String persistenceServiceId) {
+    private Optional<JRuleValue> averageSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("averageSince", ZonedDateTime.class, String.class);
-            return (Optional<JRuleDecimalValue>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing averageSince", e);
         }
     }
 
-    private Optional<JRuleDecimalValue> sumSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleValue> sumSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("sumSince", ZonedDateTime.class, String.class);
-            return (Optional<JRuleDecimalValue>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing sumSince", e);
         }
