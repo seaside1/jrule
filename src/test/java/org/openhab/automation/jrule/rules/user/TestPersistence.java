@@ -120,9 +120,9 @@ public class TestPersistence extends JRule {
         varianceSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
         changedSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
 
-        historicState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
-        previousState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
-        changedSince(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
+        historicState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, JRuleItem::getStateAsString);
+        previousState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, JRuleItem::getStateAsString);
+        changedSince(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, JRuleItem::getStateAsString);
 
         historicState(ITEM_DATETIME_TO_PERSIST, JRuleDateTimeItem::forName,
                 i -> ((JRuleDateTimeItem) i).getStateAsDateTime());
