@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.openhab.core.library.types.StringListType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 /**
@@ -24,7 +23,7 @@ import org.openhab.core.types.State;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public class JRuleStringListValue implements JRuleValue {
+public class JRuleStringListValue extends JRuleValueBase implements JRuleValue {
     private final StringListType ohType;
 
     public JRuleStringListValue(String value) {
@@ -39,22 +38,13 @@ public class JRuleStringListValue implements JRuleValue {
         this.ohType = new StringListType(value);
     }
 
-    @Override
-    public Command toOhCommand() {
-        throw new IllegalStateException("not a command type");
-    }
-
-    @Override
-    public State toOhState() {
-        return this.ohType;
-    }
-
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
     public String getValue(int index) {
         return this.ohType.getValue(index);
+    }
+
+    @Override
+    public State getOhType() {
+        return ohType;
     }
 
     @Override

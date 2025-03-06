@@ -13,9 +13,13 @@
 package org.openhab.automation.jrule.rules.value;
 
 import java.util.Locale;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * The {@link JRuleQuantityValueTest}
@@ -40,5 +44,19 @@ class JRuleQuantityValueTest {
         Assertions.assertEquals("23.12", String.format(Locale.ENGLISH, "%.2f", value.floatValue()));
         Assertions.assertEquals(23, value.longValue());
         Assertions.assertEquals("kW", value.unit());
+    }
+
+    @TestFactory
+    Stream<DynamicTest> as() {
+        return Stream.of(
+                DynamicTest.dynamicTest("JRuleDecimalValue",
+                        () -> cast(new JRuleQuantityValue("23.12 kW"), JRuleDecimalValue.class,
+                                t -> Assertions.assertEquals(23.12F, t.floatValue()))),
+                DynamicTest.dynamicTest("JRulePercentValue", () -> cast(new JRuleQuantityValue("70 %"),
+                        JRulePercentValue.class, t -> Assertions.assertEquals(70, t.intValue()))));
+    }
+
+    private <T extends JRuleValue> void cast(JRuleQuantityValue value, Class<T> target, Consumer<T> assertion) {
+        assertion.accept((T) value.as(target));
     }
 }

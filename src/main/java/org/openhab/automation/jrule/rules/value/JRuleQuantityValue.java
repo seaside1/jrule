@@ -15,7 +15,6 @@ package org.openhab.automation.jrule.rules.value;
 import java.util.Objects;
 
 import org.openhab.core.library.types.QuantityType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 
 import tech.units.indriya.format.SimpleUnitFormat;
@@ -25,7 +24,7 @@ import tech.units.indriya.format.SimpleUnitFormat;
  *
  * @author Robert Delbrück - Initial contribution
  */
-public class JRuleQuantityValue implements JRuleValue {
+public class JRuleQuantityValue extends JRuleValueBase implements JRuleValue {
     private final QuantityType<?> ohType;
 
     public JRuleQuantityValue(String value) {
@@ -37,17 +36,7 @@ public class JRuleQuantityValue implements JRuleValue {
     }
 
     @Override
-    public String stringValue() {
-        return this.ohType.toFullString();
-    }
-
-    @Override
-    public Command toOhCommand() {
-        return this.ohType;
-    }
-
-    @Override
-    public State toOhState() {
+    public State getOhType() {
         return ohType;
     }
 

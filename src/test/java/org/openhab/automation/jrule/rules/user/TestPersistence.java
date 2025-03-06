@@ -20,6 +20,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.openhab.automation.jrule.items.*;
+import org.openhab.automation.jrule.persistence.JRuleHistoricState;
 import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.value.*;
 
@@ -58,9 +59,9 @@ public class TestPersistence extends JRule {
     public void persistFuture() {
         JRuleNumberItem jRuleNumberItem = JRuleNumberItem.forName(ITEM_NUMBER_TO_PERSIST_FUTURE);
 
-        jRuleNumberItem.persist(new JRuleDecimalValue(10), now, PERSISTENCE_SERVICE_ID);
-        jRuleNumberItem.persist(new JRuleDecimalValue(20), now.plusHours(1), PERSISTENCE_SERVICE_ID);
-        jRuleNumberItem.persist(new JRuleDecimalValue(30), now.plusHours(2), PERSISTENCE_SERVICE_ID);
+        jRuleNumberItem.persist(now, new JRuleDecimalValue(10), PERSISTENCE_SERVICE_ID);
+        jRuleNumberItem.persist(now.plusHours(1), new JRuleDecimalValue(20), PERSISTENCE_SERVICE_ID);
+        jRuleNumberItem.persist(now.plusHours(2), new JRuleDecimalValue(30), PERSISTENCE_SERVICE_ID);
     }
 
     @JRuleName(NAME_QUERY_IN_FUTURE)
@@ -68,13 +69,19 @@ public class TestPersistence extends JRule {
     public void queryFuture() {
         JRuleNumberItem jRuleNumberItem = JRuleNumberItem.forName(ITEM_NUMBER_TO_PERSIST_FUTURE);
 
-        logInfo("now: {}", jRuleNumberItem.getHistoricState(now, PERSISTENCE_SERVICE_ID).get());
-        logInfo("now +1: {}", jRuleNumberItem.getHistoricState(now.plusHours(1), PERSISTENCE_SERVICE_ID).get());
-        logInfo("now +2: {}", jRuleNumberItem.getHistoricState(now.plusHours(2), PERSISTENCE_SERVICE_ID).get());
+        logInfo("now: {}", jRuleNumberItem.historicState(now, PERSISTENCE_SERVICE_ID).map(JRuleHistoricState::getValue)
+                .orElseThrow());
+        logInfo("now +1: {}", jRuleNumberItem.historicState(now.plusHours(1), PERSISTENCE_SERVICE_ID)
+                .map(JRuleHistoricState::getValue).orElseThrow());
+        logInfo("now +2: {}", jRuleNumberItem.historicState(now.plusHours(2), PERSISTENCE_SERVICE_ID)
+                .map(JRuleHistoricState::getValue).orElseThrow());
 
-        logInfo("now stateAt: {}", jRuleNumberItem.getStateAt(now, PERSISTENCE_SERVICE_ID).get());
-        logInfo("now stateAt +1: {}", jRuleNumberItem.getStateAt(now.plusHours(1), PERSISTENCE_SERVICE_ID).get());
-        logInfo("now stateAt +2: {}", jRuleNumberItem.getStateAt(now.plusHours(2), PERSISTENCE_SERVICE_ID).get());
+        logInfo("now stateAt: {}", jRuleNumberItem.historicState(now, PERSISTENCE_SERVICE_ID)
+                .map(JRuleHistoricState::getValue).orElseThrow());
+        logInfo("now stateAt +1: {}", jRuleNumberItem.historicState(now.plusHours(1), PERSISTENCE_SERVICE_ID)
+                .map(JRuleHistoricState::getValue).orElseThrow());
+        logInfo("now stateAt +2: {}", jRuleNumberItem.historicState(now.plusHours(2), PERSISTENCE_SERVICE_ID)
+                .map(JRuleHistoricState::getValue).orElseThrow());
     }
 
     @JRuleName(NAME_PERSIST_ALL_TYPES)
@@ -113,9 +120,9 @@ public class TestPersistence extends JRule {
         varianceSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
         changedSince(ITEM_QUANTITY_TO_PERSIST, JRuleQuantityItem::forName, quantityStateFunction);
 
-        historicState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
-        previousState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
-        changedSince(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, i -> i.getStateAsString());
+        historicState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, JRuleItem::getStateAsString);
+        previousState(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, JRuleItem::getStateAsString);
+        changedSince(ITEM_STRING_TO_PERSIST, JRuleStringItem::forName, JRuleItem::getStateAsString);
 
         historicState(ITEM_DATETIME_TO_PERSIST, JRuleDateTimeItem::forName,
                 i -> ((JRuleDateTimeItem) i).getStateAsDateTime());
@@ -191,7 +198,7 @@ public class TestPersistence extends JRule {
         final String function = "averageSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> averageSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(Double::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void sumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -199,7 +206,7 @@ public class TestPersistence extends JRule {
         final String function = "sumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> sumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(Double::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void minimumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -207,7 +214,7 @@ public class TestPersistence extends JRule {
         final String function = "minimumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> minimumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(Double::floatValue).orElse(null));
+                        .map((JRuleHistoricState t) -> t.getValue().stringValue()).orElse(null));
     }
 
     private void maximumSince(String itemName, Function<String, JRuleItem> getItem,
@@ -215,7 +222,7 @@ public class TestPersistence extends JRule {
         final String function = "maximumSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> maximumSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(Double::floatValue).orElse(null));
+                        .map((JRuleHistoricState t) -> (t.getValue()).stringValue()).orElse(null));
     }
 
     private void varianceSince(String itemName, Function<String, JRuleItem> getItem,
@@ -223,7 +230,7 @@ public class TestPersistence extends JRule {
         final String function = "varianceSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> varianceSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(Double::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void deviationSince(String itemName, Function<String, JRuleItem> getItem,
@@ -231,21 +238,21 @@ public class TestPersistence extends JRule {
         final String function = "deviationSince";
         printInfos(itemName, getItem, currentValue, function,
                 (i, item) -> deviationSince(item, ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID)
-                        .map(Double::floatValue).orElse(null));
+                        .map(v -> v.as(JRuleDecimalValue.class)).map(JRuleDecimalValue::floatValue).orElse(null));
     }
 
     private void historicState(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "historicState";
         printInfos(itemName, getItem, currentValue, function, (i, item) -> item
-                .getHistoricState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID).orElse(null));
+                .historicState(ZonedDateTime.now().minusSeconds(i), PERSISTENCE_SERVICE_ID).orElse(null));
     }
 
     private void previousState(String itemName, Function<String, JRuleItem> getItem,
             Function<JRuleItem, Object> currentValue) {
         final String function = "previousState";
         printInfos(itemName, getItem, currentValue, function,
-                (i, item) -> item.getPreviousState(true, PERSISTENCE_SERVICE_ID).orElse(null));
+                (i, item) -> item.previousState(true, PERSISTENCE_SERVICE_ID).orElse(null));
     }
 
     private void printInfos(String itemName, Function<String, JRuleItem> getItem,
@@ -261,55 +268,57 @@ public class TestPersistence extends JRule {
         logInfo("{}: {} now: {}", functionName, itemName, currentValue.apply(jRuleItem));
     }
 
-    private Optional<Double> minimumSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleHistoricState> minimumSince(JRuleItem jRuleItem, ZonedDateTime time,
+            String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("minimumSince", ZonedDateTime.class, String.class);
-            return (Optional<Double>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleHistoricState>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing minimumSince", e);
         }
     }
 
-    private Optional<Double> maximumSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleHistoricState> maximumSince(JRuleItem jRuleItem, ZonedDateTime time,
+            String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("maximumSince", ZonedDateTime.class, String.class);
-            return (Optional<Double>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleHistoricState>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing maximumSince", e);
         }
     }
 
-    private Optional<Double> varianceSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleValue> varianceSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("varianceSince", ZonedDateTime.class, String.class);
-            return (Optional<Double>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing varianceSince", e);
         }
     }
 
-    private Optional<Double> deviationSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleValue> deviationSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("deviationSince", ZonedDateTime.class, String.class);
-            return (Optional<Double>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing deviationSince", e);
         }
     }
 
-    private Optional<Double> averageSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleValue> averageSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("averageSince", ZonedDateTime.class, String.class);
-            return (Optional<Double>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing averageSince", e);
         }
     }
 
-    private Optional<Double> sumSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
+    private Optional<JRuleValue> sumSince(JRuleItem jRuleItem, ZonedDateTime time, String persistenceServiceId) {
         try {
             Method method = jRuleItem.getClass().getMethod("sumSince", ZonedDateTime.class, String.class);
-            return (Optional<Double>) method.invoke(jRuleItem, time, persistenceServiceId);
+            return (Optional<JRuleValue>) method.invoke(jRuleItem, time, persistenceServiceId);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("error executing sumSince", e);
         }

@@ -61,6 +61,11 @@ public enum JRulePlayPauseValue implements JRuleValue {
     }
 
     @Override
+    public <T extends JRuleValue> T as(Class<T> target) {
+        throw new IllegalStateException("cannot cast to '%s'".formatted(target));
+    }
+
+    @Override
     public String toString() {
         return ohType.toString();
     }
