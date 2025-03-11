@@ -12,11 +12,14 @@
  */
 package org.openhab.automation.jrule.rules;
 
+import java.lang.annotation.Inherited;
+
 /**
  * The {@link JRuleCondition}
  *
  * @author Robert Delbrück
  */
+@Inherited
 public @interface JRuleCondition {
     double gt() default Double.MIN_VALUE;
 
