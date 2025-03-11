@@ -335,11 +335,11 @@ public class TestRules extends JRule {
     @JRuleWhenItemReceivedCommand(item = ITEM_TRIGGER_RULE, condition = @JRuleCondition(eq = COMMAND_NULL_TESTING))
     public void nullTesting(JRuleItemEvent event) throws JRuleExecutionException {
         JRuleStringItem stringItem = JRuleStringItem.forName(ITEM_NULL_TESTING);
-        stringItem.postUpdate((JRuleStringValue) null);
+        stringItem.postNullUpdate();
         assert stringItem.getState() == null;
         stringItem.postUpdate("abc");
         assert stringItem.getState().stringValue().equals("abc");
-        stringItem.postUpdate((JRuleStringValue) null);
+        stringItem.postNullUpdate();
         assert stringItem.getState() == null;
     }
 
