@@ -87,3 +87,6 @@ Number          Number_To_Persist_Future   (InfluxDbPersist)
 
 
 Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }
+
+String ModuleActionCommandItem "Module Action Command"
+String ModuleActionRecipientItem "Module Action Recipient"
