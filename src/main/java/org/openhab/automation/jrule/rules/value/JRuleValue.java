@@ -28,4 +28,6 @@ public interface JRuleValue {
     Command toOhCommand();
 
     State toOhState();
+
+    <T extends JRuleValue> T as(Class<T> target);
 }

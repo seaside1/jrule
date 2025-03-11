@@ -12,7 +12,6 @@
  */
 package org.openhab.automation.jrule.items;
 
-import java.time.ZonedDateTime;
 import java.util.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -20,16 +19,16 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
+import org.openhab.automation.jrule.persistence.JRulePersistence;
 import org.openhab.automation.jrule.rules.value.JRuleRefreshValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
-import org.openhab.core.types.State;
 
 /**
  * The {@link JRuleItem} JRule Item
  *
  * @author Robert Delbrück - Initial contribution
  */
-public interface JRuleItem {
+public interface JRuleItem extends JRulePersistence {
     static JRuleItem forName(String itemName) throws JRuleItemNotFoundException {
         return JRuleItemRegistry.get(itemName);
     }
@@ -100,48 +99,6 @@ public interface JRuleItem {
     default void postNullUpdate() {
         JRuleEventHandler.get().postUpdate(getName(), null);
     }
-
-    default Optional<ZonedDateTime> lastUpdated() {
-        return lastUpdated(null);
-    }
-
-    Optional<ZonedDateTime> lastUpdated(String persistenceServiceId);
-
-    default boolean changedSince(ZonedDateTime timestamp) {
-        return changedSince(timestamp, null);
-    }
-
-    boolean changedSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default boolean updatedSince(ZonedDateTime timestamp) {
-        return updatedSince(timestamp, null);
-    }
-
-    boolean updatedSince(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp) {
-        return getHistoricState(timestamp, null);
-    }
-
-    Optional<JRuleValue> getHistoricState(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<JRuleValue> getStateAt(ZonedDateTime timestamp) {
-        return getStateAt(timestamp, null);
-    }
-
-    Optional<JRuleValue> getStateAt(ZonedDateTime timestamp, String persistenceServiceId);
-
-    default Optional<State> getPreviousState(boolean skipEquals) {
-        return getPreviousState(skipEquals, null);
-    }
-
-    Optional<State> getPreviousState(boolean skipEquals, String persistenceServiceId);
-
-    default void persist(JRuleValue state, ZonedDateTime time) {
-        persist(state, time, null);
-    }
-
-    void persist(JRuleValue state, ZonedDateTime time, String persistenceServiceId);
 
     default boolean isGroup() {
         return false;
