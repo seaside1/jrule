@@ -45,6 +45,7 @@
     + [Example 41 - Get Metadata and Tags](#example-41---get-metadata-and-tags)
     + [Example 42 - Persist future data](#example-42---persist-future-data)
     + [Example 43 - Creating a rule dynamically using JRuleBuilder](#example-43---creating-a-rule-dynamically-using-jrulebuilder)
+    + [Example 44 - Setting items linked to a thing to UNDEF when thing goes offline](#example-44---setting-items-linked-to-a-thing-to-undef-when-thing-goes-offline)
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1123,5 +1124,36 @@ public class DynamicRuleModule extends JRule {
                 .whenItemChange("MyItem", JRuleMemberOf.None, "OFF", "ON", null, null)
                 .build();
     }
+}
+```
+
+## Example 44 - Setting items linked to a thing to UNDEF when thing goes offline
+
+Use case: No longer be fooled by outdated item states when a thing goes offline
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import java.util.List;
+
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.event.JRuleThingEvent;
+import org.openhab.automation.jrule.things.JRuleAbstractThing;
+import org.openhab.automation.jrule.things.JRuleChannel;
+import org.openhab.automation.jrule.things.JRuleThingRegistry;
+import org.openhab.automation.jrule.things.JRuleThingStatus;
+
+public class ChannelsToUndefWhenTingOffline extends JRule {
+  @JRuleName("Device monitoring - Set linked items to UNDEF if thing goes offline")
+  @JRuleWhenThingTrigger(thing = "*", from = JRuleThingStatus.ONLINE)
+  public void setChannelsToUndefWhenThingOffline(JRuleThingEvent thingEvent) {
+    String thingUID = thingEvent.getThing();
+    JRuleAbstractThing thing = JRuleThingRegistry.get(thingUID, JRuleAbstractThing.class);
+    List<JRuleChannel> channels = thing.getChannels();
+    channels.forEach(channel -> thing.getLinkedItems(channel).forEach(JRuleItem::postUndefUpdate));
+  }
 }
 ```
