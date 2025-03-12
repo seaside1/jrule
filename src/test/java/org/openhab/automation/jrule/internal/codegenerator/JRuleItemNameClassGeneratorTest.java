@@ -15,10 +15,9 @@ package org.openhab.automation.jrule.internal.codegenerator;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,16 +34,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.compiler.JRuleCompiler;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleItemNameClassGenerator;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.automation.jrule.test_utils.JRuleItemTestUtils;
-import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
-import org.openhab.core.items.Item;
-import org.openhab.core.items.ItemNotFoundException;
-import org.openhab.core.items.Metadata;
-import org.openhab.core.items.MetadataKey;
-import org.openhab.core.items.MetadataRegistry;
+import org.openhab.core.items.*;
 import org.openhab.core.library.items.CallItem;
 import org.openhab.core.library.items.ColorItem;
 import org.openhab.core.library.items.ContactItem;
@@ -123,19 +117,21 @@ public class JRuleItemNameClassGeneratorTest {
     }
 
     @Test
-    public void testGenerateItemsFile()
-            throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            MalformedURLException, ClassNotFoundException, NoSuchFieldException, ItemNotFoundException {
+    public void testGenerateItemsFile() throws Exception {
         List<Item> items = new ArrayList<>();
 
-        items.add(createItem(StringItem.class, new StringType("abc")));
+        GenericItem itemString = createItem(StringItem.class, new StringType("abc"));
+        itemString.addGroupNames("StringItemGroup");
+        items.add(itemString);
         items.add(createItem(ColorItem.class, new HSBType(new DecimalType(1), new PercentType(2), new PercentType(3))));
         items.add(createItem(ContactItem.class, OpenClosedType.OPEN));
         items.add(createItem(DateTimeItem.class, new DateTimeType(ZonedDateTime.now())));
         items.add(createItem(DimmerItem.class, new PercentType(50)));
         items.add(createItem(PlayerItem.class, PlayPauseType.PAUSE));
         items.add(createItem(SwitchItem.class, OnOffType.OFF));
-        items.add(createItem(NumberItem.class, new DecimalType(340)));
+        GenericItem itemNumber = createItem(NumberItem.class, new DecimalType(340));
+        itemNumber.addGroupNames("NumberItemGroup", "DimmerItemGroup");
+        items.add(itemNumber);
         items.add(createItem(RollershutterItem.class, new PercentType(22)));
         items.add(createItem(LocationItem.class, new PointType(new DecimalType(22.22), new DecimalType(54.12))));
         // items.add(createItem(CallItem.class, new StringType("+4930123456")));
@@ -164,39 +160,23 @@ public class JRuleItemNameClassGeneratorTest {
         boolean success = sourceFileGenerator.generateItemNamesSource(items, metadataRegistry);
         assertTrue(success, "Failed to generate source file for items");
 
-        compiler.compile(List.of(new File(targetFolder, "JRuleItemNames.java")), "target/classes:target/gen");
+        Assertions.assertTrue(
+                compiler.compile(List.of(new File(targetFolder, "JRuleItemNames.java")), "target/classes:target/gen"));
 
-        // ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
-        // Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {
-        // Object itemName = invocationOnMock.getArgument(0);
-        // return items.stream().filter(item -> item.getName().equals(itemName)).findFirst().orElseThrow();
-        // });
-        // JRuleEventHandler.get().setItemRegistry(itemRegistry);
-        //
-        // File compiledClass = new File(targetFolder, "JRuleItems.class");
-        // assertTrue(compiledClass.exists());
-        //
-        // URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
-        // JRuleActionClassGeneratorTest.class.getClassLoader());
-        // final String className = "org.openhab.automation.jrule.generated.items.JRuleItems";
-        // Class<?> aClass = classLoader.loadClass(className);
-        // Object jRuleItems = aClass.getConstructor().newInstance();
-        //
-        // for (Item item : items) {
-        // testAllMethodsOnGeneratedItem(aClass, jRuleItems, item.getName());
-        // }
-    }
+        ItemRegistry itemRegistry = Mockito.mock(ItemRegistry.class);
+        Mockito.when(itemRegistry.getItem(Mockito.anyString())).thenAnswer(invocationOnMock -> {
+            Object itemName = invocationOnMock.getArgument(0);
+            return items.stream().filter(item -> item.getName().equals(itemName)).findFirst().orElseThrow();
+        });
+        JRuleEventHandler.get().setItemRegistry(itemRegistry);
 
-    private static void testAllMethodsOnGeneratedItem(Class<?> aClass, Object jRuleItems, String itemName)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Field itemField = aClass.getDeclaredField(itemName);
-        Object item = itemField.get(jRuleItems);
+        File compiledClass = new File(targetFolder, "JRuleItemNames.class");
+        assertTrue(compiledClass.exists());
 
-        Method getName = item.getClass().getMethod("getName");
-        Assertions.assertEquals(itemName, getName.invoke(item));
-
-        Method getState = item.getClass().getMethod("getState");
-        Assertions.assertNotNull(getState.invoke(item));
+        URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("target/gen").toURI().toURL() },
+                JRuleActionClassGeneratorTest.class.getClassLoader());
+        final String className = "org.openhab.automation.jrule.generated.items.JRuleItemNames";
+        classLoader.loadClass(className);
     }
 
     private GroupItem createGroupItem(Class<? extends GenericItem> clazz, State initialState)
