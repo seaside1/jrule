@@ -143,6 +143,14 @@ public class JRuleEventHandler {
         }
     }
 
+    public void postUndef(String itemName) {
+        postUpdate(itemName, UnDefType.UNDEF);
+    }
+
+    public void postNull(String itemName) {
+        postUpdate(itemName, UnDefType.NULL);
+    }
+
     public void postUpdate(String itemName, double value, String unit) {
         QuantityType<?> type = new QuantityType<>(value + " " + unit);
         postUpdate(itemName, type);

@@ -13,12 +13,16 @@
 package org.openhab.automation.jrule.internal.handler;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.openhab.automation.jrule.items.JRuleItem;
+import org.openhab.automation.jrule.items.JRuleItemRegistry;
+import org.openhab.automation.jrule.things.JRuleChannel;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
-import org.openhab.core.thing.Thing;
-import org.openhab.core.thing.ThingManager;
-import org.openhab.core.thing.ThingRegistry;
-import org.openhab.core.thing.ThingUID;
+import org.openhab.core.thing.*;
+import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 
 /**
  * The {@link JRuleThingHandler} provides access to thing actions
@@ -36,12 +40,18 @@ public class JRuleThingHandler {
 
     private ThingManager thingManager;
 
+    private ItemChannelLinkRegistry itemChannelLinkRegistry;
+
     public void setThingManager(ThingManager thingManager) {
         this.thingManager = thingManager;
     }
 
     public void setThingRegistry(ThingRegistry thingRegistry) {
         this.thingRegistry = thingRegistry;
+    }
+
+    public void setItemChannelLinkRegistry(ItemChannelLinkRegistry itemChannelLinkRegistry) {
+        this.itemChannelLinkRegistry = itemChannelLinkRegistry;
     }
 
     public static JRuleThingHandler get() {
@@ -82,5 +92,25 @@ public class JRuleThingHandler {
         } else {
             return JRuleThingStatus.THING_UNKNOWN;
         }
+    }
+
+    /**
+     * Get all channels of a thing
+     * 
+     * @param thingUID the thing UID
+     * @return list of all channels
+     */
+    public List<JRuleChannel> getChannels(String thingUID) {
+        Thing thing = thingRegistry.get(new ThingUID(thingUID));
+        if (thing != null) {
+            return thing.getChannels().stream().map(channel -> new JRuleChannel(channel.getUID().toString())).toList();
+        } else {
+            return List.of();
+        }
+    }
+
+    public Set<JRuleItem> getLinkedItems(JRuleChannel channel) {
+        return itemChannelLinkRegistry.getLinkedItemNames(new ChannelUID(channel.getChannelUID())).stream()
+                .map(itemName -> JRuleItemRegistry.get(itemName)).collect(Collectors.toSet());
     }
 }
