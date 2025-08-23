@@ -312,7 +312,7 @@ public abstract class JRuleITBase {
         return Optional.ofNullable(getState(itemName)).map(Double::parseDouble);
     }
 
-    private String getState(String itemName) throws IOException, ParseException {
+    protected static String getState(String itemName) throws IOException, ParseException {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpGet request = new HttpGet(String.format("http://%s:%s/rest/items/" + itemName + "/state",
                     getOpenhabHost(), getOpenhabPort()));

@@ -90,6 +90,27 @@ public class ITJRule extends JRuleITBase {
     }
 
     @Test
+    public void mqttThingChangedFromOnline() throws MqttException {
+
+        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
+                .pollInterval(200, TimeUnit.MILLISECONDS).await("thing online")
+                .until(() -> getThingState("mqtt:topic:mqtt:fromonlinetest"), s -> s.equals("ONLINE"));
+        publishMqttMessage("fromonlinetest/state", "1");
+        Awaitility.await().with().pollDelay(100, TimeUnit.MILLISECONDS).timeout(5, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS).await("item updated")
+                .until(() -> getState(TestRules.ITEM_MQTT_TOPIC_FROM_ONLINE_TEST), s -> "1".equals(s));
+        mqttProxy.setConnectionCut(true);
+        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(20, TimeUnit.SECONDS)
+                .pollInterval(200, TimeUnit.MILLISECONDS).await("thing online")
+                .until(() -> getThingState("mqtt:topic:mqtt:fromonlinetest"), s -> s.equals("OFFLINE"));
+        Awaitility.await().with().pollDelay(1, TimeUnit.SECONDS).timeout(30, TimeUnit.SECONDS)
+                .pollInterval(200, TimeUnit.MILLISECONDS).await("item undef")
+                .until(() -> getState(TestRules.ITEM_MQTT_TOPIC_FROM_ONLINE_TEST), s -> "UNDEF".equals(s));
+
+        verifyRuleWasExecuted(TestRules.NAME_MQTT_THING_CHANGED_FROM_ONLINE);
+    }
+
+    @Test
     public void memberOfGroupReceivedCommand() throws IOException {
         sendCommand(TestRules.ITEM_SWITCH_GROUP_MEMBER1, JRuleSwitchItem.ON);
         verifyRuleWasExecuted(TestRules.NAME_MEMBER_OF_GROUP_RECEIVED_COMMAND);

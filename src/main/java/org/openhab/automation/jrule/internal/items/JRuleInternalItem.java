@@ -330,6 +330,20 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
+    public Optional<JRuleValue> varianceUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+        Item item = getItem(name);
+        return Optional.ofNullable(PersistenceExtensions.varianceUntil(item, timestamp, serviceId))
+                .map(v -> JRuleEventHandler.get().toValue(v));
+    }
+
+    @Override
+    public Optional<JRuleValue> sumBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId) {
+        Item item = getItem(name);
+        return Optional.ofNullable(PersistenceExtensions.sumBetween(item, begin, end, serviceId))
+                .map(v -> JRuleEventHandler.get().toValue(v));
+    }
+
+    @Override
     public Optional<JRuleValue> sumSince(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
         return Optional.ofNullable(PersistenceExtensions.sumSince(item, timestamp, serviceId))
@@ -337,9 +351,9 @@ public abstract class JRuleInternalItem implements JRuleItem {
     }
 
     @Override
-    public Optional<JRuleValue> varianceUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
+    public Optional<JRuleValue> sumUntil(ZonedDateTime timestamp, @Nullable String serviceId) {
         Item item = getItem(name);
-        return Optional.ofNullable(PersistenceExtensions.varianceUntil(item, timestamp, serviceId))
+        return Optional.ofNullable(PersistenceExtensions.sumUntil(item, timestamp, serviceId))
                 .map(v -> JRuleEventHandler.get().toValue(v));
     }
 
