@@ -387,6 +387,35 @@ public interface JRulePersistence {
 
     Optional<JRuleValue> sumSince(ZonedDateTime timestamp, @Nullable String serviceId);
 
+    default Optional<JRuleDecimalValue> sumUntilAsDecimal(ZonedDateTime timestamp, @Nullable String serviceId) {
+        return sumUntil(timestamp, serviceId).map(v -> v.as(JRuleDecimalValue.class));
+    }
+
+    default Optional<JRuleDecimalValue> sumUntilAsDecimal(ZonedDateTime timestamp) {
+        return sumUntilAsDecimal(timestamp, null);
+    }
+
+    default Optional<JRuleValue> sumUntil(ZonedDateTime timestamp) {
+        return sumUntil(timestamp, null);
+    }
+
+    Optional<JRuleValue> sumUntil(ZonedDateTime timestamp, @Nullable String serviceId);
+
+    default Optional<JRuleDecimalValue> sumBetweenAsDecimal(ZonedDateTime begin, ZonedDateTime end,
+            @Nullable String serviceId) {
+        return sumBetween(begin, end, serviceId).map(v -> v.as(JRuleDecimalValue.class));
+    }
+
+    default Optional<JRuleDecimalValue> sumBetweenAsDecimal(ZonedDateTime begin, ZonedDateTime end) {
+        return sumBetweenAsDecimal(begin, end, null);
+    }
+
+    default Optional<JRuleValue> sumBetween(ZonedDateTime begin, ZonedDateTime end) {
+        return sumBetween(begin, end, null);
+    }
+
+    Optional<JRuleValue> sumBetween(ZonedDateTime begin, ZonedDateTime end, @Nullable String serviceId);
+
     default Optional<JRuleDecimalValue> medianSinceAsDecimal(ZonedDateTime timestamp, @Nullable String serviceId) {
         return medianSince(timestamp, serviceId).map(v -> v.as(JRuleDecimalValue.class));
     }
