@@ -171,7 +171,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      * @param command as number via JRuleDecimalValue will be sent.
      */
     default void sendCommandIfDifferent(double command) {
-        if (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) < 0.0001) {
+        if (getState() == null
+                || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) < 0.0001)) {
             sendUncheckedCommand(new JRuleDecimalValue(command));
         }
     }
@@ -188,11 +189,12 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
     /**
      * Sends a number command without any unit only if current state is different
      *
-     * @param state as number via JRuleDecimalValue will be sent.
+     * @param command as number via JRuleDecimalValue will be sent.
      */
-    default void postUpdateIfDifferent(double state) {
-        if (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - state) < 0.0001) {
-            postUncheckedUpdate(new JRuleDecimalValue(state));
+    default void postUpdateIfDifferent(double command) {
+        if (getState() == null
+                || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) < 0.0001)) {
+            sendUncheckedCommand(new JRuleDecimalValue(command));
         }
     }
 
@@ -211,7 +213,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      * @param command as number via JRuleDecimalValue will be sent.
      */
     default void sendCommandIfDifferent(int command) {
-        if (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) < 0.0001) {
+        if (getState() == null
+                || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) < 0.0001)) {
             sendUncheckedCommand(new JRuleDecimalValue(command));
         }
     }
@@ -231,7 +234,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      * @param state as number via JRuleDecimalValue will be sent.
      */
     default void postUpdateIfDifferent(int state) {
-        if (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - state) < 0.0001) {
+        if (getState() == null
+                || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - state) < 0.0001)) {
             postUncheckedUpdate(new JRuleDecimalValue(state));
         }
     }
