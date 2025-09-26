@@ -251,6 +251,13 @@ public class JRuleHandler implements PropertyChangeListener {
         eventSubscriber.removePropertyChangeListener(this);
         JRuleItemRegistry.clear();
         JRuleThingRegistry.clear();
+        if(JRuleUtil.class.getClassLoader() instanceof JRuleClassLoader jRuleClassLoader) {
+            try {
+                jRuleClassLoader.close();
+            } catch (IOException e) {
+                // Best effort
+            }
+        }
         logDebug("Dispose complete");
     }
 
@@ -312,13 +319,6 @@ public class JRuleHandler implements PropertyChangeListener {
         compiler.loadClassesFromFolder(loader, new File(config.getRulesRootDirectory()), config.getRulesPackage(),
                 true);
         compiler.loadClassesFromJar(loader, new File(config.getJarRulesDirectory()), config.getRulesPackage(), true);
-
-        try {
-            //Close classloader. This will propagate to all classes that implement Closeable
-            loader.close();
-        } catch (IOException e) {
-            logger.error("Could not close classLoader", e);
-        }
     }
 
     private boolean initializeFolder(String folder) {
