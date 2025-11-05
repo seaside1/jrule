@@ -25,7 +25,11 @@
       org.mozilla.javascript.*;resolution:=optional,\
       org.python.*;resolution:=optional,\
       org.zeroturnaround.javarebel.*;resolution:=optional,\
-      org.apache.tools.ant.*;resolution:=optional</bnd.importpackage>
+      org.apache.tools.ant.*;resolution:=optional,\
+      jakarta.el.*;resolution:=optional,\
+      jakarta.servlet.*;resolution:=optional,\
+      javax.el.*;resolution:=optional,\
+      javax.servlet.*;resolution:=optional</bnd.importpackage>
   </properties>
   <dependencies>
     <dependency>
@@ -83,11 +87,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.el</groupId>
-      <artifactId>javax.el-api</artifactId>
-      <version>2.2.4</version>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jsp-api</artifactId>
       <version>2.0</version>
@@ -122,7 +121,6 @@
       </testResource>
     </testResources>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
