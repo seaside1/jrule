@@ -93,7 +93,6 @@ public class JRuleItemTestUtils {
                 JRuleCallGroupItem.class));
         items.add(
                 Pair.of(createGroupItem(ImageItem.class, new RawType(new byte[0], "jpeg")), JRuleImageGroupItem.class));
-        // items.add(Pair.of(createGroupItem(null, null), JRuleUnspecifiedGroupItem.class));
         return items;
     }
 
