@@ -3,7 +3,6 @@
     <feature version="0.0.0">
         <feature>openhab-runtime-base</feature>
         <feature>wrap</feature>
-        <bundle>mvn:javax.el/javax.el-api/2.2.4</bundle>
         <bundle>mvn:org.freemarker/freemarker/2.3.34</bundle>
         <bundle>mvn:org.openhab.addons.bundles/org.openhab.automation.jrule/5.0.2-SNAPSHOT</bundle>
         <bundle>wrap:mvn:javax.servlet/jsp-api/2.0</bundle>
