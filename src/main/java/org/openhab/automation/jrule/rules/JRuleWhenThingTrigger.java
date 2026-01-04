@@ -21,7 +21,6 @@ import org.openhab.automation.jrule.things.JRuleThingStatus;
  *
  * @author Robert Delbrück
  */
-@Inherited
 @Repeatable(JRuleWhenThingTriggers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })

@@ -19,7 +19,6 @@ import java.lang.annotation.*;
  *
  * @author Robert Delbrück
  */
-@Inherited
 @Repeatable(JRuleWhenCronTriggers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })

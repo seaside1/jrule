@@ -19,7 +19,6 @@ import java.lang.annotation.*;
  *
  * @author Arne Seime- Initial contribution
  */
-@Inherited
 @Repeatable(JRulePreconditions.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
