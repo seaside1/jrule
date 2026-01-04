@@ -13,6 +13,8 @@
 package org.openhab.automation.jrule.internal;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -23,6 +25,8 @@ import org.openhab.automation.jrule.internal.handler.JRuleHandler;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.core.audio.AudioHTTPServer;
+import org.openhab.core.automation.handler.ModuleHandlerFactory;
+import org.openhab.core.automation.type.ModuleTypeRegistry;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.MetadataRegistry;
@@ -35,10 +39,7 @@ import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 import org.openhab.core.voice.VoiceManager;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,8 @@ public class JRuleFactory {
 
     private final JRuleDelayedDebouncingExecutor delayedInit = new JRuleDelayedDebouncingExecutor(5, TimeUnit.SECONDS);
 
+    private Set<ModuleHandlerFactory> allModuleHandlerFactories = new CopyOnWriteArraySet<>();
+
     @Activate
     public JRuleFactory(Map<String, Object> properties, final @Reference JRuleEventSubscriber eventSubscriber,
             final @Reference ItemRegistry itemRegistry,
@@ -71,7 +74,8 @@ public class JRuleFactory {
             final @Reference NetworkAddressService networkAddressService, final ComponentContext componentContext,
             final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry,
             final @Reference JRuleRuleProvider ruleProvider,
-            @Reference final PersistenceServiceRegistry persistenceServiceRegistry) {
+            @Reference final PersistenceServiceRegistry persistenceServiceRegistry,
+            @Reference ModuleTypeRegistry moduleTypeRegistry) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
@@ -85,8 +89,18 @@ public class JRuleFactory {
         JRuleItemRegistry.setMetadataRegistry(metadataRegistry);
         jRuleHandler = new JRuleHandler(config, itemRegistry, itemChannelLinkRegistry, thingRegistry, thingManager,
                 eventPublisher, eventSubscriber, voiceManager, audioHTTPServer, networkAddressService, cronScheduler,
-                componentContext.getBundleContext(), metadataRegistry);
+                componentContext.getBundleContext(), metadataRegistry, moduleTypeRegistry, allModuleHandlerFactories);
         delayedInit.call(this::init);
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+    protected void addModuleHandlerFactory(ModuleHandlerFactory moduleHandlerFactory) {
+        logger.debug("ModuleHandlerFactory added {}", moduleHandlerFactory.getClass().getSimpleName());
+        allModuleHandlerFactories.add(moduleHandlerFactory);
+    }
+
+    protected void removeModuleHandlerFactory(ModuleHandlerFactory moduleHandlerFactory) {
+        allModuleHandlerFactories.remove(moduleHandlerFactory);
     }
 
     @Nullable

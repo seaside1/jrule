@@ -1157,3 +1157,25 @@ public class ChannelsToUndefWhenTingOffline extends JRule {
   }
 }
 ```
+
+## Example 45 - Send a push-notification through myOpenhab module action
+
+Use case: receive push notification on mobile phone about important events
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.generated.moduleactions.JRuleModuleActions.notificationSendExtendedBroadcastNotification;
+
+public class MyOpenhabNotification extends JRule {
+    @JRuleName("Send Push-Notification over MyOpenhab")
+    @JRuleWhenThingTrigger(from = JRuleThingStatus.ONLINE)
+    public void notifyAboutOnlineThing(JRuleEvent event) {
+        notificationSendExtendedBroadcastNotification("a thing went online", "lightbulb", "thingOnlineNotification")
+    }
+}
+```
