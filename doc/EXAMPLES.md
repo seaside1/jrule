@@ -1157,3 +1157,44 @@ public class ChannelsToUndefWhenTingOffline extends JRule {
   }
 }
 ```
+
+
+### Example 46 - Rule inheriance
+
+Use case: Define reusable abstract rule classes for re-use across multiple installations/rule sets.
+
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.internal.engine.JRuleEngine;
+import org.openhab.automation.jrule.rules.JRule;
+
+public abstract class AbstractThingMonitoringRule extends JRule {
+
+    private final Set<String> ignoredThings = Collections.synchronizedSet(new HashSet<>());
+
+    @JRuleName("Device monitoring - Track and schedule restart if thing goes offline")
+    @JRuleWhenThingTrigger(thing = "*", from = JRuleThingStatus.ONLINE)
+    @JRuleWhenThingTrigger(thing = "*", to = JRuleThingStatus.ONLINE)
+    public synchronized void startTrackingNonOnlineThing(JRuleThingEvent thingEvent) {
+        if(!ignoredThings.contains(thingEvent.getThingUID())) {
+            // ... do something about it
+        }
+    }
+}
+
+// Concrete class for Site 1 (separate file)
+public class Site1ThingMonitoring extends AbstractThingMonitoringRule {
+    public Site1ThingMonitoring() {
+        addIgnoredThing(JRuleThings.my_tv_that_is_offline_when_switched_off.getThingUID());
+    }
+}
+
+// Concrete class for Site 2 (separate file)
+public class Site2ThingMonitoring extends AbstractThingMonitoringRule {
+    public Site2ThingMonitoring() {
+        addIgnoredThing(JRuleThings.beacon_that_goes_offline_when_not_used.getThingUID());
+    }
+}
+```
