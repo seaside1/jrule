@@ -121,8 +121,9 @@ public class JRuleEngine implements PropertyChangeListener {
     public void add(JRule jRule, boolean enableRule) {
         logDebug("Adding rule: {}, enabled: {}", jRule, enableRule);
         ruleLoadingStatistics.addRuleClass();
-        Arrays.stream(jRule.getClass().getDeclaredMethods()).filter(method -> !method.getName().startsWith("lambda$"))
-                .filter(method -> method.getDeclaringClass().equals(jRule.getClass())) // Skip inherited methods
+        Arrays.stream(jRule.getClass().getMethods()).filter(method -> !method.getName().startsWith("lambda$"))
+                .filter(method -> method.isAnnotationPresent(JRuleName.class)
+                        && JRule.class.isAssignableFrom(method.getDeclaringClass()))
                 .forEach(method -> this.add(method, jRule, enableRule));
     }
 
@@ -138,12 +139,6 @@ public class JRuleEngine implements PropertyChangeListener {
 
     private void add(Method method, JRule jRule, boolean enableRule) {
         logDebug("Adding rule method: {}", method.getName());
-
-        if (!method.isAnnotationPresent(JRuleName.class)) {
-            logDebug("Skipping method {} on class {} since JRuleName annotation is missing", method.getName(),
-                    jRule.getClass().getName());
-            return;
-        }
 
         // Check if method is public, else execution will fail at runtime
         boolean isPublic = (method.getModifiers() & Modifier.PUBLIC) != 0;
