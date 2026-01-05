@@ -1159,7 +1159,7 @@ public class ChannelsToUndefWhenTingOffline extends JRule {
 ```
 
 
-### Example 46 - Rule inheriance
+### Example 46 - Rule inheritance
 
 Use case: Define reusable abstract rule classes for re-use across multiple installations/rule sets.
 
