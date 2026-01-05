@@ -187,7 +187,7 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
     }
 
     /**
-     * Sends a number command without any unit only if current state is different
+     * Update state without any unit only if current state is different
      *
      * @param command as number via JRuleDecimalValue will be sent.
      */
