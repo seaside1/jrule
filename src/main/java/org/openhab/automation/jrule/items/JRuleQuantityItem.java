@@ -171,7 +171,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      * @param command as number via JRuleDecimalValue will be sent.
      */
     default void sendCommandIfDifferent(double command) {
-        if (getState() == null || Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001) {
+        if (getState() == null
+                || (getState() != null && Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001)) {
             sendUncheckedCommand(new JRuleDecimalValue(command));
         }
     }
@@ -192,7 +193,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      */
     @Override
     default void postUpdateIfDifferent(double command) {
-        if (getState() == null || Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001) {
+        if (getState() == null
+                || (getState() != null && Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001)) {
             postUncheckedUpdate(new JRuleDecimalValue(command));
         }
     }
@@ -213,7 +215,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      */
     @Override
     default void sendCommandIfDifferent(int command) {
-        if (getState() == null || Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001) {
+        if (getState() == null
+                || (getState() != null && Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001)) {
             sendUncheckedCommand(new JRuleDecimalValue(command));
         }
     }
@@ -234,7 +237,8 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      */
     @Override
     default void postUpdateIfDifferent(int state) {
-        if (getState() == null || Math.abs(getStateAsDecimal().doubleValue() - state) > 0.0001) {
+        if (getState() == null
+                || (getState() != null && Math.abs(getStateAsDecimal().doubleValue() - state) > 0.0001)) {
             postUncheckedUpdate(new JRuleDecimalValue(state));
         }
     }
