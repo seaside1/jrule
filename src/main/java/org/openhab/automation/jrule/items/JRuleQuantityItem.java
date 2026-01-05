@@ -107,7 +107,7 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
     }
 
     /**
-     * Sends a number uppdate with the given unit only if current state is different
+     * Sends a number update with the given unit only if current state is different
      *
      * @param state as number via JRuleQuantityValue will be sent.
      * @param unit of value as a string
