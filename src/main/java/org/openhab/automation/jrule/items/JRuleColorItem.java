@@ -14,11 +14,12 @@ package org.openhab.automation.jrule.items;
 
 import java.util.Optional;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.internal.JRuleUtil;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.internal.items.JRuleInternalColorItem;
-import org.openhab.automation.jrule.rules.value.*;
+import org.openhab.automation.jrule.rules.value.JRuleHsbValue;
 
 /**
  * The {@link JRuleColorItem} JRule Item
@@ -41,6 +42,17 @@ public interface JRuleColorItem extends JRuleDimmerItem {
      */
     default void sendCommand(JRuleHsbValue command) {
         sendUncheckedCommand(command);
+    }
+
+    /**
+     * Sends a string command only if current state is different
+     *
+     * @param command command to send.
+     */
+    default void sendCommandIfDifferent(@NonNull JRuleHsbValue command) {
+        if (!command.equals(getState())) {
+            sendUncheckedCommand(command);
+        }
     }
 
     /**

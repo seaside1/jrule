@@ -48,6 +48,17 @@ public interface JRuleDimmerItem extends JRuleSwitchItem {
     }
 
     /**
+     * Sends a percent command only if current state is different
+     *
+     * @param command command to send.
+     */
+    default void sendCommandIfDifferent(JRulePercentValue command) {
+        if (!command.equals(getState())) {
+            sendUncheckedCommand(command);
+        }
+    }
+
+    /**
      * Sends a percent update
      * 
      * @param state update to send
@@ -57,12 +68,27 @@ public interface JRuleDimmerItem extends JRuleSwitchItem {
     }
 
     /**
+     * Sends a percent update only if current state is different
+     * 
+     * @param state update to send
+     */
+    default void postUpdateIfDifferent(JRulePercentValue state) {
+        if (!state.equals(getState())) {
+            postUncheckedUpdate(state);
+        }
+    }
+
+    /**
      * Sends a command in percent.
      * 
      * @param command in percent via JRulePercentValue will be send.
      */
     default void sendCommand(int command) {
         sendUncheckedCommand(new JRulePercentValue(command));
+    }
+
+    default void sendCommandIfDifferent(int command) {
+        sendCommandIfDifferent(new JRulePercentValue(command));
     }
 
     /**
@@ -90,6 +116,10 @@ public interface JRuleDimmerItem extends JRuleSwitchItem {
      */
     default void postUpdate(int state) {
         postUncheckedUpdate(new JRulePercentValue(state));
+    }
+
+    default void postUpdateIfDifferent(int state) {
+        postUpdateIfDifferent(new JRulePercentValue(state));
     }
 
     default JRulePercentValue getStateAsPercent() {
