@@ -235,6 +235,7 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      *
      * @param state as number via JRuleDecimalValue will be sent.
      */
+    @Override
     default void postUpdateIfDifferent(int state) {
         if (getState() == null
                 || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - state) > 0.0001)) {
