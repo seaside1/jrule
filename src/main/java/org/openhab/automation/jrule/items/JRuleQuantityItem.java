@@ -191,6 +191,7 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      *
      * @param command as number via JRuleDecimalValue will be sent.
      */
+    @Override
     default void postUpdateIfDifferent(double command) {
         if (getState() == null
                 || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001)) {
