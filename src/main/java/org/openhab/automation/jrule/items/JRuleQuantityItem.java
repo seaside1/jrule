@@ -194,7 +194,7 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
     default void postUpdateIfDifferent(double command) {
         if (getState() == null
                 || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001)) {
-            sendUncheckedCommand(new JRuleDecimalValue(command));
+            postUncheckedUpdate(new JRuleDecimalValue(command));
         }
     }
 
