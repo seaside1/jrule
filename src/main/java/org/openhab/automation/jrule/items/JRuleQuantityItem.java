@@ -213,6 +213,7 @@ public interface JRuleQuantityItem extends JRuleNumberItem {
      *
      * @param command as number via JRuleDecimalValue will be sent.
      */
+    @Override
     default void sendCommandIfDifferent(int command) {
         if (getState() == null
                 || (getStateAsDecimal() != null && Math.abs(getStateAsDecimal().doubleValue() - command) > 0.0001)) {
