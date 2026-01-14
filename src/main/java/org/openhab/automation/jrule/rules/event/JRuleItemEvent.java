@@ -120,6 +120,7 @@ public class JRuleItemEvent extends JRuleEvent {
 
     @Override
     public String toString() {
-        return String.format("JRuleEvent [item=%s, memberItem=%s, oldState=%s]", item, memberItem, oldState);
+        return String.format("JRuleEvent [item=%s, memberItem=%s, oldState=%s, lastStateUpdate=%s, lastStateChange=%s]",
+                item, memberItem, oldState, lastStateUpdate, lastStateChange);
     }
 }
