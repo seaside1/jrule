@@ -1182,10 +1182,10 @@ import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 
-public class TimestampsLastUpdateLastChange extends JRule{
+public class TimestampsLastUpdateLastChange extends JRule {
 
   @JRuleName("Getting the duration of previous state")
-  @JRuleWhenItemChange(item=switchItem)
+  @JRuleWhenItemChange(item = switchItem)
   public void getDurationOfPreviousState(JRuleItemEvent event) {
     JRuleValue previousState = event.getOldState();
     JRuleValue currentState = event.getState();
@@ -1193,21 +1193,21 @@ public class TimestampsLastUpdateLastChange extends JRule{
     ZonedDateTime lastUpdate = event.getLastStateUpdate();
     String itemName = event.getItem().getName();
 
-    if(lastChange != null) {
+    if (lastChange != null) {
       Duration dur = Duration.between(lastChange, Instant.now().atZone(ZoneId.systemDefault()));
       String formattedDuration = DurationFormatUtils.formatDurationWords(dur.toMillis(), true, true);
       logInfo("Item {} was in state {} for {} before changing to {}.", itemName, previousState, formattedDuration, currentState);
 
-      // If switch was ON for longer than 1 minutes, log a warning
-      if(previousState == ON && currentState == OFF && dur.toMinutes() >= 1) {
-        logWarn("Item {} was ON for more than 1 minutes before turning OFF ({}).", itemName, formattedDuration);
+      // If switch was ON for longer than 1 minute, log a warning
+      if (previousState == ON && currentState == OFF && dur.toMinutes() >= 1) {
+        logWarn("Item {} was ON for more than 1 minute before turning OFF ({}).", itemName, formattedDuration);
       }
     }
     else {
       logInfo("Item {} was in state {} since unknown time before changing to {}.", itemName, previousState, currentState);
     }
 
-    if(lastUpdate != null) {
+    if (lastUpdate != null) {
       logInfo("Item {} was last updated at {}.", itemName, lastUpdate);
     }
     else {
