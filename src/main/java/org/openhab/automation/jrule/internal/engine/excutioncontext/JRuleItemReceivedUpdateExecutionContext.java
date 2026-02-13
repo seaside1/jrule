@@ -90,7 +90,7 @@ public class JRuleItemReceivedUpdateExecutionContext extends JRuleItemExecutionC
         // ((ItemStateEvent) event).getItemState());
 
         return new JRuleItemEvent(item, memberItem,
-                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null);
+                JRuleEventHandler.get().toValue(((ItemStateEvent) event).getItemState()), null, null, null);
     }
 
     @Override
