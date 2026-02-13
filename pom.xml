@@ -30,6 +30,7 @@
       jakarta.servlet.*;resolution:=optional,\
       javax.el.*;resolution:=optional,\
       javax.servlet.*;resolution:=optional</bnd.importpackage>
+    <xml.skip>true</xml.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -52,19 +53,19 @@
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
       <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>toxiproxy</artifactId>
+      <artifactId>testcontainers-toxiproxy</artifactId>
       <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>mockserver</artifactId>
+      <artifactId>testcontainers-mockserver</artifactId>
       <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
