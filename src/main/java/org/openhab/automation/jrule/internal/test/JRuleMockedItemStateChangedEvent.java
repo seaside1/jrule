@@ -24,7 +24,7 @@ public class JRuleMockedItemStateChangedEvent extends ItemStateChangedEvent {
 
     protected JRuleMockedItemStateChangedEvent(String topic, String payload, String itemName, State newItemState,
             State oldItemState) {
-        super(topic, payload, itemName, newItemState, oldItemState, null, null);
+        super(topic, payload, itemName, newItemState, oldItemState, null, null, "jrule");
     }
 
     @Override
