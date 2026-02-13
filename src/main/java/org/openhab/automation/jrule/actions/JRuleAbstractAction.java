@@ -25,19 +25,18 @@ import org.openhab.core.thing.binding.ThingActions;
  * @author Robert Delbrück - Initial contribution
  */
 public abstract class JRuleAbstractAction {
-    private final ThingActions thingActions;
     private final String scope;
     private final String thingUID;
 
     protected JRuleAbstractAction(String scope, String thingUID) {
         this.scope = scope;
         this.thingUID = thingUID;
-        thingActions = Objects.requireNonNull(Things.getActions(scope, thingUID),
-                String.format("action for '%s' with uid '%s' could not be found", scope, thingUID));
     }
 
     protected Object invokeMethod(String methodName, Class<?>[] classes, Object... args) {
         try {
+            ThingActions thingActions = Objects.requireNonNull(Things.getActions(scope, thingUID),
+                    String.format("action for '%s' with uid '%s' could not be found", scope, thingUID));
             Method method = thingActions.getClass().getDeclaredMethod(methodName, classes);
             return method.invoke(thingActions, args);
         } catch (NoSuchMethodException e) {
