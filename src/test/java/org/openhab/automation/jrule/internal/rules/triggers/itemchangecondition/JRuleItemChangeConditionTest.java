@@ -98,10 +98,11 @@ public class JRuleItemChangeConditionTest extends JRuleAbstractTest {
 
     // Syntactic sugar
     private Event itemChangeEvent(String item, String from, String to) {
-        return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from));
+        return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from), null, null);
     }
 
     private Event itemQuantityChangeEvent(String item, String from, String to) {
-        return ItemEventFactory.createStateChangedEvent(item, new QuantityType<>(to), new QuantityType<>(from));
+        return ItemEventFactory.createStateChangedEvent(item, new QuantityType<>(to), new QuantityType<>(from), null,
+                null);
     }
 }

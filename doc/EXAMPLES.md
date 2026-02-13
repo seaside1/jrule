@@ -46,6 +46,7 @@
     + [Example 42 - Persist future data](#example-42---persist-future-data)
     + [Example 43 - Creating a rule dynamically using JRuleBuilder](#example-43---creating-a-rule-dynamically-using-jrulebuilder)
     + [Example 44 - Setting items linked to a thing to UNDEF when thing goes offline](#example-44---setting-items-linked-to-a-thing-to-undef-when-thing-goes-offline)
+    + [Example 45 - Getting the timestamp of the previous state update/change when a state change event occurred](#example-45---getting-the-timestamp-of-the-previous-state-update-change-when-a-state-change-event-occurred)
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1043,7 +1044,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 41 - Get Metadata and Tags
+### Example 41 - Get Metadata and Tags
 
 Use case: Get Tags and Metadata of Items
 
@@ -1068,7 +1069,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 42 - Persist future data
+### Example 42 - Persist future data
 
 Use case: Persist future data for e.g. Tibber future prices
 
@@ -1097,7 +1098,7 @@ public class DemoRule extends JRule {
 }
 ```
 
-## Example 43 - Creating a rule dynamically using JRuleBuilder
+### Example 43 - Creating a rule dynamically using JRuleBuilder
 
 Use case: Build a rule dynamically during runtime without static annotations. Can be used when rule parameters are not
 known at compile time, e.g. when they are read from a configuration file
@@ -1127,7 +1128,7 @@ public class DynamicRuleModule extends JRule {
 }
 ```
 
-## Example 44 - Setting items linked to a thing to UNDEF when thing goes offline
+### Example 44 - Setting items linked to a thing to UNDEF when thing goes offline
 
 Use case: No longer be fooled by outdated item states when a thing goes offline
 
@@ -1154,6 +1155,64 @@ public class ChannelsToUndefWhenTingOffline extends JRule {
     JRuleAbstractThing thing = JRuleThingRegistry.get(thingUID, JRuleAbstractThing.class);
     List<JRuleChannel> channels = thing.getChannels();
     channels.forEach(channel -> thing.getLinkedItems(channel).forEach(JRuleItem::postUndefUpdate));
+  }
+}
+```
+
+### Example 45 - Getting the timestamp of the previous state update/change when a state change event occurred
+
+Use case: Getting the duration how long an item was in the previous state before changing
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.switchItem;
+import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.OFF;
+import static org.openhab.automation.jrule.rules.value.JRuleOnOffValue.ON;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
+
+public class TimestampsLastUpdateLastChange extends JRule {
+
+  @JRuleName("Getting the duration of previous state")
+  @JRuleWhenItemChange(item = switchItem)
+  public void getDurationOfPreviousState(JRuleItemEvent event) {
+    JRuleValue previousState = event.getOldState();
+    JRuleValue currentState = event.getState();
+    ZonedDateTime lastChange = event.getLastStateChange();
+    ZonedDateTime lastUpdate = event.getLastStateUpdate();
+    String itemName = event.getItem().getName();
+
+    if (lastChange != null) {
+      Duration dur = Duration.between(lastChange, Instant.now().atZone(ZoneId.systemDefault()));
+      String formattedDuration = DurationFormatUtils.formatDurationWords(dur.toMillis(), true, true);
+      logInfo("Item {} was in state {} for {} before changing to {}.", itemName, previousState, formattedDuration, currentState);
+
+      // If switch was ON for longer than 1 minute, log a warning
+      if (previousState == ON && currentState == OFF && dur.toMinutes() >= 1) {
+        logWarn("Item {} was ON for more than 1 minute before turning OFF ({}).", itemName, formattedDuration);
+      }
+    }
+    else {
+      logInfo("Item {} was in state {} since unknown time before changing to {}.", itemName, previousState, currentState);
+    }
+
+    if (lastUpdate != null) {
+      logInfo("Item {} was last updated at {}.", itemName, lastUpdate);
+    }
+    else {
+      logInfo("Item {} was never updated.", itemName);
+    }
   }
 }
 ```

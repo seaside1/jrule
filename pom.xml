@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.openhab.addons.bundles</groupId>
     <artifactId>org.openhab.addons.reactor.bundles</artifactId>
-    <version>4.2.0</version>
+    <version>5.0.2</version>
   </parent>
   <artifactId>org.openhab.automation.jrule</artifactId>
+  <version>5.0.2-SNAPSHOT</version>
   <name>openHAB Add-ons :: Bundles :: Standalone Java Rules Automation</name>
-  <version>4.2.1-SNAPSHOT</version>
 
   <properties>
-    <testcontainers.version>1.20.4</testcontainers.version>
+    <testcontainers.version>1.21.3</testcontainers.version>
     <bnd.importpackage>com.sun.org.apache.xml.internal.utils.*;resolution:=optional,\
       com.sun.org.apache.xpath.internal.*;resolution:=optional,\
       org.apache.log.*;resolution:=optional,\
@@ -25,48 +25,23 @@
       org.mozilla.javascript.*;resolution:=optional,\
       org.python.*;resolution:=optional,\
       org.zeroturnaround.javarebel.*;resolution:=optional,\
-      org.apache.tools.ant.*;resolution:=optional
-    </bnd.importpackage>
+      org.apache.tools.ant.*;resolution:=optional,\
+      jakarta.el.*;resolution:=optional,\
+      jakarta.servlet.*;resolution:=optional,\
+      javax.el.*;resolution:=optional,\
+      javax.servlet.*;resolution:=optional</bnd.importpackage>
   </properties>
-  <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>false</filtering>
-      </testResource>
-      <testResource>
-        <directory>src/test/maven-resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
-    <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M7</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-      <version>2.3.32</version>
+      <version>2.3.34</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>4.2.0</version>
+      <version>4.3.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -96,7 +71,7 @@
     <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock</artifactId>
-      <version>3.8.0</version>
+      <version>3.13.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -107,14 +82,9 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
-      <version>4.8.1</version>
+      <artifactId>mockito-core</artifactId>
+      <version>5.20.0</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.el</groupId>
-      <artifactId>javax.el-api</artifactId>
-      <version>2.2.4</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -125,20 +95,47 @@
 
   <repositories>
     <repository>
-      <id>openhab-release</id>
-      <url>https://openhab.jfrog.io/artifactory/libs-release</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <id>openhab-release</id>
+      <url>https://openhab.jfrog.io/artifactory/libs-release</url>
     </repository>
     <repository>
-      <id>openhab-snapshot</id>
-      <url>https://openhab.jfrog.io/artifactory/libs-snapshot</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+      <id>openhab-snapshot</id>
+      <url>https://openhab.jfrog.io/artifactory/libs-snapshot</url>
     </repository>
   </repositories>
+  <build>
+    <testResources>
+      <testResource>
+        <filtering>false</filtering>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <filtering>true</filtering>
+        <directory>src/test/maven-resources</directory>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.0.0-M7</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
     <profile>
       <id>standalone</id>
