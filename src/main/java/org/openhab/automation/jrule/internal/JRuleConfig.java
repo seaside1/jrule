@@ -37,18 +37,19 @@ public class JRuleConfig {
 
     private static final String JAR_DIR = "jar";
 
-    public static final String GENERATED_PACKAGE = "org.openhab.automation.jrule.generated.";
-    public static final String DEFAULT_RULES_PACKAGE = "org.openhab.automation.jrule.rules.user";
-    private static final String RULES_PACKAGE_PROPERTY = "org.openhab.automation.jrule.package";
-    private static final String RULES_DIRECTORY_PROPERTY = "org.openhab.automation.jrule.rules.directory";
-    private static final String WORKING_DIR_PROPERTY = "org.openhab.automation.jrule.directory";
-    private static final String GENERATED_ITEM_PREFIX_PROPERTY = "org.openhab.automation.jrule.itemprefix";
-    private static final String GENERATED_ITEM_PACKAGE_PROPERTY = "org.openhab.automation.jrule.itempackage";
-    private static final String GENERATED_THING_PACKAGE_PROPERTY = "org.openhab.automation.jrule.thingpackage";
-    private static final String EXECUTORS_MIN_PROPERTY = "org.openhab.automation.jrule.engine.executors.min";
-    private static final String EXECUTORS_MAX_PROPERTY = "org.openhab.automation.jrule.engine.executors.max";
-    private static final String EXECUTORS_ENABLE_PROPERTY = "org.openhab.automation.jrule.engine.executors.enable";
-    private static final String EXECUTORS_THREAD_KEEPALIVE_PROPERTY = "org.openhab.automation.jrule.engine.executors.keepalive";
+    public static final String BASE_PACKAGE = "org.openhab.automation.jrule";
+    public static final String GENERATED_PACKAGE = BASE_PACKAGE + ".generated.";
+    public static final String DEFAULT_RULES_PACKAGE = BASE_PACKAGE + ".rules.user";
+    private static final String RULES_PACKAGE_PROPERTY = BASE_PACKAGE + ".package";
+    private static final String RULES_DIRECTORY_PROPERTY = BASE_PACKAGE + ".rules.directory";
+    private static final String WORKING_DIR_PROPERTY = BASE_PACKAGE + ".directory";
+    private static final String GENERATED_ITEM_PREFIX_PROPERTY = BASE_PACKAGE + ".itemprefix";
+    private static final String GENERATED_ITEM_PACKAGE_PROPERTY = BASE_PACKAGE + ".itempackage";
+    private static final String GENERATED_THING_PACKAGE_PROPERTY = BASE_PACKAGE + ".thingpackage";
+    private static final String EXECUTORS_MIN_PROPERTY = BASE_PACKAGE + ".engine.executors.min";
+    private static final String EXECUTORS_MAX_PROPERTY = BASE_PACKAGE + ".engine.executors.max";
+    private static final String EXECUTORS_ENABLE_PROPERTY = BASE_PACKAGE + ".engine.executors.enable";
+    private static final String EXECUTORS_THREAD_KEEPALIVE_PROPERTY = BASE_PACKAGE + ".engine.executors.keepalive";
 
     private static final int DEFAULT_MIN_EXECUTORS = 2;
     private static final int DEFAULT_MAX_EXECUTORS = 10;
@@ -62,9 +63,9 @@ public class JRuleConfig {
     private static final String DEFAULT_WORKING_DIR = File.separator + "etc" + File.separator + "openhab"
             + File.separator + "automation" + File.separator + "jrule";
     private static final String DEFAULT_GENERATED_ITEM_PREFIX = "_";
-    private static final String DEFAULT_GENERATED_ITEM_PACKAGE = "org.openhab.automation.jrule.generated.items";
-    private static final String DEFAULT_GENERATED_THING_PACKAGE = "org.openhab.automation.jrule.generated.things";
-    private static final String DEFAULT_GENERATED_ACTION_PACKAGE = "org.openhab.automation.jrule.generated.actions";
+    private static final String DEFAULT_GENERATED_ITEM_PACKAGE = BASE_PACKAGE + ".generated.items";
+    private static final String DEFAULT_GENERATED_THING_PACKAGE = BASE_PACKAGE + ".generated.things";
+    private static final String DEFAULT_GENERATED_ACTION_PACKAGE = BASE_PACKAGE + ".generated.actions";
 
     private static final String CLASS_DIR = "class";
 
@@ -74,11 +75,12 @@ public class JRuleConfig {
     private static final String LOG_NAME_CONF = "JRuleConf";
     private static final String JRULE_CONFIG_NAME = "jrule.conf";
 
-    private static final String INIT_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.initdelay";
+    private static final String INIT_DELAY_PROPERTY = BASE_PACKAGE + ".engine.initdelay";
     private static final int DEFAULT_INIT_DELAY = 5;
-    private static final String INIT_RULES_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.rulesdelay";
+    private static final String INIT_RULES_DELAY_PROPERTY = BASE_PACKAGE + ".engine.rulesdelay";
     private static final int DEFAULT_RULES_INIT_DELAY = 2;
-    private static final String DEFAULT_ITEMS_RECOMPILATION_DELAY_PROPERTY = "org.openhab.automation.jrule.engine.itemsrecompilationdelay";
+    private static final String DEFAULT_ITEMS_RECOMPILATION_DELAY_PROPERTY = BASE_PACKAGE
+            + ".engine.itemsrecompilationdelay";
     private static final int DEFAULT_ITEMS_RECOMPILATION_DELAY = 5;
     public static final String GEN = "gen";
     private final Map<String, Object> properties;
