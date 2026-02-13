@@ -13,7 +13,7 @@
   <name>openHAB Add-ons :: Bundles :: Standalone Java Rules Automation</name>
 
   <properties>
-    <testcontainers.version>1.21.3</testcontainers.version>
+    <testcontainers.version>2.0.3</testcontainers.version>
     <bnd.importpackage>com.sun.org.apache.xml.internal.utils.*;resolution:=optional,\
       com.sun.org.apache.xpath.internal.*;resolution:=optional,\
       org.apache.log.*;resolution:=optional,\
