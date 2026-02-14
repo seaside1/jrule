@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.test;
 
+import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.core.items.events.ItemStateChangedEvent;
 import org.openhab.core.types.State;
 
@@ -24,7 +25,7 @@ public class JRuleMockedItemStateChangedEvent extends ItemStateChangedEvent {
 
     protected JRuleMockedItemStateChangedEvent(String topic, String payload, String itemName, State newItemState,
             State oldItemState) {
-        super(topic, payload, itemName, newItemState, oldItemState, null, null);
+        super(topic, payload, itemName, newItemState, oldItemState, null, null, JRuleConfig.BASE_PACKAGE);
     }
 
     @Override

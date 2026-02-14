@@ -84,6 +84,7 @@ public class JRuleItemNameClassGenerator extends JRuleAbstractClassGenerator {
         itemModel.put("metadata", metadata.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", ")));
         itemModel.put("tags", StringUtils.join(item.getTags().stream().sorted().toList(), ", "));
+        itemModel.put("groupNames", item.getGroupNames().stream().sorted().toList());
         return itemModel;
     }
 }
