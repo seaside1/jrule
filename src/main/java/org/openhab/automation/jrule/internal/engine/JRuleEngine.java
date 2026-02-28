@@ -22,12 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -39,32 +34,13 @@ import org.openhab.automation.jrule.exception.JRuleItemNotFoundException;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.JRuleLog;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleChannelExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleItemExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleThingExecutionContext;
-import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleTimedExecutionContext;
+import org.openhab.automation.jrule.internal.engine.excutioncontext.*;
 import org.openhab.automation.jrule.internal.engine.timer.JRuleTimerExecutor;
 import org.openhab.automation.jrule.internal.events.JRuleEventSubscriber;
 import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.module.JRuleModuleEntry;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
-import org.openhab.automation.jrule.rules.JRule;
-import org.openhab.automation.jrule.rules.JRuleCondition;
-import org.openhab.automation.jrule.rules.JRuleDebounce;
-import org.openhab.automation.jrule.rules.JRuleDelayed;
-import org.openhab.automation.jrule.rules.JRuleLogName;
-import org.openhab.automation.jrule.rules.JRuleMemberOf;
-import org.openhab.automation.jrule.rules.JRuleName;
-import org.openhab.automation.jrule.rules.JRulePrecondition;
-import org.openhab.automation.jrule.rules.JRuleTag;
-import org.openhab.automation.jrule.rules.JRuleWhenChannelTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedCommand;
-import org.openhab.automation.jrule.rules.JRuleWhenItemReceivedUpdate;
-import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
-import org.openhab.automation.jrule.rules.JRuleWhenTimeTrigger;
+import org.openhab.automation.jrule.rules.*;
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.things.JRuleThingStatus;
 import org.openhab.core.events.AbstractEvent;
@@ -73,9 +49,12 @@ import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.events.ItemEvent;
+import org.openhab.core.library.items.NumberItem;
+import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.persistence.PersistenceServiceRegistry;
 import org.openhab.core.scheduler.CronScheduler;
+import org.openhab.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -286,39 +265,62 @@ public class JRuleEngine implements PropertyChangeListener {
             } catch (ItemNotFoundException e) {
                 throw new JRuleItemNotFoundException("Cannot find item for precondition", e);
             }
-            final String state = item.getState().toString();
-            if (context.getEq().isPresent() && context.getEq().filter(state::equals).isEmpty()) {
-                logDebug("precondition mismatch: {} = {}", state, context.getEq().get());
-                return false;
-            }
-            if (context.getNeq().isPresent() && context.getNeq().filter(ref -> !state.equals(ref)).isEmpty()) {
-                logDebug("precondition mismatch: {} != {}", state, context.getNeq().get());
-                return false;
-            }
-            if (context.getLt().isPresent()
-                    && context.getLt().filter(ref -> QuantityType.valueOf(state).doubleValue() < ref).isEmpty()) {
-                logDebug("precondition mismatch: {} < {}", state, context.getLt().get());
-                return false;
-            }
-            if (context.getLte().isPresent()
-                    && context.getLte().filter(ref -> QuantityType.valueOf(state).doubleValue() <= ref).isEmpty()) {
-                logDebug("precondition mismatch: {} <= {}", state, context.getLte().get());
-                return false;
-            }
-            if (context.getGt().isPresent()
-                    && context.getGt().filter(ref -> QuantityType.valueOf(state).doubleValue() > ref).isEmpty()) {
-                logDebug("precondition mismatch: {} > {}", state, context.getGt().get());
-                return false;
-            }
-            if (context.getGte().isPresent()
-                    && context.getGte().filter(ref -> QuantityType.valueOf(state).doubleValue() >= ref).isEmpty()) {
-                logDebug("precondition mismatch: {} >= {}", state, context.getGte().get());
-                return false;
-            }
 
-            logDebug("precondition match: {} matches {}", state, context);
+            final State state = item.getState();
+            final String stateAsString = state.toString();
+
+            if (context.getEq().isPresent() && context.getEq().filter(stateAsString::equals).isEmpty()) {
+                logDebug("precondition mismatch: {} = {}", stateAsString, context.getEq().get());
+                return false;
+            }
+            if (context.getNeq().isPresent() && context.getNeq().filter(ref -> !stateAsString.equals(ref)).isEmpty()) {
+                logDebug("precondition mismatch: {} != {}", stateAsString, context.getNeq().get());
+                return false;
+            } else {
+                // Cannot compare non-numeric items
+                if (isNumericComparisonPresent(context) && !isNumericItem(item)) {
+                    logWarn("Non-numeric item {} used in precondition that compares values using lt/lte/gt/gte - this will never match. Check your '{}' rule definition",
+                            context.getItem(), jRuleExecutionContext.getUid());
+                    return false;
+                }
+
+                boolean stateIsNumeric = state instanceof QuantityType || state instanceof DecimalType;
+
+                if (context.getLt().isPresent() && (!stateIsNumeric || context.getLt()
+                        .filter(ref -> QuantityType.valueOf(stateAsString).doubleValue() < ref).isEmpty())) {
+                    logDebug("precondition mismatch: {} < {}", stateAsString, context.getLt().get());
+                    return false;
+                }
+                if (context.getLte().isPresent() && (!stateIsNumeric || context.getLte()
+                        .filter(ref -> QuantityType.valueOf(stateAsString).doubleValue() <= ref).isEmpty())) {
+                    logDebug("precondition mismatch: {} <= {}", stateAsString, context.getLte().get());
+                    return false;
+                }
+                if (context.getGt().isPresent() && (!stateIsNumeric || context.getGt()
+                        .filter(ref -> QuantityType.valueOf(stateAsString).doubleValue() > ref).isEmpty())) {
+                    logDebug("precondition mismatch: {} > {}", stateAsString, context.getGt().get());
+                    return false;
+                }
+                if (context.getGte().isPresent() && (!stateIsNumeric || context.getGte()
+                        .filter(ref -> QuantityType.valueOf(stateAsString).doubleValue() >= ref).isEmpty())) {
+                    logDebug("precondition mismatch: {} >= {}", stateAsString, context.getGte().get());
+                    return false;
+                }
+
+            }
+            logDebug("precondition match: {} matches {}", stateAsString, context);
             return true;
         });
+    }
+
+    private static boolean isNumericItem(Item item) {
+        return (item instanceof NumberItem)
+                || (item instanceof GroupItem groupItem && groupItem.getBaseItem() instanceof NumberItem);
+    }
+
+    private static boolean isNumericComparisonPresent(JRulePreconditionContext context) {
+        return context.getLt().isPresent() || context.getLte().isPresent() || context.getGt().isPresent()
+                || context.getGte().isPresent();
     }
 
     @Override
