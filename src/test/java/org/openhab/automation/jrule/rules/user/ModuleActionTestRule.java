@@ -33,6 +33,6 @@ public class ModuleActionTestRule extends JRule {
         Class<?> moduleActionClass = Class
                 .forName("org.openhab.automation.jrule.generated.moduleactions.JRuleModuleActions");
         Method method = moduleActionClass.getMethod("coreItemCommandAction", String.class, String.class);
-        method.invoke(null, "ModuleActionRecipientItem", "CommandToSend");
+        method.invoke(new Object(), "ModuleActionRecipientItem", "CommandToSend");
     }
 }
