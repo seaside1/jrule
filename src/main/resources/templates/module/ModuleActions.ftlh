@@ -13,7 +13,7 @@ import java.util.HashMap;
 * <br/>
 * Includes all available actions for all rule modules
 *
-* @author Arne Seime- Initial contribution
+* @author Arne Seime - Initial contribution
 */
 public class JRuleModuleActions {
 <#list methods as action>
@@ -25,7 +25,7 @@ public class JRuleModuleActions {
     </#list>
      * @return Map<String, Object> - The result of the action
     */
-    public static Map <String,Object> ${action.name} (<#list action.args as arg>${arg.type} ${arg.name}<#sep>, </#sep></#list>) {
+    public static Map<String, Object> ${action.name} (<#list action.args as arg>${arg.type} ${arg.name}<#sep>, </#sep></#list>) {
         Map<String, Object> context = new HashMap<>();
         <#list action.args as arg>
         context.put("${arg.name}", ${arg.name});
