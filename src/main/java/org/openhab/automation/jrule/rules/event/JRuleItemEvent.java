@@ -12,6 +12,9 @@
  */
 package org.openhab.automation.jrule.rules.event;
 
+import java.time.ZonedDateTime;
+
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
@@ -29,11 +32,17 @@ public class JRuleItemEvent extends JRuleEvent {
     private final JRuleValue state;
     private final JRuleValue oldState;
 
-    public JRuleItemEvent(JRuleItem item, JRuleItem memberItem, JRuleValue state, JRuleValue oldState) {
+    private final @Nullable ZonedDateTime lastStateUpdate;
+    private final @Nullable ZonedDateTime lastStateChange;
+
+    public JRuleItemEvent(JRuleItem item, JRuleItem memberItem, JRuleValue state, JRuleValue oldState,
+            @Nullable ZonedDateTime lastStateUpdate, @Nullable ZonedDateTime lastStateChange) {
         this.item = item;
         this.memberItem = memberItem;
         this.state = state;
         this.oldState = oldState;
+        this.lastStateUpdate = lastStateUpdate;
+        this.lastStateChange = lastStateChange;
     }
 
     public JRuleItem getItem() {
@@ -91,8 +100,27 @@ public class JRuleItemEvent extends JRuleEvent {
         return oldState;
     }
 
+    /**
+     * Gets the timestamp of the previous state update that occurred prior to this event.
+     *
+     * @return the last state update
+     */
+    public @Nullable ZonedDateTime getLastStateUpdate() {
+        return lastStateUpdate;
+    }
+
+    /**
+     * Gets the timestamp of the previous state change that occurred prior to this event.
+     *
+     * @return the last state change
+     */
+    public @Nullable ZonedDateTime getLastStateChange() {
+        return lastStateChange;
+    }
+
     @Override
     public String toString() {
-        return String.format("JRuleEvent [item=%s, memberItem=%s, oldState=%s]", item, memberItem, oldState);
+        return String.format("JRuleEvent [item=%s, memberItem=%s, oldState=%s, lastStateUpdate=%s, lastStateChange=%s]",
+                item, memberItem, oldState, lastStateUpdate, lastStateChange);
     }
 }

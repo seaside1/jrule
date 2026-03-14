@@ -78,6 +78,6 @@ public class JRuleDelayedTest extends JRuleAbstractTest {
     }
 
     private Event itemChangeEvent(String item, String from, String to) {
-        return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from));
+        return ItemEventFactory.createStateChangedEvent(item, new StringType(to), new StringType(from), null, null);
     }
 }

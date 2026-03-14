@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.IOUtils;
 import org.awaitility.Awaitility;
 import org.eclipse.paho.client.mqttv3.*;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +46,6 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
-import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import org.testcontainers.utility.MountableFile;
 
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -109,7 +109,7 @@ public abstract class JRuleITBase {
     public static final int TIMEOUT = 180;
     public static final String LOG_REGEX_START = "^\\d+:\\d+:\\d+.\\d+.*";
     @SuppressWarnings("resource")
-    private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:4.2.0-debian")
+    private static final GenericContainer<?> openhabContainer = new GenericContainer<>("openhab/openhab:5.0.2-debian")
             .withCopyToContainer(MountableFile.forClasspathResource("docker/conf", 0777), "/openhab/conf")
             .withCopyFileToContainer(MountableFile.forClasspathResource("docker/log4j2.xml", 0777),
                     "/openhab/userdata/etc/log4j2.xml")
