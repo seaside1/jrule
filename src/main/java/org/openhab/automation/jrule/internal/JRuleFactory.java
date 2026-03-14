@@ -74,8 +74,8 @@ public class JRuleFactory {
             final @Reference NetworkAddressService networkAddressService, final ComponentContext componentContext,
             final @Reference CronScheduler cronScheduler, final @Reference MetadataRegistry metadataRegistry,
             final @Reference JRuleRuleProvider ruleProvider,
-            @Reference final PersistenceServiceRegistry persistenceServiceRegistry,
-            @Reference ModuleTypeRegistry moduleTypeRegistry) {
+            final @Reference PersistenceServiceRegistry persistenceServiceRegistry,
+            final @Reference ModuleTypeRegistry moduleTypeRegistry) {
         JRuleConfig config = new JRuleConfig(properties);
         config.initConfig();
         jRuleEngine = JRuleEngine.get();
