@@ -47,6 +47,8 @@
     + [Example 43 - Creating a rule dynamically using JRuleBuilder](#example-43---creating-a-rule-dynamically-using-jrulebuilder)
     + [Example 44 - Setting items linked to a thing to UNDEF when thing goes offline](#example-44---setting-items-linked-to-a-thing-to-undef-when-thing-goes-offline)
     + [Example 45 - Getting the timestamp of the previous state update/change when a state change event occurred](#example-45---getting-the-timestamp-of-the-previous-state-update-change-when-a-state-change-event-occurred)
+    + [Example 46 - Send a push-notification through myOpenhab module action](#example-46---send-a-push-notification-through-myopenhab-module-action)
+    
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1214,5 +1216,27 @@ public class TimestampsLastUpdateLastChange extends JRule {
       logInfo("Item {} was never updated.", itemName);
     }
   }
+}
+```
+
+### Example 46 - Send a push-notification through myOpenhab module action
+
+Use case: receive push notification on mobile phone about important events
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import org.openhab.automation.jrule.rules.event.JRuleEvent;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenThingTrigger;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.generated.moduleactions.JRuleModuleActions.notificationSendExtendedBroadcastNotification;
+
+public class MyOpenhabNotification extends JRule {
+    @JRuleName("Send Push-Notification over MyOpenhab")
+    @JRuleWhenThingTrigger(from = JRuleThingStatus.ONLINE)
+    public void notifyAboutOnlineThing(JRuleEvent event) {
+        notificationSendExtendedBroadcastNotification("a thing went online", "lightbulb", "thingOnlineNotification")
+    }
 }
 ```
