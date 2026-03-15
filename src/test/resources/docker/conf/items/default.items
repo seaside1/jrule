@@ -89,3 +89,8 @@ Number          Number_To_Persist_Future   (InfluxDbPersist)
 Dimmer          Dimmer_With_Tags_And_Metadata   ["Control", "Light"]	{ Speech="SetLightState" [ location="Livingroom" ] }
 
 Number ItemToUndef {channel="mqtt:topic:mqtt:fromonlinetest:number"}
+
+Number         Number_Item_Command_Source_From_Post
+Number         Number_Item_Command_Source_From_Rule_Intermediate
+Number         Number_Item_Command_Source_From_Rule_Final
+Number         Number_Item_Update_Source_From_Rule

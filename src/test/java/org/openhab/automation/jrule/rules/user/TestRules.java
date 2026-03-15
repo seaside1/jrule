@@ -120,6 +120,15 @@ public class TestRules extends JRule {
     public static final String NAME_TRIGGER_ON_GROUP_STATE_CHANGE = "trigger on group state change";
     public static final String ITEM_SWITCH_GROUP_OR = "SwitchGroupOr";
     public static final String TAG_CUSTOM = "custom";
+    public static final String EVENT_COMMAND_SOURCE_POST = "Item received command from POST";
+    public static final String EVENT_COMMAND_SOURCE_INTERMEDIATE = "Item received command from first rule";
+    public static final String EVENT_COMMAND_SOURCE_FINAL = "Item received command from second rule";
+    public static final String EVENT_UPDATE_SOURCE = "Item received update from rule";
+    public static final String EVENT_CHANGED_SOURCE = "Item changed from rule";
+    public static final String ITEM_COMMAND_SOURCE_POST = "Number_Item_Command_Source_From_Post";
+    public static final String ITEM_COMMAND_SOURCE_INTERMEDIATE = "Number_Item_Command_Source_From_Rule_Intermediate";
+    public static final String ITEM_COMMAND_SOURCE_FINAL = "Number_Item_Command_Source_From_Rule_Final";
+    public static final String ITEM_UPDATE_SOURCE = "Number_Item_Update_Source_From_Rule";
 
     @JRuleTag({ TAG_CUSTOM })
     @JRuleName(NAME_SWITCH_ITEM_RECEIVED_ANY_COMMAND)
@@ -415,6 +424,39 @@ public class TestRules extends JRule {
         logInfo("Metadata: '{}'", item.getMetadata());
         logInfo("Metadata Value: '{}'", item.getMetadata().get("VoiceSystem").getValue());
         logInfo("Metadata Configuration: '{}'", item.getMetadata().get("VoiceSystem").getConfiguration());
+    }
+
+    @JRuleName(EVENT_COMMAND_SOURCE_POST)
+    @JRuleWhenItemReceivedCommand(item = ITEM_COMMAND_SOURCE_POST)
+    public void itemReceivedCommandSourcePost(JRuleItemEvent event) {
+        logInfo("First rule received command. Source: {}", event.getSource());
+        JRuleNumberItem.forName(ITEM_COMMAND_SOURCE_INTERMEDIATE).sendCommand((JRuleDecimalValue) event.getState());
+    }
+
+    @JRuleName(EVENT_COMMAND_SOURCE_INTERMEDIATE)
+    @JRuleWhenItemReceivedCommand(item = ITEM_COMMAND_SOURCE_INTERMEDIATE)
+    public void itemReceivedCommandSourceIntermediate(JRuleItemEvent event) {
+        logInfo("Intermediate rule received command. Source: {}", event.getSource());
+        JRuleNumberItem.forName(ITEM_COMMAND_SOURCE_FINAL).sendCommand((JRuleDecimalValue) event.getState());
+    }
+
+    @JRuleName(EVENT_COMMAND_SOURCE_FINAL)
+    @JRuleWhenItemReceivedCommand(item = ITEM_COMMAND_SOURCE_FINAL)
+    public void itemReceivedCommandSourceFinal(JRuleItemEvent event) {
+        logInfo("Final rule received command. Source: {}", event.getSource());
+        JRuleNumberItem.forName(ITEM_UPDATE_SOURCE).postUpdate((JRuleDecimalValue) event.getState());
+    }
+
+    @JRuleName(EVENT_UPDATE_SOURCE)
+    @JRuleWhenItemReceivedUpdate(item = ITEM_UPDATE_SOURCE)
+    public void itemReceivedUpdateSource(JRuleItemEvent event) {
+        logInfo("Rule received update. Source: {}", event.getSource());
+    }
+
+    @JRuleName(EVENT_CHANGED_SOURCE)
+    @JRuleWhenItemChange(item = ITEM_UPDATE_SOURCE)
+    public void itemChangedSourceFinal(JRuleItemEvent event) {
+        logInfo("Item changed. Source: {}", event.getSource());
     }
 
     private static void castLocation() {
