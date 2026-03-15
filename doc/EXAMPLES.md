@@ -47,6 +47,7 @@
     + [Example 43 - Creating a rule dynamically using JRuleBuilder](#example-43---creating-a-rule-dynamically-using-jrulebuilder)
     + [Example 44 - Setting items linked to a thing to UNDEF when thing goes offline](#example-44---setting-items-linked-to-a-thing-to-undef-when-thing-goes-offline)
     + [Example 45 - Getting the timestamp of the previous state update/change when a state change event occurred](#example-45---getting-the-timestamp-of-the-previous-state-update-change-when-a-state-change-event-occurred)
+    + [Example 46 - Getting the source that triggered the event](#example-46---getting-the-source-that-triggered-the-event)
 
 ### Example 1 - Invoke another item Switch from rule
 
@@ -1214,5 +1215,50 @@ public class TimestampsLastUpdateLastChange extends JRule {
       logInfo("Item {} was never updated.", itemName);
     }
   }
+}
+```
+
+### Example 46 - Getting the source that triggered the event
+
+Use case: Checking if a rule was triggerd by itself or by a POST request
+
+```java
+package org.openhab.automation.jrule.rules.user;
+
+import java.time.Duration;
+import static org.openhab.automation.jrule.generated.items.JRuleItemNames.switchItem;
+
+import org.openhab.automation.jrule.generated.items.JRuleItems;
+import org.openhab.automation.jrule.rules.JRule;
+import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
+import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+
+public class EventSource extends JRule {
+         
+    @JRuleName("Switch Reset")
+    @JRuleWhenItemChange(item = switchItem)
+    public void switchReset(JRuleItemEvent event) {
+        logInfo("Item '{}' changed to '{}'. Event source: '{}'", event.getItem().getName(), event.getState().toString(), event.getSource());
+
+        if(event.getSource() != null)
+        {
+            String[] eventParts = event.getSource().split("\\$");
+            if(eventParts.length == 2 && eventParts[0].equals("org.openhab.core.io.rest")) {
+                logInfo("REST Api call detected from user: {}", eventParts[1]);
+            }
+
+            if(event.getSource().startsWith("org.openhab.automation.jrule.rules.user.EventSource$lambda$switchReset")) {
+                logWarn("Loop detected. Exiting...");
+                return;
+            }
+        }
+
+        JRuleOnOffValue newValue = event.getState() == JRuleOnOffValue.ON ? JRuleOnOffValue.OFF : JRuleOnOffValue.ON;
+        createTimer(Duration.ofSeconds(5), (Void) -> {
+            JRuleItems.switchItem.postUpdate(newValue);
+        });
+    }
 }
 ```

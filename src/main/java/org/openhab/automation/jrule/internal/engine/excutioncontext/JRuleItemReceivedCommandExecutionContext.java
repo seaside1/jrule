@@ -88,7 +88,8 @@ public class JRuleItemReceivedCommandExecutionContext extends JRuleItemExecution
         }
 
         return new JRuleItemEvent(item, memberItem,
-                JRuleEventHandler.get().toValue(((ItemCommandEvent) event).getItemCommand()), null, null, null);
+                JRuleEventHandler.get().toValue(((ItemCommandEvent) event).getItemCommand()), null, null, null,
+                event.getSource());
     }
 
     @Override

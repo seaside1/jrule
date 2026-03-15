@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.handler;
 
+import java.lang.StackWalker.StackFrame;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ import org.openhab.core.items.events.ItemEventFactory;
 import org.openhab.core.library.types.*;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
+import org.openhab.core.types.Type;
 import org.openhab.core.types.UnDefType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +121,28 @@ public class JRuleEventHandler {
         sendCommand(itemName, type);
     }
 
+    private String getSourceRule(String itemName, Type commandOrState) {
+        // Find calling class that extends "JRule" and use this class as source for command/update
+        String source = null;
+
+        try {
+            java.util.Optional<StackFrame> ruleFrameOpt = StackWalker
+                    .getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(frames -> frames.filter(f -> {
+                        Class<?> c = f.getDeclaringClass();
+                        return JRule.class.isAssignableFrom(c) && !c.equals(JRule.class);
+                    }).findFirst());
+            StackFrame ruleFrame = ruleFrameOpt.orElse(null);
+            if (ruleFrame != null) {
+                Class<?> ruleClass = ruleFrame.getDeclaringClass();
+                source = ruleClass.getName() + "$" + ruleFrame.getMethodName();
+            }
+        } catch (Throwable t) {
+            throw new JRuleRuntimeException(String.format(
+                    "Failed to resolve caller for item '%s' and command/state '%s'", itemName, commandOrState), t);
+        }
+        return source;
+    }
+
     public void sendCommand(String itemName, Command command) {
         if (eventPublisher == null) {
             return;
@@ -132,7 +156,13 @@ public class JRuleEventHandler {
         } catch (ItemNotFoundException e) {
             throw new JRuleRuntimeException("cannot resolve item: " + itemName, e);
         }
-        eventPublisher.post(ItemEventFactory.createCommandEvent(itemName, command));
+
+        String source = getSourceRule(itemName, command);
+        if (source == null) {
+            logDebug("Failed to resolve source for command '{}' (item: '{}')", command, itemName);
+        }
+
+        eventPublisher.post(ItemEventFactory.createCommandEvent(itemName, command, source));
     }
 
     public void postUpdate(String itemName, JRuleValue value) {
@@ -169,7 +199,13 @@ public class JRuleEventHandler {
         } catch (ItemNotFoundException e) {
             throw new JRuleRuntimeException("cannot resolve item: " + itemName, e);
         }
-        final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state);
+
+        String source = getSourceRule(itemName, state);
+        if (source == null) {
+            logDebug("Failed to resolve source for state update '{}' (item: '{}')", state, itemName);
+        }
+
+        final ItemEvent itemEvent = ItemEventFactory.createStateEvent(itemName, state, source);
         eventPublisher.post(itemEvent);
     }
 
