@@ -35,14 +35,17 @@ public class JRuleItemEvent extends JRuleEvent {
     private final @Nullable ZonedDateTime lastStateUpdate;
     private final @Nullable ZonedDateTime lastStateChange;
 
+    private final @Nullable String source;
+
     public JRuleItemEvent(JRuleItem item, JRuleItem memberItem, JRuleValue state, JRuleValue oldState,
-            @Nullable ZonedDateTime lastStateUpdate, @Nullable ZonedDateTime lastStateChange) {
+            @Nullable ZonedDateTime lastStateUpdate, @Nullable ZonedDateTime lastStateChange, @Nullable String source) {
         this.item = item;
         this.memberItem = memberItem;
         this.state = state;
         this.oldState = oldState;
         this.lastStateUpdate = lastStateUpdate;
         this.lastStateChange = lastStateChange;
+        this.source = source;
     }
 
     public JRuleItem getItem() {
@@ -118,9 +121,19 @@ public class JRuleItemEvent extends JRuleEvent {
         return lastStateChange;
     }
 
+    /**
+     * Gets the source of the event
+     * 
+     * @return the source of the event
+     */
+    public @Nullable String getSource() {
+        return source;
+    }
+
     @Override
     public String toString() {
-        return String.format("JRuleEvent [item=%s, memberItem=%s, oldState=%s, lastStateUpdate=%s, lastStateChange=%s]",
-                item, memberItem, oldState, lastStateUpdate, lastStateChange);
+        return String.format(
+                "JRuleEvent [item=%s, memberItem=%s, oldState=%s, lastStateUpdate=%s, lastStateChange=%s, source=%s]",
+                item, memberItem, oldState, lastStateUpdate, lastStateChange, source);
     }
 }

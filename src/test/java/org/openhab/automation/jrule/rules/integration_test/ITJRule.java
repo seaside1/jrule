@@ -306,4 +306,23 @@ public class ITJRule extends JRuleITBase {
         verifyLogEntry("rule trigger for change: OFF");
         verifyNoError();
     }
+
+    @Test
+    public void switchItemReceiveCommandSource() throws IOException {
+        sendCommand(TestRules.ITEM_COMMAND_SOURCE_POST, "1");
+        verifyRuleWasExecuted(TestRules.EVENT_COMMAND_SOURCE_POST);
+        verifyRuleWasExecuted(TestRules.EVENT_COMMAND_SOURCE_INTERMEDIATE);
+        verifyRuleWasExecuted(TestRules.EVENT_COMMAND_SOURCE_FINAL);
+        verifyRuleWasExecuted(TestRules.EVENT_UPDATE_SOURCE);
+        verifyRuleWasExecuted(TestRules.EVENT_CHANGED_SOURCE);
+        verifyLogEntry("First rule received command. Source: org.openhab.core.io.rest");
+        verifyLogEntry(
+                "Intermediate rule received command. Source: org.openhab.automation.jrule.rules.user.TestRules$itemReceivedCommandSourcePost");
+        verifyLogEntry(
+                "Final rule received command. Source: org.openhab.automation.jrule.rules.user.TestRules$itemReceivedCommandSourceIntermediate");
+        verifyLogEntry(
+                "Rule received update. Source: org.openhab.automation.jrule.rules.user.TestRules$itemReceivedCommandSourceFinal");
+        verifyLogEntry(
+                "Item changed. Source: org.openhab.automation.jrule.rules.user.TestRules$itemReceivedCommandSourceFinal");
+    }
 }
