@@ -2,6 +2,8 @@
 
 package ${packageName};
 
+import org.openhab.automation.jrule.items.JRuleItemDefinition;
+
 /**
 * Automatically Generated Enum for ItemNames - DO NOT EDIT!
 *
@@ -20,6 +22,7 @@ public class JRuleItemNames {
      * <br/>
      * Metadata: ${itemName.metadata}
      */
+ @JRuleItemDefinition(name="${itemName.name}", type="${itemName.type}", groupNames={<#list itemName.groupNames as groupName>"${groupName}"<#sep>, </#sep></#list>})
  public static final String ${itemName.name} = "${itemName.name}";
 </#list>
 }
