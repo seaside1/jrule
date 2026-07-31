@@ -1270,7 +1270,7 @@ public class EventSource extends JRule {
 Use case: receive push notification on mobile phone about important events
 
 ```java
-package org.openhab.automation.jrule.rules.user.security;
+package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.event.JRuleEvent;
 import org.openhab.automation.jrule.rules.JRuleName;
