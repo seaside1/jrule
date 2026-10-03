@@ -14,6 +14,8 @@ package org.openhab.automation.jrule.rules.value;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.core.library.types.IncreaseDecreaseType;
 
 /**
  * The {@link JRuleIncreaseDecreaseValueTest}
@@ -28,5 +30,18 @@ class JRuleIncreaseDecreaseValueTest {
         String string = value.stringValue();
         JRuleIncreaseDecreaseValue fromString = JRuleIncreaseDecreaseValue.getValueFromString(string);
         Assertions.assertEquals(value, fromString);
+    }
+
+    /**
+     * An incoming IncreaseDecreaseType has to reach the rule. Without a commandMapping entry the conversion
+     * threw "cannot find mapping for oh type", which the event bus swallowed as a warning - a dimmer command
+     * from a wall switch then triggered no rule at all.
+     */
+    @Test
+    void fromOhCommand() {
+        Assertions.assertEquals(JRuleIncreaseDecreaseValue.INCREASE,
+                JRuleEventHandler.get().toValue(IncreaseDecreaseType.INCREASE));
+        Assertions.assertEquals(JRuleIncreaseDecreaseValue.DECREASE,
+                JRuleEventHandler.get().toValue(IncreaseDecreaseType.DECREASE));
     }
 }

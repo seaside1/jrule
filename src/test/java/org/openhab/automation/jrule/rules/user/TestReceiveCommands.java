@@ -33,6 +33,7 @@ public class TestReceiveCommands extends JRule {
     public static final String NAME_RECEIVE_IMAGE_COMMAND = "receive image command";
     public static final String NAME_RECEIVE_ROLLERSHUTTER_COMMAND = "receive rollershutter command";
     public static final String NAME_RECEIVE_DIMMER_COMMAND = "receive dimmer command";
+    public static final String NAME_RECEIVE_DIMMER_INCREASE_DECREASE_COMMAND = "receive dimmer increase decrease command";
     public static final String NAME_RECEIVE_COLOR_COMMAND = "receive color command";
     public static final String NAME_RECEIVE_LOCATION_COMMAND = "receive location command";
     public static final String NAME_RECEIVE_QUANTITY_COMMAND = "receive quantity command";
@@ -58,6 +59,7 @@ public class TestReceiveCommands extends JRule {
     public static final String ITEM_IMAGE_EVENT = "Image_Event";
     public static final String ITEM_ROLLERSHUTTER_EVENT = "Rollershutter_Event";
     public static final String ITEM_DIMMER_EVENT = "Dimmer_Event";
+    public static final String ITEM_DIMMER_INCREASE_DECREASE_EVENT = "Dimmer_IncreaseDecrease_Event";
     public static final String ITEM_COLOR_EVENT = "Color_Event";
     public static final String ITEM_LOCATION_EVENT = "Location_Event";
     public static final String ITEM_QUANTITY_EVENT = "Quantity_Event";
@@ -113,6 +115,12 @@ public class TestReceiveCommands extends JRule {
     @JRuleName(NAME_RECEIVE_DIMMER_COMMAND)
     @JRuleWhenItemReceivedCommand(item = ITEM_DIMMER_EVENT)
     public void receiveDimmerCommand(JRuleItemEvent event) {
+        logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
+    }
+
+    @JRuleName(NAME_RECEIVE_DIMMER_INCREASE_DECREASE_COMMAND)
+    @JRuleWhenItemReceivedCommand(item = ITEM_DIMMER_INCREASE_DECREASE_EVENT)
+    public void receiveDimmerIncreaseDecreaseCommand(JRuleItemEvent event) {
         logInfo("received: '{}', type: '{}'", event.getState(), event.getState().getClass());
     }
 

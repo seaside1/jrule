@@ -54,6 +54,9 @@ public class JRuleEventHandler {
         commandMapping.put(JRuleUpDownValue.class, UpDownType.class);
         commandMapping.put(JRuleOnOffValue.class, OnOffType.class);
         commandMapping.put(JRuleStopMoveValue.class, StopMoveType.class);
+        // command-only: a dimmer actuator is told to ramp, it never reports INCREASE/DECREASE back as a state,
+        // which is why there is no counterpart in stateMapping below.
+        commandMapping.put(JRuleIncreaseDecreaseValue.class, IncreaseDecreaseType.class);
         commandMapping.put(JRuleDateTimeValue.class, DateTimeType.class);
         commandMapping.put(JRulePointValue.class, PointType.class);
         commandMapping.put(JRuleDecimalValue.class, DecimalType.class);
@@ -376,6 +379,8 @@ public class JRuleEventHandler {
             return (V) new JRuleStringValue(plain);
         } else if (JRuleUpDownValue.class.isAssignableFrom(valueClass)) {
             return (V) JRuleUpDownValue.getValueFromString(plain);
+        } else if (JRuleIncreaseDecreaseValue.class.isAssignableFrom(valueClass)) {
+            return (V) JRuleIncreaseDecreaseValue.getValueFromString(plain);
         } else if (JRuleOnOffValue.class.isAssignableFrom(valueClass)) {
             return (V) JRuleOnOffValue.getValueFromString(plain);
         } else if (JRuleDateTimeValue.class.isAssignableFrom(valueClass)) {

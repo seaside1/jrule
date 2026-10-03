@@ -96,6 +96,16 @@ public class ITJRuleReceiveCommands extends JRuleITBase {
     }
 
     @Test
+    public void receiveDimmerIncreaseDecreaseCommand() throws IOException {
+        sendCommand(TestReceiveCommands.ITEM_DIMMER_INCREASE_DECREASE_EVENT, "INCREASE");
+        sendCommand(TestReceiveCommands.ITEM_DIMMER_INCREASE_DECREASE_EVENT, "DECREASE");
+        verifyRuleWasExecuted(TestReceiveCommands.NAME_RECEIVE_DIMMER_INCREASE_DECREASE_COMMAND);
+        verifyLogEntry("received: 'INCREASE'");
+        verifyLogEntry("received: 'DECREASE'");
+        verifyNoError();
+    }
+
+    @Test
     public void receiveColorCommand() throws IOException {
         sendCommand(TestReceiveCommands.ITEM_COLOR_EVENT, "1,2,3");
         sendCommand(TestReceiveCommands.ITEM_COLOR_EVENT, "359,100,100");

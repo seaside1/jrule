@@ -60,6 +60,7 @@ Contact         Contact_Event
 Image           Image_Event
 Rollershutter   Rollershutter_Event
 Dimmer          Dimmer_Event
+Dimmer          Dimmer_IncreaseDecrease_Event
 Color           Color_Event
 Location        Location_Event
 Number:Power    Quantity_Event
