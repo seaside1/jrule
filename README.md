@@ -303,6 +303,16 @@ These are method inherited from the JRule superclass.
 | `postUpdate`                         | Post a state update to an item                                          |
 | `logXXX`                             | Log a Debug/Info/Warn/Error message                                     |
 
+The `create*Timer` methods return a `JRuleTimer`, which carries a few methods of its own:
+
+| Method                  | Description                                                                       |
+|-------------------------|-----------------------------------------------------------------------------------|
+| `cancel`                | Cancel the pending callback                                                       |
+| `isRunning` / `isDone`  | Whether the callback is still pending / has run                                   |
+| `create*TimerAfter`     | Chain another timer, its delay counted from this one's                            |
+| `rescheduleTimer`       | Replace this timer with a new delay                                               |
+| `invoke`                | Run the callback now instead of waiting for the delay, leaving the schedule alone |
+
 ## GUI support
 
 Rules are registered in the rule registry:

@@ -34,6 +34,8 @@ public class JRuleTimerTestRules extends JRule {
 
     public static final String TRIGGER_ITEM = "triggerItem";
     public static final String TARGET_ITEM = "targetItem";
+    public static final String TIMER_INVOKED_BY_NAME = "invoked-by-name-timer";
+    public static final String LONG_LOCK = "long-lock";
     public static final String TARGET_ITEM_REPEATING = "repeating";
     public static final String TARGET_ITEM_REPEATING_WITH_NAME = "repeating-with-name";
     public static final String TARGET_ITEM_REPEATING_WITH_NAME_REPLACED = "repeating-with-name-replaced";
@@ -167,5 +169,36 @@ public class JRuleTimerTestRules extends JRule {
         stringItem.sendCommand("isTimerRunning (known-timer): " + isTimerRunning(timerKnown));
         Thread.sleep(1100);
         stringItem.sendCommand("isTimerRunning (known-timer): " + isTimerRunning(timerKnown));
+    }
+
+    @JRuleName("Rule name")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "long-lock")
+    public void testLongLock() {
+        // held long enough that the test can still find it, unlike the short-lived locks in testLocks
+        getTimeLock(LONG_LOCK, Duration.ofHours(1));
+    }
+
+    @JRuleName("Rule name")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "invoke-by-name")
+    public void testInvokeTimerByName() {
+        JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
+        // scheduled far out and deliberately not invoked here - the test looks it up and invokes it
+        createTimer(TIMER_INVOKED_BY_NAME, Duration.ofHours(1), t -> stringItem.sendCommand("invoked by name"));
+    }
+
+    @JRuleName("Rule name")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "invoke")
+    public void testInvokeTimer() {
+        JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
+
+        JRuleTimerHandler.JRuleTimer timer = createTimer("invoked-timer", Duration.ofHours(1),
+                t -> stringItem.sendCommand("invoked"));
+        stringItem.sendCommand("still running before invoke: " + timer.isRunning());
+        timer.invoke();
+        stringItem.sendCommand("still running after invoke: " + timer.isRunning());
+        // the execution context has to survive invoke(), or everything after it in the rule breaks
+        createTimer("after-invoke", Duration.ofHours(1), t -> {
+        });
+        stringItem.sendCommand("context survived");
     }
 }

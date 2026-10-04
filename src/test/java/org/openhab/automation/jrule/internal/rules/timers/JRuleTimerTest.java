@@ -20,7 +20,10 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
+import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.rules.JRuleAbstractTest;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
 import org.openhab.core.events.Event;
@@ -166,6 +169,71 @@ public class JRuleTimerTest extends JRuleAbstractTest {
                 "isTimerRunning (known-timer): true"));
         assertEquals(1, eventPublisher.countCommandEvent(JRuleTimerTestRules.TARGET_ITEM,
                 "isTimerRunning (known-timer): false"));
+    }
+
+    @Test
+    public void testInvokeTimer() throws ItemNotFoundException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        // Set item state in ItemRegistry
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "invoke")));
+        verify(rule, times(1)).testInvokeTimer();
+
+        // the timer is scheduled an hour out, so without invoke() nothing of this would have happened yet
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "invoked"));
+        // invoke() runs the function without touching the schedule
+        assertTrue(
+                eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "still running before invoke: true"));
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "still running after invoke: true"));
+        // the rule's execution context has to outlive invoke() - creating a timer afterwards needs it
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "context survived"));
+    }
+
+    /**
+     * The path a rule test actually takes: it never holds the JRuleTimer the rule created, so it looks the timer up
+     * by name and invokes it from outside the rule. This is what JRuleTestBase.invokeTimer does in the jrule-test
+     * framework, and the only reason getTimers is public.
+     */
+    @Test
+    public void testInvokeTimerLookedUpByName() throws ItemNotFoundException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "invoke-by-name")));
+        verify(rule, times(1)).testInvokeTimerByName();
+
+        // the rule scheduled it an hour out and did not invoke it, so nothing has run yet
+        assertFalse(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "invoked by name"));
+
+        List<JRuleTimerHandler.JRuleTimer> timers = JRuleTimerHandler.get()
+                .getTimers(JRuleTimerTestRules.TIMER_INVOKED_BY_NAME);
+        assertEquals(1, timers.size(), "rule should have registered exactly one timer under that name");
+        timers.get(0).invoke();
+
+        assertTrue(eventPublisher.hasCommandEvent(JRuleTimerTestRules.TARGET_ITEM, "invoked by name"));
+    }
+
+    @Test
+    public void testInvokeRejectsTimeLock() throws ItemNotFoundException {
+        JRuleTimerTestRules rule = initRule(JRuleTimerTestRules.class);
+        registerItem(new StringItem(JRuleTimerTestRules.TARGET_ITEM), UnDefType.UNDEF);
+        registerItem(new StringItem(JRuleTimerTestRules.TRIGGER_ITEM), UnDefType.UNDEF);
+
+        JRuleItemRegistry.get(JRuleTimerTestRules.TARGET_ITEM, TargetItem.class);
+        fireEvents(false, List.of(itemChangeEvent(JRuleTimerTestRules.TRIGGER_ITEM, "nothing", "long-lock")));
+        verify(rule, times(1)).testLongLock();
+
+        // getTimers hands out time locks too, and those carry no function - invoking one has to say so
+        List<JRuleTimerHandler.JRuleTimer> locks = JRuleTimerHandler.get()
+                .getTimers(JRuleTimerHandler.LOCK_PREFIX + JRuleTimerTestRules.LONG_LOCK);
+        assertEquals(1, locks.size());
+        JRuleRuntimeException e = Assertions.assertThrows(JRuleRuntimeException.class, () -> locks.get(0).invoke());
+        assertTrue(e.getMessage().contains("time locks cannot be invoked"), e.getMessage());
     }
 
     private Event itemChangeEvent(String item, String from, String to) {

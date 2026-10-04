@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.automation.jrule.exception.JRuleRuntimeException;
 import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.engine.excutioncontext.JRuleExecutionContext;
@@ -159,7 +161,7 @@ public class JRuleTimerHandler {
         return JRule.JRULE_EXECUTION_CONTEXT.get();
     }
 
-    private synchronized List<JRuleTimer> getTimers(String timerName) {
+    public synchronized List<JRuleTimer> getTimers(String timerName) {
         List<JRuleTimer> list = timers.stream().filter(timer -> timer.name.equals(timerName))
                 .collect(Collectors.toList());
         logger.trace("timers for name '{}': {}", timerName, list.size());
@@ -279,6 +281,36 @@ public class JRuleTimerHandler {
 
         public JRuleTimerHandler.JRuleTimer rescheduleTimer(Duration delay) {
             return JRuleTimerHandler.this.createOrReplaceTimer(this.name, delay, this.function, context);
+        }
+
+        /**
+         * Runs the timer's function now instead of waiting for the delay to pass, and returns once it has finished.
+         * The pending invocation is left alone, so a timer that has not fired yet still fires at its scheduled time.
+         * <p>
+         * The function runs on a timer thread, not on the caller's, because it has to run under its own execution
+         * context - the same one the scheduled invocation gets - and that context is torn down again afterwards.
+         * Running it on the caller's thread would tear down the caller's context along with it.
+         * <p>
+         * Exceptions from the function are logged and not rethrown, exactly as on the scheduled path. A timer that
+         * has already been cancelled is counted as done, so invoking it also retires it.
+         *
+         * @return this timer
+         */
+        public JRuleTimerHandler.JRuleTimer invoke() {
+            if (this.function == null) {
+                // time locks are registered as timers without a function, see getTimeLock
+                throw new JRuleRuntimeException(
+                        String.format("Timer '%s' has no function to invoke, time locks cannot be invoked", this.name));
+            }
+            try {
+                executorService.submit(() -> invokeTimerInternal(this, this.function)).get();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (ExecutionException e) {
+                JRuleLog.error(logger, getLogName(), "Error invoking timer '{}': {}", this.name,
+                        ExceptionUtils.getStackTrace(e.getCause()));
+            }
+            return this;
         }
 
         public boolean isDone() {
