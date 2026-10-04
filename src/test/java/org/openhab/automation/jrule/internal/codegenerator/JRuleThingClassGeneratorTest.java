@@ -12,6 +12,7 @@
  */
 package org.openhab.automation.jrule.internal.codegenerator;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -100,12 +101,12 @@ public class JRuleThingClassGeneratorTest {
 
         Thing subThing1 = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
                 new ThingUID("mybinding", "thingtype", "id1"));
-        subThing1.setBridgeUID(bridgeThing.getBridgeUID());
+        subThing1.setBridgeUID(bridgeThing.getUID());
 
         generateAndCompile(subThing1);
         Thing subThing2 = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"),
                 new ThingUID("mybinding", "thingtype", "id2"));
-        subThing2.setBridgeUID(bridgeThing.getBridgeUID());
+        subThing2.setBridgeUID(bridgeThing.getUID());
         generateAndCompile(subThing2);
 
         bridgeThing.addThing(subThing1);
@@ -126,6 +127,41 @@ public class JRuleThingClassGeneratorTest {
 
         File compiledClass = new File(targetFolder, "JRuleThings.class");
         assertTrue(compiledClass.exists());
+    }
+
+    /**
+     * A thing that gets a bridge assigned without being removed and re-added switches template from
+     * Standalone to SubThing, so the supertype of its generated class changes. JRuleStandaloneThing and
+     * JRuleSubThing are siblings under JRuleAbstractThing, so a JRuleThings that declares the field as
+     * JRuleSubThing cannot be compiled against a class that still extends JRuleStandaloneThing.
+     */
+    @Test
+    public void testRegeneratingThingSourceAfterBridgeAssignment() {
+        ThingUID movedUid = new ThingUID("mybinding", "thingtype", "movedunderbridge");
+        generateAndCompile(new ThingImpl(new ThingTypeUID("mybinding", "thingtype"), movedUid));
+
+        BridgeImpl bridge = new BridgeImpl(new ThingTypeUID("mybinding", "bridgetype"),
+                new ThingUID("mybinding", "bridgetype", "newbridge"));
+        Thing movedThing = new ThingImpl(new ThingTypeUID("mybinding", "thingtype"), movedUid);
+        movedThing.setBridgeUID(bridge.getUID());
+        bridge.addThing(movedThing);
+        generateAndCompile(bridge);
+
+        List<Thing> things = Lists.create(bridge, movedThing);
+
+        // Only JRuleThings regenerated, which is what happened before the per-thing pass was added
+        assertTrue(sourceFileGenerator.generateThingsSource(things), "Failed to generate source file for things");
+        assertFalse(compileThings(), "a stale per-thing class must not compile against the regenerated JRuleThings");
+
+        // Regenerating the per-thing class from the same snapshot, the way the compilation path does
+        assertTrue(sourceFileGenerator.generateThingSource(movedThing),
+                "Failed to regenerate source file for " + movedThing);
+        assertTrue(compileThings(), "regenerating the per-thing class must make both compile together");
+    }
+
+    private boolean compileThings() {
+        return compiler.compile(List.of(new File(targetFolder, "JRuleThings.java")),
+                "target/classes" + File.pathSeparator + "target/gen");
     }
 
     private void generateAndCompile(Thing thing) {
