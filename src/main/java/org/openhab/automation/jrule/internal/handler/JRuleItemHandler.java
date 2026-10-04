@@ -41,7 +41,7 @@ import org.openhab.core.thing.link.ItemChannelLinkRegistry;
  */
 public class JRuleItemHandler {
 
-    private static volatile JRuleItemHandler instance = null;
+    private static final JRuleItemHandler INSTANCE = new JRuleItemHandler();
 
     private JRuleItemHandler() {
     }
@@ -64,14 +64,7 @@ public class JRuleItemHandler {
     }
 
     public static JRuleItemHandler get() {
-        if (instance == null) {
-            synchronized (JRuleItemHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleItemHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public Item addToRegistry(Item item) {

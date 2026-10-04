@@ -86,7 +86,7 @@ public class JRuleEventHandler {
 
     private static final String LOG_NAME_EVENT = "JRuleEvent";
 
-    private static volatile JRuleEventHandler instance;
+    private static final JRuleEventHandler INSTANCE = new JRuleEventHandler();
 
     private EventPublisher eventPublisher;
 
@@ -98,14 +98,7 @@ public class JRuleEventHandler {
     }
 
     public static JRuleEventHandler get() {
-        if (instance == null) {
-            synchronized (JRuleEventHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleEventHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public void setEventPublisher(EventPublisher eventPublisher) {

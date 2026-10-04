@@ -30,7 +30,7 @@ import org.openhab.core.config.core.Configuration;
  */
 public class JRuleModuleActionHandler {
 
-    private static volatile JRuleModuleActionHandler instance = null;
+    private static final JRuleModuleActionHandler INSTANCE = new JRuleModuleActionHandler();
 
     private ModuleTypeRegistry moduleTypeRegistry;
 
@@ -110,13 +110,6 @@ public class JRuleModuleActionHandler {
     }
 
     public static JRuleModuleActionHandler get() {
-        if (instance == null) {
-            synchronized (JRuleModuleActionHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleModuleActionHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 }

@@ -31,7 +31,7 @@ import org.openhab.core.thing.link.ItemChannelLinkRegistry;
  */
 public class JRuleThingHandler {
 
-    private static volatile JRuleThingHandler instance = null;
+    private static final JRuleThingHandler INSTANCE = new JRuleThingHandler();
 
     private JRuleThingHandler() {
     }
@@ -55,14 +55,7 @@ public class JRuleThingHandler {
     }
 
     public static JRuleThingHandler get() {
-        if (instance == null) {
-            synchronized (JRuleThingHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleThingHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public void disable(String thingUID) {

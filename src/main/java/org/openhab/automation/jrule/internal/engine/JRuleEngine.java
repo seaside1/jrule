@@ -98,20 +98,13 @@ public class JRuleEngine implements PropertyChangeListener {
     private final Logger logger = LoggerFactory.getLogger(JRuleEngine.class);
     protected ItemRegistry itemRegistry;
     protected JRuleLoadingStatistics ruleLoadingStatistics;
-    private static volatile JRuleEngine instance;
+    private static final JRuleEngine INSTANCE = new JRuleEngine();
 
     JRuleRuleProvider ruleProvider;
     private PersistenceServiceRegistry persistenceServiceRegistry;
 
     public static JRuleEngine get() {
-        if (instance == null) {
-            synchronized (JRuleEngine.class) {
-                if (instance == null) {
-                    instance = new JRuleEngine();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     private JRuleEngine() {

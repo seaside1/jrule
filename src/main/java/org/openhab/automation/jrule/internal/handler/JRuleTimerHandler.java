@@ -47,23 +47,18 @@ import org.slf4j.MDC;
 public class JRuleTimerHandler {
     private static final Logger logger = LoggerFactory.getLogger(JRuleTimerHandler.class);
     public static final String LOCK_PREFIX = "$LOCK$-";
-    private static volatile JRuleTimerHandler instance = null;
+    private static final ExecutorService executorService = Executors
+            .newCachedThreadPool(target -> new Thread(target, "jrule-timer"));
+
+    // after executorService: static initializers run in textual order, so a constructor that ever
+    // comes to touch the pool would see it as null from here
+    private static final JRuleTimerHandler INSTANCE = new JRuleTimerHandler();
 
     public static JRuleTimerHandler get() {
-        if (instance == null) {
-            synchronized (JRuleThingHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleTimerHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     private final CopyOnWriteArrayList<JRuleTimer> timers = new CopyOnWriteArrayList<>();
-
-    private static final ExecutorService executorService = Executors
-            .newCachedThreadPool(target -> new Thread(target, "jrule-timer"));
 
     private JRuleTimerHandler() {
     }

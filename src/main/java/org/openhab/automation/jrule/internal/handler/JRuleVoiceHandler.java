@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleVoiceHandler {
 
-    private static volatile JRuleVoiceHandler instance;
+    private static final JRuleVoiceHandler INSTANCE = new JRuleVoiceHandler();
 
     private VoiceManager voiceManager;
     private AudioHTTPServer audioHTTPServer;
@@ -43,14 +43,7 @@ public class JRuleVoiceHandler {
     }
 
     public static JRuleVoiceHandler get() {
-        if (instance == null) {
-            synchronized (JRuleVoiceHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleVoiceHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public void setVoiceManager(VoiceManager voiceManager) {

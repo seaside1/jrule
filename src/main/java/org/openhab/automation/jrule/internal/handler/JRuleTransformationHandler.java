@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JRuleTransformationHandler {
 
-    private static volatile JRuleTransformationHandler instance;
+    private static final JRuleTransformationHandler INSTANCE = new JRuleTransformationHandler();
 
     private BundleContext bundleContext;
 
@@ -36,14 +36,7 @@ public class JRuleTransformationHandler {
     }
 
     public static JRuleTransformationHandler get() {
-        if (instance == null) {
-            synchronized (JRuleTransformationHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleTransformationHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public void setBundleContext(BundleContext bundleContext) {

@@ -33,20 +33,13 @@ import org.openhab.core.io.net.http.HttpUtil;
  */
 public class JRuleActionHandler {
 
-    private static volatile JRuleActionHandler instance = null;
+    private static final JRuleActionHandler INSTANCE = new JRuleActionHandler();
 
     private JRuleActionHandler() {
     }
 
     public static JRuleActionHandler get() {
-        if (instance == null) {
-            synchronized (JRuleActionHandler.class) {
-                if (instance == null) {
-                    instance = new JRuleActionHandler();
-                }
-            }
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public void executeCommandLine(String... commandLine) {
