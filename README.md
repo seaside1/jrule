@@ -261,7 +261,10 @@ Logging from rule can be done in 3 different ways
 * `org.openhab.automation.jrule.generated.items.JRuleItems` contains a field for each `Item`. You can send
   commands/updates and access state/label/metadata
 * `org.openhab.automation.jrule.generated.items.JRuleItemNames` contains an `Item` name field for each item for item
-  name safety in annotations etc.
+  name safety in annotations etc. Each field also carries a `@JRuleItemDefinition` annotation with the item's `name`,
+  `type` and `groupNames`, so the registry data is available by reflection at runtime, for instance to pick every
+  item belonging to a given group without querying the registry. `type` is the item's registry type, which is
+  plain `Group` for a group item - its base item type is not part of the annotation.
 
 ### JRuleThings
 
