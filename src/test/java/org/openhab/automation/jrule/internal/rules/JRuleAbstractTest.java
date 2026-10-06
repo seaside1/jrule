@@ -19,12 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.openhab.automation.jrule.internal.JRuleConfig;
 import org.openhab.automation.jrule.internal.engine.JRuleEngine;
 import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
+import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
 import org.openhab.automation.jrule.internal.module.JRuleRuleProvider;
 import org.openhab.automation.jrule.internal.test.JRuleMockedEventBus;
 import org.openhab.automation.jrule.items.JRuleItemRegistry;
@@ -53,6 +55,16 @@ public abstract class JRuleAbstractTest {
     @AfterAll
     protected void shutdown() {
         eventBus.stop();
+    }
+
+    /**
+     * Timers outlive the test method that created them: JRuleTimerHandler is a singleton, so a timer left pending
+     * keeps firing into the shared mocked event bus while later tests run, and the commands it sends show up in
+     * their assertions. Drop them after every test instead of only in @AfterAll.
+     */
+    @AfterEach
+    protected void cancelPendingTimers() {
+        JRuleTimerHandler.get().cancelAll();
     }
 
     @BeforeAll

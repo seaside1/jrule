@@ -34,6 +34,8 @@ public class JRuleTimerTestRules extends JRule {
 
     public static final String TRIGGER_ITEM = "triggerItem";
     public static final String TARGET_ITEM = "targetItem";
+    public static final String LEAK_PROBE_TIMER = "leak-probe-timer";
+    private static final int MAX_RESCHEDULES = 4;
     public static final String TARGET_ITEM_REPEATING = "repeating";
     public static final String TARGET_ITEM_REPEATING_WITH_NAME = "repeating-with-name";
     public static final String TARGET_ITEM_REPEATING_WITH_NAME_REPLACED = "repeating-with-name-replaced";
@@ -84,10 +86,25 @@ public class JRuleTimerTestRules extends JRule {
         JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
         stringItem.sendCommand("command");
 
+        final AtomicInteger reschedules = new AtomicInteger(0);
         createTimer("TimerName", Duration.ofMillis(500), t -> {
             stringItem.sendCommand("timedCommand");
-            t.rescheduleTimer(Duration.ofMillis(500));
+            // Bounded on purpose. An endless reschedule cannot be cancelled reliably from @AfterEach: the
+            // callback registers its successor after cancelAll() has walked the list, so the timer outlives
+            // its own test method and fires into every later one.
+            if (reschedules.incrementAndGet() < MAX_RESCHEDULES) {
+                t.rescheduleTimer(Duration.ofMillis(500));
+            }
         });
+    }
+
+    @JRuleName("Leak probe")
+    @JRuleWhenItemChange(item = TRIGGER_ITEM, to = "leak-probe")
+    public void testTimerForLeakProbe() {
+        JRuleStringItem stringItem = JRuleStringItem.forName(TARGET_ITEM);
+        // long enough that it is still pending whenever the triggering test method returns, however slow
+        // the machine is - the probe asserts on the timer being registered, not on its callback having run
+        createTimer(LEAK_PROBE_TIMER, Duration.ofSeconds(30), t -> stringItem.sendCommand("leaked"));
     }
 
     @JRuleName("Repeating Timers")
